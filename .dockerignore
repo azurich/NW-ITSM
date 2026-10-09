@@ -1,0 +1,10 @@
+.git
+**/node_modules
+backend/target
+frontend/dist
+vendor
+public/build
+public/lib
+files
+config/config_db.php
+config/glpicrypt.key

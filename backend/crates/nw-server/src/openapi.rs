@@ -1,0 +1,70 @@
+//! OpenAPI description of `/api/v2`, the contract shared with the web
+//! application (`frontend/src/api/schema.ts` is generated from it).
+
+use utoipa::{
+    Modify, OpenApi,
+    openapi::security::{ApiKey, ApiKeyValue, HttpAuthScheme, HttpBuilder, SecurityScheme},
+};
+
+use crate::{
+    error::{ErrorBody, ErrorDetail},
+    routes::{auth, computers, health},
+};
+
+#[derive(OpenApi)]
+#[openapi(
+    info(
+        title = "NW-ITSM API",
+        description = "API v2 of NW-ITSM, served by the Rust backend next to the legacy PHP application.",
+        license(name = "GPL-2.0-or-later"),
+    ),
+    paths(
+        health::health,
+        auth::login,
+        auth::logout,
+        auth::current_session,
+        computers::list,
+        computers::get_one,
+    ),
+    components(schemas(ErrorBody, ErrorDetail)),
+    modifiers(&SessionSecurity),
+    security(("session_cookie" = []), ("bearer" = [])),
+    tags(
+        (name = "system", description = "Service status"),
+        (name = "auth", description = "Authentication and session"),
+        (name = "assets", description = "Inventory of assets"),
+    )
+)]
+pub struct ApiDoc;
+
+struct SessionSecurity;
+
+impl Modify for SessionSecurity {
+    fn modify(&self, openapi: &mut utoipa::openapi::OpenApi) {
+        let components = openapi.components.get_or_insert_with(Default::default);
+        components.add_security_scheme(
+            "session_cookie",
+            SecurityScheme::ApiKey(ApiKey::Cookie(ApiKeyValue::new(
+                crate::session::COOKIE_NAME,
+            ))),
+        );
+        components.add_security_scheme(
+            "bearer",
+            SecurityScheme::Http(
+                HttpBuilder::new()
+                    .scheme(HttpAuthScheme::Bearer)
+                    .bearer_format("JWT")
+                    .build(),
+            ),
+        );
+    }
+}
+
+/// The OpenAPI document as pretty JSON, with a trailing newline.
+pub fn json() -> String {
+    let mut json = ApiDoc::openapi()
+        .to_pretty_json()
+        .expect("the OpenAPI document is serializable");
+    json.push('\n');
+    json
+}

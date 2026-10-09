@@ -38,3 +38,9 @@ megalinter-reports/
 composer.lock
 package-lock.json
 .php-cs-fixer.cache
+
+# NW-ITSM (Rust backend, React frontend)
+/backend/target/
+/frontend/node_modules/
+/frontend/dist/
+!/frontend/package-lock.json

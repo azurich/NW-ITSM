@@ -68,6 +68,11 @@ find $WORKING_DIR -depth \( -iname ".*" ! -iname ".htaccess" \) -exec rm -rf {} 
 
 # Remove useless dev files and directories
 dev_nodes=(
+    # NW-ITSM sources, shipped separately as the nw-server image
+    "backend"
+    "dev"
+    "docs"
+    "frontend"
     ".eslintrc.json"
     ".editorconfig"
     "composer.json"

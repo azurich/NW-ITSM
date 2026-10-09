@@ -1,0 +1,861 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NW-ITSM API",
+    "description": "API v2 of NW-ITSM, served by the Rust backend next to the legacy PHP application.",
+    "license": {
+      "name": "GPL-2.0-or-later"
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v2/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Logs in with a local ITSM-NG account and sets the session cookie.",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Logged in, `nw_session` cookie set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Wrong login or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Account disabled, password expired or no usable profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Removes the session cookie.",
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "description": "Session cookie removed"
+          }
+        }
+      }
+    },
+    "/api/v2/auth/session": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Returns the current session.",
+        "operationId": "current_session",
+        "responses": {
+          "200": {
+            "description": "Current session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/computers": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the computers visible to the session (trash and templates excluded).",
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number, starting at 1.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Items per page.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Text searched in the name, serial number, inventory number and UUID.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "serial",
+                "inventory_number",
+                "entity",
+                "location",
+                "type",
+                "manufacturer",
+                "state",
+                "updated_at"
+              ]
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of computers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on computers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/computers/{id}": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Returns a computer visible to the session, including one in the trash.",
+        "operationId": "get_one",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Computer id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The computer",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ComputerDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on computers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Service health, without authentication.",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Service and database are up",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database unreachable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ComputerDetail": {
+        "type": "object",
+        "required": [
+          "id",
+          "is_deleted",
+          "is_dynamic",
+          "is_recursive",
+          "entity"
+        ],
+        "properties": {
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contact": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contact_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "entity": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "group": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inventory_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_deleted": {
+            "type": "boolean",
+            "description": "In the trash."
+          },
+          "is_dynamic": {
+            "type": "boolean",
+            "description": "Updated by an inventory tool."
+          },
+          "is_recursive": {
+            "type": "boolean",
+            "description": "Visible in sub-entities."
+          },
+          "location": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "manufacturer": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "model": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serial": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "tech_group": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "tech_user": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "user": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "uuid": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "ComputerPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "per_page",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ComputerSummary"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "per_page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Number of matching computers on every page."
+          }
+        }
+      },
+      "ComputerSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "entity"
+        ],
+        "properties": {
+          "entity": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inventory_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "location": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "manufacturer": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serial": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "ErrorBody": {
+        "type": "object",
+        "description": "Error payload: `{\"error\": {\"code\": \"...\", \"message\": \"...\"}}`.",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        }
+      },
+      "ErrorDetail": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Stable, machine-readable code (`unauthenticated`, `not_found`...)."
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "required": [
+          "status",
+          "database",
+          "version"
+        ],
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "`ok` or `unreachable`."
+          },
+          "status": {
+            "type": "string",
+            "description": "`ok` or `degraded`."
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "login",
+          "password"
+        ],
+        "properties": {
+          "login": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "ProfileRef": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Ref": {
+        "type": "object",
+        "description": "A related object: id and display name.",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` when the related row no longer exists."
+          }
+        }
+      },
+      "SessionEntities": {
+        "type": "object",
+        "required": [
+          "unrestricted",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "description": "Number of visible entities.",
+            "minimum": 0
+          },
+          "unrestricted": {
+            "type": "boolean",
+            "description": "Every entity is visible."
+          }
+        }
+      },
+      "SessionInfo": {
+        "type": "object",
+        "required": [
+          "user",
+          "profile",
+          "profiles",
+          "entities",
+          "rights"
+        ],
+        "properties": {
+          "entities": {
+            "$ref": "#/components/schemas/SessionEntities"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/SessionProfile"
+          },
+          "profiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProfileRef"
+            },
+            "description": "Every profile granted to the user."
+          },
+          "rights": {
+            "type": "object",
+            "description": "Rights of the active profile, as legacy bitmasks per module.",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "user": {
+            "$ref": "#/components/schemas/SessionUser"
+          }
+        }
+      },
+      "SessionInterface": {
+        "type": "string",
+        "description": "Interface opened by the profile.",
+        "enum": [
+          "central",
+          "helpdesk"
+        ]
+      },
+      "SessionProfile": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "interface"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "interface": {
+            "$ref": "#/components/schemas/SessionInterface"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "SessionUser": {
+        "type": "object",
+        "required": [
+          "id",
+          "login",
+          "display_name"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Preferred language (`fr_FR`...), if set."
+          },
+          "login": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "session_cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "nw_session"
+      }
+    }
+  },
+  "security": [
+    {
+      "session_cookie": []
+    },
+    {
+      "bearer": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "system",
+      "description": "Service status"
+    },
+    {
+      "name": "auth",
+      "description": "Authentication and session"
+    },
+    {
+      "name": "assets",
+      "description": "Inventory of assets"
+    }
+  ]
+}

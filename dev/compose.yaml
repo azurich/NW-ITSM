@@ -1,0 +1,67 @@
+# Development stack: legacy ITSM-NG (PHP) and NW-ITSM (Rust + React) on
+# the same MariaDB database, behind one proxy on http://localhost:8000.
+# See docs/DEVELOPMENT.md.
+name: nw-itsm
+
+services:
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: itsm
+      MARIADB_USER: itsm
+      MARIADB_PASSWORD: itsm
+    ports:
+      - "127.0.0.1:3306:3306"
+    volumes:
+      - db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+  # Legacy application, served by the PHP built-in server from the sources.
+  legacy:
+    build:
+      context: ..
+      dockerfile: .github/actions/images/app/Dockerfile
+    working_dir: /var/itsm
+    command: ["php", "-S", "0.0.0.0:8000", "-t", "/var/itsm"]
+    volumes:
+      - ..:/var/itsm
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # NW-ITSM API and built web application.
+  api:
+    build:
+      context: ..
+      dockerfile: backend/Dockerfile
+    environment:
+      NW_DATABASE_URL: mysql://itsm:itsm@db:3306/itsm
+      NW_SESSION_SECRET: ${NW_SESSION_SECRET:-development-only-secret-0123456789}
+      NW_COOKIE_SECURE: "false"
+      RUST_LOG: info,sqlx=warn
+    depends_on:
+      db:
+        condition: service_healthy
+
+  proxy:
+    image: caddy:2
+    ports:
+      - "127.0.0.1:8000:8000"
+    environment:
+      # host.docker.internal:5173 to use the Vite dev server of the host.
+      APP_UPSTREAM: ${APP_UPSTREAM:-api:8080}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - legacy
+      - api
+
+volumes:
+  db:

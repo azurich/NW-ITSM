@@ -1,0 +1,19 @@
+# Routes one origin to both applications, so they share cookies and links:
+#   /api/v2/*  NW-ITSM API (Rust)
+#   /app/*     NW-ITSM web application (built by the API, or Vite in dev)
+#   *          legacy ITSM-NG (PHP)
+{
+	admin off
+}
+
+:8000 {
+	handle /api/v2/* {
+		reverse_proxy api:8080
+	}
+	handle /app* {
+		reverse_proxy {$APP_UPSTREAM}
+	}
+	handle {
+		reverse_proxy legacy:8000
+	}
+}

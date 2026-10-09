@@ -1,0 +1,11 @@
+//! Business rules shared by every NW-ITSM component.
+//!
+//! This crate performs no I/O: it receives plain data loaded by `nw-db`
+//! and reproduces the semantics of the legacy ITSM-NG PHP code so both
+//! stacks can run side by side on the same database.
+
+pub mod entity;
+pub mod fk;
+pub mod naming;
+pub mod password;
+pub mod rights;

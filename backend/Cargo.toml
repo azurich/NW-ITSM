@@ -1,0 +1,43 @@
+[workspace]
+resolver = "3"
+members = ["crates/nw-domain", "crates/nw-db", "crates/nw-server"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+license = "GPL-2.0-or-later"
+repository = "https://github.com/azurich/NW-ITSM"
+rust-version = "1.85"
+
+[workspace.dependencies]
+nw-domain = { path = "crates/nw-domain" }
+nw-db = { path = "crates/nw-db" }
+
+anyhow = "1"
+axum = { version = "0.8", features = ["macros"] }
+axum-extra = { version = "0.10", features = ["cookie"] }
+bcrypt = "0.17"
+chrono = { version = "0.4", default-features = false, features = ["clock", "serde", "std"] }
+hex = "0.4"
+jsonwebtoken = "9"
+md-5 = "0.10"
+rand = "0.9"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+sha1 = "0.10"
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls-ring-webpki", "mysql", "chrono", "macros"] }
+subtle = "2"
+thiserror = "2"
+time = { version = "0.3", default-features = false }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "signal", "net"] }
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.6", features = ["fs", "trace", "set-header"] }
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
+utoipa = { version = "5", features = ["axum_extras", "chrono"] }
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+all = { level = "warn", priority = -1 }

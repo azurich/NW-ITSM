@@ -1,0 +1,60 @@
+name: Backend (Rust)
+
+on:
+  pull_request:
+    paths:
+      - "backend/**"
+      - "install/mysql/glpi-empty.sql"
+      - ".github/workflows/backend.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "backend/**"
+      - "install/mysql/glpi-empty.sql"
+      - ".github/workflows/backend.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: Format, lint and test
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      db:
+        image: mariadb:10.11
+        env:
+          MARIADB_ROOT_PASSWORD: root
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s
+          --health-timeout=3s
+          --health-retries=30
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: backend
+
+      - name: Format
+        run: cargo fmt --all --check
+
+      - name: Lint
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+
+      - name: Test (with the legacy schema on MariaDB)
+        run: cargo test --workspace --locked
+        env:
+          NW_TEST_DATABASE_URL: mysql://root:root@127.0.0.1:3306
