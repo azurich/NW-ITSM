@@ -26,6 +26,9 @@ pub struct Current {
     pub is_deleted: bool,
     pub is_dynamic: bool,
     pub is_global: bool,
+    pub is_template: bool,
+    /// Stored values of the fields of the form (of a template, with its
+    /// name).
     pub values: Vec<(Field, Value)>,
 }
 
@@ -63,8 +66,27 @@ pub struct UpdateEffects<'a> {
     pub infocoms: &'a InfocomSettings,
 }
 
+/// What a creation starts from.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Origin<'a> {
+    /// The form of a new item.
+    Form,
+    /// The form of a new template, its name among the values.
+    Template,
+    /// The form of an item created from a template (`CommonDBTM::clone`):
+    /// the other columns of the template are copied, and its infocom,
+    /// contracts and documents cloned (`Clonable::post_clone`).
+    FromTemplate {
+        id: i32,
+        /// `"%1$s (%2$s)"` in the language of the author, for the names in
+        /// the history of the cloned links.
+        name_id: &'a str,
+    },
+}
+
 /// Creates an asset (legacy `CommonDBTM::add`), with its infocom when
-/// configured. Returns its id.
+/// configured. Returns its id, `None` when the template to copy no longer
+/// exists.
 pub async fn create(
     pool: &MySqlPool,
     kind: AssetKind,
@@ -72,20 +94,75 @@ pub async fn create(
     values: &[(Field, Value)],
     actor: &str,
     infocom_settings: &InfocomSettings,
-) -> Result<i32, sqlx::Error> {
+    origin: Origin<'_>,
+) -> Result<Option<i32>, sqlx::Error> {
     let mut tx = pool.begin().await?;
+    // The columns of the template not in the form are copied.
+    let copied: Vec<String> = match origin {
+        Origin::FromTemplate { .. } => {
+            let set = [
+                "id",
+                "entities_id",
+                "date_creation",
+                "date_mod",
+                "is_template",
+                "template_name",
+            ];
+            crate::schema::columns(&mut tx, kind.table())
+                .await?
+                .into_iter()
+                .filter(|column| {
+                    !set.contains(&column.as_str())
+                        && !values.iter().any(|(field, _)| field.column == column)
+                })
+                .collect()
+        }
+        Origin::Form | Origin::Template => Vec::new(),
+    };
     let mut sql = QueryBuilder::<MySql>::new(format!("INSERT INTO {} (entities_id", kind.table()));
     for (field, _) in values {
         sql.push(format_args!(", {}", field.column));
     }
-    sql.push(", date_creation, date_mod) VALUES (");
+    for column in &copied {
+        sql.push(format_args!(", `{column}`"));
+    }
+    if origin == Origin::Template {
+        sql.push(", is_template");
+    }
+    sql.push(", date_creation, date_mod) ");
+    sql.push(match origin {
+        Origin::FromTemplate { .. } => "SELECT ",
+        Origin::Form | Origin::Template => "VALUES (",
+    });
     sql.push_bind(entity_id);
     for (_, value) in values {
         sql.push(", ");
         push_value(&mut sql, value);
     }
-    sql.push(", NOW(), NOW())");
-    let id = i32::try_from(sql.build().execute(&mut *tx).await?.last_insert_id())
+    for column in &copied {
+        sql.push(format_args!(", t.`{column}`"));
+    }
+    if origin == Origin::Template {
+        sql.push(", 1");
+    }
+    sql.push(", NOW(), NOW()");
+    match origin {
+        Origin::FromTemplate { id, .. } => {
+            sql.push(format_args!(
+                " FROM {} t WHERE t.is_template = 1 AND t.id = ",
+                kind.table()
+            ));
+            sql.push_bind(id);
+        }
+        Origin::Form | Origin::Template => {
+            sql.push(")");
+        }
+    }
+    let result = sql.build().execute(&mut *tx).await?;
+    if result.rows_affected() == 0 {
+        return Ok(None);
+    }
+    let id = i32::try_from(result.last_insert_id())
         .map_err(|error| sqlx::Error::Decode(Box::new(error)))?;
 
     let entry = Entry::item(kind.itemtype(), id, Action::CreateItem);
@@ -103,14 +180,33 @@ pub async fn create(
         entities_id: entity_id,
         is_recursive: value_of("is_recursive") == Some(&Value::Bool(true)),
     };
-    if infocom_settings.auto_create {
+    // Not for a clone.
+    if infocom_settings.auto_create && !matches!(origin, Origin::FromTemplate { .. }) {
         infocoms::create_for_new_item(&mut tx, infocom_settings, owner, actor).await?;
     }
-    // The form always posts a status, even none.
-    let states_id = value_of("states_id").map_or(0, Value::id);
-    infocoms::fill_status_dates(&mut tx, infocom_settings, owner, states_id, actor).await?;
+    // The form always posts a status, even none; not for a template.
+    if origin != Origin::Template {
+        let states_id = value_of("states_id").map_or(0, Value::id);
+        infocoms::fill_status_dates(&mut tx, infocom_settings, owner, states_id, actor).await?;
+    }
+    if let Origin::FromTemplate {
+        id: template_id,
+        name_id,
+    } = origin
+    {
+        super::template::clone_links(
+            &mut tx,
+            kind,
+            template_id,
+            owner,
+            name_id,
+            infocom_settings,
+            actor,
+        )
+        .await?;
+    }
     tx.commit().await?;
-    Ok(id)
+    Ok(Some(id))
 }
 
 /// Updates an asset (legacy `CommonDBTM::update`) and, for computers,
@@ -346,10 +442,10 @@ async fn lock(
     kind: AssetKind,
     id: i32,
 ) -> Result<Option<Current>, sqlx::Error> {
-    let fields = kind.fields();
+    let fields = kind.template_fields();
     let columns: Vec<String> = fields.iter().map(|field| select_column(*field)).collect();
     let row = sqlx::query(&format!(
-        "SELECT id, entities_id, is_deleted, is_dynamic, {} FROM {} WHERE id = ? FOR UPDATE",
+        "SELECT id, entities_id, is_deleted, is_dynamic, is_template, {} FROM {} WHERE id = ? FOR UPDATE",
         columns.join(", "),
         kind.table()
     ))
@@ -359,8 +455,10 @@ async fn lock(
     let Some(row) = row else {
         return Ok(None);
     };
+    let is_template: bool = row.try_get("is_template")?;
     let values: Vec<(Field, Value)> = fields
         .into_iter()
+        .filter(|field| is_template || field.column != "template_name")
         .map(|field| Ok((field, read_value(&row, field)?)))
         .collect::<Result<_, sqlx::Error>>()?;
     // Only some tables have the column.
@@ -373,6 +471,7 @@ async fn lock(
         is_deleted: row.try_get("is_deleted")?,
         is_dynamic: row.try_get("is_dynamic")?,
         is_global,
+        is_template,
         values,
     }))
 }

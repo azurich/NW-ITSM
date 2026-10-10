@@ -90,6 +90,8 @@ pub struct Detail {
     pub is_recursive: bool,
     /// `0` or `1`: a number for every type, as only some tables have it.
     pub is_global: i64,
+    pub is_template: bool,
+    pub template_name: Option<String>,
     pub date_creation: Option<DateTime<Utc>>,
     pub date_mod: Option<DateTime<Utc>>,
     pub entities_id: i32,
@@ -211,13 +213,14 @@ pub async fn list(
     Ok((items, total))
 }
 
-/// Fetches one asset if it is visible in the scope. Items in the trash are
-/// returned (flagged), templates are not.
+/// Fetches one asset (or template) if it is visible in the scope. Items in
+/// the trash are returned (flagged).
 pub async fn get(
     pool: &MySqlPool,
     kind: AssetKind,
     scope: &EntityScope,
     id: i32,
+    template: bool,
 ) -> Result<Option<Detail>, sqlx::Error> {
     let (type_column, _) = kind.type_dropdown();
     let (model_column, model_table) = kind.model_dropdown();
@@ -227,6 +230,7 @@ pub async fn get(
         "SELECT a.id, a.name, a.serial, a.otherserial, a.contact, a.contact_num, a.comment, \
                 {uuid} AS uuid, {brand} AS brand, {number_line} AS number_line, \
                 a.is_deleted, a.is_dynamic, a.is_recursive, {is_global} AS is_global, \
+                a.is_template, a.template_name, \
                 a.date_creation, a.date_mod, \
                 a.entities_id, e.completename AS entity, \
                 a.locations_id, l.completename AS location, \
@@ -258,11 +262,38 @@ pub async fn get(
           LEFT JOIN glpi_groups g ON g.id = a.groups_id \
           LEFT JOIN glpi_users ut ON ut.id = a.users_id_tech \
           LEFT JOIN glpi_groups gt ON gt.id = a.groups_id_tech \
-          WHERE a.is_template = 0 AND a.id = "
+          WHERE a.is_template = "
     ));
+    sql.push_bind(template).push(" AND a.id = ");
     sql.push_bind(id);
     restrict_entities(&mut sql, "a", scope);
     sql.build_query_as().fetch_optional(pool).await
+}
+
+/// A template of a type.
+#[derive(Debug, Clone, FromRow)]
+pub struct TemplateSummary {
+    pub id: i32,
+    pub template_name: Option<String>,
+    pub name: Option<String>,
+    pub entities_id: i32,
+    pub entity: Option<String>,
+}
+
+/// Templates visible in the scope, by name (`CommonDBTM::listTemplates`).
+pub async fn list_templates(
+    pool: &MySqlPool,
+    kind: AssetKind,
+    scope: &EntityScope,
+) -> Result<Vec<TemplateSummary>, sqlx::Error> {
+    let mut sql = QueryBuilder::<MySql>::new(format!(
+        "SELECT a.id, a.template_name, a.name, a.entities_id, e.completename AS entity \
+         FROM {} a LEFT JOIN glpi_entities e ON e.id = a.entities_id WHERE a.is_template = 1",
+        kind.table()
+    ));
+    restrict_entities(&mut sql, "a", scope);
+    sql.push(" ORDER BY a.template_name, a.id");
+    sql.build_query_as().fetch_all(pool).await
 }
 
 /// Every field of an asset as text (`1` or `0` for the flags), with the
@@ -336,6 +367,40 @@ fn like_pattern(term: &str) -> String {
     }
     pattern.push('%');
     pattern
+}
+
+/// Stored values of every column of an asset, as text, `NULL` left out
+/// (the input of a clone, `CommonDBTM::clone`). Empty when it no longer
+/// exists.
+pub async fn row_texts(
+    pool: &MySqlPool,
+    kind: AssetKind,
+    id: i32,
+) -> Result<HashMap<String, String>, sqlx::Error> {
+    let mut conn = pool.acquire().await?;
+    let columns = crate::schema::columns(&mut conn, kind.table()).await?;
+    let select: Vec<String> = columns
+        .iter()
+        .map(|column| format!("CAST(`{column}` AS CHAR) AS `{column}`"))
+        .collect();
+    let row = sqlx::query(&format!(
+        "SELECT {} FROM {} WHERE id = ?",
+        select.join(", "),
+        kind.table()
+    ))
+    .bind(id)
+    .fetch_optional(&mut *conn)
+    .await?;
+    let Some(row) = row else {
+        return Ok(HashMap::new());
+    };
+    let mut values = HashMap::new();
+    for column in columns {
+        if let Some(value) = row.try_get::<Option<String>, _>(column.as_str())? {
+            values.insert(column, value);
+        }
+    }
+    Ok(values)
 }
 
 #[cfg(test)]

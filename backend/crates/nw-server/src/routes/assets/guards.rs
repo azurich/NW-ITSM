@@ -72,13 +72,37 @@ pub async fn check_purge(pool: &MySqlPool, kind: AssetKind, id: i32) -> ApiResul
     }
 }
 
-/// Checks a creation.
-pub async fn check_create(pool: &MySqlPool, infocoms: &InfocomSettings) -> ApiResult<()> {
+/// Checks a creation. `writes_infocom`: an infocom may be created or
+/// dated with the item; `clones_infocom`: the one of the template is
+/// cloned for it.
+pub async fn check_create(
+    pool: &MySqlPool,
+    writes_infocom: bool,
+    clones_infocom: bool,
+) -> ApiResult<()> {
     check_plugins(pool).await?;
-    if infocoms.auto_create || infocoms.any_status_date() {
-        check_side_unicity(pool, "Infocom", &INFOCOM_INPUT).await?;
+    if clones_infocom {
+        // The clone posts every column of the infocom.
+        check_side_unicity(pool, "Infocom", None).await?;
+    } else if writes_infocom {
+        check_side_unicity(pool, "Infocom", Some(&INFOCOM_INPUT)).await?;
     }
     Ok(())
+}
+
+/// Checks a creation from a template: its linked rows must all be cloned
+/// like the PHP code does (`nw_domain::template`).
+pub async fn check_template(pool: &MySqlPool, kind: AssetKind, id: i32) -> ApiResult<()> {
+    let blockers = assets::template_blockers(pool, kind, id).await?;
+    if blockers.is_empty() {
+        Ok(())
+    } else {
+        tracing::info!(
+            ?blockers,
+            "creation from a template left to the classic interface"
+        );
+        Err(ApiError::LegacyRequired("linked_data"))
+    }
 }
 
 /// Columns a write changes on an item.
@@ -132,7 +156,7 @@ pub async fn check_update(
     let infocom_writes = (changed.contains(&"states_id") && infocoms.any_status_date())
         || changed.contains(&"is_recursive");
     if infocom_writes {
-        check_side_unicity(pool, "Infocom", &INFOCOM_INPUT).await?;
+        check_side_unicity(pool, "Infocom", Some(&INFOCOM_INPUT)).await?;
     }
     if kind == AssetKind::Computer && !propagation.to_devices(changed).is_empty() {
         let device_input: Vec<&str> = DEVICE_FIELDS
@@ -140,7 +164,7 @@ pub async fn check_update(
             .map(|field| field.column)
             .chain(["id"])
             .collect();
-        check_side_unicity(pool, "Item_DeviceSimcard", &device_input).await?;
+        check_side_unicity(pool, "Item_DeviceSimcard", Some(&device_input)).await?;
     }
     Ok(())
 }
@@ -163,8 +187,13 @@ const INFOCOM_INPUT: [&str; 13] = [
 ];
 
 /// Unicity of the items written along (infocoms, SIM cards): not ported.
-/// A criterion only on fields such a write posts could apply to it.
-async fn check_side_unicity(pool: &MySqlPool, itemtype: &str, posted: &[&str]) -> ApiResult<()> {
+/// A criterion only on fields such a write posts (`None`: all of them)
+/// could apply to it.
+async fn check_side_unicity(
+    pool: &MySqlPool,
+    itemtype: &str,
+    posted: Option<&[&str]>,
+) -> ApiResult<()> {
     let applies = unicity::active_fields(pool, itemtype)
         .await?
         .iter()
@@ -174,7 +203,8 @@ async fn check_side_unicity(pool: &MySqlPool, itemtype: &str, posted: &[&str]) -
                 .map(String::as_str)
                 .filter(|field| !field.is_empty())
                 .collect();
-            !fields.is_empty() && fields.iter().all(|field| posted.contains(field))
+            !fields.is_empty()
+                && posted.is_none_or(|posted| fields.iter().all(|field| posted.contains(field)))
         });
     if applies {
         Err(ApiError::LegacyRequired("field_unicity"))

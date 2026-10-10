@@ -10,6 +10,10 @@ export type AssetFields = Schemas['AssetFields']
 export type ChoiceField = Schemas['ChoiceField']
 export type Choice = Schemas['Choice']
 export type DuplicateNotice = Schemas['DuplicateNotice']
+export type TemplateList = Schemas['TemplateList']
+export type TemplateSummary = Schemas['TemplateSummary']
+/** Fields of a template: those of its items, and its own name. */
+export type TemplateFields = Schemas['TemplateFields']
 /** Connector or feature of a type (`has_*`). */
 export type Feature = keyof Schemas['Features']
 
@@ -173,4 +177,54 @@ export async function purgeAsset(kind: AssetType, id: number): Promise<void> {
   if (!response.ok) {
     throw toApiError(response.status, error)
   }
+}
+
+/** Templates of a type, by name. */
+export const templatesQuery = (kind: AssetType) =>
+  queryOptions({
+    queryKey: ['templates', kind],
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v2/assets/{kind}/templates', { params: { path: { kind } } })),
+  })
+
+export const templateQuery = (kind: AssetType, id: number) =>
+  queryOptions({
+    queryKey: ['template', kind, id],
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v2/assets/{kind}/templates/{id}', { params: { path: { kind, id } } })),
+  })
+
+export async function createTemplate(kind: AssetType, entityId: number, fields: TemplateFields): Promise<AssetDetail> {
+  return unwrap(
+    await api.POST('/api/v2/assets/{kind}/templates', {
+      params: { path: { kind } },
+      body: { ...fields, entity_id: entityId },
+    }),
+  )
+}
+
+export async function updateTemplate(kind: AssetType, id: number, fields: TemplateFields): Promise<AssetDetail> {
+  return unwrap(
+    await api.PATCH('/api/v2/assets/{kind}/templates/{id}', { params: { path: { kind, id } }, body: fields }),
+  )
+}
+
+/** Deletes a template for good. */
+export async function purgeTemplate(kind: AssetType, id: number): Promise<void> {
+  const { response, error } = await api.DELETE('/api/v2/assets/{kind}/templates/{id}', {
+    params: { path: { kind, id } },
+  })
+  if (!response.ok) {
+    throw toApiError(response.status, error)
+  }
+}
+
+/** Creates an item from a template: the fields not given take its values. */
+export async function createFromTemplate(kind: AssetType, id: number, fields: AssetFields): Promise<AssetDetail> {
+  return unwrap(
+    await api.POST('/api/v2/assets/{kind}/templates/{id}/items', {
+      params: { path: { kind, id } },
+      body: fields,
+    }),
+  )
 }

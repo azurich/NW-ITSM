@@ -14,12 +14,13 @@ import { Layout } from './components/Layout'
 import { NotFound } from './components/States'
 import { applyUserLanguage } from './i18n'
 import { isSafeRedirect } from './lib/redirect'
-import { parseAssetListSearch } from './lib/search'
-import { AssetCreatePage, AssetEditPage } from './pages/AssetEditPage'
+import { parseAssetCreateSearch, parseAssetListSearch } from './lib/search'
+import { AssetCreatePage, AssetEditPage, TemplateCreatePage, TemplateEditPage } from './pages/AssetEditPage'
 import { AssetPage } from './pages/AssetPage'
 import { AssetsPage } from './pages/AssetsPage'
 import { LoginPage } from './pages/LoginPage'
 import { PreferencesPage } from './pages/PreferencesPage'
+import { TemplatesPage } from './pages/TemplatesPage'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -95,6 +96,7 @@ const assetListRoute = createRoute({
 const assetCreateRoute = createRoute({
   getParentRoute: () => assetTypeRoute,
   path: '/new',
+  validateSearch: parseAssetCreateSearch,
   component: AssetCreatePage,
 })
 
@@ -117,6 +119,30 @@ const assetEditRoute = createRoute({
   component: AssetEditPage,
 })
 
+const templatesRoute = createRoute({
+  getParentRoute: () => assetTypeRoute,
+  path: '/templates',
+})
+
+const templateListRoute = createRoute({
+  getParentRoute: () => templatesRoute,
+  path: '/',
+  component: TemplatesPage,
+})
+
+const templateCreateRoute = createRoute({
+  getParentRoute: () => templatesRoute,
+  path: '/new',
+  component: TemplateCreatePage,
+})
+
+const templateEditRoute = createRoute({
+  getParentRoute: () => templatesRoute,
+  path: '/$id/edit',
+  params: idParams,
+  component: TemplateEditPage,
+})
+
 const preferencesRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: '/preferences',
@@ -127,7 +153,13 @@ const routeTree = rootRoute.addChildren([
   loginRoute,
   authenticatedRoute.addChildren([
     indexRoute,
-    assetTypeRoute.addChildren([assetListRoute, assetCreateRoute, assetRoute, assetEditRoute]),
+    assetTypeRoute.addChildren([
+      assetListRoute,
+      assetCreateRoute,
+      assetRoute,
+      assetEditRoute,
+      templatesRoute.addChildren([templateListRoute, templateCreateRoute, templateEditRoute]),
+    ]),
     preferencesRoute,
   ]),
 ])

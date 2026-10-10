@@ -42,6 +42,79 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/assets/{kind}/templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Lists the templates of a type visible to the session, by name
+         *     (`CommonDBTM::listTemplates`).
+         */
+        get: operations["list_templates"];
+        put?: never;
+        /**
+         * Creates a template in one of the selected entities. Its fields are not
+         *     checked for unicity, and its status fills no date.
+         */
+        post: operations["create_template"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/assets/{kind}/templates/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns a template visible to the session. */
+        get: operations["get_template"];
+        put?: never;
+        post?: never;
+        /**
+         * Deletes a template for good, with its history and the rows the PHP
+         *     code deletes with it (contracts, documents, infocom...). Linked data
+         *     whose purge is not ported leaves it to the classic interface.
+         */
+        delete: operations["purge_template"];
+        options?: never;
+        head?: never;
+        /**
+         * Updates a template of a selected entity. Its fields are not checked
+         *     for unicity.
+         */
+        patch: operations["update_template"];
+        trace?: never;
+    };
+    "/api/v2/assets/{kind}/templates/{id}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Creates an item from a template, in the entity of the template (one of
+         *     the selected entities). The fields not given take the values of the
+         *     template; its other columns are copied, and its infocom, contracts and
+         *     documents cloned for the item. Other linked data (components, network
+         *     ports, software...) leaves it to the classic interface.
+         */
+        post: operations["create_from_template"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/assets/{kind}/{id}": {
         parameters: {
             query?: never;
@@ -383,6 +456,8 @@ export interface components {
             is_global: boolean;
             /** @description Visible in sub-entities. */
             is_recursive: boolean;
+            /** @description A template: a model of the items of its type. */
+            is_template: boolean;
             kind: components["schemas"]["AssetType"];
             location?: null | components["schemas"]["Ref"];
             manufacturer?: null | components["schemas"]["Ref"];
@@ -406,6 +481,8 @@ export interface components {
             state?: null | components["schemas"]["Ref"];
             tech_group?: null | components["schemas"]["Ref"];
             tech_user?: null | components["schemas"]["Ref"];
+            /** @description Name of a template. */
+            template_name?: string | null;
             type?: null | components["schemas"]["Ref"];
             update_source?: null | components["schemas"]["Ref"];
             /** Format: date-time */
@@ -736,6 +813,37 @@ export interface components {
             language_is_default: boolean;
             login: string;
         };
+        TemplateCreation: components["schemas"]["AssetFields"] & {
+            /**
+             * Format: int32
+             * @description Entity of the new template: one of the selected entities.
+             */
+            entity_id: number;
+            template_name?: string | null;
+        };
+        /**
+         * @description Fields of a template. Absent fields are left unchanged; `null` clears a
+         *     field.
+         */
+        TemplateFields: components["schemas"]["AssetFields"] & {
+            template_name?: string | null;
+        };
+        /** @description The templates of a type visible to the session. */
+        TemplateList: {
+            /** @description The session may create templates, and items from them. */
+            can_create: boolean;
+            /** @description By name. */
+            items: components["schemas"]["TemplateSummary"][];
+        };
+        /** @description A template in the list. */
+        TemplateSummary: {
+            entity: components["schemas"]["Ref"];
+            /** Format: int32 */
+            id: number;
+            /** @description Name given to the items created from it. */
+            name?: string | null;
+            template_name?: string | null;
+        };
     };
     responses: never;
     parameters: never;
@@ -911,6 +1019,333 @@ export interface operations {
             };
             /** @description No create or update right, or entity not selected */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_templates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The templates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TemplateList"];
+                };
+            };
+            /** @description Not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No read nor create right on this type */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    create_template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TemplateCreation"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetDetail"];
+                };
+            };
+            /** @description Invalid fields */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No create right, or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Must be created in the classic interface (`legacy_required`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    get_template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Template id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The template */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetDetail"];
+                };
+            };
+            /** @description Not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No read right on this type */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    purge_template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Template id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted for good */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No purge right (on the type, or on its infocom), or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Must be done in the classic interface (`legacy_required`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    update_template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Template id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TemplateFields"];
+            };
+        };
+        responses: {
+            /** @description Updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetDetail"];
+                };
+            };
+            /** @description Invalid fields */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No update right, or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Items of other entities use the shared template (`sharing_in_use`), or must be changed in the classic interface (`legacy_required`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    create_from_template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Template id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssetFields"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetDetail"];
+                };
+            };
+            /** @description Invalid fields */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No create right, or entity of the template not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible template */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Another item has the same values (`duplicate`), or must be created in the classic interface (`legacy_required`) */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

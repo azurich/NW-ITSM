@@ -43,3 +43,14 @@ export function withDefaults(search: AssetListSearch): AssetListParams {
     trash: search.trash ?? false,
   }
 }
+
+/** Search parameters of the creation page. */
+export interface AssetCreateSearch {
+  /** Template to start from; `0` for none. */
+  template?: number
+}
+
+export function parseAssetCreateSearch(raw: Record<string, unknown>): AssetCreateSearch {
+  const template = Number(raw.template)
+  return { template: raw.template !== undefined && Number.isInteger(template) && template >= 0 ? template : undefined }
+}

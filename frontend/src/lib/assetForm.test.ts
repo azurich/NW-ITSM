@@ -105,3 +105,25 @@ describe('fields of one type', () => {
     expect(changedFields('phones', form)).toEqual({ name: 'TEL', has_headset: true, power_supply_id: 1 })
   })
 })
+
+describe('templates', () => {
+  const template = { ...detail, is_template: true, template_name: 'Laptop' } as AssetDetail
+
+  it('reads and sends the name of a template', () => {
+    const initial = formFromDetail(template)
+    expect(initial.template_name).toBe('Laptop')
+    const form = formFromDetail(template)
+    expect(changedFields('computers', form, initial)).toEqual({})
+    form.template_name = 'Desktop'
+    expect(changedFields('computers', form, initial)).toEqual({ template_name: 'Desktop' })
+  })
+
+  it('has no template name for an item', () => {
+    expect(formFromDetail(detail).template_name).toBeUndefined()
+    expect(changedFields('computers', emptyForm())).toEqual({})
+  })
+
+  it('sends the name of a new template, even empty', () => {
+    expect(changedFields('computers', { ...emptyForm(), template_name: '' })).toEqual({ template_name: '' })
+  })
+})

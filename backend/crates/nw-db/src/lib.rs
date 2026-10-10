@@ -14,6 +14,7 @@ pub mod history;
 pub mod infocoms;
 pub mod profiles;
 pub mod rules;
+mod schema;
 mod scope;
 pub mod unicity;
 pub mod users;

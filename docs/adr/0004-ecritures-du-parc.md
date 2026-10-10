@@ -1,7 +1,8 @@
 # ADR 0004 — Écritures du parc
 
 - **Statut** : accepté (complété le 2026-10-10 : règles métier,
-  informations financières, unicité des champs et partage portés)
+  informations financières, unicité des champs, partage, champs propres à
+  chaque type, suppression définitive et gabarits portés)
 - **Date** : 2026-10-10
 
 ## Contexte
@@ -300,15 +301,72 @@ ordinateur de la corbeille avec toutes les sortes de liens portés (et
 quelques-uns que le PHP laisse), purgés par le formulaire PHP sur l'une et
 par l'API sur l'autre : bases identiques, mêmes événements.
 
+### Gabarits
+
+- Un gabarit est un élément marqué `is_template`, avec un nom de gabarit
+  (`template_name`). Routes à part (`/assets/{type}/templates`) : un
+  gabarit n'apparaît ni dans les listes ni dans les routes des éléments, et
+  inversement.
+- **Liste** comme `CommonDBTM::listTemplates` : gabarits des entités
+  actives et gabarits partagés de leurs parentes, par nom ; lisible avec le
+  droit de lecture ou de création du type. Modifier un gabarit demande le
+  droit de création dans l'interface classique (lien de la liste) ; l'API
+  applique les droits de ses formulaires : `CREATE` pour en ajouter,
+  `UPDATE` pour en modifier un, `PURGE` pour en supprimer un.
+- **Création et modification** comme le formulaire « gabarit »
+  (`withtemplate=1`) : mêmes règles métier qu'un élément, mais pas
+  d'unicité des champs (`checkUnicity` ignore les gabarits). À la création,
+  le statut ne remplit pas de date (il en remplit à la modification, comme
+  le PHP), l'information financière automatique est créée. Le nom du
+  gabarit est historisé (option 65 pour les ordinateurs et matériels
+  réseau, 61 sinon), juste après l'entité.
+- **Suppression** : définitive d'emblée (pas de corbeille pour un gabarit),
+  avec les mêmes liens et refus que la purge d'un élément.
+- **Création d'un élément depuis un gabarit** comme le formulaire
+  `withtemplate=2` (`CommonDBTM::clone`, `Clonable::post_clone`) : dans
+  l'entité du gabarit, qui doit être active ; les champs non donnés
+  reprennent les valeurs du gabarit (un texte vide du gabarit est posté
+  vide), ses autres colonnes sont recopiées (inventaire automatique, coût
+  total de possession...). Règles métier et unicité des champs s'appliquent
+  (l'unicité sur toutes les colonnes recopiées, comme le PHP), pas de
+  création automatique d'information financière, dates du statut remplies.
+  Puis, dans l'ordre du PHP : l'information financière du gabarit est
+  recopiée (avec l'alerte par défaut de l'entité, sauf si le statut en a
+  déjà créé une), les liens vers les contrats (sauf contrat déjà au maximum
+  d'éléments, `max_links_allowed`) et les documents (auteur, position et
+  date conservés), avec l'historique des deux côtés (`Nom (id)`, `N/A` pour
+  un nom vide).
+- Renvoyé vers l'interface classique (`linked_data`) quand le gabarit a des
+  liens dont la recopie n'est pas portée : système d'exploitation,
+  composants, ports réseau, disques, logiciels et licences, connexions,
+  notes, articles de la base de connaissances, cartouches.
+- **Correction côté PHP** : `CommonDBTM::clone` ajoutait « (copie) » au nom
+  saisi pour un élément créé depuis un gabarit (le gabarit était traité
+  comme un élément dupliqué). Le nom donné est conservé (test atoum
+  `tests/units/Computer.php`) ; la duplication d'un élément garde son
+  suffixe.
+- Non rétabli : la numérotation automatique des gabarits (`<###>` dans un
+  champ) n'est plus appliquée par les formulaires Twig d'ITSM-NG ; un tel
+  motif est donc recopié tel quel, des deux côtés.
+
+Vérification : sur des copies identiques de la base de référence, un
+gabarit d'ordinateur avec information financière, deux contrats (dont un
+plein) et deux documents (dont un sans nom) ; création d'un élément depuis
+ce gabarit (avec et sans statut qui remplit une date), création,
+modification (avec dates du statut), retrait du partage et suppression d'un
+gabarit, et création d'un moniteur depuis un gabarit, faites par les
+formulaires PHP postés comme par un navigateur puis par l'API : bases
+identiques, mêmes événements.
+
 ### Ce qui renvoie vers l'interface classique
 
 | Motif (`details`) | Situation |
 | --- | --- |
 | `plugins` | Un plugin est activé : ses hooks ne s'exécuteraient pas |
 | `business_rules` | Une règle métier utilise un critère ou une action de plugin, une condition textuelle sur « inventaire automatique » (libellé traduit), ou une expression régulière que les deux moteurs ne lisent pas pareil |
-| `field_unicity` | Un critère d'unicité porte sur un champ que le formulaire n'a pas, ou pourrait s'appliquer aux informations financières ou aux cartes SIM écrites en même temps |
+| `field_unicity` | Un critère d'unicité porte sur un champ que le formulaire n'a pas, ou pourrait s'appliquer aux informations financières (créées, datées ou recopiées d'un gabarit) ou aux cartes SIM écrites en même temps |
 | `notifications` | Un doublon relève d'un critère qui envoie des notifications, et elles sont actives |
-| `linked_data` | Une purge toucherait des données liées dont la suppression n'est pas portée (ports réseau, composants, logiciels, tickets, baies, cartouches, réservations en cours, impact, connexions avec nettoyage à la déconnexion) |
+| `linked_data` | Une purge toucherait des données liées dont la suppression n'est pas portée (ports réseau, composants, logiciels, tickets, baies, cartouches, réservations en cours, impact, connexions avec nettoyage à la déconnexion), ou le gabarit d'une création a des liens dont la recopie n'est pas portée (système d'exploitation, composants, ports réseau, disques, logiciels, connexions, notes, base de connaissances, cartouches) |
 | `linked_items` | Partager l'élément changerait l'entité d'objets liés rangés dans une autre entité (données incohérentes : seule la recopie du partage est portée) |
 
 Une modification qui ne change rien, ou une mise à la corbeille d'un
@@ -316,7 +374,6 @@ Une modification qui ne change rien, ou une mise à la corbeille d'un
 
 ### Hors périmètre de cette étape
 
-- **Gabarits** : exclus des listes et des écritures.
 - Les onglets (composants, connexions, logiciels, informations
   financières) restent dans l'interface classique.
 - Les valeurs choisies sont vérifiées en existence, pas en visibilité,

@@ -292,6 +292,47 @@ fn stored_value(date: AutoDate, now: &str) -> &str {
     }
 }
 
+/// Clones the infocom of a template for an item created from it
+/// (`Infocom::clone`): its values, with the entity and the sharing of the
+/// item and the default alert of its entity, and the creation in its
+/// history. Refused, like the PHP code, when the item already has one
+/// (filled by its status).
+pub async fn clone_for_item(
+    conn: &mut MySqlConnection,
+    settings: &InfocomSettings,
+    template_id: i32,
+    owner: Owner<'_>,
+    actor: &str,
+) -> Result<(), sqlx::Error> {
+    let sources: Vec<i32> = sqlx::query_scalar(
+        "SELECT id FROM glpi_infocoms WHERE itemtype = ? AND items_id = ? ORDER BY id",
+    )
+    .bind(owner.itemtype)
+    .bind(template_id)
+    .fetch_all(&mut *conn)
+    .await?;
+    for source in sources {
+        if find(conn, owner).await?.is_some() {
+            continue;
+        }
+        let id = crate::schema::copy_row(
+            conn,
+            "glpi_infocoms",
+            source,
+            &[
+                ("items_id", owner.id),
+                ("entities_id", owner.entities_id),
+                ("is_recursive", i32::from(owner.is_recursive)),
+                ("alert", settings.default_alert(owner.entities_id)),
+            ],
+        )
+        .await?;
+        crate::history::record(conn, actor, &Entry::item("Infocom", id, Action::CreateItem))
+            .await?;
+    }
+    Ok(())
+}
+
 /// Whether the item has an infocom.
 pub async fn exists(pool: &MySqlPool, itemtype: &str, items_id: i32) -> Result<bool, sqlx::Error> {
     let found: Option<i32> =

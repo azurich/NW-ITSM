@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseAssetListSearch, withDefaults } from './search'
+import { parseAssetCreateSearch, parseAssetListSearch, withDefaults } from './search'
 
 describe('parseAssetListSearch', () => {
   it('keeps valid values', () => {
@@ -34,5 +34,15 @@ describe('withDefaults', () => {
   it('fills the API parameters', () => {
     expect(withDefaults({})).toEqual({ page: 1, search: '', sort: 'name', order: 'asc', trash: false })
     expect(withDefaults({ search: ' pc ' }).search).toBe('pc')
+  })
+})
+
+describe('parseAssetCreateSearch', () => {
+  it('keeps a template id, 0 for a blank form', () => {
+    expect(parseAssetCreateSearch({ template: '12' })).toEqual({ template: 12 })
+    expect(parseAssetCreateSearch({ template: 0 })).toEqual({ template: 0 })
+    expect(parseAssetCreateSearch({})).toEqual({ template: undefined })
+    expect(parseAssetCreateSearch({ template: '-1' })).toEqual({ template: undefined })
+    expect(parseAssetCreateSearch({ template: 'x' })).toEqual({ template: undefined })
   })
 })

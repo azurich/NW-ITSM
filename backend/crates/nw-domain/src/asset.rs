@@ -430,9 +430,30 @@ impl AssetKind {
             .copied()
     }
 
-    /// Sorts values in the order of the legacy form.
-    pub fn sort_by_form(self, values: &mut [(Field, Value)]) {
-        let fields = self.fields();
+    /// `template_name`, a field of the templates only.
+    pub fn template_name_field(self) -> Field {
+        let search_option = match self {
+            Self::Computer | Self::NetworkEquipment => 65,
+            _ => 61,
+        };
+        text("template_name", search_option)
+    }
+
+    /// Fields of the form of a template: its name comes first, after the
+    /// entity part.
+    pub fn template_fields(self) -> Vec<Field> {
+        let mut fields = self.fields();
+        fields.insert(1, self.template_name_field());
+        fields
+    }
+
+    /// Sorts values in the order of the legacy form (of a template or not).
+    pub fn sort_by_form(self, values: &mut [(Field, Value)], template: bool) {
+        let fields = if template {
+            self.template_fields()
+        } else {
+            self.fields()
+        };
         values.sort_by_key(|(field, _)| {
             fields
                 .iter()

@@ -1802,3 +1802,403 @@ async fn choices_are_those_of_the_legacy_forms() {
         .await;
     assert_eq!(response.status, StatusCode::OK);
 }
+
+#[tokio::test]
+async fn templates_are_managed_like_php() {
+    let app = test_app!();
+    let manager = app.login("manager").await;
+    app.sql(
+        "UPDATE glpi_computers SET template_name = 'Laptop' WHERE id = 106; \
+         INSERT INTO glpi_computers (id, name, entities_id, is_template, template_name) VALUES \
+           (108, 'LY', 2, 1, 'Lyon'), (109, NULL, 1, 1, 'Desktop'); \
+         INSERT INTO glpi_fieldunicities (id, name, itemtype, entities_id, is_recursive, fields, is_active, action_refuse) \
+           VALUES (1, 'Name', 'Computer', 0, 1, 'name', 1, 1); \
+         INSERT INTO glpi_configs (context, name, value) VALUES ('core', 'auto_create_infocoms', '1'); \
+         UPDATE glpi_entities SET autofill_buy_date = 'STATUS_1' WHERE id = 0",
+    )
+    .await;
+
+    // The templates of the selected entities, by name; not among the items.
+    let response = app
+        .get("/api/v2/assets/computers/templates", Some(&manager))
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["can_create"], json!(true));
+    let names: Vec<&str> = response.body["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|item| item["template_name"].as_str().unwrap())
+        .collect();
+    assert_eq!(names, ["Desktop", "Laptop"]);
+    assert_eq!(
+        app.get("/api/v2/assets/computers/106", Some(&manager))
+            .await
+            .status,
+        StatusCode::NOT_FOUND
+    );
+    let response = app
+        .get("/api/v2/assets/computers/templates/106", Some(&manager))
+        .await;
+    assert_eq!(response.body["is_template"], json!(true));
+    assert_eq!(response.body["template_name"], json!("Laptop"));
+    assert_eq!(
+        response.body["permissions"],
+        json!({ "update": true, "trash": false, "purge": true })
+    );
+    assert_eq!(
+        app.get("/api/v2/assets/computers/templates/102", Some(&manager))
+            .await
+            .status,
+        StatusCode::NOT_FOUND
+    );
+    let helpdesk = app.login("helpdesk").await;
+    assert_eq!(
+        app.get("/api/v2/assets/computers/templates", Some(&helpdesk))
+            .await
+            .status,
+        StatusCode::FORBIDDEN
+    );
+
+    // A new template: its name is not checked for unicity, its status
+    // fills no date, it gets an infocom like an item.
+    let response = app
+        .post(
+            "/api/v2/assets/computers/templates",
+            &manager,
+            Some(json!({
+                "entity_id": 1, "template_name": "Server", "name": "PC-PARIS-1", "state_id": 1
+            })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    assert_eq!(response.body["is_template"], json!(true));
+    assert_eq!(response.body["template_name"], json!("Server"));
+    let id = response.body["id"].as_i64().unwrap() as i32;
+    assert_eq!(history(&app, "Computer", id).await, [item_row(20)]);
+    assert_eq!(
+        column(
+            &app,
+            &format!(
+                "SELECT CAST(buy_date AS CHAR) FROM glpi_infocoms WHERE itemtype = 'Computer' AND items_id = {id}"
+            )
+        )
+        .await,
+        None
+    );
+    assert_eq!(
+        events(&app).await.pop().unwrap().4,
+        "manager adds the item PC-PARIS-1"
+    );
+    // Not in a parent entity.
+    assert_eq!(
+        app.post(
+            "/api/v2/assets/computers/templates",
+            &manager,
+            Some(json!({ "entity_id": 0, "template_name": "Root" })),
+        )
+        .await
+        .status,
+        StatusCode::FORBIDDEN
+    );
+
+    // Changed like an item, its name first in the history; still not
+    // checked for unicity.
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/computers/templates/{id}"),
+            &manager,
+            json!({ "name": "PC-PARIS-A", "template_name": "Big server" }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["template_name"], json!("Big server"));
+    assert_eq!(
+        history(&app, "Computer", id).await[1..],
+        [
+            row(65, "Server", "Big server"),
+            row(1, "PC-PARIS-1", "PC-PARIS-A")
+        ]
+    );
+    // Not through the routes of the items, nor the other way round.
+    assert_eq!(
+        app.patch(
+            &format!("/api/v2/assets/computers/{id}"),
+            &manager,
+            json!({ "name": "X" })
+        )
+        .await
+        .status,
+        StatusCode::NOT_FOUND
+    );
+    assert_eq!(
+        app.post(
+            &format!("/api/v2/assets/computers/{id}/trash"),
+            &manager,
+            None
+        )
+        .await
+        .status,
+        StatusCode::NOT_FOUND
+    );
+    assert_eq!(
+        app.patch(
+            "/api/v2/assets/computers/templates/102",
+            &manager,
+            json!({ "name": "X" })
+        )
+        .await
+        .status,
+        StatusCode::NOT_FOUND
+    );
+
+    // Purged without the trash, with its infocom (and that right).
+    let uri = format!("/api/v2/assets/computers/templates/{id}");
+    assert_eq!(
+        app.send(Method::DELETE, &uri, Some(&manager), None)
+            .await
+            .status,
+        StatusCode::FORBIDDEN
+    );
+    app.sql("INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES (4, 'infocom', 31)")
+        .await;
+    let response = app.send(Method::DELETE, &uri, Some(&manager), None).await;
+    assert_eq!(response.status, StatusCode::NO_CONTENT, "{}", response.body);
+    assert_eq!(
+        count(
+            &app,
+            &format!(
+                "SELECT (SELECT COUNT(*) FROM glpi_computers WHERE id = {id}) \
+                 + (SELECT COUNT(*) FROM glpi_infocoms WHERE items_id = {id}) \
+                 + (SELECT COUNT(*) FROM glpi_logs WHERE itemtype = 'Computer' AND items_id = {id})"
+            )
+        )
+        .await,
+        0
+    );
+    assert_eq!(
+        events(&app).await.pop().unwrap().4,
+        "manager purges an item"
+    );
+}
+
+#[tokio::test]
+async fn items_are_created_from_templates_like_php() {
+    let app = test_app!();
+    let manager = app.login("manager").await;
+    // A template of Paris with values the form does not show, an infocom,
+    // contracts and documents.
+    app.sql(
+        "UPDATE glpi_computers SET template_name = 'Laptop', name = 'TPL', serial = NULL, comment = 'model', \
+           locations_id = 1, computertypes_id = 1, is_recursive = 1, is_dynamic = 1, ticket_tco = 12.5 \
+         WHERE id = 106; \
+         INSERT INTO glpi_infocoms (id, itemtype, items_id, entities_id, value, buy_date, alert, comment) \
+           VALUES (7, 'Computer', 106, 1, 100, '2026-02-01', 1, 'bought'); \
+         INSERT INTO glpi_contracts (id, name, entities_id, max_links_allowed) VALUES (1, 'Support', 1, 0), (2, 'Full', 1, 1); \
+         INSERT INTO glpi_contracts_items (contracts_id, itemtype, items_id) VALUES (1, 'Computer', 106), (2, 'Computer', 106); \
+         INSERT INTO glpi_documents (id, name, entities_id) VALUES (1, '', 1); \
+         INSERT INTO glpi_documents_items (documents_id, itemtype, items_id, entities_id, users_id, date) \
+           VALUES (1, 'Computer', 106, 1, 10, '2026-01-01 08:00:00'); \
+         UPDATE glpi_entities SET default_infocom_alert = 4 WHERE id = 1",
+    )
+    .await;
+
+    let response = app
+        .post(
+            "/api/v2/assets/computers/templates/106/items",
+            &manager,
+            Some(json!({ "name": "PC-NEW", "serial": "SN-NEW" })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    let id = response.body["id"].as_i64().unwrap() as i32;
+    // The values given, else those of the template; not a template.
+    assert_eq!(response.body["is_template"], json!(false));
+    assert_eq!(response.body["template_name"], Value::Null);
+    assert_eq!(response.body["name"], json!("PC-NEW"));
+    assert_eq!(response.body["serial"], json!("SN-NEW"));
+    assert_eq!(response.body["comment"], json!("model"));
+    assert_eq!(response.body["entity"]["id"], json!(1));
+    assert_eq!(response.body["is_recursive"], json!(true));
+    assert_eq!(response.body["location"]["id"], json!(1));
+    assert_eq!(
+        column(
+            &app,
+            &format!(
+                "SELECT CAST(CONCAT_WS('|', is_dynamic, ticket_tco, is_template, IFNULL(template_name, '-'), uuid) AS CHAR) \
+                 FROM glpi_computers WHERE id = {id}"
+            )
+        )
+        .await
+        .as_deref(),
+        // An empty text of the template is posted empty.
+        Some("1|12.5000|0|-|")
+    );
+    // Its infocom, with the default alert of the entity.
+    assert_eq!(
+        column(
+            &app,
+            &format!(
+                "SELECT CAST(CONCAT_WS('|', entities_id, is_recursive, value, buy_date, alert, comment) AS CHAR) \
+                 FROM glpi_infocoms WHERE itemtype = 'Computer' AND items_id = {id}"
+            )
+        )
+        .await
+        .as_deref(),
+        Some("1|1|100.0000|2026-02-01|4|bought")
+    );
+    let infocom: i32 = sqlx::query_scalar(&format!(
+        "SELECT id FROM glpi_infocoms WHERE itemtype = 'Computer' AND items_id = {id}"
+    ))
+    .fetch_one(&app.pool)
+    .await
+    .unwrap();
+    assert_eq!(history(&app, "Infocom", infocom).await, [item_row(20)]);
+    // Its contracts, except the one having all its items, and documents,
+    // with the history of both sides.
+    assert_eq!(
+        count(
+            &app,
+            &format!("SELECT COUNT(*) FROM glpi_contracts_items WHERE items_id = {id}")
+        )
+        .await,
+        1
+    );
+    assert_eq!(
+        column(
+            &app,
+            &format!(
+                "SELECT CAST(CONCAT_WS('|', entities_id, is_recursive, users_id, date) AS CHAR) \
+                 FROM glpi_documents_items WHERE items_id = {id}"
+            )
+        )
+        .await
+        .as_deref(),
+        Some("1|1|10|2026-01-01 08:00:00")
+    );
+    let link = |itemtype: &str, name: &str| {
+        (
+            0,
+            String::new(),
+            name.to_owned(),
+            itemtype.to_owned(),
+            15,
+            "manager (19)".to_owned(),
+        )
+    };
+    assert_eq!(
+        history(&app, "Computer", id).await,
+        [
+            item_row(20),
+            link("Contract", "Support (1)"),
+            link("Document", "N/A (1)")
+        ]
+    );
+    assert_eq!(
+        history(&app, "Contract", 1).await,
+        [link("Computer", &format!("PC-NEW ({id})"))]
+    );
+    assert_eq!(
+        history(&app, "Document", 1).await,
+        [link("Computer", &format!("PC-NEW ({id})"))]
+    );
+    assert_eq!(
+        events(&app).await.pop().unwrap(),
+        (
+            id,
+            "computers".into(),
+            "inventory".into(),
+            4,
+            "manager adds the item PC-NEW".into()
+        )
+    );
+
+    // An item dated by its status keeps its own infocom.
+    app.sql("UPDATE glpi_entities SET autofill_buy_date = 'STATUS_1' WHERE id = 0")
+        .await;
+    let response = app
+        .post(
+            "/api/v2/assets/computers/templates/106/items",
+            &manager,
+            Some(json!({ "name": "PC-NEW-2", "state_id": 1 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    let second = response.body["id"].as_i64().unwrap() as i32;
+    assert_eq!(
+        column(
+            &app,
+            &format!(
+                "SELECT CAST(CONCAT_WS('|', COUNT(*), MAX(value), MAX(buy_date) = CURDATE()) AS CHAR) \
+                 FROM glpi_infocoms WHERE itemtype = 'Computer' AND items_id = {second}"
+            )
+        )
+        .await
+        .as_deref(),
+        Some("1|0.0000|1")
+    );
+
+    // The unicity of the fields applies, on every column of the template.
+    app.sql(
+        "INSERT INTO glpi_fieldunicities (id, name, itemtype, entities_id, is_recursive, fields, is_active, action_refuse) \
+         VALUES (1, 'TCO', 'Computer', 0, 1, 'ticket_tco,name', 1, 1)",
+    )
+    .await;
+    let response = app
+        .post(
+            "/api/v2/assets/computers/templates/106/items",
+            &manager,
+            Some(json!({ "name": "PC-NEW" })),
+        )
+        .await;
+    assert_eq!(response.error_code(), "duplicate", "{}", response.body);
+    app.sql("DELETE FROM glpi_fieldunicities").await;
+
+    // Linked data whose cloning is not ported.
+    for sql in [
+        "INSERT INTO glpi_networkports (id, itemtype, items_id, entities_id) VALUES (9, 'Computer', 106, 1)",
+        "INSERT INTO glpi_items_disks (id, itemtype, items_id, entities_id) VALUES (9, 'Computer', 106, 1)",
+        "INSERT INTO glpi_computers_items (id, computers_id, itemtype, items_id) VALUES (9, 106, 'Monitor', 202)",
+    ] {
+        app.sql(sql).await;
+        let response = app
+            .post(
+                "/api/v2/assets/computers/templates/106/items",
+                &manager,
+                Some(json!({ "name": "PC-X" })),
+            )
+            .await;
+        assert_eq!(response.error_code(), "legacy_required", "{sql}");
+        assert_eq!(response.body["error"]["details"], json!(["linked_data"]));
+        app.sql(
+            "DELETE FROM glpi_networkports WHERE id = 9; DELETE FROM glpi_items_disks WHERE id = 9; \
+             DELETE FROM glpi_computers_items WHERE id = 9",
+        )
+        .await;
+    }
+
+    // In the entity of the template, one of the session.
+    app.sql("UPDATE glpi_computers SET entities_id = 0 WHERE id = 106")
+        .await;
+    assert_eq!(
+        app.post(
+            "/api/v2/assets/computers/templates/106/items",
+            &manager,
+            Some(json!({ "name": "PC-X" })),
+        )
+        .await
+        .status,
+        StatusCode::FORBIDDEN
+    );
+    // An item is not a template.
+    assert_eq!(
+        app.post(
+            "/api/v2/assets/computers/templates/102/items",
+            &manager,
+            Some(json!({ "name": "PC-X" })),
+        )
+        .await
+        .status,
+        StatusCode::NOT_FOUND
+    );
+}

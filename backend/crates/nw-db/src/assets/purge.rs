@@ -46,8 +46,26 @@ pub async fn purge_blockers(
     id: i32,
     autoclean: bool,
 ) -> Result<Vec<&'static str>, sqlx::Error> {
+    let mut found = present(pool, kind, id, kind.purge_blockers()).await?;
+    if autoclean && kind != AssetKind::NetworkEquipment {
+        let mut sql = QueryBuilder::new("SELECT 1 FROM glpi_computers_items WHERE ");
+        push_owner(&mut sql, kind, id, Owner::Connection);
+        if exists(pool, sql).await? {
+            found.push("glpi_computers_items");
+        }
+    }
+    Ok(found)
+}
+
+/// Tables of the blockers having rows of the asset.
+pub(super) async fn present(
+    pool: &MySqlPool,
+    kind: AssetKind,
+    id: i32,
+    blockers: Vec<Blocker>,
+) -> Result<Vec<&'static str>, sqlx::Error> {
     let mut found = Vec::new();
-    for blocker in kind.purge_blockers() {
+    for blocker in blockers {
         let (name, sql) = match blocker {
             Blocker::Item(table) => {
                 let mut sql = QueryBuilder::new(format!("SELECT 1 FROM {table} WHERE "));
@@ -90,13 +108,6 @@ pub async fn purge_blockers(
         };
         if exists(pool, sql).await? {
             found.push(name);
-        }
-    }
-    if autoclean && kind != AssetKind::NetworkEquipment {
-        let mut sql = QueryBuilder::new("SELECT 1 FROM glpi_computers_items WHERE ");
-        push_owner(&mut sql, kind, id, Owner::Connection);
-        if exists(pool, sql).await? {
-            found.push("glpi_computers_items");
         }
     }
     Ok(found)

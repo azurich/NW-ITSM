@@ -30,6 +30,24 @@ fn every_schema_reference_is_declared() {
     assert!(missing.is_empty(), "undeclared schemas: {missing:?}");
 }
 
+/// The frontend types name each operation by its id: two handlers of the
+/// same name in different modules must be told apart (`operation_id`).
+#[test]
+fn every_operation_id_is_unique() {
+    let document: serde_json::Value = serde_json::from_str(&nw_server::openapi::json()).unwrap();
+    let mut ids: Vec<&str> = document["paths"]
+        .as_object()
+        .unwrap()
+        .values()
+        .flat_map(|methods| methods.as_object().unwrap().values())
+        .filter_map(|operation| operation["operationId"].as_str())
+        .collect();
+    let count = ids.len();
+    ids.sort_unstable();
+    ids.dedup();
+    assert_eq!(ids.len(), count, "duplicate operation ids");
+}
+
 fn collect_missing(
     value: &serde_json::Value,
     schemas: &serde_json::Value,

@@ -1,10 +1,10 @@
 import {
   ASSET_TYPES,
   type AssetDetail,
-  type AssetFields,
   type AssetType,
   type Choice,
   type Feature,
+  type TemplateFields,
 } from '../api/assets'
 
 export const TEXT_FIELDS = [
@@ -52,6 +52,8 @@ export interface AssetForm {
   numbers: Record<NumberField, string>
   flags: Partial<Record<FlagField, boolean>>
   is_recursive: boolean
+  /** Name of a template; absent for an item. */
+  template_name?: string
 }
 
 /** Switches of the type. */
@@ -114,6 +116,9 @@ export function formFromDetail(asset: AssetDetail): AssetForm {
     form.flags[field] = asset[field] ?? false
   }
   form.is_recursive = asset.is_recursive
+  if (asset.is_template) {
+    form.template_name = asset.template_name ?? ''
+  }
   return form
 }
 
@@ -121,7 +126,7 @@ export function formFromDetail(asset: AssetDetail): AssetForm {
  * Fields to send: those of the type that differ from `initial`, or every
  * filled one for a creation.
  */
-export function changedFields(kind: AssetType, form: AssetForm, initial?: AssetForm): AssetFields {
+export function changedFields(kind: AssetType, form: AssetForm, initial?: AssetForm): TemplateFields {
   const fields: Record<string, string | number | boolean | null> = {}
   for (const field of TEXT_FIELDS) {
     const value = form.text[field]
@@ -152,5 +157,8 @@ export function changedFields(kind: AssetType, form: AssetForm, initial?: AssetF
   if (form.is_recursive !== (initial?.is_recursive ?? false)) {
     fields.is_recursive = form.is_recursive
   }
-  return fields as AssetFields
+  if (form.template_name !== undefined && (initial ? form.template_name !== initial.template_name : true)) {
+    fields.template_name = form.template_name
+  }
+  return fields as TemplateFields
 }

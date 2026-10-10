@@ -41,6 +41,8 @@ pub enum Action {
     LockItem,
     /// Restored, for an item managed by an inventory tool.
     UnlockItem,
+    /// A link to another item was added (`HISTORY_ADD_RELATION`).
+    AddRelation,
 }
 
 impl Action {
@@ -50,6 +52,7 @@ impl Action {
             Self::UpdateDevice => 2,
             Self::DeleteItem => 13,
             Self::RestoreItem => 14,
+            Self::AddRelation => 15,
             Self::CreateItem => 20,
             Self::LockItem => 26,
             Self::UnlockItem => 27,
@@ -91,6 +94,18 @@ impl Entry {
         }
     }
 
+    /// A link to another item was added, recorded on one side: the type
+    /// and the name of the other side (`CommonDBRelation::post_addItem`).
+    pub fn relation(itemtype: &str, items_id: i32, other_itemtype: &str, other_name: &str) -> Self {
+        Self {
+            itemtype: itemtype.to_owned(),
+            items_id,
+            itemtype_link: other_itemtype.to_owned(),
+            action: Action::AddRelation,
+            change: Change::new(0, "", other_name),
+        }
+    }
+
     /// A field of a component changed, recorded on the item that holds it:
     /// the link is `<component type>#<field>` and the values are raw ids.
     pub fn device_update(
@@ -123,6 +138,19 @@ pub fn dropdown_value(name: Option<&str>, id: i32) -> String {
     let name = name.filter(|name| !name.is_empty()).unwrap_or(NO_VALUE);
     format!("{name} ({id})")
 }
+
+/// Name of an item in the history of its links (`getNameID` with the id
+/// forced): `name_id` is `"%1$s (%2$s)"` in the language of the author,
+/// `N/A` stands for an empty name.
+pub fn name_id(name_id: &str, name: Option<&str>, id: i32) -> String {
+    let name = name
+        .filter(|name| !name.is_empty())
+        .unwrap_or(NOT_AVAILABLE);
+    crate::i18n::sprintf(name_id, &[name, &id.to_string()])
+}
+
+/// `NOT_AVAILABLE` of the PHP code.
+pub const NOT_AVAILABLE: &str = "N/A";
 
 /// Full name of a tree dropdown as shown by the PHP code: the separator,
 /// stored raw, is HTML-encoded (`getTreeValueCompleteName`).

@@ -18,5 +18,6 @@ pub mod php;
 pub mod purge;
 pub mod rights;
 pub mod rules;
+pub mod template;
 pub mod text;
 pub mod unicity;

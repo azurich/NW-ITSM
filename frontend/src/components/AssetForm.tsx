@@ -110,6 +110,18 @@ export function AssetFormView({
           <legend className="px-1 text-sm font-semibold uppercase tracking-wide text-slate-500">
             {t('asset.sections.general')}
           </legend>
+          {form.template_name !== undefined && (
+            <label className="block text-sm font-medium">
+              {t('templates.name')}
+              <input
+                type="text"
+                value={form.template_name}
+                maxLength={255}
+                onChange={(event) => setForm({ ...form, template_name: event.target.value })}
+                className={inputClass}
+              />
+            </label>
+          )}
           {entityField}
           {text('name')}
           {choice('type')}

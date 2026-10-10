@@ -87,7 +87,10 @@ Chaque lot suit la même « définition de terminé » :
 - [x] Suppression définitive depuis la corbeille, avec les liens que le PHP
       supprime, vérifiée contre le PHP (refus explicite pour les ports
       réseau, composants, logiciels, tickets...)
-- [ ] Gabarits
+- [x] Gabarits : liste, création, modification, suppression, et création
+      d'un élément depuis un gabarit (informations financières, contrats et
+      documents recopiés), vérifiés contre le PHP ; nom donné à l'élément
+      conservé, corrigé côté PHP
 - [ ] Baies et autres types (équipements passifs, PDU, enclos, clusters)
 - [ ] Logiciels, licences, versions installées
 - [ ] Liaisons entre objets (`itemtype` / `items_id`), composants, ports réseau

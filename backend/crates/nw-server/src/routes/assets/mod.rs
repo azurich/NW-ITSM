@@ -4,6 +4,7 @@
 mod business;
 pub mod choices;
 mod guards;
+pub mod templates;
 pub mod unicity;
 
 use std::collections::{HashMap, HashSet, hash_map::Entry};
@@ -54,6 +55,20 @@ pub fn routes() -> Router<AppState> {
         .route(
             "/assets/{kind}/{id}",
             get(get_one).patch(update).delete(purge),
+        )
+        .route(
+            "/assets/{kind}/templates",
+            get(templates::list).post(templates::create),
+        )
+        .route(
+            "/assets/{kind}/templates/{id}",
+            get(templates::get_one)
+                .patch(templates::update)
+                .delete(templates::purge),
+        )
+        .route(
+            "/assets/{kind}/templates/{id}/items",
+            post(templates::create_item),
         )
         .route("/assets/{kind}/{id}/trash", post(trash))
         .route("/assets/{kind}/{id}/restore", post(restore))
@@ -246,6 +261,10 @@ pub struct AssetDetail {
     pub group: Option<Ref>,
     pub tech_user: Option<Ref>,
     pub tech_group: Option<Ref>,
+    /// A template: a model of the items of its type.
+    pub is_template: bool,
+    /// Name of a template.
+    pub template_name: Option<String>,
     pub permissions: AssetPermissions,
     /// After a write: items with the same values as this one, reported by
     /// a unicity criterion that does not refuse them.
@@ -521,7 +540,7 @@ pub async fn get_one(
 ) -> ApiResult<Json<AssetDetail>> {
     let (kind, id) = parse_path(path)?;
     session.require(kind.right(), READ)?;
-    Ok(Json(detail(&state, &session, kind, id).await?))
+    Ok(Json(detail(&state, &session, kind, id, false).await?))
 }
 
 /// Creates an asset in one of the selected entities.
@@ -548,77 +567,181 @@ pub async fn create(
     let kind = AssetKind::from(kind);
     session.require(kind.right(), CREATE)?;
     let Json(request) = payload.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
+    let requested = field_values(kind, &request.fields)?;
+    let created = create_asset(
+        &state,
+        &session,
+        kind,
+        request.entity_id,
+        requested,
+        Creation::Item,
+    )
+    .await?;
+    Ok((StatusCode::CREATED, Json(created)))
+}
+
+/// What a creation makes.
+enum Creation {
+    /// An item, from the form of a new item.
+    Item,
+    /// A template, from the form of a new template.
+    Template,
+    /// An item from the form of this template: its stored values fill the
+    /// fields not given, as the form shows them.
+    FromTemplate(assets::Current),
+}
+
+/// Creates an asset like the legacy forms (`CommonDBTM::add`, `clone` from
+/// a template): the rules of a creation, the unicity of the fields (not
+/// for a template), the event. Returns the new asset.
+async fn create_asset(
+    state: &AppState,
+    session: &Session,
+    kind: AssetKind,
+    entity_id: i32,
+    requested: Vec<(Field, Value)>,
+    creation: Creation,
+) -> ApiResult<AssetDetail> {
     // Legacy CommonDBTM::canCreateItem: an entity of the session, not a parent.
-    if !session.scope.active().contains(&request.entity_id) {
+    if !session.scope.active().contains(&entity_id) {
         return Err(ApiError::Forbidden);
     }
-    let requested = field_values(kind, &request.fields)?;
-    check_references(&state, &requested).await?;
+    check_references(state, &requested).await?;
     let infocom_settings = infocoms::settings(&state.pool).await?;
-    guards::check_create(&state.pool, &infocom_settings).await?;
+    // Infocom written: created with the item (not for a clone), dated by
+    // its status (not for a template), cloned from the template.
+    let (writes_infocom, clones_infocom) = match &creation {
+        Creation::Item => (
+            infocom_settings.auto_create || infocom_settings.any_status_date(),
+            false,
+        ),
+        Creation::Template => (infocom_settings.auto_create, false),
+        Creation::FromTemplate(template) => (
+            infocom_settings.any_status_date(),
+            infocoms::exists(&state.pool, kind.itemtype(), template.id).await?,
+        ),
+    };
+    guards::check_create(&state.pool, writes_infocom, clones_infocom).await?;
+    if let Creation::FromTemplate(template) = &creation {
+        guards::check_template(&state.pool, kind, template.id).await?;
+    }
 
-    // Every field of the form is written, empty when not given (an empty
-    // text, not NULL), and seen by the rules, as the classic interface does.
-    let mut values: Vec<(Field, Value)> = kind
-        .fields()
+    // Every field of the form is written as the classic interface posts
+    // it: the given value, else the value of a new item (an empty text,
+    // not NULL) or of the template. The rules see them all.
+    let fields = match creation {
+        Creation::Template => kind.template_fields(),
+        Creation::Item | Creation::FromTemplate(_) => kind.fields(),
+    };
+    let mut values: Vec<(Field, Value)> = fields
         .into_iter()
         .filter_map(|field| {
             let posted = requested
                 .iter()
                 .find(|(given, _)| given.column == field.column);
-            let value = match posted {
-                Some((_, value)) => value.clone(),
-                None => field.form_default()?,
+            let value = match (posted, &creation) {
+                (Some((_, value)), _) => value.clone(),
+                (None, Creation::FromTemplate(template)) => match template.value(field.column)? {
+                    Value::Text(None) => Value::Text(Some(String::new())),
+                    value => value.clone(),
+                },
+                (None, Creation::Item | Creation::Template) => field.form_default()?,
             };
             Some((field, value))
         })
         .collect();
+    // The event names the item as posted.
+    let posted_name = values
+        .iter()
+        .find_map(|(field, value)| match value {
+            Value::Text(name) if field.column == "name" => name.clone(),
+            _ => None,
+        })
+        .unwrap_or_default();
     let rules = nw_db::rules::asset_rules(&state.pool).await?;
     let rule_values = business::run(
         &state.pool,
-        &session,
+        session,
         &rules,
         Operation::Add,
         kind,
-        &business::FormInput::form(&values, request.entity_id, None),
+        &business::FormInput::form(&values, entity_id, None),
     )
     .await?;
     business::merge(&mut values, rule_values);
 
-    // Unicity of the values the rules leave.
-    let posted = business::FormInput::form(&values, request.entity_id, None).by_field();
-    let notices = unicity::check(
-        &state,
-        &session,
-        kind,
-        request.entity_id,
-        unicity::Posted::Form(&posted),
-        None,
-    )
-    .await?
-    .log_and_enforce(&state, kind, None)
-    .await?;
+    // Unicity of the values the rules leave; not for a template.
+    let posted = business::FormInput::form(&values, entity_id, None).by_field();
+    let checked = match &creation {
+        Creation::Template => None,
+        Creation::Item => Some(
+            unicity::check(
+                state,
+                session,
+                kind,
+                entity_id,
+                unicity::Posted::Form(&posted),
+                None,
+            )
+            .await?,
+        ),
+        Creation::FromTemplate(template) => {
+            // The clone posts every column of the template.
+            let mut input = assets::row_texts(&state.pool, kind, template.id).await?;
+            for column in [
+                "id",
+                "date_creation",
+                "date_mod",
+                "is_template",
+                "template_name",
+            ] {
+                input.remove(column);
+            }
+            input.extend(posted);
+            Some(
+                unicity::check(
+                    state,
+                    session,
+                    kind,
+                    entity_id,
+                    unicity::Posted::Fields(&input),
+                    None,
+                )
+                .await?,
+            )
+        }
+    };
+    let notices = match checked {
+        Some(checked) => checked.log_and_enforce(state, kind, None).await?,
+        None => Vec::new(),
+    };
 
     let actor = history::actor(session.user.id, &session.own_name());
+    let name_id = i18n::tr(&session.preferences.language, text::NAME_ID);
+    let origin = match &creation {
+        Creation::Item => assets::Origin::Form,
+        Creation::Template => assets::Origin::Template,
+        Creation::FromTemplate(template) => assets::Origin::FromTemplate {
+            id: template.id,
+            name_id: &name_id,
+        },
+    };
     let id = assets::create(
         &state.pool,
         kind,
-        request.entity_id,
+        entity_id,
         &values,
         &actor,
         &infocom_settings,
+        origin,
     )
-    .await?;
-    let name = request
-        .fields
-        .name
-        .as_deref()
-        .map(to_stored)
-        .unwrap_or_default();
-    log_asset_event(&state, &session, kind, id, text::ADDS_ITEM, &[&name]).await;
-    let mut created = detail(&state, &session, kind, id).await?;
+    .await?
+    .ok_or(ApiError::NotFound)?;
+    log_asset_event(state, session, kind, id, text::ADDS_ITEM, &[&posted_name]).await;
+    let template = matches!(creation, Creation::Template);
+    let mut created = detail(state, session, kind, id, template).await?;
     created.duplicates = notices;
-    Ok((StatusCode::CREATED, Json(created)))
+    Ok(created)
 }
 
 /// Updates an asset of a selected entity. For computers, the changes of
@@ -650,9 +773,25 @@ pub async fn update(
     let (kind, id) = parse_path(path)?;
     session.require(kind.right(), UPDATE)?;
     let Json(fields) = payload.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
-    let current = writable(&state, &session, kind, id).await?;
-    let mut values = field_values(kind, &fields)?;
-    check_references(&state, &values).await?;
+    let values = field_values(kind, &fields)?;
+    Ok(Json(
+        update_asset(&state, &session, kind, id, values, false).await?,
+    ))
+}
+
+/// Updates an asset (or a template) like the legacy forms: the rules of an
+/// update, the unicity of the fields (not for a template), the changes of
+/// a computer copied to its connected items, the event.
+async fn update_asset(
+    state: &AppState,
+    session: &Session,
+    kind: AssetKind,
+    id: i32,
+    mut values: Vec<(Field, Value)>,
+    template: bool,
+) -> ApiResult<AssetDetail> {
+    let current = writable(state, session, kind, id, template).await?;
+    check_references(state, &values).await?;
 
     // The rules see the whole form: the stored values and the changes.
     let rules = nw_db::rules::asset_rules(&state.pool).await?;
@@ -660,7 +799,7 @@ pub async fn update(
     business::merge(&mut form, values.clone());
     let rule_values = business::run(
         &state.pool,
-        &session,
+        session,
         &rules,
         Operation::Update,
         kind,
@@ -669,20 +808,27 @@ pub async fn update(
     .await?;
     business::merge(&mut values, rule_values);
     // The changes, and their history, in the order of the legacy form.
-    kind.sort_by_form(&mut values);
+    kind.sort_by_form(&mut values, template);
 
-    // Unicity of the whole form, checked even when nothing changes.
+    // Unicity of the whole form, checked even when nothing changes; not
+    // for a template.
     business::merge(&mut form, values.clone());
     let posted = business::FormInput::form(&form, current.entities_id, Some(id)).by_field();
-    let checked = unicity::check(
-        &state,
-        &session,
-        kind,
-        current.entities_id,
-        unicity::Posted::Form(&posted),
-        Some(id),
-    )
-    .await?;
+    let checked = if template {
+        None
+    } else {
+        Some(
+            unicity::check(
+                state,
+                session,
+                kind,
+                current.entities_id,
+                unicity::Posted::Form(&posted),
+                Some(id),
+            )
+            .await?,
+        )
+    };
 
     // A computer copies some changes to its connected items, whose own
     // update runs the rules, then the unicity check, on the copied fields.
@@ -710,7 +856,7 @@ pub async fn update(
                 let input = business::FormInput::fields(&item_values);
                 let rule_values = business::run(
                     &state.pool,
-                    &session,
+                    session,
                     &rules,
                     Operation::Update,
                     item.kind,
@@ -723,8 +869,8 @@ pub async fn update(
             let mut posted = business::FormInput::fields(&item_values).by_field();
             posted.insert("id".to_owned(), item.id.to_string());
             let checked = unicity::check(
-                &state,
-                &session,
+                state,
+                session,
                 item.kind,
                 item.entities_id,
                 unicity::Posted::Fields(&posted),
@@ -747,10 +893,13 @@ pub async fn update(
     .await?;
 
     // Events of the duplicates, as the PHP code logs them on the way.
-    let notices = checked.log_and_enforce(&state, kind, Some(id)).await?;
+    let notices = match checked {
+        Some(checked) => checked.log_and_enforce(state, kind, Some(id)).await?,
+        None => Vec::new(),
+    };
     let mut refused_items = HashSet::new();
     for (item, checked) in &connected_checks {
-        if checked.log(&state, item.kind, Some(item.id)).await {
+        if checked.log(state, item.kind, Some(item.id)).await {
             refused_items.insert((item.kind, item.id));
         }
     }
@@ -765,10 +914,10 @@ pub async fn update(
     assets::update(&state.pool, kind, id, &values, &actor, effects)
         .await?
         .ok_or(ApiError::NotFound)?;
-    log_asset_event(&state, &session, kind, id, text::UPDATES_ITEM, &[]).await;
-    let mut updated = detail(&state, &session, kind, id).await?;
+    log_asset_event(state, session, kind, id, text::UPDATES_ITEM, &[]).await;
+    let mut updated = detail(state, session, kind, id, template).await?;
     updated.duplicates = notices;
-    Ok(Json(updated))
+    Ok(updated)
 }
 
 /// Moves an asset to the trash.
@@ -844,10 +993,23 @@ pub async fn purge(
     path: Result<Path<(AssetType, i32)>, PathRejection>,
 ) -> ApiResult<StatusCode> {
     let (kind, id) = parse_path(path)?;
+    purge_asset(&state, &session, kind, id, false).await?;
+    Ok(StatusCode::NO_CONTENT)
+}
+
+/// Purges an asset of the trash, or a template.
+async fn purge_asset(
+    state: &AppState,
+    session: &Session,
+    kind: AssetKind,
+    id: i32,
+    template: bool,
+) -> ApiResult<()> {
     session.require(kind.right(), PURGE)?;
-    let current = writable(&state, &session, kind, id).await?;
-    // The classic interface offers it in the trash only.
-    if !current.is_deleted {
+    let current = writable(state, session, kind, id, template).await?;
+    // The classic interface offers it in the trash only; a template, in
+    // the list of the templates.
+    if !template && !current.is_deleted {
         return Err(ApiError::NotInTrash);
     }
     // `canPurgeItem`: purging the infocom too.
@@ -860,8 +1022,8 @@ pub async fn purge(
     if !assets::purge(&state.pool, kind, id).await? {
         return Err(ApiError::NotFound);
     }
-    log_asset_event(&state, &session, kind, id, text::PURGES_ITEM, &[]).await;
-    Ok(StatusCode::NO_CONTENT)
+    log_asset_event(state, session, kind, id, text::PURGES_ITEM, &[]).await;
+    Ok(())
 }
 
 async fn set_trashed(
@@ -873,7 +1035,7 @@ async fn set_trashed(
     let (kind, id) = parse_path(path)?;
     // Legacy forms check DELETE for both actions.
     session.require(kind.right(), DELETE)?;
-    let current = writable(&state, &session, kind, id).await?;
+    let current = writable(&state, &session, kind, id, false).await?;
     if current.is_deleted != trashed {
         guards::check_trash(&state.pool).await?;
     }
@@ -889,7 +1051,7 @@ async fn set_trashed(
         };
         log_asset_event(&state, &session, kind, id, action, &[]).await;
     }
-    Ok(Json(detail(&state, &session, kind, id).await?))
+    Ok(Json(detail(&state, &session, kind, id, false).await?))
 }
 
 fn parse_path(path: Result<Path<(AssetType, i32)>, PathRejection>) -> ApiResult<(AssetKind, i32)> {
@@ -897,15 +1059,17 @@ fn parse_path(path: Result<Path<(AssetType, i32)>, PathRejection>) -> ApiResult<
     Ok((kind.into(), id))
 }
 
-/// The asset, if visible, and in an entity of the session (legacy
-/// `canUpdateItem`: items shared from a parent entity are read-only).
+/// The asset (or template), if visible, and in an entity of the session
+/// (legacy `canUpdateItem`: items shared from a parent entity are
+/// read-only).
 async fn writable(
     state: &AppState,
     session: &Session,
     kind: AssetKind,
     id: i32,
+    template: bool,
 ) -> ApiResult<assets::Current> {
-    let visible = assets::get(&state.pool, kind, &session.scope, id)
+    let visible = assets::get(&state.pool, kind, &session.scope, id, template)
         .await?
         .ok_or(ApiError::NotFound)?;
     if !session.scope.active().contains(&visible.entities_id) {
@@ -916,19 +1080,22 @@ async fn writable(
         .ok_or(ApiError::NotFound)
 }
 
+/// An asset (or a template) visible to the session.
 async fn detail(
     state: &AppState,
     session: &Session,
     kind: AssetKind,
     id: i32,
+    template: bool,
 ) -> ApiResult<AssetDetail> {
-    let row = assets::get(&state.pool, kind, &session.scope, id)
+    let row = assets::get(&state.pool, kind, &session.scope, id, template)
         .await?
         .ok_or(ApiError::NotFound)?;
     let in_selected_entity = session.scope.active().contains(&row.entities_id);
     let permissions = AssetPermissions {
         update: in_selected_entity && session.rights.has(kind.right(), UPDATE),
-        trash: in_selected_entity && session.rights.has(kind.right(), DELETE),
+        // A template is purged, not moved to the trash.
+        trash: !template && in_selected_entity && session.rights.has(kind.right(), DELETE),
         purge: in_selected_entity && session.rights.has(kind.right(), PURGE),
     };
     let specific = assets::specific(&state.pool, kind, id).await?;
@@ -1273,6 +1440,12 @@ impl AssetDetail {
                 ),
             ),
             tech_group: Ref::optional(row.groups_id_tech, row.tech_group),
+            is_template: row.is_template,
+            template_name: if row.is_template {
+                decode(row.template_name)
+            } else {
+                None
+            },
             permissions,
             duplicates: Vec::new(),
         }

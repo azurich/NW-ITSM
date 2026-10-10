@@ -10,6 +10,7 @@ export const READ = 1
 export const UPDATE = 2
 export const CREATE = 4
 export const DELETE = 8
+export const PURGE = 16
 
 export const sessionQuery = queryOptions({
   queryKey: ['session'],

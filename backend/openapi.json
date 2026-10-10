@@ -305,6 +305,445 @@
         }
       }
     },
+    "/api/v2/assets/{kind}/templates": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the templates of a type visible to the session, by name\n(`CommonDBTM::listTemplates`).",
+        "operationId": "list_templates",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The templates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read nor create right on this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Creates a template in one of the selected entities. Its fields are not\nchecked for unicity, and its status fills no date.",
+        "operationId": "create_template",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateCreation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be created in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/templates/{id}": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Returns a template visible to the session.",
+        "operationId": "get_template",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Template id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The template",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Deletes a template for good, with its history and the rows the PHP\ncode deletes with it (contracts, documents, infocom...). Linked data\nwhose purge is not ported leaves it to the classic interface.",
+        "operationId": "purge_template",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Template id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted for good"
+          },
+          "403": {
+            "description": "No purge right (on the type, or on its infocom), or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be done in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Updates a template of a selected entity. Its fields are not checked\nfor unicity.",
+        "operationId": "update_template",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Template id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Items of other entities use the shared template (`sharing_in_use`), or must be changed in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/templates/{id}/items": {
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Creates an item from a template, in the entity of the template (one of\nthe selected entities). The fields not given take the values of the\ntemplate; its other columns are copied, and its infocom, contracts and\ndocuments cloned for the item. Other linked data (components, network\nports, software...) leaves it to the classic interface.",
+        "operationId": "create_from_template",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Template id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create right, or entity of the template not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible template",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another item has the same values (`duplicate`), or must be created in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/assets/{kind}/{id}": {
       "get": {
         "tags": [
@@ -1236,6 +1675,7 @@
               "is_recursive",
               "is_global",
               "entity",
+              "is_template",
               "permissions"
             ],
             "properties": {
@@ -1324,6 +1764,10 @@
               "is_recursive": {
                 "type": "boolean",
                 "description": "Visible in sub-entities."
+              },
+              "is_template": {
+                "type": "boolean",
+                "description": "A template: a model of the items of its type."
               },
               "kind": {
                 "$ref": "#/components/schemas/AssetType"
@@ -1453,6 +1897,13 @@
                     "$ref": "#/components/schemas/Ref"
                   }
                 ]
+              },
+              "template_name": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Name of a template."
               },
               "type": {
                 "oneOf": [
@@ -2464,6 +2915,103 @@
           },
           "login": {
             "type": "string"
+          }
+        }
+      },
+      "TemplateCreation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AssetFields",
+            "description": "The fields given to the items created from the template."
+          },
+          {
+            "type": "object",
+            "required": [
+              "entity_id"
+            ],
+            "properties": {
+              "entity_id": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Entity of the new template: one of the selected entities."
+              },
+              "template_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "TemplateFields": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AssetFields"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "template_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        ],
+        "description": "Fields of a template. Absent fields are left unchanged; `null` clears a\nfield."
+      },
+      "TemplateList": {
+        "type": "object",
+        "description": "The templates of a type visible to the session.",
+        "required": [
+          "items",
+          "can_create"
+        ],
+        "properties": {
+          "can_create": {
+            "type": "boolean",
+            "description": "The session may create templates, and items from them."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateSummary"
+            },
+            "description": "By name."
+          }
+        }
+      },
+      "TemplateSummary": {
+        "type": "object",
+        "description": "A template in the list.",
+        "required": [
+          "id",
+          "entity"
+        ],
+        "properties": {
+          "entity": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Name given to the items created from it."
+          },
+          "template_name": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       }

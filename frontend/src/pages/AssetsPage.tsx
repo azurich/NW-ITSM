@@ -95,13 +95,22 @@ function AssetList({ kind }: { kind: AssetType }) {
           {params.trash ? t('assets.hideTrash') : t('assets.showTrash')}
         </button>
         {hasRight(session, ASSET_TYPES[kind].right, CREATE) && !params.trash && (
-          <Link
-            to="/assets/$kind/new"
-            params={{ kind }}
-            className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500"
-          >
-            {t('assets.new')}
-          </Link>
+          <>
+            <Link
+              to="/assets/$kind/new"
+              params={{ kind }}
+              className="rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-indigo-500"
+            >
+              {t('assets.new')}
+            </Link>
+            <Link
+              to="/assets/$kind/templates"
+              params={{ kind }}
+              className="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
+            >
+              {t('templates.manage')}
+            </Link>
+          </>
         )}
         <input
           type="search"
