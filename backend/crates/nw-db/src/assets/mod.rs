@@ -6,6 +6,6 @@ mod write;
 
 pub use read::{Detail, ListItem, ListQuery, Sort, get, list};
 pub use write::{
-    Current, UpdateOutcome, create, current, propagation_targets, references_exist, set_trashed,
-    update,
+    Current, UpdateEffects, UpdateOutcome, connected_kinds, create, current, forwarded_items,
+    references_exist, set_trashed, update,
 };

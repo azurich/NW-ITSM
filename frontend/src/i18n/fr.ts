@@ -167,10 +167,9 @@ export const fr = {
       bad_request: 'Valeurs refusées : {{message}}',
       legacy: 'Cette modification doit être faite dans l’interface classique',
       legacy_required: {
-        business_rules: 'des règles métier s’appliquent à ces éléments.',
+        business_rules: 'une règle métier utilise un critère, une action ou une expression régulière non prise en charge ici.',
         field_unicity: 'des critères d’unicité des champs sont configurés.',
-        infocom_creation: 'les informations financières sont créées avec les éléments.',
-        infocom_dates: 'ce statut remplit des dates des informations financières.',
+        linked_items: 'partager l’élément modifie aussi ses objets liés (logiciels, ports réseau, disques…).',
         plugins: 'des plugins de l’interface classique réagissent aux modifications.',
         unrecursive: 'retirer le partage avec les sous-entités demande des vérifications.',
       },

@@ -153,8 +153,7 @@ export function AssetFormView({
 const LEGACY_REASONS = [
   'business_rules',
   'field_unicity',
-  'infocom_creation',
-  'infocom_dates',
+  'linked_items',
   'plugins',
   'unrecursive',
 ] as const

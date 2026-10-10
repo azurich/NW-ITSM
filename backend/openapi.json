@@ -1799,7 +1799,7 @@
             "items": {
               "type": "string"
             },
-            "description": "More codes, for example the broken rules of `weak_password`\n(`too_short`, `missing_digit`, `missing_lowercase`,\n`missing_uppercase`, `missing_symbol`) or the reason of\n`legacy_required` (`business_rules`, `field_unicity`,\n`infocom_creation`, `infocom_dates`, `plugins`, `unrecursive`)."
+            "description": "More codes, for example the broken rules of `weak_password`\n(`too_short`, `missing_digit`, `missing_lowercase`,\n`missing_uppercase`, `missing_symbol`) or the reason of\n`legacy_required` (`business_rules`, `field_unicity`,\n`linked_items`, `plugins`, `unrecursive`)."
           },
           "message": {
             "type": "string"

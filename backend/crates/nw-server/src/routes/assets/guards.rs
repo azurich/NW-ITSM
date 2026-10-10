@@ -2,13 +2,8 @@
 //! that they are made in the classic interface instead of silently
 //! skipping it (see `docs/adr/0004-ecritures-du-parc.md`).
 
-use nw_db::{MySqlPool, assets, config, guards};
-use nw_domain::{
-    asset::{AssetKind, Field, Propagation, Value},
-    entity::{EntityTree, used_config},
-    infocom::{AUTOFILL_SETTINGS, fills_on_status},
-    rules::Operation,
-};
+use nw_db::{MySqlPool, assets, config, guards, infocoms::InfocomSettings};
+use nw_domain::asset::{AssetKind, Field, Propagation, Value};
 
 use crate::error::{ApiError, ApiResult};
 
@@ -48,34 +43,21 @@ pub async fn check_trash(pool: &MySqlPool) -> ApiResult<()> {
 /// Checks a creation.
 pub async fn check_create(
     pool: &MySqlPool,
-    tree: &EntityTree,
     kind: AssetKind,
-    entity_id: i32,
-    values: &[(Field, Value)],
+    infocoms: &InfocomSettings,
 ) -> ApiResult<()> {
     check_plugins(pool).await?;
-    check_rules(pool, &[kind], Operation::Add).await?;
-    check_unicity(pool, kind).await?;
-    let auto_create = config::core_values(pool, &["auto_create_infocoms"]).await?;
-    if auto_create.get("auto_create_infocoms").map(String::as_str) == Some("1") {
-        return Err(ApiError::LegacyRequired("infocom_creation"));
-    }
-    if let Some(states_id) = value_of(values, "states_id") {
-        check_status_dates(pool, tree, entity_id, states_id).await?;
-    }
-    Ok(())
+    check_unicity(
+        pool,
+        &[kind],
+        infocoms.auto_create || infocoms.any_status_date(),
+    )
+    .await
 }
 
-/// Checks an update, with the items that would follow a computer change.
-pub async fn check_update(
-    pool: &MySqlPool,
-    tree: &EntityTree,
-    kind: AssetKind,
-    current: &assets::Current,
-    values: &[(Field, Value)],
-    propagation: Propagation,
-) -> ApiResult<()> {
-    let changed: Vec<&str> = values
+/// Columns a write changes on an item.
+pub fn changed_columns(current: &assets::Current, values: &[(Field, Value)]) -> Vec<&'static str> {
+    values
         .iter()
         .filter(|(field, new)| {
             current
@@ -83,36 +65,42 @@ pub async fn check_update(
                 .is_some_and(|old| new.differs_from(old))
         })
         .map(|(field, _)| field.column)
-        .collect();
+        .collect()
+}
+
+/// Checks an update, with the items that follow a computer change
+/// (`connected`: their types).
+pub async fn check_update(
+    pool: &MySqlPool,
+    kind: AssetKind,
+    current: &assets::Current,
+    changed: &[&str],
+    connected: &[AssetKind],
+    infocoms: &InfocomSettings,
+) -> ApiResult<()> {
     if changed.is_empty() {
         return Ok(());
     }
     check_plugins(pool).await?;
-    if current.value("is_recursive") == Some(&Value::Bool(true))
-        && changed.contains(&"is_recursive")
-    {
-        // Legacy CommonDBTM::canUnrecurs checks the items of other entities
-        // that use this one.
-        return Err(ApiError::LegacyRequired("unrecursive"));
-    }
-
-    let mut kinds = vec![kind];
-    if kind == AssetKind::Computer {
-        kinds.extend(assets::propagation_targets(pool, current.id, propagation, &changed).await?);
-    }
-    check_rules(pool, &kinds, Operation::Update).await?;
-    check_unicity(pool, kind).await?;
-
-    if changed.contains(&"states_id") {
-        if let Some(states_id) = value_of(values, "states_id") {
-            check_status_dates(pool, tree, current.entities_id, states_id).await?;
-            if kinds.len() > 1 && propagation.state {
-                // The connected items may be in other entities.
-                check_status_dates_anywhere(pool, states_id).await?;
-            }
+    if changed.contains(&"is_recursive") {
+        if current.value("is_recursive") == Some(&Value::Bool(true)) {
+            // Legacy CommonDBTM::canUnrecurs checks the items of other
+            // entities that use this one.
+            return Err(ApiError::LegacyRequired("unrecursive"));
+        }
+        // The sharing is copied to the linked items, infocoms excepted.
+        if !assets::forwarded_items(pool, kind, current.id)
+            .await?
+            .is_empty()
+        {
+            return Err(ApiError::LegacyRequired("linked_items"));
         }
     }
-    Ok(())
+    let mut kinds = vec![kind];
+    kinds.extend(connected);
+    let infocom_writes = (changed.contains(&"states_id") && infocoms.any_status_date())
+        || changed.contains(&"is_recursive");
+    check_unicity(pool, &kinds, infocom_writes).await
 }
 
 /// The hooks of the PHP plugins (`pre_item_add`, `item_update`...) do not
@@ -125,67 +113,17 @@ async fn check_plugins(pool: &MySqlPool) -> ApiResult<()> {
     }
 }
 
-async fn check_rules(pool: &MySqlPool, kinds: &[AssetKind], operation: Operation) -> ApiResult<()> {
-    let rules = guards::active_asset_rules(pool).await?;
-    let applies = kinds.iter().any(|kind| {
-        rules
-            .iter()
-            .any(|rule| rule.may_apply_to_manual_write(kind.itemtype(), operation))
-    });
-    if applies {
-        Err(ApiError::LegacyRequired("business_rules"))
-    } else {
-        Ok(())
+/// Unicity criteria of the written types, infocoms included when they may
+/// be written too.
+async fn check_unicity(pool: &MySqlPool, kinds: &[AssetKind], infocoms: bool) -> ApiResult<()> {
+    let mut itemtypes: Vec<&str> = kinds.iter().map(|kind| kind.itemtype()).collect();
+    if infocoms {
+        itemtypes.push("Infocom");
     }
-}
-
-async fn check_unicity(pool: &MySqlPool, kind: AssetKind) -> ApiResult<()> {
-    if guards::has_field_unicity(pool, kind.itemtype()).await? {
-        Err(ApiError::LegacyRequired("field_unicity"))
-    } else {
-        Ok(())
-    }
-}
-
-/// Infocom dates filled when the item of this entity gets the status.
-async fn check_status_dates(
-    pool: &MySqlPool,
-    tree: &EntityTree,
-    entity_id: i32,
-    states_id: i32,
-) -> ApiResult<()> {
-    let settings = guards::entity_settings(pool, &AUTOFILL_SETTINGS).await?;
-    for index in 0..AUTOFILL_SETTINGS.len() {
-        let used = used_config(tree, entity_id, |id| {
-            settings
-                .get(&id)
-                .and_then(|values| values[index].as_deref())
-        });
-        if used.is_some_and(|setting| fills_on_status(setting, states_id)) {
-            return Err(ApiError::LegacyRequired("infocom_dates"));
+    for itemtype in itemtypes {
+        if guards::has_field_unicity(pool, itemtype).await? {
+            return Err(ApiError::LegacyRequired("field_unicity"));
         }
     }
     Ok(())
-}
-
-/// Infocom dates filled by this status in any entity.
-async fn check_status_dates_anywhere(pool: &MySqlPool, states_id: i32) -> ApiResult<()> {
-    let settings = guards::entity_settings(pool, &AUTOFILL_SETTINGS).await?;
-    let filled = settings
-        .values()
-        .flatten()
-        .flatten()
-        .any(|setting| fills_on_status(setting, states_id));
-    if filled {
-        Err(ApiError::LegacyRequired("infocom_dates"))
-    } else {
-        Ok(())
-    }
-}
-
-fn value_of(values: &[(Field, Value)], column: &str) -> Option<i32> {
-    values
-        .iter()
-        .find(|(field, _)| field.column == column)
-        .map(|(_, value)| value.id())
 }

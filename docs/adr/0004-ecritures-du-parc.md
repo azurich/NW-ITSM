@@ -1,6 +1,7 @@
 # ADR 0004 — Écritures du parc
 
-- **Statut** : accepté
+- **Statut** : accepté (complété le 2026-10-10 : règles métier et
+  informations financières portées)
 - **Date** : 2026-10-10
 
 ## Contexte
@@ -61,6 +62,9 @@ classique, sur le même élément. Rien n'est écrit en cas de refus.
   le statut des composants, selon la configuration
   (`is_*_autoupdate`, `state_autoupdate_mode`), avec leur historique ;
   logiciels installés marqués à la corbeille et à la restauration.
+- Partage avec les sous-entités (`is_recursive` de 0 à 1) : recopié sans
+  historique vers les informations financières de l'élément
+  (`forwardEntityInformations`).
 - Listes de choix des formulaires : valeurs de l'entité de l'élément et
   valeurs récursives de ses parents ; statuts visibles pour le type,
   groupes « éléments » pour le groupe, groupes « assignables » pour le
@@ -73,15 +77,73 @@ mise à la corbeille et une restauration, appliquées par le code PHP à un
 ordinateur et par l'API à son jumeau, donnent des lignes `glpi_logs` et des
 valeurs identiques, y compris sur le moniteur et le composant.
 
+### Règles métier du parc (`RuleAsset`)
+
+Le moteur est porté (`nw_domain::rules`) avec la sémantique exacte du PHP,
+mesurée sur la base de référence :
+
+- Seules les règles **actives de l'entité racine** s'exécutent (la
+  collection est construite sur l'entité 0), par rang. Une règle sans
+  critère ne s'exécute jamais. Chaque règle lit l'entrée d'origine ; les
+  actions des règles qui correspondent s'accumulent, la dernière l'emporte.
+- **Bug du PHP conservé** : `assetBusinessRules` passe la condition
+  « Ajout / Mise à jour » dans le mauvais argument de `processAllRules` ;
+  elle n'est donc jamais appliquée et toutes les règles s'exécutent à la
+  création comme à la modification. Le Rust fait de même pour que les deux
+  interfaces donnent le même résultat. La correction devra être faite des
+  deux côtés à la fois.
+- Les règles lisent **le formulaire complet**, comme le poste l'interface
+  classique : tous les champs (valeurs enregistrées et modifications), l'entité,
+  `_itemtype` et `_auto` = 0. Elles s'appliquent donc aussi quand un autre
+  champ change. Pour un élément connecté qui suit un ordinateur, elles ne
+  lisent que les champs recopiés, comme `Computer::post_updateItem`.
+- Critères de `RuleAsset` (statut, lieu, entité, utilisateur, fabricant,
+  commentaire, contacts, type, inventaire automatique) et conditions : est,
+  n'est pas, contient, ne contient pas, commence par, finit par, existe,
+  n'existe pas, sous, pas sous, expressions régulières. Comparaisons à la
+  manière de PHP 8 (`==` entre chaînes numériques, `empty`, casse). Les
+  conditions textuelles comparent les noms affichés (nom complet des arbres
+  avec `&gt;`, nom d'utilisateur selon les préférences de l'auteur).
+- Actions `assign` et `regex_result` (dont l'utilisateur retrouvé par son
+  identifiant de connexion avec `#0`...).
+- Expressions régulières PCRE exécutées avec la crate `regex` : délimiteurs,
+  modificateurs, correspondances octet par octet sans `u`, itération de
+  `preg_match_all` (correspondance vide gardée après une correspondance non
+  vide). Ce que les deux moteurs ne lisent pas pareil (références arrière,
+  assertions, quantificateurs possessifs, `$` devant un saut de ligne
+  final...) est refusé plutôt qu'exécuté différemment.
+
+Vérification : règles avec expression régulière et utilisateur retrouvé,
+condition « sous », règle sur les moniteurs, règle de création, appliquées
+par le PHP (avec le formulaire complet) et par l'API à des jumeaux, avec
+recopie vers un moniteur connecté et création d'un moniteur : historique,
+valeurs et informations financières identiques.
+
+### Informations financières (`glpi_infocoms`)
+
+- Création avec l'élément quand `auto_create_infocoms` est actif : entité et
+  partage de l'élément, alerte par défaut de l'entité (héritage compris),
+  création inscrite dans l'historique de l'information financière.
+- Dates remplies quand l'élément prend un statut (`autofill_*` =
+  `STATUS_<id>`, héritage compris), à la création comme à la modification,
+  y compris pour un élément connecté qui reçoit le statut de son ordinateur :
+  information financière créée si besoin, sinon mise à jour. Comme le PHP,
+  la date est historisée sur l'élément avec l'heure, seulement si la valeur
+  enregistrée change (une date déjà au jour est réécrite sans historique).
+  Une fin de garantie repoussée efface l'alerte de fin de garantie.
+
+Vérification : création automatique, dates à la création et à la
+modification, date ancienne, date déjà au jour, date vide, partage recopié :
+identiques au PHP.
+
 ### Ce qui renvoie vers l'interface classique
 
 | Motif (`details`) | Situation |
 | --- | --- |
 | `plugins` | Un plugin est activé : ses hooks ne s'exécuteraient pas |
-| `business_rules` | Une règle métier du parc active peut s'appliquer à une saisie manuelle de ce type (y compris aux éléments connectés qui suivraient la modification). Les règles limitées aux outils d'inventaire (`_auto` = 1) ou à d'autres types sont ignorées |
-| `field_unicity` | Un critère d'unicité actif existe pour ce type |
-| `infocom_creation` | Les informations financières sont créées avec les éléments |
-| `infocom_dates` | Le nouveau statut remplit une date des informations financières dans l'entité (paramètre hérité compris) |
+| `business_rules` | Une règle métier utilise un critère ou une action de plugin, une condition textuelle sur « inventaire automatique » (libellé traduit), ou une expression régulière que les deux moteurs ne lisent pas pareil |
+| `field_unicity` | Un critère d'unicité actif existe pour un type écrit (l'élément, les éléments connectés qui le suivent, les informations financières quand elles sont écrites) |
+| `linked_items` | Partager l'élément le recopierait aussi vers ses objets liés autres que les informations financières (logiciels installés, ports réseau, disques, systèmes d'exploitation, réservations, machines virtuelles) |
 | `unrecursive` | Retirer le partage avec les sous-entités : le PHP vérifie d'abord les éléments des autres entités qui l'utilisent |
 
 Une modification qui ne change rien, ou une mise à la corbeille d'un
@@ -103,10 +165,9 @@ Une modification qui ne change rien, ou une mise à la corbeille d'un
 
 - Les écritures courantes du parc se font dans la nouvelle interface sans
   dépendre du PHP, avec des données identiques à celles du PHP.
-- Une installation avec des plugins actifs, des règles métier manuelles ou
-  la création automatique des informations financières continue d'écrire
-  par l'interface classique, sans perte silencieuse ; chaque fonction portée
-  plus tard retire un motif de refus.
+- Une installation avec des plugins actifs ou des critères d'unicité
+  continue d'écrire par l'interface classique, sans perte silencieuse ;
+  chaque fonction portée plus tard retire un motif de refus.
 - Le motif `plugins` disparaîtra avec la phase 2 (modèle d'extension
   natif) : en attendant, désactiver un plugin inutile ouvre les écritures
   natives.

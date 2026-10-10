@@ -5,6 +5,8 @@
 //! Each function runs in one transaction. Rights, entities and the checks
 //! for PHP features not ported yet are the caller's job.
 
+use std::collections::HashMap;
+
 use nw_domain::{
     asset::{
         AssetKind, DEVICE_FIELDS, DEVICE_ITEMS, DIRECT_CONNECT_KINDS, Field, FieldKind,
@@ -13,6 +15,8 @@ use nw_domain::{
     history::{self, Action, Change, Entry},
 };
 use sqlx::{MySql, MySqlConnection, MySqlPool, QueryBuilder, Row, mysql::MySqlRow};
+
+use crate::infocoms::{self, InfocomSettings, Owner};
 
 /// Stored state of an asset, locked for the transaction.
 #[derive(Debug, Clone)]
@@ -45,13 +49,26 @@ pub struct UpdateOutcome {
     pub devices: Vec<(&'static str, i32)>,
 }
 
-/// Creates an asset (legacy `CommonDBTM::add`). Returns its id.
+/// What an update writes besides the values of the item.
+#[derive(Debug, Clone, Copy)]
+pub struct UpdateEffects<'a> {
+    /// Fields of a computer copied to its connected items and components.
+    pub propagation: Propagation,
+    /// Values set by the business rules on the connected items of each
+    /// type, run on the copied fields.
+    pub connected_rules: &'a HashMap<AssetKind, Vec<(Field, Value)>>,
+    pub infocoms: &'a InfocomSettings,
+}
+
+/// Creates an asset (legacy `CommonDBTM::add`), with its infocom when
+/// configured. Returns its id.
 pub async fn create(
     pool: &MySqlPool,
     kind: AssetKind,
     entity_id: i32,
     values: &[(Field, Value)],
     actor: &str,
+    infocom_settings: &InfocomSettings,
 ) -> Result<i32, sqlx::Error> {
     let mut tx = pool.begin().await?;
     let mut sql = QueryBuilder::<MySql>::new(format!("INSERT INTO {} (entities_id", kind.table()));
@@ -70,6 +87,25 @@ pub async fn create(
 
     let entry = Entry::item(kind.itemtype(), id, Action::CreateItem);
     crate::history::record(&mut tx, actor, &entry).await?;
+
+    let value_of = |column: &str| {
+        values
+            .iter()
+            .find(|(field, _)| field.column == column)
+            .map(|(_, value)| value)
+    };
+    let owner = Owner {
+        itemtype: kind.itemtype(),
+        id,
+        entities_id: entity_id,
+        is_recursive: value_of("is_recursive") == Some(&Value::Bool(true)),
+    };
+    if infocom_settings.auto_create {
+        infocoms::create_for_new_item(&mut tx, infocom_settings, owner, actor).await?;
+    }
+    // The form always posts a status, even none.
+    let states_id = value_of("states_id").map_or(0, Value::id);
+    infocoms::fill_status_dates(&mut tx, infocom_settings, owner, states_id, actor).await?;
     tx.commit().await?;
     Ok(id)
 }
@@ -83,8 +119,9 @@ pub async fn update(
     id: i32,
     values: &[(Field, Value)],
     actor: &str,
-    propagation: Propagation,
+    effects: UpdateEffects<'_>,
 ) -> Result<Option<UpdateOutcome>, sqlx::Error> {
+    let propagation = effects.propagation;
     let mut tx = pool.begin().await?;
     let Some(current) = lock(&mut tx, kind, id).await? else {
         return Ok(None);
@@ -93,6 +130,16 @@ pub async fn update(
         changed: apply_changes(&mut tx, kind, &current, values, actor).await?,
         ..UpdateOutcome::default()
     };
+    after_update(
+        &mut tx,
+        kind,
+        &current,
+        values,
+        &outcome.changed,
+        effects.infocoms,
+        actor,
+    )
+    .await?;
 
     if kind == AssetKind::Computer && !outcome.changed.is_empty() {
         let new_value = |column: &str| {
@@ -111,14 +158,33 @@ pub async fn update(
                 if item.is_global {
                     continue;
                 }
-                let item_values: Vec<(Field, Value)> = to_items
+                let mut item_values: Vec<(Field, Value)> = to_items
                     .iter()
                     .filter_map(|column| Some((item_kind.field(column)?, new_value(column)?)))
                     .collect();
-                if !apply_changes(&mut tx, item_kind, &item, &item_values, actor)
-                    .await?
-                    .is_empty()
+                // The business rules of the item's update run on the copied
+                // fields; what they set wins.
+                for (field, value) in effects
+                    .connected_rules
+                    .get(&item_kind)
+                    .into_iter()
+                    .flatten()
                 {
+                    item_values.retain(|(existing, _)| existing.column != field.column);
+                    item_values.push((*field, value.clone()));
+                }
+                let changed = apply_changes(&mut tx, item_kind, &item, &item_values, actor).await?;
+                after_update(
+                    &mut tx,
+                    item_kind,
+                    &item,
+                    &item_values,
+                    &changed,
+                    effects.infocoms,
+                    actor,
+                )
+                .await?;
+                if !changed.is_empty() {
                     outcome.connected_items.push((item_kind, item_id));
                 }
             }
@@ -175,6 +241,41 @@ pub async fn update(
 
     tx.commit().await?;
     Ok(Some(outcome))
+}
+
+/// What follows an update of the item itself (`CommonDBTM::update`): its
+/// infocom gets the new sharing (`forwardEntityInformations`) and the
+/// dates of its new status (`Infocom::manageDateOnStatusChange`).
+async fn after_update(
+    conn: &mut MySqlConnection,
+    kind: AssetKind,
+    current: &Current,
+    values: &[(Field, Value)],
+    changed: &[&str],
+    infocom_settings: &InfocomSettings,
+    actor: &str,
+) -> Result<(), sqlx::Error> {
+    let value_of = |column: &str| {
+        values
+            .iter()
+            .find(|(field, _)| field.column == column)
+            .map(|(_, value)| value)
+            .or_else(|| current.value(column))
+    };
+    let owner = Owner {
+        itemtype: kind.itemtype(),
+        id: current.id,
+        entities_id: current.entities_id,
+        is_recursive: value_of("is_recursive") == Some(&Value::Bool(true)),
+    };
+    if changed.contains(&"is_recursive") {
+        infocoms::forward_entity(conn, owner).await?;
+    }
+    if changed.contains(&"states_id") {
+        let states_id = value_of("states_id").map_or(0, Value::id);
+        infocoms::fill_status_dates(conn, infocom_settings, owner, states_id, actor).await?;
+    }
+    Ok(())
 }
 
 /// Moves an asset to the trash or restores it (legacy `CommonDBTM::delete`
@@ -418,24 +519,59 @@ pub async fn references_exist(
     Ok(missing)
 }
 
-/// Whether a computer has items or components that would follow a change
-/// of these columns, and of which types (for the business rules check).
-pub async fn propagation_targets(
+/// Types of the non-global items connected to a computer: those that follow
+/// its changes (and run their own business rules).
+pub async fn connected_kinds(
     pool: &MySqlPool,
     computer_id: i32,
-    propagation: Propagation,
-    changed: &[&str],
 ) -> Result<Vec<AssetKind>, sqlx::Error> {
-    if propagation.to_connected_items(changed).is_empty() {
-        return Ok(Vec::new());
-    }
     let mut conn = pool.acquire().await?;
-    let mut kinds: Vec<AssetKind> = connected_items(&mut conn, computer_id)
-        .await?
-        .into_iter()
-        .map(|(kind, _)| kind)
-        .collect();
-    kinds.sort_by_key(|kind| kind.itemtype());
-    kinds.dedup();
+    let mut kinds = Vec::new();
+    for (kind, id) in connected_items(&mut conn, computer_id).await? {
+        if kinds.contains(&kind) {
+            continue;
+        }
+        let is_global = if kind.can_be_global() {
+            "is_global"
+        } else {
+            "0"
+        };
+        let global: Option<i64> = sqlx::query_scalar(&format!(
+            "SELECT CAST({is_global} AS SIGNED) FROM {} WHERE id = ?",
+            kind.table()
+        ))
+        .bind(id)
+        .fetch_optional(&mut *conn)
+        .await?;
+        if global == Some(0) {
+            kinds.push(kind);
+        }
+    }
     Ok(kinds)
+}
+
+/// Tables of the items that follow the entity and sharing of an asset
+/// (`$forward_entity_to`), infocoms excepted, holding rows of this asset.
+pub async fn forwarded_items(
+    pool: &MySqlPool,
+    kind: AssetKind,
+    id: i32,
+) -> Result<Vec<&'static str>, sqlx::Error> {
+    let mut found = Vec::new();
+    for &table in kind.forward_entity_tables() {
+        let condition = if table == "glpi_computervirtualmachines" {
+            "computers_id = ?"
+        } else {
+            "itemtype = ? AND items_id = ?"
+        };
+        let sql = format!("SELECT COUNT(*) FROM {table} WHERE {condition}");
+        let mut query = sqlx::query_scalar::<_, i64>(&sql);
+        if table != "glpi_computervirtualmachines" {
+            query = query.bind(kind.itemtype());
+        }
+        if query.bind(id).fetch_one(pool).await? > 0 {
+            found.push(table);
+        }
+    }
+    Ok(found)
 }

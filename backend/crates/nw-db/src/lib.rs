@@ -11,7 +11,9 @@ pub mod entities;
 pub mod events;
 pub mod guards;
 pub mod history;
+pub mod infocoms;
 pub mod profiles;
+pub mod rules;
 mod scope;
 pub mod users;
 

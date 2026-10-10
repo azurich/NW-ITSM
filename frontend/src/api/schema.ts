@@ -521,7 +521,7 @@ export interface components {
              *     (`too_short`, `missing_digit`, `missing_lowercase`,
              *     `missing_uppercase`, `missing_symbol`) or the reason of
              *     `legacy_required` (`business_rules`, `field_unicity`,
-             *     `infocom_creation`, `infocom_dates`, `plugins`, `unrecursive`).
+             *     `linked_items`, `plugins`, `unrecursive`).
              */
             details?: string[];
             message: string;

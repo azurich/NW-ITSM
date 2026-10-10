@@ -68,10 +68,14 @@ Chaque lot suit la même « définition de terminé » :
       écriture PHP ([ADR 0004](adr/0004-ecritures-du-parc.md))
 - [x] Listes de choix des formulaires filtrées par entité comme le PHP
 - [x] Refus explicite (`409 legacy_required`) quand une fonction PHP non
-      portée s'appliquerait : plugins actifs, règles métier, unicité des
-      champs, informations financières automatiques, retrait du partage
-- [ ] Porter ces fonctions pour lever les refus : règles métier du parc,
-      unicité des champs, informations financières automatiques
+      portée s'appliquerait : plugins actifs, unicité des champs, partage
+      d'un élément ayant des objets liés, retrait du partage
+- [x] Règles métier du parc (moteur de règles, expressions régulières PCRE)
+      et informations financières automatiques (création, dates selon le
+      statut), vérifiées contre le PHP
+- [ ] Unicité des champs, recopie du partage vers tous les objets liés
+- [ ] Corriger des deux côtés le bug des règles du parc qui ignorent la
+      condition « Ajout / Mise à jour » (reproduit pour l'instant)
 - [ ] Champs propres à chaque type, gabarits, suppression définitive
 - [ ] Baies et autres types (équipements passifs, PDU, enclos, clusters)
 - [ ] Logiciels, licences, versions installées

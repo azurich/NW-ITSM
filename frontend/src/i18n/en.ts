@@ -169,10 +169,9 @@ export const en: typeof fr = {
       bad_request: 'Values refused: {{message}}',
       legacy: 'This change must be made in the classic interface',
       legacy_required: {
-        business_rules: 'business rules apply to these items.',
+        business_rules: 'a business rule uses a criterion, an action or a regular expression not supported here.',
         field_unicity: 'field unicity criteria are configured.',
-        infocom_creation: 'financial information is created with the items.',
-        infocom_dates: 'this status fills dates of the financial information.',
+        linked_items: 'sharing the item also changes its linked items (software, network ports, disks...).',
         plugins: 'plugins of the classic interface react to changes.',
         unrecursive: 'unsharing with the sub-entities needs checks.',
       },

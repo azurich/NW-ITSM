@@ -1,8 +1,11 @@
 //! Assets: computers, monitors, printers, network equipment, peripherals
 //! and phones, under `/assets/{type}`.
 
+mod business;
 pub mod choices;
 mod guards;
+
+use std::collections::HashMap;
 
 use axum::{
     Json, Router,
@@ -16,7 +19,7 @@ use axum::{
 use chrono::{DateTime, Utc};
 use nw_db::{
     assets::{self, ListQuery, Sort},
-    events,
+    events, infocoms,
 };
 use nw_domain::{
     asset::{AssetKind, Field, FieldKind, Value},
@@ -418,12 +421,47 @@ pub async fn create(
     if !session.scope.active().contains(&request.entity_id) {
         return Err(ApiError::Forbidden);
     }
-    let values = field_values(kind, &request.fields)?;
-    check_references(&state, &values).await?;
-    guards::check_create(&state.pool, &session.tree, kind, request.entity_id, &values).await?;
+    let requested = field_values(kind, &request.fields)?;
+    check_references(&state, &requested).await?;
+    let infocom_settings = infocoms::settings(&state.pool).await?;
+    guards::check_create(&state.pool, kind, &infocom_settings).await?;
+
+    // Every field of the form is written, empty when not given (an empty
+    // text, not NULL), and seen by the rules, as the classic interface does.
+    let mut values: Vec<(Field, Value)> = kind
+        .fields()
+        .into_iter()
+        .map(|field| {
+            let posted = requested
+                .iter()
+                .find(|(given, _)| given.column == field.column);
+            (
+                field,
+                posted.map_or_else(|| empty_value(field), |(_, value)| value.clone()),
+            )
+        })
+        .collect();
+    let rules = nw_db::rules::asset_rules(&state.pool).await?;
+    let rule_values = business::run(
+        &state.pool,
+        &session,
+        &rules,
+        kind,
+        &business::FormInput::form(&values, request.entity_id, None),
+    )
+    .await?;
+    business::merge(&mut values, rule_values);
 
     let actor = history::actor(session.user.id, &session.own_name());
-    let id = assets::create(&state.pool, kind, request.entity_id, &values, &actor).await?;
+    let id = assets::create(
+        &state.pool,
+        kind,
+        request.entity_id,
+        &values,
+        &actor,
+        &infocom_settings,
+    )
+    .await?;
     let name = request
         .fields
         .name
@@ -467,21 +505,70 @@ pub async fn update(
     session.require(kind.right(), UPDATE)?;
     let Json(fields) = payload.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
     let current = writable(&state, &session, kind, id).await?;
-    let values = field_values(kind, &fields)?;
+    let mut values = field_values(kind, &fields)?;
     check_references(&state, &values).await?;
+
+    // The rules see the whole form: the stored values and the changes.
+    let rules = nw_db::rules::asset_rules(&state.pool).await?;
+    let mut form = current.values.clone();
+    business::merge(&mut form, values.clone());
+    let rule_values = business::run(
+        &state.pool,
+        &session,
+        &rules,
+        kind,
+        &business::FormInput::form(&form, current.entities_id, Some(id)),
+    )
+    .await?;
+    business::merge(&mut values, rule_values);
+
+    // A computer copies some changes to its connected items, whose own
+    // update runs the rules on the copied fields.
+    let changed = guards::changed_columns(&current, &values);
     let propagation = guards::propagation(&state.pool).await?;
+    let copied: Vec<(Field, Value)> = propagation
+        .to_connected_items(&changed)
+        .into_iter()
+        .filter_map(|column| {
+            values
+                .iter()
+                .find(|(field, _)| field.column == column)
+                .cloned()
+        })
+        .collect();
+    let mut connected = Vec::new();
+    let mut connected_rules = HashMap::new();
+    if kind == AssetKind::Computer && !copied.is_empty() {
+        connected = assets::connected_kinds(&state.pool, id).await?;
+        for &item_kind in &connected {
+            let item_copied: Vec<(Field, Value)> = copied
+                .iter()
+                .filter_map(|(field, value)| Some((item_kind.field(field.column)?, value.clone())))
+                .collect();
+            let input = business::FormInput::fields(&item_copied);
+            let item_values =
+                business::run(&state.pool, &session, &rules, item_kind, &input).await?;
+            connected_rules.insert(item_kind, item_values);
+        }
+    }
+    let infocom_settings = infocoms::settings(&state.pool).await?;
     guards::check_update(
         &state.pool,
-        &session.tree,
         kind,
         &current,
-        &values,
-        propagation,
+        &changed,
+        &connected,
+        &infocom_settings,
     )
     .await?;
 
     let actor = history::actor(session.user.id, &session.own_name());
-    assets::update(&state.pool, kind, id, &values, &actor, propagation)
+    let effects = assets::UpdateEffects {
+        propagation,
+        connected_rules: &connected_rules,
+        infocoms: &infocom_settings,
+    };
+    assets::update(&state.pool, kind, id, &values, &actor, effects)
         .await?
         .ok_or(ApiError::NotFound)?;
     log_asset_event(&state, &session, kind, id, "updates an item").await;
@@ -705,6 +792,15 @@ async fn log_asset_event(
         },
     )
     .await;
+}
+
+/// Value of a field the form posts empty.
+fn empty_value(field: Field) -> Value {
+    match field.kind {
+        FieldKind::Text => Value::Text(Some(String::new())),
+        FieldKind::Dropdown { .. } | FieldKind::User => Value::Id(0),
+        FieldKind::Bool => Value::Bool(false),
+    }
 }
 
 fn decode(text: Option<String>) -> Option<String> {

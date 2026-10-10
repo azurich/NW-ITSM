@@ -237,6 +237,40 @@ impl AssetKind {
         fields
     }
 
+    /// Tables of the items following the entity and sharing of the asset
+    /// (`$forward_entity_to`), infocoms excepted.
+    pub fn forward_entity_tables(self) -> &'static [&'static str] {
+        match self {
+            Self::Computer => &[
+                "glpi_items_disks",
+                "glpi_computervirtualmachines",
+                "glpi_items_softwareversions",
+                "glpi_networkports",
+                "glpi_reservationitems",
+                "glpi_items_operatingsystems",
+            ],
+            Self::Monitor | Self::Peripheral => &[
+                "glpi_reservationitems",
+                "glpi_items_operatingsystems",
+                "glpi_networkports",
+                "glpi_items_softwareversions",
+            ],
+            Self::NetworkEquipment | Self::Printer => &[
+                "glpi_networkports",
+                "glpi_reservationitems",
+                "glpi_items_operatingsystems",
+                "glpi_items_disks",
+                "glpi_items_softwareversions",
+            ],
+            Self::Phone => &[
+                "glpi_networkports",
+                "glpi_reservationitems",
+                "glpi_items_operatingsystems",
+                "glpi_items_disks",
+            ],
+        }
+    }
+
     pub fn field(self, column: &str) -> Option<Field> {
         self.fields()
             .into_iter()

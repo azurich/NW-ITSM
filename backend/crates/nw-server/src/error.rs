@@ -67,7 +67,7 @@ pub struct ErrorDetail {
     /// (`too_short`, `missing_digit`, `missing_lowercase`,
     /// `missing_uppercase`, `missing_symbol`) or the reason of
     /// `legacy_required` (`business_rules`, `field_unicity`,
-    /// `infocom_creation`, `infocom_dates`, `plugins`, `unrecursive`).
+    /// `linked_items`, `plugins`, `unrecursive`).
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub details: Vec<&'static str>,
 }

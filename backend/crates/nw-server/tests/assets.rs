@@ -506,6 +506,367 @@ async fn writes_stay_in_the_selected_entities() {
     assert_eq!(history(&app, "Computer", 101).await, []);
 }
 
+/// A `RuleAsset` rule of the root entity, run on `condition` (1 add, 2
+/// update, 3 both).
+async fn rule(
+    app: &common::TestApp,
+    id: i32,
+    condition: i32,
+    criteria: &[(&str, i32, &str)],
+    actions: &[(&str, &str, &str)],
+) {
+    let mut sql = format!(
+        "INSERT INTO glpi_rules (id, entities_id, sub_type, ranking, name, `match`, is_active, `condition`) \
+         VALUES ({id}, 0, 'RuleAsset', {id}, 'Rule {id}', 'AND', 1, {condition});"
+    );
+    for (criteria, condition, pattern) in criteria {
+        sql += &format!(
+            "INSERT INTO glpi_rulecriterias (rules_id, criteria, `condition`, pattern) \
+             VALUES ({id}, '{criteria}', {condition}, '{pattern}');"
+        );
+    }
+    for (action_type, field, value) in actions {
+        sql += &format!(
+            "INSERT INTO glpi_ruleactions (rules_id, action_type, field, value) \
+             VALUES ({id}, '{action_type}', '{field}', '{value}');"
+        );
+    }
+    app.sql(&sql).await;
+}
+
+#[tokio::test]
+async fn business_rules_change_the_written_values() {
+    let app = test_app!();
+    let manager = app.login("manager").await;
+    // Update of a computer whose contact is "jdupont": location and comment.
+    rule(
+        &app,
+        1,
+        2,
+        &[("_itemtype", 0, "Computer"), ("contact", 0, "JDUPONT")],
+        &[
+            ("assign", "locations_id", "3"),
+            ("assign", "comment", "set by rule"),
+        ],
+    )
+    .await;
+    // The user comes from an e-mail address in the contact.
+    rule(
+        &app,
+        2,
+        3,
+        &[("_auto", 0, "0"), ("contact", 6, "/^(.*)@example/")],
+        &[("regex_result", "_affect_user_by_regex", "#0")],
+    )
+    .await;
+    // Inventory tools only: never run here.
+    rule(
+        &app,
+        3,
+        3,
+        &[("_auto", 0, "1")],
+        &[("assign", "states_id", "2")],
+    )
+    .await;
+    // Without criteria, inactive, or defined in a sub-entity: never run.
+    rule(&app, 4, 3, &[], &[("assign", "states_id", "2")]).await;
+    rule(
+        &app,
+        5,
+        3,
+        &[("contact", 8, "")],
+        &[("assign", "states_id", "2")],
+    )
+    .await;
+    app.sql("UPDATE glpi_rules SET is_active = 0 WHERE id = 5")
+        .await;
+    rule(
+        &app,
+        6,
+        3,
+        &[("contact", 8, "")],
+        &[("assign", "states_id", "2")],
+    )
+    .await;
+    app.sql("UPDATE glpi_rules SET entities_id = 1 WHERE id = 6")
+        .await;
+
+    let response = app
+        .patch(
+            "/api/v2/assets/computers/102",
+            &manager,
+            json!({ "contact": "jdupont" }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["location"]["id"], 3);
+    assert_eq!(response.body["comment"], "set by rule");
+    assert_eq!(response.body["state"], Value::Null);
+    assert_eq!(
+        history(&app, "Computer", 102).await,
+        [
+            row(7, "", "jdupont"),
+            row(3, "Paris HQ &gt; Room 1 (1)", "Warehouse (3)"),
+            row(16, "", "set by rule"),
+        ]
+    );
+
+    // Rules see the whole form: an unrelated change runs them again, and
+    // what they set stays.
+    let response = app
+        .patch(
+            "/api/v2/assets/computers/102",
+            &manager,
+            json!({ "comment": "mine", "serial": "S2" }),
+        )
+        .await;
+    assert_eq!(response.body["comment"], "set by rule");
+    assert_eq!(response.body["serial"], "S2");
+
+    // Creation with a contact from which the user login is taken.
+    let response = app
+        .post(
+            "/api/v2/assets/monitors",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "MON-NEW", "contact": "paris@example.org" })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    assert_eq!(response.body["user"]["id"], 11);
+    // Unknown login: no user.
+    let response = app
+        .post(
+            "/api/v2/assets/monitors",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "MON-NEW-2", "contact": "nobody@example.org" })),
+        )
+        .await;
+    assert_eq!(response.body["user"], Value::Null);
+}
+
+#[tokio::test]
+async fn connected_items_run_their_own_rules() {
+    let app = test_app!();
+    app.sql(
+        "INSERT INTO glpi_configs (context, name, value) VALUES \
+         ('core', 'is_location_autoupdate', '1'), ('core', 'is_contact_autoupdate', '1')",
+    )
+    .await;
+    // Monitors moved to the warehouse get a status; the rules see the
+    // copied fields (location, contact).
+    rule(
+        &app,
+        1,
+        2,
+        &[("_itemtype", 0, "Monitor"), ("locations_id", 0, "3")],
+        &[("assign", "states_id", "1"), ("assign", "comment", "moved")],
+    )
+    .await;
+    rule(
+        &app,
+        2,
+        2,
+        &[("_itemtype", 0, "Monitor"), ("contact", 2, "jd")],
+        &[("assign", "users_id", "13")],
+    )
+    .await;
+    let manager = app.login("manager").await;
+    let response = app
+        .patch(
+            "/api/v2/assets/computers/102",
+            &manager,
+            json!({ "location_id": 3, "contact": "jd" }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    // Not on the computer itself.
+    assert_eq!(response.body["state"], Value::Null);
+
+    let monitor = app.get("/api/v2/assets/monitors/200", Some(&manager)).await;
+    assert_eq!(monitor.body["location"]["id"], 3);
+    assert_eq!(monitor.body["state"]["id"], 1);
+    assert_eq!(monitor.body["comment"], "moved");
+    assert_eq!(monitor.body["user"]["id"], 13);
+    // The global monitor neither follows nor runs the rules.
+    let shared = app.get("/api/v2/assets/monitors/201", Some(&manager)).await;
+    assert_eq!(shared.body["state"], Value::Null);
+}
+
+#[tokio::test]
+async fn infocoms_are_created_and_dated_like_php() {
+    let app = test_app!();
+    let manager = app.login("manager").await;
+    let infocom = |itemtype: &'static str, id: i32| {
+        let pool = app.pool.clone();
+        async move {
+            sqlx::query_as::<_, (i32, i32, bool, i32, Option<String>, Option<String>, Option<String>)>(
+                "SELECT id, entities_id, is_recursive, alert, CAST(buy_date AS CHAR), CAST(use_date AS CHAR), \
+                 CAST(warranty_date AS CHAR) FROM glpi_infocoms WHERE itemtype = ? AND items_id = ?",
+            )
+            .bind(itemtype)
+            .bind(id)
+            .fetch_optional(&pool)
+            .await
+            .unwrap()
+        }
+    };
+    let today: String = sqlx::query_scalar("SELECT CAST(CURDATE() AS CHAR)")
+        .fetch_one(&app.pool)
+        .await
+        .unwrap();
+
+    // Created with the item; default alert of the root entity, inherited.
+    app.sql(
+        "INSERT INTO glpi_configs (context, name, value) VALUES ('core', 'auto_create_infocoms', '1'); \
+         UPDATE glpi_entities SET default_infocom_alert = 4 WHERE id = 0",
+    )
+    .await;
+    let response = app
+        .post(
+            "/api/v2/assets/printers",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "PRN-1", "is_recursive": true })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    let printer = response.body["id"].as_i64().unwrap() as i32;
+    let (infocom_id, entity, recursive, alert, buy, _, _) =
+        infocom("Printer", printer).await.unwrap();
+    assert_eq!((entity, recursive, alert, buy), (1, true, 4, None));
+    assert_eq!(history(&app, "Infocom", infocom_id).await, [item_row(20)]);
+
+    // Dates filled by the status, set on the root entity and inherited.
+    app.sql(
+        "UPDATE glpi_entities SET autofill_buy_date = 'STATUS_1', autofill_use_date = 'STATUS_1', \
+         autofill_warranty_date = 'STATUS_2' WHERE id = 0",
+    )
+    .await;
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/printers/{printer}"),
+            &manager,
+            json!({ "state_id": 1 }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    let (_, _, _, _, buy, used, warranty) = infocom("Printer", printer).await.unwrap();
+    assert_eq!(
+        (buy.as_deref(), used.as_deref(), warranty),
+        (Some(today.as_str()), Some(today.as_str()), None)
+    );
+    // Logged on the printer with the time, as the PHP code does.
+    let dates: Vec<_> = history(&app, "Printer", printer)
+        .await
+        .into_iter()
+        .filter(|entry| matches!(entry.0, 37 | 38))
+        .collect();
+    assert_eq!(dates.len(), 2);
+    assert_eq!((dates[0].0, dates[1].0), (37, 38));
+    assert_eq!(dates[0].1, "");
+    assert!(
+        dates[0].2.starts_with(&today) && dates[0].2.len() == 19,
+        "{}",
+        dates[0].2
+    );
+
+    // Back to the status the same day: rewritten, but not logged again.
+    for state in [2, 1] {
+        app.patch(
+            &format!("/api/v2/assets/printers/{printer}"),
+            &manager,
+            json!({ "state_id": state }),
+        )
+        .await;
+    }
+    let logged = history(&app, "Printer", printer)
+        .await
+        .into_iter()
+        .filter(|entry| matches!(entry.0, 37 | 38 | 123))
+        .count();
+    // Status 2 filled the warranty date once.
+    assert_eq!(logged, 3);
+
+    // A new item with a status: the infocom is created, then dated.
+    app.sql("DELETE FROM glpi_configs WHERE name = 'auto_create_infocoms'")
+        .await;
+    let response = app
+        .post(
+            "/api/v2/assets/phones",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "PHONE-1", "state_id": 1 })),
+        )
+        .await;
+    let phone = response.body["id"].as_i64().unwrap() as i32;
+    let (phone_infocom, _, _, alert, buy, used, _) = infocom("Phone", phone).await.unwrap();
+    assert_eq!(
+        (alert, buy.as_deref(), used.as_deref()),
+        (4, Some(today.as_str()), Some(today.as_str()))
+    );
+    assert_eq!(
+        history(&app, "Infocom", phone_infocom).await,
+        [item_row(20)]
+    );
+    assert!(
+        history(&app, "Phone", phone)
+            .await
+            .iter()
+            .all(|entry| entry.0 == 0)
+    );
+    // Without status nor automatic creation: no infocom.
+    let response = app
+        .post(
+            "/api/v2/assets/phones",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "PHONE-2" })),
+        )
+        .await;
+    assert!(
+        infocom("Phone", response.body["id"].as_i64().unwrap() as i32)
+            .await
+            .is_none()
+    );
+
+    // A connected monitor getting the status of its computer is dated too.
+    app.sql("INSERT INTO glpi_configs (context, name, value) VALUES ('core', 'state_autoupdate_mode', '-1')")
+        .await;
+    let response = app
+        .patch(
+            "/api/v2/assets/computers/102",
+            &manager,
+            json!({ "state_id": 1 }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert!(infocom("Computer", 102).await.is_some());
+    assert!(infocom("Monitor", 200).await.is_some());
+    assert!(infocom("Monitor", 201).await.is_none());
+}
+
+#[tokio::test]
+async fn sharing_follows_to_the_infocom() {
+    let app = test_app!();
+    let manager = app.login("manager").await;
+    app.sql(
+        "INSERT INTO glpi_infocoms (itemtype, items_id, entities_id, is_recursive) VALUES ('Computer', 107, 1, 0)",
+    )
+    .await;
+    let response = app
+        .patch(
+            "/api/v2/assets/computers/107",
+            &manager,
+            json!({ "is_recursive": true }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    let recursive: bool = sqlx::query_scalar(
+        "SELECT is_recursive FROM glpi_infocoms WHERE itemtype = 'Computer' AND items_id = 107",
+    )
+    .fetch_one(&app.pool)
+    .await
+    .unwrap();
+    assert!(recursive);
+}
+
 #[tokio::test]
 async fn unported_php_features_send_the_change_to_the_classic_interface() {
     let app = test_app!();
@@ -517,12 +878,14 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
     };
     let create = json!({ "entity_id": 1, "name": "new" });
 
-    // Business rule on manual updates of computers.
-    app.sql(
-        "INSERT INTO glpi_rules (id, sub_type, name, `match`, is_active, `condition`) VALUES \
-         (1, 'RuleAsset', 'Set the location', 'AND', 1, 2); \
-         INSERT INTO glpi_rulecriterias (rules_id, criteria, `condition`, pattern) VALUES \
-         (1, 'name', 0, 'x'), (1, '_itemtype', 0, 'Computer')",
+    // Rules the engine cannot run identically: a plugin criterion, a
+    // regular expression only PCRE understands.
+    rule(
+        &app,
+        1,
+        2,
+        &[("_plugin_tag", 0, "x")],
+        &[("assign", "comment", "x")],
     )
     .await;
     let response = app
@@ -533,47 +896,21 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
         )
         .await;
     refused(&response, "business_rules");
-    // Not on creations, nor on the other types.
+    // A rule meant for updates also runs on creations, as in PHP.
     let response = app
         .post("/api/v2/assets/computers", &manager, Some(create.clone()))
         .await;
-    assert_eq!(response.status, StatusCode::CREATED);
-    let response = app
-        .patch(
-            "/api/v2/assets/monitors/200",
-            &manager,
-            json!({ "name": "x" }),
-        )
+    refused(&response, "business_rules");
+    app.sql("DELETE FROM glpi_rulecriterias; DELETE FROM glpi_ruleactions; DELETE FROM glpi_rules")
         .await;
-    assert_eq!(response.status, StatusCode::OK);
-    // A rule limited to inventory tools does not apply.
-    app.sql("INSERT INTO glpi_rulecriterias (rules_id, criteria, `condition`, pattern) VALUES (1, '_auto', 0, '1')")
-        .await;
-    let response = app
-        .patch(
-            "/api/v2/assets/computers/102",
-            &manager,
-            json!({ "name": "x" }),
-        )
-        .await;
-    assert_eq!(response.status, StatusCode::OK);
-
-    // Location change propagated to a monitor, with a rule on monitors.
-    app.sql(
-        "INSERT INTO glpi_configs (context, name, value) VALUES ('core', 'is_location_autoupdate', '1'); \
-         INSERT INTO glpi_rules (id, sub_type, name, `match`, is_active, `condition`) VALUES \
-         (2, 'RuleAsset', 'Monitors', 'AND', 1, 2); \
-         INSERT INTO glpi_rulecriterias (rules_id, criteria, `condition`, pattern) VALUES (2, '_itemtype', 0, 'Monitor')",
+    rule(
+        &app,
+        2,
+        2,
+        &[("contact", 6, "/(a)\\\\1/")],
+        &[("assign", "comment", "x")],
     )
     .await;
-    let response = app
-        .patch(
-            "/api/v2/assets/computers/102",
-            &manager,
-            json!({ "location_id": 3 }),
-        )
-        .await;
-    refused(&response, "business_rules");
     let response = app
         .patch(
             "/api/v2/assets/computers/102",
@@ -581,10 +918,11 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
             json!({ "serial": "y" }),
         )
         .await;
-    assert_eq!(response.status, StatusCode::OK);
-    app.sql("DELETE FROM glpi_rules").await;
+    refused(&response, "business_rules");
+    app.sql("DELETE FROM glpi_rulecriterias; DELETE FROM glpi_ruleactions; DELETE FROM glpi_rules")
+        .await;
 
-    // Unicity of fields.
+    // Unicity of fields, also on the infocoms when they are written.
     app.sql(
         "INSERT INTO glpi_fieldunicities (name, itemtype, entities_id, fields, is_active, action_refuse) \
          VALUES ('Serial', 'Computer', 0, 'serial', 1, 1)",
@@ -598,54 +936,16 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
         )
         .await;
     refused(&response, "field_unicity");
-    app.sql("DELETE FROM glpi_fieldunicities").await;
-
-    // Financial information created with the items.
-    app.sql("INSERT INTO glpi_configs (context, name, value) VALUES ('core', 'auto_create_infocoms', '1')")
-        .await;
+    app.sql(
+        "UPDATE glpi_fieldunicities SET itemtype = 'Infocom'; \
+         INSERT INTO glpi_configs (context, name, value) VALUES ('core', 'auto_create_infocoms', '1')",
+    )
+    .await;
     let response = app
         .post("/api/v2/assets/computers", &manager, Some(create.clone()))
         .await;
-    refused(&response, "infocom_creation");
-    app.sql("DELETE FROM glpi_configs WHERE name = 'auto_create_infocoms'")
-        .await;
-
-    // Status filling a date of the financial information, set on the root
-    // entity and inherited by Paris.
-    app.sql("UPDATE glpi_entities SET autofill_use_date = 'STATUS_1' WHERE id = 0")
-        .await;
-    let response = app
-        .patch(
-            "/api/v2/assets/monitors/200",
-            &manager,
-            json!({ "state_id": 1 }),
-        )
-        .await;
-    refused(&response, "infocom_dates");
-    let mut with_state = create.clone();
-    with_state["state_id"] = json!(1);
-    let response = app
-        .post("/api/v2/assets/monitors", &manager, Some(with_state))
-        .await;
-    refused(&response, "infocom_dates");
-    let response = app
-        .patch(
-            "/api/v2/assets/monitors/200",
-            &manager,
-            json!({ "state_id": 2 }),
-        )
-        .await;
-    assert_eq!(response.status, StatusCode::OK);
-    app.sql("UPDATE glpi_entities SET autofill_use_date = '0' WHERE id = 1")
-        .await;
-    let response = app
-        .patch(
-            "/api/v2/assets/monitors/200",
-            &manager,
-            json!({ "state_id": 1 }),
-        )
-        .await;
-    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    refused(&response, "field_unicity");
+    app.sql("DELETE FROM glpi_fieldunicities").await;
 
     // Hooks of the PHP plugins.
     app.sql(
@@ -676,7 +976,7 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
     assert_eq!(response.status, StatusCode::OK);
     app.sql("UPDATE glpi_plugins SET state = 4").await;
 
-    // Shared items cannot be unshared here.
+    // Sharing an item with linked items (here an installed software).
     let response = app
         .patch(
             "/api/v2/assets/computers/102",
@@ -684,11 +984,19 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
             json!({ "is_recursive": true }),
         )
         .await;
-    assert_eq!(response.status, StatusCode::OK);
-    assert_eq!(response.body["is_recursive"], true);
+    refused(&response, "linked_items");
+    // Shared items cannot be unshared here.
     let response = app
         .patch(
-            "/api/v2/assets/computers/102",
+            "/api/v2/assets/computers/107",
+            &manager,
+            json!({ "is_recursive": true }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK);
+    let response = app
+        .patch(
+            "/api/v2/assets/computers/107",
             &manager,
             json!({ "is_recursive": false }),
         )
@@ -696,12 +1004,7 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
     refused(&response, "unrecursive");
 
     // Refusals write nothing.
-    let names: Vec<_> = history(&app, "Computer", 102)
-        .await
-        .into_iter()
-        .map(|entry| entry.0)
-        .collect();
-    assert_eq!(names, [1, 5, 86]);
+    assert_eq!(history(&app, "Computer", 102).await, []);
 }
 
 #[tokio::test]
