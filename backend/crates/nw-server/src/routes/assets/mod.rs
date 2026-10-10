@@ -23,7 +23,7 @@ use nw_db::{
     events, infocoms,
 };
 use nw_domain::{
-    asset::{AssetKind, Field, FieldKind, Value},
+    asset::{AssetKind, Field, FieldKind, Value, filter_decimal, filter_integer},
     fk::fk,
     history,
     i18n::{self, Source, text},
@@ -203,6 +203,19 @@ pub struct AssetDetail {
     pub contact: Option<String>,
     pub contact_number: Option<String>,
     pub comment: Option<String>,
+    /// Monitors only: diagonal in inches, as stored (`"21.50"`).
+    pub size: Option<String>,
+    /// Printers (free text) and network equipment (MiB) only.
+    pub memory: Option<String>,
+    /// Printers only.
+    pub initial_page_counter: Option<i32>,
+    /// Printers only: current counter of pages.
+    pub page_counter: Option<i32>,
+    /// Phones only.
+    pub power_supply: Option<Ref>,
+    /// Connectors and features of the type, `null` for the other types.
+    #[serde(flatten)]
+    pub features: Features,
     /// In the trash.
     pub is_deleted: bool,
     /// Updated by an inventory tool.
@@ -233,6 +246,90 @@ pub struct AssetDetail {
     /// a unicity criterion that does not refuse them.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub duplicates: Vec<unicity::DuplicateNotice>,
+}
+
+/// Connectors and features of monitors, printers and phones (`have_*`).
+#[derive(Debug, Default, Deserialize, Serialize, ToSchema)]
+pub struct Features {
+    /// Monitors.
+    pub has_microphone: Option<bool>,
+    /// Monitors and phones.
+    pub has_speaker: Option<bool>,
+    /// Monitors.
+    pub has_subd: Option<bool>,
+    /// Monitors.
+    pub has_bnc: Option<bool>,
+    /// Monitors.
+    pub has_dvi: Option<bool>,
+    /// Monitors.
+    pub has_pivot: Option<bool>,
+    /// Monitors.
+    pub has_hdmi: Option<bool>,
+    /// Monitors.
+    pub has_displayport: Option<bool>,
+    /// Printers: serial port.
+    pub has_serial: Option<bool>,
+    /// Printers.
+    pub has_parallel: Option<bool>,
+    /// Printers.
+    pub has_usb: Option<bool>,
+    /// Printers.
+    pub has_ethernet: Option<bool>,
+    /// Printers.
+    pub has_wifi: Option<bool>,
+    /// Phones.
+    pub has_headset: Option<bool>,
+}
+
+impl Features {
+    /// `(API name, value)` with the column of the type.
+    fn columns(&self, kind: AssetKind) -> [(&'static str, &'static str, Option<bool>); 14] {
+        let speaker = if kind == AssetKind::Phone {
+            "have_hp"
+        } else {
+            "have_speaker"
+        };
+        [
+            ("has_microphone", "have_micro", self.has_microphone),
+            ("has_speaker", speaker, self.has_speaker),
+            ("has_subd", "have_subd", self.has_subd),
+            ("has_bnc", "have_bnc", self.has_bnc),
+            ("has_dvi", "have_dvi", self.has_dvi),
+            ("has_pivot", "have_pivot", self.has_pivot),
+            ("has_hdmi", "have_hdmi", self.has_hdmi),
+            ("has_displayport", "have_displayport", self.has_displayport),
+            ("has_serial", "have_serial", self.has_serial),
+            ("has_parallel", "have_parallel", self.has_parallel),
+            ("has_usb", "have_usb", self.has_usb),
+            ("has_ethernet", "have_ethernet", self.has_ethernet),
+            ("has_wifi", "have_wifi", self.has_wifi),
+            ("has_headset", "have_headset", self.has_headset),
+        ]
+    }
+
+    fn read(kind: AssetKind, specific: &assets::Specific) -> Self {
+        let flag = |column: &str| specific.flag(column);
+        Self {
+            has_microphone: flag("have_micro"),
+            has_speaker: flag(if kind == AssetKind::Phone {
+                "have_hp"
+            } else {
+                "have_speaker"
+            }),
+            has_subd: flag("have_subd"),
+            has_bnc: flag("have_bnc"),
+            has_dvi: flag("have_dvi"),
+            has_pivot: flag("have_pivot"),
+            has_hdmi: flag("have_hdmi"),
+            has_displayport: flag("have_displayport"),
+            has_serial: flag("have_serial"),
+            has_parallel: flag("have_parallel"),
+            has_usb: flag("have_usb"),
+            has_ethernet: flag("have_ethernet"),
+            has_wifi: flag("have_wifi"),
+            has_headset: flag("have_headset"),
+        }
+    }
 }
 
 /// Fields of a creation or an update. Absent fields are left unchanged;
@@ -306,6 +403,28 @@ pub struct AssetFields {
     pub tech_group_id: Option<i32>,
     /// Visible in sub-entities. Can be set, not unset (classic interface).
     pub is_recursive: Option<bool>,
+    /// Monitors only: decimal number of inches (`"21.5"`, `"21,5"`).
+    #[serde(default, deserialize_with = "nullable_text")]
+    #[schema(value_type = Option<String>)]
+    pub size: Option<String>,
+    /// Printers: free text. Network equipment: a whole number of MiB, or
+    /// empty.
+    #[serde(default, deserialize_with = "nullable_text")]
+    #[schema(value_type = Option<String>)]
+    pub memory: Option<String>,
+    /// Printers only.
+    pub initial_page_counter: Option<i32>,
+    /// Printers only.
+    pub page_counter: Option<i32>,
+    /// Phones only.
+    #[serde(default, deserialize_with = "nullable_id")]
+    #[schema(value_type = Option<i32>)]
+    pub power_supply_id: Option<i32>,
+    /// Monitors, printers, peripherals and phones only: one item for
+    /// several computers.
+    pub is_global: Option<bool>,
+    #[serde(flatten)]
+    pub features: Features,
 }
 
 #[derive(Debug, Deserialize, ToSchema)]
@@ -438,14 +557,15 @@ pub async fn create(
     let mut values: Vec<(Field, Value)> = kind
         .fields()
         .into_iter()
-        .map(|field| {
+        .filter_map(|field| {
             let posted = requested
                 .iter()
                 .find(|(given, _)| given.column == field.column);
-            (
-                field,
-                posted.map_or_else(|| empty_value(field), |(_, value)| value.clone()),
-            )
+            let value = match posted {
+                Some((_, value)) => value.clone(),
+                None => field.form_default()?,
+            };
+            Some((field, value))
         })
         .collect();
     let rules = nw_db::rules::asset_rules(&state.pool).await?;
@@ -543,6 +663,8 @@ pub async fn update(
     )
     .await?;
     business::merge(&mut values, rule_values);
+    // The changes, and their history, in the order of the legacy form.
+    kind.sort_by_form(&mut values);
 
     // Unicity of the whole form, checked even when nothing changes.
     business::merge(&mut form, values.clone());
@@ -758,7 +880,14 @@ async fn detail(
         update: in_selected_entity && session.rights.has(kind.right(), UPDATE),
         trash: in_selected_entity && session.rights.has(kind.right(), DELETE),
     };
-    Ok(AssetDetail::from_row(kind, row, session, permissions))
+    let specific = assets::specific(&state.pool, kind, id).await?;
+    Ok(AssetDetail::from_row(
+        kind,
+        row,
+        &specific,
+        session,
+        permissions,
+    ))
 }
 
 /// Stored values of the given fields, validated.
@@ -796,6 +925,11 @@ fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, 
         ("group_id", "groups_id", fields.group_id),
         ("tech_user_id", "users_id_tech", fields.tech_user_id),
         ("tech_group_id", "groups_id_tech", fields.tech_group_id),
+        (
+            "power_supply_id",
+            "phonepowersupplies_id",
+            fields.power_supply_id,
+        ),
     ];
     let field = |name: &str, column: &str| {
         kind.field(column).ok_or_else(|| {
@@ -824,13 +958,98 @@ fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, 
         }
         values.push((field(name, column)?, Value::Id(id)));
     }
-    if let Some(recursive) = fields.is_recursive {
-        values.push((
-            field("is_recursive", "is_recursive")?,
-            Value::Bool(recursive),
-        ));
+    let flags = [
+        ("is_recursive", "is_recursive", fields.is_recursive),
+        ("is_global", "is_global", fields.is_global),
+    ];
+    for (name, column, flag) in flags.into_iter().chain(fields.features.columns(kind)) {
+        let Some(flag) = flag else { continue };
+        values.push((field(name, column)?, Value::Bool(flag)));
+    }
+
+    // Numbers, kept as the legacy input filter keeps them; what it would
+    // turn into another number, or the database refuse, is refused.
+    if let Some(size) = &fields.size {
+        if !is_decimal(size) {
+            return Err(ApiError::BadRequest(
+                "size: a decimal number is required".to_owned(),
+            ));
+        }
+        let size_value = filter_decimal(size);
+        if !fits_size(&size_value) {
+            return Err(ApiError::BadRequest("size: out of range".to_owned()));
+        }
+        values.push((field("size", "size")?, Value::Text(Some(size_value))));
+    }
+    if let Some(memory) = &fields.memory {
+        if kind == AssetKind::NetworkEquipment {
+            let trimmed = memory.trim();
+            let digits = trimmed.strip_prefix('-').unwrap_or(trimmed);
+            let valid = trimmed.is_empty()
+                || (!digits.is_empty()
+                    && digits.len() <= 18
+                    && digits.bytes().all(|byte| byte.is_ascii_digit()));
+            if !valid {
+                return Err(ApiError::BadRequest(
+                    "memory: a whole number is required".to_owned(),
+                ));
+            }
+            values.push((
+                field("memory", "ram")?,
+                Value::Text(Some(filter_integer(memory))),
+            ));
+        } else {
+            let stored = to_stored(memory);
+            if stored.chars().count() > MAX_TEXT_CHARS {
+                return Err(ApiError::BadRequest("memory: too long".to_owned()));
+            }
+            values.push((field("memory", "memory_size")?, Value::Text(Some(stored))));
+        }
+    }
+    let counters = [
+        (
+            "initial_page_counter",
+            "init_pages_counter",
+            fields.initial_page_counter,
+        ),
+        ("page_counter", "last_pages_counter", fields.page_counter),
+    ];
+    for (name, column, counter) in counters {
+        let Some(counter) = counter else { continue };
+        values.push((field(name, column)?, Value::Text(Some(counter.to_string()))));
     }
     Ok(values)
+}
+
+/// A decimal number: digits, with `.` or `,` before the decimals.
+fn is_decimal(text: &str) -> bool {
+    let text = text.trim();
+    let unsigned = text.strip_prefix(['-', '+']).unwrap_or(text);
+    let (integer, fraction) = unsigned.split_once(['.', ',']).unwrap_or((unsigned, ""));
+    let digits = |part: &str| part.bytes().all(|byte| byte.is_ascii_digit());
+    !(integer.is_empty() && fraction.is_empty()) && digits(integer) && digits(fraction)
+}
+
+/// Fits `decimal(5,2)` once rounded to the cent like the database.
+fn fits_size(value: &str) -> bool {
+    if value.contains('E') {
+        return value
+            .parse::<f64>()
+            .is_ok_and(|number| number.abs() < 999.995);
+    }
+    let unsigned = value.trim_start_matches('-');
+    let (integer, fraction) = unsigned.split_once('.').unwrap_or((unsigned, ""));
+    let Ok(integer) = integer.parse::<u64>() else {
+        return false;
+    };
+    let mut decimals = fraction.bytes().map(|byte| u64::from(byte - b'0'));
+    let tens = decimals.next().unwrap_or(0);
+    let units = decimals.next().unwrap_or(0);
+    let round_up = decimals.next().unwrap_or(0) >= 5;
+    integer
+        .checked_mul(100)
+        .and_then(|cents| cents.checked_add(tens * 10 + units + u64::from(round_up)))
+        .is_some_and(|cents| cents <= 99_999)
 }
 
 async fn check_references(state: &AppState, values: &[(Field, Value)]) -> ApiResult<()> {
@@ -866,15 +1085,6 @@ async fn log_asset_event(
         },
     )
     .await;
-}
-
-/// Value of a field the form posts empty.
-fn empty_value(field: Field) -> Value {
-    match field.kind {
-        FieldKind::Text => Value::Text(Some(String::new())),
-        FieldKind::Dropdown { .. } | FieldKind::User => Value::Id(0),
-        FieldKind::Bool => Value::Bool(false),
-    }
 }
 
 fn decode(text: Option<String>) -> Option<String> {
@@ -921,6 +1131,7 @@ impl AssetDetail {
     fn from_row(
         kind: AssetKind,
         row: assets::Detail,
+        specific: &assets::Specific,
         session: &Session,
         permissions: AssetPermissions,
     ) -> Self {
@@ -957,6 +1168,23 @@ impl AssetDetail {
             contact: decode(row.contact),
             contact_number: decode(row.contact_num),
             comment: decode(row.comment),
+            size: specific.text("size"),
+            memory: decode(
+                specific
+                    .text("memory_size")
+                    .or_else(|| specific.text("ram")),
+            ),
+            initial_page_counter: specific
+                .text("init_pages_counter")
+                .and_then(|counter| counter.parse().ok()),
+            page_counter: specific
+                .text("last_pages_counter")
+                .and_then(|counter| counter.parse().ok()),
+            power_supply: specific
+                .text("phonepowersupplies_id")
+                .and_then(|id| id.parse().ok())
+                .and_then(|id| Ref::optional(id, specific.power_supply.clone())),
+            features: Features::read(kind, specific),
             is_deleted: row.is_deleted,
             is_dynamic: row.is_dynamic,
             is_recursive: row.is_recursive,

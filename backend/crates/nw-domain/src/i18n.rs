@@ -70,9 +70,31 @@ pub mod text {
     pub const UPDATE_SOURCE: Source = One("Update Source", "Update Sources");
     pub const LOCATION_COMMENTS: Source = Text("Location comments");
     pub const CHILD_ENTITIES: Source = Text("Child entities");
+    pub const SIZE: Source = Text("Size");
+    pub const MICROPHONE: Source = Text("Microphone");
+    pub const SPEAKERS: Source = Text("Speakers");
+    pub const SUB_D: Source = Text("Sub-D");
+    pub const BNC: Source = Text("BNC");
+    pub const DVI: Source = Text("DVI");
+    pub const PIVOT: Source = Text("Pivot");
+    pub const HDMI: Source = Text("HDMI");
+    pub const DISPLAYPORT: Source = Text("DisplayPort");
+    pub const GLOBAL_MANAGEMENT: Source = Text("Global management");
+    pub const SERIAL_PORT: Source = Text("Serial");
+    pub const PARALLEL: Source = Text("Parallel");
+    pub const USB: Source = Text("USB");
+    pub const ETHERNET: Source = Text("Ethernet");
+    pub const WIFI: Source = Text("Wifi");
+    pub const MEMORY: Source = One("Memory", "Memories");
+    pub const MIO: Source = Text("Mio");
+    pub const INITIAL_PAGE_COUNTER: Source = Text("Initial page counter");
+    pub const PAGE_COUNTER: Source = Text("Current counter of pages");
+    pub const POWER_SUPPLY: Source = One("Power supply", "Power supplies");
+    pub const HEADSET: Source = Text("Headset");
+    pub const SPEAKER: Source = Text("Speaker");
 
     /// Every text, for the catalog.
-    pub const ALL: [Source; 33] = [
+    pub const ALL: [Source; 55] = [
         LOGIN,
         FAILED_LOGIN,
         ADDS_ITEM,
@@ -106,6 +128,28 @@ pub mod text {
         UPDATE_SOURCE,
         LOCATION_COMMENTS,
         CHILD_ENTITIES,
+        SIZE,
+        MICROPHONE,
+        SPEAKERS,
+        SUB_D,
+        BNC,
+        DVI,
+        PIVOT,
+        HDMI,
+        DISPLAYPORT,
+        GLOBAL_MANAGEMENT,
+        SERIAL_PORT,
+        PARALLEL,
+        USB,
+        ETHERNET,
+        WIFI,
+        MEMORY,
+        MIO,
+        INITIAL_PAGE_COUNTER,
+        PAGE_COUNTER,
+        POWER_SUPPLY,
+        HEADSET,
+        SPEAKER,
     ];
 }
 

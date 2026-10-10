@@ -60,7 +60,7 @@ pub fn changed_columns(current: &assets::Current, values: &[(Field, Value)]) -> 
         .filter(|(field, new)| {
             current
                 .value(field.column)
-                .is_some_and(|old| new.differs_from(old))
+                .is_some_and(|old| field.changes(old, new))
         })
         .map(|(field, _)| field.column)
         .collect()

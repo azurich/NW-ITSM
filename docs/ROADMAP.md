@@ -80,7 +80,11 @@ Chaque lot suit la même « définition de terminé » :
       fichiers `.mo` de l'application, vérifiés contre le PHP
 - [x] Règles du parc : condition « Ajout / Mise à jour » respectée,
       corrigée des deux côtés (PHP et Rust, tests atoum compris)
-- [ ] Champs propres à chaque type, gabarits, suppression définitive
+- [x] Champs propres à chaque type (taille et connectique des moniteurs,
+      ports, mémoire et compteurs des imprimantes, mémoire des matériels
+      réseau, alimentation des téléphones, type de gestion), avec les
+      champs perdus des formulaires PHP rétablis, vérifiés contre le PHP
+- [ ] Gabarits, suppression définitive
 - [ ] Baies et autres types (équipements passifs, PDU, enclos, clusters)
 - [ ] Logiciels, licences, versions installées
 - [ ] Liaisons entre objets (`itemtype` / `items_id`), composants, ports réseau

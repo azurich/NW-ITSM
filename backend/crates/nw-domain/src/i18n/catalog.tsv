@@ -31,6 +31,28 @@ ar_SA.mo	Network	Networks
 ar_SA.mo	Update Source	Update Sources
 ar_SA.mo	Location comments	Location comments
 ar_SA.mo	Child entities	كيانات فرعية
+ar_SA.mo	Size	الحجم
+ar_SA.mo	Microphone	Microphone
+ar_SA.mo	Speakers	Speakers
+ar_SA.mo	Sub-D	Sub-D
+ar_SA.mo	BNC	BNC
+ar_SA.mo	DVI	DVI
+ar_SA.mo	Pivot	Pivot
+ar_SA.mo	HDMI	HDMI
+ar_SA.mo	DisplayPort	DisplayPort
+ar_SA.mo	Global management	الإداراة العامة
+ar_SA.mo	Serial	Serial
+ar_SA.mo	Parallel	Parallel
+ar_SA.mo	USB	USB
+ar_SA.mo	Ethernet	إيثرنت
+ar_SA.mo	Wifi	Wifi
+ar_SA.mo	Memory	Memories
+ar_SA.mo	Mio	م.ب
+ar_SA.mo	Initial page counter	Initial page counter
+ar_SA.mo	Current counter of pages	Current counter of pages
+ar_SA.mo	Power supply	Power supplies
+ar_SA.mo	Headset	Headset
+ar_SA.mo	Speaker	Speaker
 be_BY.mo	%1$s log in from IP %2$s	%1$s зайшоў у сістэму з IP %2$s
 be_BY.mo	Failed login for %1$s from IP %2$s	Няўдалы ўваход у сістэму для  %1$s з IP %2$s
 be_BY.mo	%1$s adds the item %2$s	%1$s дадае элемент %2$s
@@ -64,6 +86,28 @@ be_BY.mo	Network	Network
 be_BY.mo	Update Source	Update Source
 be_BY.mo	Location comments	Location comments
 be_BY.mo	Child entities	Даччыныя сутнасці
+be_BY.mo	Size	Памер
+be_BY.mo	Microphone	Microphone
+be_BY.mo	Speakers	Speakers
+be_BY.mo	Sub-D	Sub-D
+be_BY.mo	BNC	BNC
+be_BY.mo	DVI	DVI
+be_BY.mo	Pivot	Pivot
+be_BY.mo	HDMI	HDMI
+be_BY.mo	DisplayPort	DisplayPort
+be_BY.mo	Global management	Global management
+be_BY.mo	Serial	Serial
+be_BY.mo	Parallel	Parallel
+be_BY.mo	USB	USB
+be_BY.mo	Ethernet	Ethernet
+be_BY.mo	Wifi	Wifi
+be_BY.mo	Memory	Memory
+be_BY.mo	Mio	Mio
+be_BY.mo	Initial page counter	Initial page counter
+be_BY.mo	Current counter of pages	Current counter of pages
+be_BY.mo	Power supply	Power supply
+be_BY.mo	Headset	Headset
+be_BY.mo	Speaker	Speaker
 bg_BG.mo	%1$s log in from IP %2$s	%1$s влиза от IP %2$s
 bg_BG.mo	Failed login for %1$s from IP %2$s	Неуспешен вход за %1$s от IP %2$s
 bg_BG.mo	%1$s adds the item %2$s	%1$s добави елемента %2$s
@@ -97,6 +141,28 @@ bg_BG.mo	Network	Мрежа
 bg_BG.mo	Update Source	Update Source
 bg_BG.mo	Location comments	Местоположение коментари
 bg_BG.mo	Child entities	Подорганизации
+bg_BG.mo	Size	Размер
+bg_BG.mo	Microphone	Микрофон
+bg_BG.mo	Speakers	Тонколони
+bg_BG.mo	Sub-D	Sub-D
+bg_BG.mo	BNC	BNC
+bg_BG.mo	DVI	DVI
+bg_BG.mo	Pivot	Pivot
+bg_BG.mo	HDMI	HDMI
+bg_BG.mo	DisplayPort	DisplayPort
+bg_BG.mo	Global management	Глобално управление
+bg_BG.mo	Serial	Сериен интерфейс
+bg_BG.mo	Parallel	Паралелен интерфейс
+bg_BG.mo	USB	USB порт
+bg_BG.mo	Ethernet	Етернет
+bg_BG.mo	Wifi	Wifi
+bg_BG.mo	Memory	Памет
+bg_BG.mo	Mio	MiB
+bg_BG.mo	Initial page counter	Начално значение на брояча на страници
+bg_BG.mo	Current counter of pages	Текущ брояч на страници
+bg_BG.mo	Power supply	Захранващ блок
+bg_BG.mo	Headset	Гарнитура
+bg_BG.mo	Speaker	Високоговорител
 ca_ES.mo	%1$s log in from IP %2$s	%1$s ha entrat des de la IP %2$s
 ca_ES.mo	Failed login for %1$s from IP %2$s	Ha fallat l'inici de sessió per %1$s des de la IP %2$s
 ca_ES.mo	%1$s adds the item %2$s	%1$s afegeix l'element %2$s
@@ -130,6 +196,28 @@ ca_ES.mo	Network	Xarxa
 ca_ES.mo	Update Source	Font de l'actualització
 ca_ES.mo	Location comments	Comentaris d'ubicació
 ca_ES.mo	Child entities	Sots-entitats
+ca_ES.mo	Size	Mida
+ca_ES.mo	Microphone	Micròfon
+ca_ES.mo	Speakers	Altaveus
+ca_ES.mo	Sub-D	Sub-D
+ca_ES.mo	BNC	BNC
+ca_ES.mo	DVI	DVI
+ca_ES.mo	Pivot	Pivot
+ca_ES.mo	HDMI	HDMI
+ca_ES.mo	DisplayPort	DisplayPort
+ca_ES.mo	Global management	Gestió global
+ca_ES.mo	Serial	Sèrie
+ca_ES.mo	Parallel	Paral·lel
+ca_ES.mo	USB	USB
+ca_ES.mo	Ethernet	Ethernet
+ca_ES.mo	Wifi	Sense fils
+ca_ES.mo	Memory	Memòria
+ca_ES.mo	Mio	MB
+ca_ES.mo	Initial page counter	Comptador de pàgina inicial
+ca_ES.mo	Current counter of pages	Comptador de pàgines actual
+ca_ES.mo	Power supply	Font d'alimentació
+ca_ES.mo	Headset	Casc
+ca_ES.mo	Speaker	Altaveu
 cs_CZ.mo	%1$s log in from IP %2$s	Uživatel %1$s se přihlásil z IP adresy %2$s
 cs_CZ.mo	Failed login for %1$s from IP %2$s	Neúspěšné přihlášení uživatele %1$s z IP adresy %2$s
 cs_CZ.mo	%1$s adds the item %2$s	%1$s přidal položku %2$s
@@ -163,6 +251,28 @@ cs_CZ.mo	Network	Síť
 cs_CZ.mo	Update Source	Zdroj aktualizací
 cs_CZ.mo	Location comments	Poznámky k umístění
 cs_CZ.mo	Child entities	Podřízené entity
+cs_CZ.mo	Size	Velikost
+cs_CZ.mo	Microphone	Mikrofon
+cs_CZ.mo	Speakers	Reproduktory
+cs_CZ.mo	Sub-D	D-sub
+cs_CZ.mo	BNC	BNC
+cs_CZ.mo	DVI	DVI
+cs_CZ.mo	Pivot	Pivot (otočení o 90°)
+cs_CZ.mo	HDMI	HDMI
+cs_CZ.mo	DisplayPort	DisplayPort
+cs_CZ.mo	Global management	Globání správa
+cs_CZ.mo	Serial	Sériový
+cs_CZ.mo	Parallel	Paralelní
+cs_CZ.mo	USB	USB
+cs_CZ.mo	Ethernet	Ethernet
+cs_CZ.mo	Wifi	Wifi
+cs_CZ.mo	Memory	Paměť
+cs_CZ.mo	Mio	MiB
+cs_CZ.mo	Initial page counter	Výchozí stav počítadla stránek
+cs_CZ.mo	Current counter of pages	Aktuální stav počítadla stránek
+cs_CZ.mo	Power supply	Napájecí zdroj
+cs_CZ.mo	Headset	Náhlavní souprava
+cs_CZ.mo	Speaker	Reproduktor
 da_DK.mo	%1$s log in from IP %2$s	%1$s log ind fra IP %2$s
 da_DK.mo	Failed login for %1$s from IP %2$s	Mislykket login for %1$s fra IP %2$s
 da_DK.mo	%1$s adds the item %2$s	%1$s tilføjer emnet %2$s
@@ -196,6 +306,28 @@ da_DK.mo	Network	Network
 da_DK.mo	Update Source	Update Source
 da_DK.mo	Location comments	Lokations kommentarer
 da_DK.mo	Child entities	Under-entiteter
+da_DK.mo	Size	Størrelse
+da_DK.mo	Microphone	Mikrofon
+da_DK.mo	Speakers	Højtalere
+da_DK.mo	Sub-D	Sub-D
+da_DK.mo	BNC	BNC
+da_DK.mo	DVI	DVI
+da_DK.mo	Pivot	Pivot
+da_DK.mo	HDMI	HDMI
+da_DK.mo	DisplayPort	DisplayPort
+da_DK.mo	Global management	Global håndtering
+da_DK.mo	Serial	Seriel
+da_DK.mo	Parallel	Parallel
+da_DK.mo	USB	USB
+da_DK.mo	Ethernet	Ethernet
+da_DK.mo	Wifi	Wifi
+da_DK.mo	Memory	Memory
+da_DK.mo	Mio	MB
+da_DK.mo	Initial page counter	Side tæller
+da_DK.mo	Current counter of pages	Nuværende aflæsning af sider
+da_DK.mo	Power supply	Power supply
+da_DK.mo	Headset	Hjelm telefoner
+da_DK.mo	Speaker	Højtaler
 de_DE.mo	%1$s log in from IP %2$s	%1$s loggt sich mit der IP %2$s ein
 de_DE.mo	Failed login for %1$s from IP %2$s	Anmeldung des Benutzers %1$s von IP %2$s fehlgeschlagen
 de_DE.mo	%1$s adds the item %2$s	%1$s fügt das Element %2$s hinzu
@@ -229,6 +361,28 @@ de_DE.mo	Network	Netzwerk
 de_DE.mo	Update Source	Aktualisierungsmethode
 de_DE.mo	Location comments	Beschreibung Standort
 de_DE.mo	Child entities	Untereinheiten
+de_DE.mo	Size	Größe
+de_DE.mo	Microphone	Mikrofon
+de_DE.mo	Speakers	Lautsprecher
+de_DE.mo	Sub-D	Sub-D
+de_DE.mo	BNC	BNC
+de_DE.mo	DVI	DVI
+de_DE.mo	Pivot	Pivot
+de_DE.mo	HDMI	HDMI
+de_DE.mo	DisplayPort	Displayport
+de_DE.mo	Global management	Als Gerätekategorie
+de_DE.mo	Serial	Seriell
+de_DE.mo	Parallel	Parallel
+de_DE.mo	USB	USB Port
+de_DE.mo	Ethernet	Ethernet
+de_DE.mo	Wifi	Wifi
+de_DE.mo	Memory	Memory
+de_DE.mo	Mio	Mio
+de_DE.mo	Initial page counter	Startwert Seitenzähler
+de_DE.mo	Current counter of pages	aktueller Stand des Seitenzählers
+de_DE.mo	Power supply	Netzteil
+de_DE.mo	Headset	Headset
+de_DE.mo	Speaker	Lautsprecher
 el_GR.mo	%1$s log in from IP %2$s	%1$s συνδέεται από την IP %2$s
 el_GR.mo	Failed login for %1$s from IP %2$s	Εσφαλμένη σύνδεση για %1$s από την IP %2$s
 el_GR.mo	%1$s adds the item %2$s	%1$s προσθέτει το στοιχείο %2$s
@@ -262,6 +416,28 @@ el_GR.mo	Network	Δίκτυο
 el_GR.mo	Update Source	Update Source
 el_GR.mo	Location comments	Σχόλια τοποθεσίας
 el_GR.mo	Child entities	Υποσύνολο οντοτήτων
+el_GR.mo	Size	Μέγεθος
+el_GR.mo	Microphone	Μικρόφωνο
+el_GR.mo	Speakers	Μεγάφωνα
+el_GR.mo	Sub-D	Sub-D
+el_GR.mo	BNC	BNC
+el_GR.mo	DVI	DVI
+el_GR.mo	Pivot	Περιστροφή
+el_GR.mo	HDMI	HDMI
+el_GR.mo	DisplayPort	Θύρα εμφάνισης
+el_GR.mo	Global management	Ολοκληρωτική διαχείριση
+el_GR.mo	Serial	Σειριακή
+el_GR.mo	Parallel	Παράλληλη
+el_GR.mo	USB	USB
+el_GR.mo	Ethernet	Ethernet
+el_GR.mo	Wifi	Ασύρματη ζεύξη
+el_GR.mo	Memory	Memory
+el_GR.mo	Mio	ΜΒ
+el_GR.mo	Initial page counter	Αρχικός μετρητής σελίδων
+el_GR.mo	Current counter of pages	Τρέχων μετρητής σελίδων
+el_GR.mo	Power supply	Power supply
+el_GR.mo	Headset	Βοηθητικό ακουστικό
+el_GR.mo	Speaker	Μεγάφωνο
 en_GB.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 en_GB.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 en_GB.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -295,6 +471,28 @@ en_GB.mo	Network	Network
 en_GB.mo	Update Source	Update Source
 en_GB.mo	Location comments	Location comments
 en_GB.mo	Child entities	Child entities
+en_GB.mo	Size	Size
+en_GB.mo	Microphone	Microphone
+en_GB.mo	Speakers	Speakers
+en_GB.mo	Sub-D	Sub-D
+en_GB.mo	BNC	BNC
+en_GB.mo	DVI	DVI
+en_GB.mo	Pivot	Pivot
+en_GB.mo	HDMI	HDMI
+en_GB.mo	DisplayPort	DisplayPort
+en_GB.mo	Global management	Global management
+en_GB.mo	Serial	Serial
+en_GB.mo	Parallel	Parallel
+en_GB.mo	USB	USB
+en_GB.mo	Ethernet	Ethernet
+en_GB.mo	Wifi	Wifi
+en_GB.mo	Memory	Memory
+en_GB.mo	Mio	Mio
+en_GB.mo	Initial page counter	Initial page counter
+en_GB.mo	Current counter of pages	Current counter of pages
+en_GB.mo	Power supply	Power supply
+en_GB.mo	Headset	Headset
+en_GB.mo	Speaker	Speaker
 en_US.mo	%1$s log in from IP %2$s	%1$s login from IP %2$s
 en_US.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 en_US.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -328,6 +526,28 @@ en_US.mo	Network	Network
 en_US.mo	Update Source	Update Source
 en_US.mo	Location comments	Location Comments
 en_US.mo	Child entities	Sub-entities
+en_US.mo	Size	Size
+en_US.mo	Microphone	Microphone
+en_US.mo	Speakers	Speakers
+en_US.mo	Sub-D	Sub-D (VGA)
+en_US.mo	BNC	BNC
+en_US.mo	DVI	DVI
+en_US.mo	Pivot	Pivot
+en_US.mo	HDMI	HDMI
+en_US.mo	DisplayPort	DisplayPort
+en_US.mo	Global management	Global Management
+en_US.mo	Serial	Serial
+en_US.mo	Parallel	Parallel
+en_US.mo	USB	USB
+en_US.mo	Ethernet	Ethernet
+en_US.mo	Wifi	Wifi
+en_US.mo	Memory	Memory
+en_US.mo	Mio	MB
+en_US.mo	Initial page counter	Initial Page Counter
+en_US.mo	Current counter of pages	Current Counter of Pages
+en_US.mo	Power supply	Power Supply
+en_US.mo	Headset	Headset
+en_US.mo	Speaker	Speaker
 eo.mo	%1$s log in from IP %2$s	%1$s вошел в систему с IP %2$s
 eo.mo	Failed login for %1$s from IP %2$s	Неудачная попытка входа пользователя %1$s с IP %2$s
 eo.mo	%1$s adds the item %2$s	%1$s aldonis objekto %2$s
@@ -361,6 +581,28 @@ eo.mo	Network	Network
 eo.mo	Update Source	Update Source
 eo.mo	Location comments	Примечания местоположения
 eo.mo	Child entities	Organizoj subordigitaj
+eo.mo	Size	Grandeco
+eo.mo	Microphone	Микрофон
+eo.mo	Speakers	Колонки
+eo.mo	Sub-D	Sub-D
+eo.mo	BNC	BNC
+eo.mo	DVI	DVI
+eo.mo	Pivot	Поворачивается
+eo.mo	HDMI	HDMI
+eo.mo	DisplayPort	DisplayPort
+eo.mo	Global management	Глобальное управление
+eo.mo	Serial	COM-интерфейс
+eo.mo	Parallel	LPT-интерфейс
+eo.mo	USB	USB
+eo.mo	Ethernet	Ethernet
+eo.mo	Wifi	Wi-Fi
+eo.mo	Memory	Memory
+eo.mo	Mio	Мб
+eo.mo	Initial page counter	Начальное значение счетчика страниц
+eo.mo	Current counter of pages	Текущий счетчик страниц
+eo.mo	Power supply	Power supply
+eo.mo	Headset	Гарнитура
+eo.mo	Speaker	Громкая связь
 es_419.mo	%1$s log in from IP %2$s	%1$s inicia sesión desde la IP %2$s
 es_419.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_419.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -394,6 +636,28 @@ es_419.mo	Network	Red
 es_419.mo	Update Source	Actualizar fuente
 es_419.mo	Location comments	Comentarios sobre locación
 es_419.mo	Child entities	Subentidades
+es_419.mo	Size	Tamaño
+es_419.mo	Microphone	Micrófono
+es_419.mo	Speakers	Altavoces
+es_419.mo	Sub-D	Sub-D
+es_419.mo	BNC	BNC
+es_419.mo	DVI	DVI
+es_419.mo	Pivot	Rotante
+es_419.mo	HDMI	HDMI
+es_419.mo	DisplayPort	Puerto de muestra
+es_419.mo	Global management	Gestión global
+es_419.mo	Serial	Serial
+es_419.mo	Parallel	Paralelo
+es_419.mo	USB	USB
+es_419.mo	Ethernet	Ethernet
+es_419.mo	Wifi	Wifi
+es_419.mo	Memory	Memory
+es_419.mo	Mio	MByte
+es_419.mo	Initial page counter	Contador de página inicial
+es_419.mo	Current counter of pages	Contador acutual de páginas
+es_419.mo	Power supply	Suministro eléctrico
+es_419.mo	Headset	Audífono
+es_419.mo	Speaker	Altavoz
 es_AR.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_AR.mo	Failed login for %1$s from IP %2$s	Login fallido de %1$s desde IP %2$s
 es_AR.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -427,6 +691,28 @@ es_AR.mo	Network	Red
 es_AR.mo	Update Source	Origen de actualizaciones
 es_AR.mo	Location comments	Comentarios
 es_AR.mo	Child entities	Subentidades
+es_AR.mo	Size	Tamaño
+es_AR.mo	Microphone	Micrófono
+es_AR.mo	Speakers	Parlantes
+es_AR.mo	Sub-D	Sub-D
+es_AR.mo	BNC	BNC
+es_AR.mo	DVI	DVI
+es_AR.mo	Pivot	Pivot
+es_AR.mo	HDMI	HDMI
+es_AR.mo	DisplayPort	DisplayPort
+es_AR.mo	Global management	Gestión global
+es_AR.mo	Serial	Puerto serial
+es_AR.mo	Parallel	Paralelo
+es_AR.mo	USB	USB
+es_AR.mo	Ethernet	Ethernet
+es_AR.mo	Wifi	Wifi
+es_AR.mo	Memory	Memory
+es_AR.mo	Mio	MB
+es_AR.mo	Initial page counter	Contador de página inicial
+es_AR.mo	Current counter of pages	Contador actual de páginas
+es_AR.mo	Power supply	Fuente de alimentación
+es_AR.mo	Headset	Casco
+es_AR.mo	Speaker	Parlante
 es_CL.mo	%1$s log in from IP %2$s	%1$s inicia sesión desde la IP %2$s
 es_CL.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_CL.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -460,6 +746,28 @@ es_CL.mo	Network	Network
 es_CL.mo	Update Source	Update Source
 es_CL.mo	Location comments	Comentarios sobre locación
 es_CL.mo	Child entities	Subentidades
+es_CL.mo	Size	Tamaño
+es_CL.mo	Microphone	Micrófono
+es_CL.mo	Speakers	Altavoces
+es_CL.mo	Sub-D	Sub-D
+es_CL.mo	BNC	BNC
+es_CL.mo	DVI	DVI
+es_CL.mo	Pivot	Rotante
+es_CL.mo	HDMI	HDMI
+es_CL.mo	DisplayPort	Puerto de muestra
+es_CL.mo	Global management	Gestión global
+es_CL.mo	Serial	Serial
+es_CL.mo	Parallel	Paralelo
+es_CL.mo	USB	USB
+es_CL.mo	Ethernet	Ethernet
+es_CL.mo	Wifi	Wifi
+es_CL.mo	Memory	Memory
+es_CL.mo	Mio	MByte
+es_CL.mo	Initial page counter	Contador de página inicial
+es_CL.mo	Current counter of pages	Contador acutual de páginas
+es_CL.mo	Power supply	Power supply
+es_CL.mo	Headset	Audífono
+es_CL.mo	Speaker	Altavoz
 es_CO.mo	%1$s log in from IP %2$s	%1$s inicio de sesión desde la IP %2$s
 es_CO.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_CO.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -493,6 +801,28 @@ es_CO.mo	Network	Red
 es_CO.mo	Update Source	Fuente de actualización
 es_CO.mo	Location comments	Comentarios de ubicación
 es_CO.mo	Child entities	Subentidades
+es_CO.mo	Size	Tamaño
+es_CO.mo	Microphone	Micrófono
+es_CO.mo	Speakers	Altavoces
+es_CO.mo	Sub-D	Sub-D
+es_CO.mo	BNC	BNC
+es_CO.mo	DVI	DVI
+es_CO.mo	Pivot	Soporte
+es_CO.mo	HDMI	HDMI
+es_CO.mo	DisplayPort	Puerto de pantalla
+es_CO.mo	Global management	Gestión global
+es_CO.mo	Serial	Serial
+es_CO.mo	Parallel	Paralelo
+es_CO.mo	USB	USB
+es_CO.mo	Ethernet	Ethernet
+es_CO.mo	Wifi	Wi-fi
+es_CO.mo	Memory	Memoria
+es_CO.mo	Mio	MB
+es_CO.mo	Initial page counter	Contador de página inicial
+es_CO.mo	Current counter of pages	Contador actual de paginas
+es_CO.mo	Power supply	Suministro eléctrico
+es_CO.mo	Headset	Manos libres
+es_CO.mo	Speaker	Altavoz
 es_ES.mo	%1$s log in from IP %2$s	%1$s inició la sesión desde la IP %2$s
 es_ES.mo	Failed login for %1$s from IP %2$s	Fallo en el inicio de sesión de %1$s desde la IP %2$s
 es_ES.mo	%1$s adds the item %2$s	%1$s añade el elemento %2$s
@@ -526,6 +856,28 @@ es_ES.mo	Network	Red
 es_ES.mo	Update Source	Fuente de actualización
 es_ES.mo	Location comments	Comentarios de ubicación
 es_ES.mo	Child entities	Entidades hijas
+es_ES.mo	Size	Tamaño
+es_ES.mo	Microphone	Micrófono
+es_ES.mo	Speakers	Altavoces
+es_ES.mo	Sub-D	Sub-D
+es_ES.mo	BNC	BNC
+es_ES.mo	DVI	DVI
+es_ES.mo	Pivot	Peana
+es_ES.mo	HDMI	HDMI
+es_ES.mo	DisplayPort	DisplayPort
+es_ES.mo	Global management	Gestión global
+es_ES.mo	Serial	Serie
+es_ES.mo	Parallel	Paralelo
+es_ES.mo	USB	USB
+es_ES.mo	Ethernet	Ethernet
+es_ES.mo	Wifi	Wifi
+es_ES.mo	Memory	Memoria
+es_ES.mo	Mio	MB
+es_ES.mo	Initial page counter	Contador de página inicial
+es_ES.mo	Current counter of pages	Contador actual de páginas
+es_ES.mo	Power supply	Fuente de alimentación
+es_ES.mo	Headset	Auricular
+es_ES.mo	Speaker	Altavoz
 es_MX.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_MX.mo	Failed login for %1$s from IP %2$s	Error de acceso para %1$s de la IP %2$s
 es_MX.mo	%1$s adds the item %2$s	%1$s añade un elemento %2$s
@@ -559,6 +911,28 @@ es_MX.mo	Network	Red
 es_MX.mo	Update Source	Fuente de actualización
 es_MX.mo	Location comments	Comentarios sobre la ubicación
 es_MX.mo	Child entities	Subentidades
+es_MX.mo	Size	Tamaño
+es_MX.mo	Microphone	Micrófono
+es_MX.mo	Speakers	Altavoces
+es_MX.mo	Sub-D	Sub-D
+es_MX.mo	BNC	BNC
+es_MX.mo	DVI	DVI
+es_MX.mo	Pivot	Pivote
+es_MX.mo	HDMI	HDMI
+es_MX.mo	DisplayPort	DisplayPort
+es_MX.mo	Global management	Gestión global
+es_MX.mo	Serial	Serie
+es_MX.mo	Parallel	Paralelo
+es_MX.mo	USB	USB
+es_MX.mo	Ethernet	Ethernet
+es_MX.mo	Wifi	Wi-fi
+es_MX.mo	Memory	Memoria
+es_MX.mo	Mio	Mb
+es_MX.mo	Initial page counter	Contador de página inicial
+es_MX.mo	Current counter of pages	Conteo actual de páginas
+es_MX.mo	Power supply	Fuente de alimentación
+es_MX.mo	Headset	Diadema
+es_MX.mo	Speaker	Altavoz
 es_VE.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_VE.mo	Failed login for %1$s from IP %2$s	Login fallido de %1$s desde IP %2$s
 es_VE.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -592,6 +966,28 @@ es_VE.mo	Network	Red
 es_VE.mo	Update Source	Origen de actualizaciones
 es_VE.mo	Location comments	Comentarios
 es_VE.mo	Child entities	Subentidades
+es_VE.mo	Size	Tamaño
+es_VE.mo	Microphone	Micrófono
+es_VE.mo	Speakers	Parlantes
+es_VE.mo	Sub-D	Sub-D
+es_VE.mo	BNC	BNC
+es_VE.mo	DVI	DVI
+es_VE.mo	Pivot	Pivot
+es_VE.mo	HDMI	HDMI
+es_VE.mo	DisplayPort	DisplayPort
+es_VE.mo	Global management	Gestión global
+es_VE.mo	Serial	Puerto serial
+es_VE.mo	Parallel	Paralelo
+es_VE.mo	USB	USB
+es_VE.mo	Ethernet	Ethernet
+es_VE.mo	Wifi	Wifi
+es_VE.mo	Memory	Memory
+es_VE.mo	Mio	MB
+es_VE.mo	Initial page counter	Contador de página inicial
+es_VE.mo	Current counter of pages	Contador actual de páginas
+es_VE.mo	Power supply	Fuente de alimentación
+es_VE.mo	Headset	Casco
+es_VE.mo	Speaker	Parlante
 et_EE.mo	%1$s log in from IP %2$s	%1$s logis sisse aadresilt %2$s
 et_EE.mo	Failed login for %1$s from IP %2$s	Ebaõnnestunud sisselogimine kasutajalt %1$s IP-aadressilt %2$s
 et_EE.mo	%1$s adds the item %2$s	%1$s lisas asja %2$s
@@ -625,6 +1021,28 @@ et_EE.mo	Network	Võrk
 et_EE.mo	Update Source	Uuenduse allikas
 et_EE.mo	Location comments	Asukoha seletus
 et_EE.mo	Child entities	Alamüksused
+et_EE.mo	Size	Suurus
+et_EE.mo	Microphone	Mikrofon
+et_EE.mo	Speakers	Kõlarid
+et_EE.mo	Sub-D	Sub-D
+et_EE.mo	BNC	BNC
+et_EE.mo	DVI	DVI
+et_EE.mo	Pivot	Pööratav
+et_EE.mo	HDMI	HDMI
+et_EE.mo	DisplayPort	DisplayPort
+et_EE.mo	Global management	Ühishaldus
+et_EE.mo	Serial	COM
+et_EE.mo	Parallel	LPT
+et_EE.mo	USB	USB
+et_EE.mo	Ethernet	Ethernet
+et_EE.mo	Wifi	Wifi
+et_EE.mo	Memory	Mälu
+et_EE.mo	Mio	Mb
+et_EE.mo	Initial page counter	Esialgne leheloendur
+et_EE.mo	Current counter of pages	Praegune leheloendur
+et_EE.mo	Power supply	Toiteallikas
+et_EE.mo	Headset	Kõrvaklapid
+et_EE.mo	Speaker	Kõlar
 eu_ES.mo	%1$s log in from IP %2$s	%1$s %2$s IP helbidetik sesioa hasi du
 eu_ES.mo	Failed login for %1$s from IP %2$s	%1$s %2$s IP helbidetik sesioa hasteko arazoa
 eu_ES.mo	%1$s adds the item %2$s	%1$s-k %2$s elementua gehitzen du
@@ -658,6 +1076,28 @@ eu_ES.mo	Network	Sarea
 eu_ES.mo	Update Source	Eguneraketa jatorria
 eu_ES.mo	Location comments	Ubikazioaren komentarioak
 eu_ES.mo	Child entities	Azpi-entitatea
+eu_ES.mo	Size	Tamaina
+eu_ES.mo	Microphone	Mikrofonoa
+eu_ES.mo	Speakers	Bozgorailuak
+eu_ES.mo	Sub-D	D-Sub
+eu_ES.mo	BNC	BNC
+eu_ES.mo	DVI	DVI
+eu_ES.mo	Pivot	Pibotea
+eu_ES.mo	HDMI	HDMI
+eu_ES.mo	DisplayPort	DisplayPort
+eu_ES.mo	Global management	Kudeaketa orokorra
+eu_ES.mo	Serial	Seriala
+eu_ES.mo	Parallel	Paraleloa
+eu_ES.mo	USB	USB
+eu_ES.mo	Ethernet	Ethernet
+eu_ES.mo	Wifi	Hari gabekoa
+eu_ES.mo	Memory	Memoria
+eu_ES.mo	Mio	MB
+eu_ES.mo	Initial page counter	Hasierako orriaren kontadorea
+eu_ES.mo	Current counter of pages	Oraingo orri kontadorea
+eu_ES.mo	Power supply	Energia iturria
+eu_ES.mo	Headset	Aurikularra
+eu_ES.mo	Speaker	Bozgorailua
 fa_IR.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 fa_IR.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 fa_IR.mo	%1$s adds the item %2$s	%1$s قلم به آيتم  %2$s شد.
@@ -691,6 +1131,28 @@ fa_IR.mo	Network	شبکه ها
 fa_IR.mo	Update Source	Update Source
 fa_IR.mo	Location comments	Location comments
 fa_IR.mo	Child entities	هویت فرزندان
+fa_IR.mo	Size	اندازه
+fa_IR.mo	Microphone	میکروفن
+fa_IR.mo	Speakers	بلندگوها
+fa_IR.mo	Sub-D	Sub-D
+fa_IR.mo	BNC	BNC
+fa_IR.mo	DVI	DVI
+fa_IR.mo	Pivot	مفصل
+fa_IR.mo	HDMI	HDMI
+fa_IR.mo	DisplayPort	درگاه صفحه نمایش
+fa_IR.mo	Global management	مدیریت سراسری
+fa_IR.mo	Serial	نوبتی
+fa_IR.mo	Parallel	موازی
+fa_IR.mo	USB	USB
+fa_IR.mo	Ethernet	اترنت
+fa_IR.mo	Wifi	Wifi
+fa_IR.mo	Memory	Memory
+fa_IR.mo	Mio	MB
+fa_IR.mo	Initial page counter	شمارنده صفحه اولیه
+fa_IR.mo	Current counter of pages	Current counter of pages
+fa_IR.mo	Power supply	منبع تغذیه
+fa_IR.mo	Headset	Headset
+fa_IR.mo	Speaker	بلندگو
 fi_FI.mo	%1$s log in from IP %2$s	%1$s kirjautuu IP-osoitteesta %2$s
 fi_FI.mo	Failed login for %1$s from IP %2$s	Epäonnistunut kirjautuminen käyttäjälle %1$s IP-osoitteesta %2$s
 fi_FI.mo	%1$s adds the item %2$s	%1$s lisää kohteen %2$s
@@ -724,6 +1186,28 @@ fi_FI.mo	Network	Lähiverkko
 fi_FI.mo	Update Source	Päivityslähde
 fi_FI.mo	Location comments	Sijainnin lisätiedot
 fi_FI.mo	Child entities	Alayksiköt
+fi_FI.mo	Size	Koko
+fi_FI.mo	Microphone	Mikrofoni
+fi_FI.mo	Speakers	Kaiuttimet
+fi_FI.mo	Sub-D	Sub-D
+fi_FI.mo	BNC	BNC
+fi_FI.mo	DVI	DVI
+fi_FI.mo	Pivot	Pivot
+fi_FI.mo	HDMI	HDMI
+fi_FI.mo	DisplayPort	Näytön portti
+fi_FI.mo	Global management	Yleinen hallinta
+fi_FI.mo	Serial	Sarjaportti
+fi_FI.mo	Parallel	Rinnakkaisportti
+fi_FI.mo	USB	USB
+fi_FI.mo	Ethernet	Ethernet
+fi_FI.mo	Wifi	Wifi
+fi_FI.mo	Memory	Memory
+fi_FI.mo	Mio	Mt
+fi_FI.mo	Initial page counter	Sivulaskurin alkuarvo
+fi_FI.mo	Current counter of pages	Sivulaskurin nykyinen arvo
+fi_FI.mo	Power supply	Virtalähde
+fi_FI.mo	Headset	Kuulokkeet
+fi_FI.mo	Speaker	Kaiutin
 fr_BE.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_BE.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_BE.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -757,6 +1241,28 @@ fr_BE.mo	Network	Network
 fr_BE.mo	Update Source	Update Source
 fr_BE.mo	Location comments	Commentaires du lieu
 fr_BE.mo	Child entities	Sous-entités
+fr_BE.mo	Size	Taille
+fr_BE.mo	Microphone	Microphone
+fr_BE.mo	Speakers	Enceintes
+fr_BE.mo	Sub-D	Sub-D
+fr_BE.mo	BNC	BNC
+fr_BE.mo	DVI	DVI
+fr_BE.mo	Pivot	Pivot
+fr_BE.mo	HDMI	HDMI
+fr_BE.mo	DisplayPort	DisplayPort
+fr_BE.mo	Global management	Gestion globale
+fr_BE.mo	Serial	Série
+fr_BE.mo	Parallel	Parallèle
+fr_BE.mo	USB	USB
+fr_BE.mo	Ethernet	Ethernet
+fr_BE.mo	Wifi	Wifi
+fr_BE.mo	Memory	Memory
+fr_BE.mo	Mio	Mio
+fr_BE.mo	Initial page counter	Compteur de page initial
+fr_BE.mo	Current counter of pages	Compteur de page actuel
+fr_BE.mo	Power supply	Power supply
+fr_BE.mo	Headset	Casque
+fr_BE.mo	Speaker	Haut parleur
 fr_CA.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_CA.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_CA.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -790,6 +1296,28 @@ fr_CA.mo	Network	Réseau
 fr_CA.mo	Update Source	Source de mise à jour
 fr_CA.mo	Location comments	Commentaires du lieu
 fr_CA.mo	Child entities	Sous-entités
+fr_CA.mo	Size	Taille
+fr_CA.mo	Microphone	Microphone
+fr_CA.mo	Speakers	Enceintes
+fr_CA.mo	Sub-D	Sub-D
+fr_CA.mo	BNC	BNC
+fr_CA.mo	DVI	DVI
+fr_CA.mo	Pivot	Pivot
+fr_CA.mo	HDMI	HDMI
+fr_CA.mo	DisplayPort	DisplayPort
+fr_CA.mo	Global management	Gestion globale
+fr_CA.mo	Serial	Série
+fr_CA.mo	Parallel	Parallèle
+fr_CA.mo	USB	USB
+fr_CA.mo	Ethernet	Ethernet
+fr_CA.mo	Wifi	Wifi
+fr_CA.mo	Memory	Mémoire
+fr_CA.mo	Mio	Mio
+fr_CA.mo	Initial page counter	Compteur de page initial
+fr_CA.mo	Current counter of pages	Compteur de page actuel
+fr_CA.mo	Power supply	Bloc d'alimentation
+fr_CA.mo	Headset	Casque
+fr_CA.mo	Speaker	Haut parleur
 fr_FR.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_FR.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_FR.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -823,6 +1351,28 @@ fr_FR.mo	Network	Réseau
 fr_FR.mo	Update Source	Source de mise à jour
 fr_FR.mo	Location comments	Commentaires du lieu
 fr_FR.mo	Child entities	Sous-entités
+fr_FR.mo	Size	Taille
+fr_FR.mo	Microphone	Microphone
+fr_FR.mo	Speakers	Enceintes
+fr_FR.mo	Sub-D	Sub-D
+fr_FR.mo	BNC	BNC
+fr_FR.mo	DVI	DVI
+fr_FR.mo	Pivot	Pivot
+fr_FR.mo	HDMI	HDMI
+fr_FR.mo	DisplayPort	DisplayPort
+fr_FR.mo	Global management	Gestion globale
+fr_FR.mo	Serial	Série
+fr_FR.mo	Parallel	Parallèle
+fr_FR.mo	USB	USB
+fr_FR.mo	Ethernet	Ethernet
+fr_FR.mo	Wifi	Wifi
+fr_FR.mo	Memory	Mémoire
+fr_FR.mo	Mio	Mio
+fr_FR.mo	Initial page counter	Compteur de page initial
+fr_FR.mo	Current counter of pages	Compteur de page actuel
+fr_FR.mo	Power supply	Alimentation
+fr_FR.mo	Headset	Casque
+fr_FR.mo	Speaker	Haut parleur
 gl_ES.mo	%1$s log in from IP %2$s	%1$s logueouse dende a IP %2$s
 gl_ES.mo	Failed login for %1$s from IP %2$s	Erro en conexión %1$s dende IP %2$s
 gl_ES.mo	%1$s adds the item %2$s	%1$s engade o elemento %2$s
@@ -856,6 +1406,28 @@ gl_ES.mo	Network	Rede
 gl_ES.mo	Update Source	Orixe de actualización
 gl_ES.mo	Location comments	Comentarios á localización
 gl_ES.mo	Child entities	Entidades fillas
+gl_ES.mo	Size	Tamaño
+gl_ES.mo	Microphone	Micrófono
+gl_ES.mo	Speakers	Altofalantes
+gl_ES.mo	Sub-D	Sub-D
+gl_ES.mo	BNC	BNC
+gl_ES.mo	DVI	DVI
+gl_ES.mo	Pivot	Pivote
+gl_ES.mo	HDMI	HDMI
+gl_ES.mo	DisplayPort	DisplayPort
+gl_ES.mo	Global management	Xestión xeral
+gl_ES.mo	Serial	Serie
+gl_ES.mo	Parallel	Paralelo
+gl_ES.mo	USB	USB
+gl_ES.mo	Ethernet	Ethernet
+gl_ES.mo	Wifi	Sen fíos (WiFi)
+gl_ES.mo	Memory	Memory
+gl_ES.mo	Mio	MB
+gl_ES.mo	Initial page counter	Contador de páxina inicial
+gl_ES.mo	Current counter of pages	Contador de impresións
+gl_ES.mo	Power supply	Alimentación
+gl_ES.mo	Headset	Casco
+gl_ES.mo	Speaker	Altofalante
 he_IL.mo	%1$s log in from IP %2$s	%1$sחיבור מכתובת IP %2$s
 he_IL.mo	Failed login for %1$s from IP %2$s	חיבור נכשל עבור %1$s מכתובת IP %2$s
 he_IL.mo	%1$s adds the item %2$s	%1$sהוסיף את הפריט %2$s
@@ -889,6 +1461,28 @@ he_IL.mo	Network	רשת
 he_IL.mo	Update Source	Update Source
 he_IL.mo	Location comments	Location comments
 he_IL.mo	Child entities	יחידות משנה
+he_IL.mo	Size	גודל
+he_IL.mo	Microphone	מיקרופון
+he_IL.mo	Speakers	רמקולים
+he_IL.mo	Sub-D	D-SUB
+he_IL.mo	BNC	BNC
+he_IL.mo	DVI	DVI
+he_IL.mo	Pivot	מסתובב
+he_IL.mo	HDMI	HDMI
+he_IL.mo	DisplayPort	DisplayPort
+he_IL.mo	Global management	ניהול גלובלי
+he_IL.mo	Serial	טורי
+he_IL.mo	Parallel	מקבילי
+he_IL.mo	USB	USB
+he_IL.mo	Ethernet	רשת קווית
+he_IL.mo	Wifi	רשת אלחוטית
+he_IL.mo	Memory	Memory
+he_IL.mo	Mio	MB
+he_IL.mo	Initial page counter	מספר מונה ראשוני של דפים
+he_IL.mo	Current counter of pages	מונה נוכחי של דפים
+he_IL.mo	Power supply	ספק כח
+he_IL.mo	Headset	אוזניות
+he_IL.mo	Speaker	רמקול
 hi_IN.mo	%1$s log in from IP %2$s	IP %2$s से %1$s लॉग इन करें
 hi_IN.mo	Failed login for %1$s from IP %2$s	आईपी ​​%2$s से %1$s के लिए लॉगिन विफल
 hi_IN.mo	%1$s adds the item %2$s	1%1$sआइटम 2%2$sजोड़ता है
@@ -922,6 +1516,28 @@ hi_IN.mo	Network	नेटवर्क
 hi_IN.mo	Update Source	अद्यतन स्रोत
 hi_IN.mo	Location comments	स्थान टिप्पणियां
 hi_IN.mo	Child entities	अस्तित्व
+hi_IN.mo	Size	आकार
+hi_IN.mo	Microphone	ध्वनिग्राही
+hi_IN.mo	Speakers	 ध्वनि विस्तारक
+hi_IN.mo	Sub-D	Sub-D
+hi_IN.mo	BNC	BNC
+hi_IN.mo	DVI	DVI
+hi_IN.mo	Pivot	प्रधान आधार
+hi_IN.mo	HDMI	HDMI
+hi_IN.mo	DisplayPort	प्रदर्शन पोर्ट
+hi_IN.mo	Global management	वैश्विक प्रबंधन
+hi_IN.mo	Serial	आनुक्रमिक
+hi_IN.mo	Parallel	समानांतर
+hi_IN.mo	USB	USB
+hi_IN.mo	Ethernet	ईथरनेट
+hi_IN.mo	Wifi	वाईफ़ाई
+hi_IN.mo	Memory	Memory
+hi_IN.mo	Mio	MB
+hi_IN.mo	Initial page counter	प्रारंभिक पृष्ठ काउंटर
+hi_IN.mo	Current counter of pages	पृष्ठों का वर्तमान काउंटर
+hi_IN.mo	Power supply	बिजली की आपूर्ति
+hi_IN.mo	Headset	हेडसेट
+hi_IN.mo	Speaker	वक्ता
 hr_HR.mo	%1$s log in from IP %2$s	%1$s prijava s IP adrese %2$s
 hr_HR.mo	Failed login for %1$s from IP %2$s	Neusjela prijava za %1$s sa IP adrese %2$s
 hr_HR.mo	%1$s adds the item %2$s	%1$s dodaje predmet. %2$s
@@ -955,6 +1571,28 @@ hr_HR.mo	Network	Mreža
 hr_HR.mo	Update Source	Izvor aktualiziranja
 hr_HR.mo	Location comments	Komentari za lokaciju
 hr_HR.mo	Child entities	Podređeni entiteti
+hr_HR.mo	Size	Veličina
+hr_HR.mo	Microphone	Mikrofon
+hr_HR.mo	Speakers	Zvučnici
+hr_HR.mo	Sub-D	Sub-D
+hr_HR.mo	BNC	BNC
+hr_HR.mo	DVI	DVI
+hr_HR.mo	Pivot	Pivot
+hr_HR.mo	HDMI	HDMI
+hr_HR.mo	DisplayPort	Priključak ekrana
+hr_HR.mo	Global management	Globalno upravljanje
+hr_HR.mo	Serial	Serijski
+hr_HR.mo	Parallel	Paralelni
+hr_HR.mo	USB	USB
+hr_HR.mo	Ethernet	Ethernet
+hr_HR.mo	Wifi	Wifi
+hr_HR.mo	Memory	Memorija
+hr_HR.mo	Mio	MB
+hr_HR.mo	Initial page counter	Početni brojač stranica
+hr_HR.mo	Current counter of pages	Trenutačni brojač stranica
+hr_HR.mo	Power supply	Izvor napajanja
+hr_HR.mo	Headset	Slušalice
+hr_HR.mo	Speaker	Zvučnik
 hu_HU.mo	%1$s log in from IP %2$s	%1$s bejelentkezett a következő IP-ről: %2$s
 hu_HU.mo	Failed login for %1$s from IP %2$s	Sikertelen bejelentkezés %1$s a %2$s IP-ről.
 hu_HU.mo	%1$s adds the item %2$s	%1$s hozzáadta a %2$s elemet
@@ -988,6 +1626,28 @@ hu_HU.mo	Network	Hálózat
 hu_HU.mo	Update Source	Forrás frissítése
 hu_HU.mo	Location comments	Helyek megjegyzései
 hu_HU.mo	Child entities	Alegységek
+hu_HU.mo	Size	Méret
+hu_HU.mo	Microphone	Mikrofon
+hu_HU.mo	Speakers	Hangszóró
+hu_HU.mo	Sub-D	Sub-D
+hu_HU.mo	BNC	BNC
+hu_HU.mo	DVI	DVI
+hu_HU.mo	Pivot	Forgatás
+hu_HU.mo	HDMI	HDMI
+hu_HU.mo	DisplayPort	DisplayPort
+hu_HU.mo	Global management	Globális kezelés
+hu_HU.mo	Serial	Soros interfész
+hu_HU.mo	Parallel	Párhuzamos interfész
+hu_HU.mo	USB	USB port
+hu_HU.mo	Ethernet	Ethernet
+hu_HU.mo	Wifi	Wifi
+hu_HU.mo	Memory	Memory
+hu_HU.mo	Mio	MB
+hu_HU.mo	Initial page counter	Kezdeti oldalszámláló
+hu_HU.mo	Current counter of pages	Oldalszámláló állása
+hu_HU.mo	Power supply	Tápegysésg
+hu_HU.mo	Headset	Fejhallgatós telefon
+hu_HU.mo	Speaker	Hangszóró
 id_ID.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 id_ID.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 id_ID.mo	%1$s adds the item %2$s	%1$s menambahkan item %2$s
@@ -1021,6 +1681,28 @@ id_ID.mo	Network	Network
 id_ID.mo	Update Source	Update Source
 id_ID.mo	Location comments	Location comments
 id_ID.mo	Child entities	Entitas anak
+id_ID.mo	Size	Ukuran
+id_ID.mo	Microphone	Microphone
+id_ID.mo	Speakers	Speakers
+id_ID.mo	Sub-D	Sub-D
+id_ID.mo	BNC	BNC
+id_ID.mo	DVI	DVI
+id_ID.mo	Pivot	Pivot
+id_ID.mo	HDMI	HDMI
+id_ID.mo	DisplayPort	Tampilkan Port
+id_ID.mo	Global management	Manajemen global
+id_ID.mo	Serial	Serial
+id_ID.mo	Parallel	Paralel
+id_ID.mo	USB	USB
+id_ID.mo	Ethernet	Ethernet
+id_ID.mo	Wifi	Wifi
+id_ID.mo	Memory	Memory
+id_ID.mo	Mio	Mio
+id_ID.mo	Initial page counter	Dihitung dari halaman awal
+id_ID.mo	Current counter of pages	Current counter of pages
+id_ID.mo	Power supply	Catu Daya
+id_ID.mo	Headset	Headset
+id_ID.mo	Speaker	Speaker
 is_IS.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 is_IS.mo	Failed login for %1$s from IP %2$s	Misheppnaðar innskráningar fyrir %1$s frá IP %2$s 
 is_IS.mo	%1$s adds the item %2$s	%1$s bætir við %2$s 
@@ -1054,6 +1736,28 @@ is_IS.mo	Network	Network
 is_IS.mo	Update Source	Update Source
 is_IS.mo	Location comments	Athugasemdir vegna staðsetningar
 is_IS.mo	Child entities	Dótturfélög
+is_IS.mo	Size	Stærð
+is_IS.mo	Microphone	Míkrafónn
+is_IS.mo	Speakers	Speakers
+is_IS.mo	Sub-D	Sub-D
+is_IS.mo	BNC	BNC
+is_IS.mo	DVI	DVI
+is_IS.mo	Pivot	Pivot
+is_IS.mo	HDMI	HDMI
+is_IS.mo	DisplayPort	DisplayPort
+is_IS.mo	Global management	Global management
+is_IS.mo	Serial	Serial
+is_IS.mo	Parallel	Parallel
+is_IS.mo	USB	USB
+is_IS.mo	Ethernet	Netkerfi
+is_IS.mo	Wifi	Þráðlaust net
+is_IS.mo	Memory	Memory
+is_IS.mo	Mio	Mio
+is_IS.mo	Initial page counter	Initial page counter
+is_IS.mo	Current counter of pages	Current counter of pages
+is_IS.mo	Power supply	Power supply
+is_IS.mo	Headset	Heyrnatól
+is_IS.mo	Speaker	Hátalari
 it_IT.mo	%1$s log in from IP %2$s	Accesso di %1$s dall'IP %2$s
 it_IT.mo	Failed login for %1$s from IP %2$s	Accesso non riuscito per %1$s dall'IP %2$s
 it_IT.mo	%1$s adds the item %2$s	%1$s aggiunge l'elemento %2$s
@@ -1087,6 +1791,28 @@ it_IT.mo	Network	Rete
 it_IT.mo	Update Source	Aggiorna sorgente
 it_IT.mo	Location comments	Commenti sulla posizione
 it_IT.mo	Child entities	Entità figlio
+it_IT.mo	Size	Dimensione
+it_IT.mo	Microphone	Microfono
+it_IT.mo	Speakers	Altoparlanti
+it_IT.mo	Sub-D	Sub-D
+it_IT.mo	BNC	BNC
+it_IT.mo	DVI	DVI
+it_IT.mo	Pivot	Pivot
+it_IT.mo	HDMI	HDMI
+it_IT.mo	DisplayPort	DisplayPort
+it_IT.mo	Global management	Gestione globale
+it_IT.mo	Serial	Seriale
+it_IT.mo	Parallel	Parallela
+it_IT.mo	USB	USB
+it_IT.mo	Ethernet	Ethernet
+it_IT.mo	Wifi	Wi-Fi
+it_IT.mo	Memory	Memoria
+it_IT.mo	Mio	MiB
+it_IT.mo	Initial page counter	Contatore pagine iniziale
+it_IT.mo	Current counter of pages	Conteggio attuale delle pagine
+it_IT.mo	Power supply	Alimentatore
+it_IT.mo	Headset	Cuffia
+it_IT.mo	Speaker	Vivavoce
 ja_JP.mo	%1$s log in from IP %2$s	%1$s は IP: %2$s からログインしました
 ja_JP.mo	Failed login for %1$s from IP %2$s	%1$s は IP: %2$s からのログインに失敗しました
 ja_JP.mo	%1$s adds the item %2$s	%1$s がアイテム %2$s を追加
@@ -1120,6 +1846,28 @@ ja_JP.mo	Network	ネットワーク
 ja_JP.mo	Update Source	更新元
 ja_JP.mo	Location comments	場所のコメント
 ja_JP.mo	Child entities	下位エンティティ
+ja_JP.mo	Size	サイズ
+ja_JP.mo	Microphone	マイク
+ja_JP.mo	Speakers	スピーカー
+ja_JP.mo	Sub-D	D-Sub
+ja_JP.mo	BNC	BNC
+ja_JP.mo	DVI	DVI
+ja_JP.mo	Pivot	ピボット
+ja_JP.mo	HDMI	HDMI
+ja_JP.mo	DisplayPort	DisplayPort
+ja_JP.mo	Global management	グローバル管理
+ja_JP.mo	Serial	シリアル
+ja_JP.mo	Parallel	パラレル
+ja_JP.mo	USB	USB
+ja_JP.mo	Ethernet	イーサネット
+ja_JP.mo	Wifi	無線
+ja_JP.mo	Memory	メモリ
+ja_JP.mo	Mio	MB
+ja_JP.mo	Initial page counter	ページカウンタの開始番号
+ja_JP.mo	Current counter of pages	現在のページカウンタ
+ja_JP.mo	Power supply	電源ユニット
+ja_JP.mo	Headset	ヘッドフォン
+ja_JP.mo	Speaker	スピーカー
 kn.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 kn.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 kn.mo	%1$s adds the item %2$s	%1$sಐಟಂ ಸೇರಿಸುತ್ತದೆ %2$s 
@@ -1153,6 +1901,28 @@ kn.mo	Network	Network
 kn.mo	Update Source	Update Source
 kn.mo	Location comments	Location comments
 kn.mo	Child entities	ಮಕ್ಕಳ ಅಸ್ತಿತ್ವಗಳು
+kn.mo	Size	ಗಾತ್ರ
+kn.mo	Microphone	Microphone
+kn.mo	Speakers	Speakers
+kn.mo	Sub-D	Sub-D
+kn.mo	BNC	BNC
+kn.mo	DVI	DVI
+kn.mo	Pivot	Pivot
+kn.mo	HDMI	HDMI
+kn.mo	DisplayPort	DisplayPort
+kn.mo	Global management	ಜಾಗತಿಕ ನಿರ್ವಹಣೆ
+kn.mo	Serial	Serial
+kn.mo	Parallel	Parallel
+kn.mo	USB	USB
+kn.mo	Ethernet	Ethernet
+kn.mo	Wifi	Wifi
+kn.mo	Memory	Memory
+kn.mo	Mio	Mio
+kn.mo	Initial page counter	Initial page counter
+kn.mo	Current counter of pages	Current counter of pages
+kn.mo	Power supply	Power supply
+kn.mo	Headset	Headset
+kn.mo	Speaker	Speaker
 ko_KR.mo	%1$s log in from IP %2$s	IP %2$s에서 %1$s로 로그인
 ko_KR.mo	Failed login for %1$s from IP %2$s	IP %2$s에서 %1$s로 로그인 실패
 ko_KR.mo	%1$s adds the item %2$s	%1$s 는 %2$s 아이템을 추가합니다.
@@ -1186,6 +1956,28 @@ ko_KR.mo	Network	네트워크
 ko_KR.mo	Update Source	소스 갱신
 ko_KR.mo	Location comments	위치 주석
 ko_KR.mo	Child entities	자식 객체
+ko_KR.mo	Size	크기
+ko_KR.mo	Microphone	마이크
+ko_KR.mo	Speakers	스피커
+ko_KR.mo	Sub-D	Sub-D
+ko_KR.mo	BNC	BNC
+ko_KR.mo	DVI	DVI
+ko_KR.mo	Pivot	화면 회전
+ko_KR.mo	HDMI	HDMI
+ko_KR.mo	DisplayPort	디스플레이포트
+ko_KR.mo	Global management	전체 관리
+ko_KR.mo	Serial	시리얼
+ko_KR.mo	Parallel	패러럴
+ko_KR.mo	USB	USB
+ko_KR.mo	Ethernet	이더넷
+ko_KR.mo	Wifi	와이파이
+ko_KR.mo	Memory	메모리
+ko_KR.mo	Mio	Mio
+ko_KR.mo	Initial page counter	초기 페이지 수
+ko_KR.mo	Current counter of pages	현재 페이지 수
+ko_KR.mo	Power supply	전원 장치
+ko_KR.mo	Headset	헤드셋
+ko_KR.mo	Speaker	스피커
 lt_LT.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 lt_LT.mo	Failed login for %1$s from IP %2$s	Nepavyko %1$s prisijungimas iš IP %2$s
 lt_LT.mo	%1$s adds the item %2$s	%1$s pridėjo elementą %2$s
@@ -1219,6 +2011,28 @@ lt_LT.mo	Network	Tinklas
 lt_LT.mo	Update Source	Update Source
 lt_LT.mo	Location comments	Location comments
 lt_LT.mo	Child entities	Pavaldūs padaliniai
+lt_LT.mo	Size	Dydis
+lt_LT.mo	Microphone	Mikrofonas
+lt_LT.mo	Speakers	Garsiakalbiai
+lt_LT.mo	Sub-D	Sub-D
+lt_LT.mo	BNC	BNC
+lt_LT.mo	DVI	DVI
+lt_LT.mo	Pivot	Suvestinė
+lt_LT.mo	HDMI	HDMI
+lt_LT.mo	DisplayPort	Vaizduoklio prievadas
+lt_LT.mo	Global management	Bendras valdymas
+lt_LT.mo	Serial	Nuoseklusis
+lt_LT.mo	Parallel	Lygiagretusis
+lt_LT.mo	USB	USB
+lt_LT.mo	Ethernet	Ethernet
+lt_LT.mo	Wifi	Wifi
+lt_LT.mo	Memory	Memory
+lt_LT.mo	Mio	Mio
+lt_LT.mo	Initial page counter	Pradiniai skaitliuko parodymai
+lt_LT.mo	Current counter of pages	Dabartiniai skaitliuko parodymai
+lt_LT.mo	Power supply	Power supply
+lt_LT.mo	Headset	Ausinės
+lt_LT.mo	Speaker	Garsiakalbis
 lv_LV.mo	%1$s log in from IP %2$s	%1$s pieteicās no IP %2$s
 lv_LV.mo	Failed login for %1$s from IP %2$s	Neveiksmīgs meiģinājums pieteikties lietotājam %1$s no IP %2$s
 lv_LV.mo	%1$s adds the item %2$s	%1$s pievieno ierakstu %2$s
@@ -1252,6 +2066,28 @@ lv_LV.mo	Network	Tīkli
 lv_LV.mo	Update Source	Atjaunināšanas avoti
 lv_LV.mo	Location comments	Komentāru atrašanās vieta
 lv_LV.mo	Child entities	Apakšnodaļas
+lv_LV.mo	Size	Izmērs
+lv_LV.mo	Microphone	Mikrofons
+lv_LV.mo	Speakers	Skaļruņi
+lv_LV.mo	Sub-D	Sub-D
+lv_LV.mo	BNC	BNC
+lv_LV.mo	DVI	DVI
+lv_LV.mo	Pivot	Pivot funkcija
+lv_LV.mo	HDMI	HDMI
+lv_LV.mo	DisplayPort	DisplayPort
+lv_LV.mo	Global management	Centralizēta pārvaldība
+lv_LV.mo	Serial	Seriālā
+lv_LV.mo	Parallel	Paralēlā
+lv_LV.mo	USB	USB
+lv_LV.mo	Ethernet	Datortīkls
+lv_LV.mo	Wifi	Wifi
+lv_LV.mo	Memory	Memory
+lv_LV.mo	Mio	MB
+lv_LV.mo	Initial page counter	Lapu skaitītāja sākotnējais rādījums
+lv_LV.mo	Current counter of pages	Pašreizējais lapu skaits
+lv_LV.mo	Power supply	Barošanas bloki
+lv_LV.mo	Headset	Klausule
+lv_LV.mo	Speaker	Skaļrunis
 mn_MN.mo	%1$s log in from IP %2$s	%1$sнь IP %2$s-ээр нэвтрэв
 mn_MN.mo	Failed login for %1$s from IP %2$s	%1$s-с IP %2$s-д нэвтрэх явц амжилтгүй боллоо
 mn_MN.mo	%1$s adds the item %2$s	%1$sтөхөөрөмжийг нэмэх%2$s
@@ -1285,6 +2121,28 @@ mn_MN.mo	Network	Сүлжээ
 mn_MN.mo	Update Source	Эх үүсвэрийг шинэчлэх
 mn_MN.mo	Location comments	Байршлын тайлбарууд
 mn_MN.mo	Child entities	Дэд газар нэгж
+mn_MN.mo	Size	Хэмжээ
+mn_MN.mo	Microphone	Микрофон
+mn_MN.mo	Speakers	Спеакерүүд
+mn_MN.mo	Sub-D	Sub-D
+mn_MN.mo	BNC	BNC
+mn_MN.mo	DVI	DVI
+mn_MN.mo	Pivot	Пивот
+mn_MN.mo	HDMI	HDMI
+mn_MN.mo	DisplayPort	Дэлгэцийн порт
+mn_MN.mo	Global management	Олон нийтийн менежмент
+mn_MN.mo	Serial	Сериал
+mn_MN.mo	Parallel	Зэрэгцээ
+mn_MN.mo	USB	USB
+mn_MN.mo	Ethernet	Ethernet
+mn_MN.mo	Wifi	Утасгүй сүлжээ
+mn_MN.mo	Memory	Санах ой
+mn_MN.mo	Mio	Mio
+mn_MN.mo	Initial page counter	Эхний хуудасны тоолуур
+mn_MN.mo	Current counter of pages	Хуудасны одоогийн тоолуур
+mn_MN.mo	Power supply	Эрчим хүчний хангамж
+mn_MN.mo	Headset	Чихэвч
+mn_MN.mo	Speaker	Спеакер
 ms_MY.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 ms_MY.mo	Failed login for %1$s from IP %2$s	Gagal masuk bagi %1$s dari IP %2$s
 ms_MY.mo	%1$s adds the item %2$s	%1$s menambah kepada item %2$s
@@ -1318,6 +2176,28 @@ ms_MY.mo	Network	rangkaian-rangkaian
 ms_MY.mo	Update Source	Kemaskini sumber
 ms_MY.mo	Location comments	Location comments
 ms_MY.mo	Child entities	Entiti bawahan
+ms_MY.mo	Size	Saiz
+ms_MY.mo	Microphone	Microphone
+ms_MY.mo	Speakers	Speakers
+ms_MY.mo	Sub-D	Sub-D
+ms_MY.mo	BNC	BNC
+ms_MY.mo	DVI	DVI
+ms_MY.mo	Pivot	Pivot
+ms_MY.mo	HDMI	HDMI
+ms_MY.mo	DisplayPort	DisplayPort
+ms_MY.mo	Global management	Global management
+ms_MY.mo	Serial	Serial
+ms_MY.mo	Parallel	Parallel
+ms_MY.mo	USB	USB
+ms_MY.mo	Ethernet	Kabel sepaksi
+ms_MY.mo	Wifi	Wifi
+ms_MY.mo	Memory	Memory
+ms_MY.mo	Mio	Mio
+ms_MY.mo	Initial page counter	Initial page counter
+ms_MY.mo	Current counter of pages	Current counter of pages
+ms_MY.mo	Power supply	Power supply
+ms_MY.mo	Headset	Headset
+ms_MY.mo	Speaker	Speaker
 nb_NO.mo	%1$s log in from IP %2$s	%1$s innlogget fra IP %2$s
 nb_NO.mo	Failed login for %1$s from IP %2$s	Innlogging feilet for %1$s fra IP %2$s
 nb_NO.mo	%1$s adds the item %2$s	%1$s legger til elementet %2$s
@@ -1351,6 +2231,28 @@ nb_NO.mo	Network	Nettverk
 nb_NO.mo	Update Source	Oppdaterings Kilde
 nb_NO.mo	Location comments	Kommentarer om sted
 nb_NO.mo	Child entities	Underenheter
+nb_NO.mo	Size	Størrelse
+nb_NO.mo	Microphone	Mikrofon
+nb_NO.mo	Speakers	Høytalere
+nb_NO.mo	Sub-D	D-sub
+nb_NO.mo	BNC	BNC
+nb_NO.mo	DVI	DVI
+nb_NO.mo	Pivot	Pivot
+nb_NO.mo	HDMI	HDMI
+nb_NO.mo	DisplayPort	DisplayPort
+nb_NO.mo	Global management	Global styring
+nb_NO.mo	Serial	Serial
+nb_NO.mo	Parallel	Parallell
+nb_NO.mo	USB	USB
+nb_NO.mo	Ethernet	Ethernet
+nb_NO.mo	Wifi	Wifi
+nb_NO.mo	Memory	Memory
+nb_NO.mo	Mio	MB
+nb_NO.mo	Initial page counter	Opprinnelig sideteller
+nb_NO.mo	Current counter of pages	Current counter of pages
+nb_NO.mo	Power supply	Strømforsyning
+nb_NO.mo	Headset	Hodetelefoner
+nb_NO.mo	Speaker	Høytaler
 nl_BE.mo	%1$s log in from IP %2$s	%1$s log in van IP %2$s
 nl_BE.mo	Failed login for %1$s from IP %2$s	Mislukt login voor %1$s van IP %2$s
 nl_BE.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
@@ -1384,6 +2286,28 @@ nl_BE.mo	Network	Netwerk
 nl_BE.mo	Update Source	Update Source
 nl_BE.mo	Location comments	Locatie opmerkingen
 nl_BE.mo	Child entities	Sub-entiteiten
+nl_BE.mo	Size	Grootte
+nl_BE.mo	Microphone	Microfoon
+nl_BE.mo	Speakers	Luidsprekers
+nl_BE.mo	Sub-D	Sub-D
+nl_BE.mo	BNC	BNC
+nl_BE.mo	DVI	DVI
+nl_BE.mo	Pivot	Pivot
+nl_BE.mo	HDMI	HDMI
+nl_BE.mo	DisplayPort	Displaypoort
+nl_BE.mo	Global management	Globaal beheer
+nl_BE.mo	Serial	Seriële poort
+nl_BE.mo	Parallel	Parallelle poort
+nl_BE.mo	USB	USB-poort
+nl_BE.mo	Ethernet	Ethernet
+nl_BE.mo	Wifi	Wifi
+nl_BE.mo	Memory	Memory
+nl_BE.mo	Mio	Mb
+nl_BE.mo	Initial page counter	Paginateller
+nl_BE.mo	Current counter of pages	Huidige teller van pagina's
+nl_BE.mo	Power supply	Power supply
+nl_BE.mo	Headset	Koptelefoons
+nl_BE.mo	Speaker	Luidspreker
 nl_NL.mo	%1$s log in from IP %2$s	%1$s log in van IP %2$s
 nl_NL.mo	Failed login for %1$s from IP %2$s	Mislukt login voor %1$s van IP %2$s
 nl_NL.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
@@ -1417,6 +2341,28 @@ nl_NL.mo	Network	Network
 nl_NL.mo	Update Source	Update Source
 nl_NL.mo	Location comments	Locatie opmerkingen
 nl_NL.mo	Child entities	Sub-entiteiten
+nl_NL.mo	Size	Grootte
+nl_NL.mo	Microphone	Microfoon
+nl_NL.mo	Speakers	Luidsprekers
+nl_NL.mo	Sub-D	Sub-D
+nl_NL.mo	BNC	BNC
+nl_NL.mo	DVI	DVI
+nl_NL.mo	Pivot	Pivot
+nl_NL.mo	HDMI	HDMI
+nl_NL.mo	DisplayPort	Displaypoort
+nl_NL.mo	Global management	Globaal beheer
+nl_NL.mo	Serial	Seriële poort
+nl_NL.mo	Parallel	Parallelle poort
+nl_NL.mo	USB	USB-poort
+nl_NL.mo	Ethernet	Ethernet
+nl_NL.mo	Wifi	Wifi
+nl_NL.mo	Memory	Memory
+nl_NL.mo	Mio	Mb
+nl_NL.mo	Initial page counter	Paginateller
+nl_NL.mo	Current counter of pages	Huidige teller van pagina's
+nl_NL.mo	Power supply	Power supply
+nl_NL.mo	Headset	Koptelefoons
+nl_NL.mo	Speaker	Luidspreker
 nn_NO.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 nn_NO.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 nn_NO.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -1450,6 +2396,28 @@ nn_NO.mo	Network	Network
 nn_NO.mo	Update Source	Update Source
 nn_NO.mo	Location comments	Location comments
 nn_NO.mo	Child entities	Barneservice enheter
+nn_NO.mo	Size	Størrelse
+nn_NO.mo	Microphone	Mikrofon
+nn_NO.mo	Speakers	Høytalere
+nn_NO.mo	Sub-D	D-sub
+nn_NO.mo	BNC	BNC
+nn_NO.mo	DVI	DVI
+nn_NO.mo	Pivot	Pivot
+nn_NO.mo	HDMI	HDMI
+nn_NO.mo	DisplayPort	DisplayPort
+nn_NO.mo	Global management	Global styring
+nn_NO.mo	Serial	Serial
+nn_NO.mo	Parallel	Parallell
+nn_NO.mo	USB	USB
+nn_NO.mo	Ethernet	Ethernet
+nn_NO.mo	Wifi	Wifi
+nn_NO.mo	Memory	Memory
+nn_NO.mo	Mio	Mio
+nn_NO.mo	Initial page counter	Opprinnelig sideteller
+nn_NO.mo	Current counter of pages	Current counter of pages
+nn_NO.mo	Power supply	Power supply
+nn_NO.mo	Headset	Hodetelefoner
+nn_NO.mo	Speaker	Høytaler
 pl_PL.mo	%1$s log in from IP %2$s	%1$s zalogował się z IP %2$s
 pl_PL.mo	Failed login for %1$s from IP %2$s	Nieudane logowanie %1$s z IP %2$s
 pl_PL.mo	%1$s adds the item %2$s	%1$s dodał element %2$s
@@ -1483,6 +2451,28 @@ pl_PL.mo	Network	Sieć
 pl_PL.mo	Update Source	Aktualizuj źródło
 pl_PL.mo	Location comments	Komentarz dla lokalizacji
 pl_PL.mo	Child entities	Podrzędne jednostki
+pl_PL.mo	Size	Rozmiar
+pl_PL.mo	Microphone	Mikrofon
+pl_PL.mo	Speakers	Głośniki
+pl_PL.mo	Sub-D	Sub-D
+pl_PL.mo	BNC	BNC
+pl_PL.mo	DVI	DVI
+pl_PL.mo	Pivot	Pivot
+pl_PL.mo	HDMI	HDMI
+pl_PL.mo	DisplayPort	DisplayPort
+pl_PL.mo	Global management	Globalne zarządzanie
+pl_PL.mo	Serial	Port szeregowy
+pl_PL.mo	Parallel	Równoległy
+pl_PL.mo	USB	USB
+pl_PL.mo	Ethernet	Ethernet
+pl_PL.mo	Wifi	WiFi
+pl_PL.mo	Memory	Pamięć
+pl_PL.mo	Mio	MB
+pl_PL.mo	Initial page counter	Początkowy stan licznika stron
+pl_PL.mo	Current counter of pages	Aktualny licznik stron
+pl_PL.mo	Power supply	Zasilacz
+pl_PL.mo	Headset	Słuchawki z mikrofonem
+pl_PL.mo	Speaker	Głośnik
 pt_BR.mo	%1$s log in from IP %2$s	%1$s fez login no IP %2$s
 pt_BR.mo	Failed login for %1$s from IP %2$s	Login falhou para %1$s no IP %2$s
 pt_BR.mo	%1$s adds the item %2$s	%1$s adicionou o item %2$s
@@ -1516,6 +2506,28 @@ pt_BR.mo	Network	Rede
 pt_BR.mo	Update Source	Fonte de atualização
 pt_BR.mo	Location comments	Comentários da localização
 pt_BR.mo	Child entities	Entidades filhas
+pt_BR.mo	Size	Tamanho
+pt_BR.mo	Microphone	Microfone
+pt_BR.mo	Speakers	Auto-Falantes
+pt_BR.mo	Sub-D	Sub-D
+pt_BR.mo	BNC	BNC
+pt_BR.mo	DVI	DVI
+pt_BR.mo	Pivot	Articulação
+pt_BR.mo	HDMI	HDMI
+pt_BR.mo	DisplayPort	DisplayPort
+pt_BR.mo	Global management	Gerência geral
+pt_BR.mo	Serial	Serial
+pt_BR.mo	Parallel	Paralela
+pt_BR.mo	USB	USB
+pt_BR.mo	Ethernet	Ethernet
+pt_BR.mo	Wifi	Wifi
+pt_BR.mo	Memory	memória
+pt_BR.mo	Mio	MB
+pt_BR.mo	Initial page counter	Contador inicial
+pt_BR.mo	Current counter of pages	Contagem atual de páginas
+pt_BR.mo	Power supply	Fonte de alimentação
+pt_BR.mo	Headset	Fone de ouvido
+pt_BR.mo	Speaker	Viva Voz
 pt_PT.mo	%1$s log in from IP %2$s	%1$s ligou-se do IP %2$s
 pt_PT.mo	Failed login for %1$s from IP %2$s	Falhou login para %1$s do IP %2$s
 pt_PT.mo	%1$s adds the item %2$s	%1$s adiciona o item %2$s
@@ -1549,6 +2561,28 @@ pt_PT.mo	Network	Rede
 pt_PT.mo	Update Source	Atualizar fonte
 pt_PT.mo	Location comments	Comentários para a localização
 pt_PT.mo	Child entities	Entidades descendentes
+pt_PT.mo	Size	Tamanho
+pt_PT.mo	Microphone	Microfone
+pt_PT.mo	Speakers	Altifalantes
+pt_PT.mo	Sub-D	Sub-D
+pt_PT.mo	BNC	BNC
+pt_PT.mo	DVI	DVI
+pt_PT.mo	Pivot	Pivô
+pt_PT.mo	HDMI	HDMI
+pt_PT.mo	DisplayPort	DisplayPort
+pt_PT.mo	Global management	Gestão global
+pt_PT.mo	Serial	Interface série
+pt_PT.mo	Parallel	Interface paralela
+pt_PT.mo	USB	USB
+pt_PT.mo	Ethernet	Ethernet
+pt_PT.mo	Wifi	Wifi
+pt_PT.mo	Memory	Memória
+pt_PT.mo	Mio	Mio
+pt_PT.mo	Initial page counter	Contador de páginas inicial
+pt_PT.mo	Current counter of pages	Contador de paginas actual
+pt_PT.mo	Power supply	Fonte de alimentação
+pt_PT.mo	Headset	Auscultadores
+pt_PT.mo	Speaker	Altifalantes
 ro_RO.mo	%1$s log in from IP %2$s	%1$s s-a conectat de la IP -ul  %2$s
 ro_RO.mo	Failed login for %1$s from IP %2$s	Conexiune eşuată pentru %1$s de la IP %2$s
 ro_RO.mo	%1$s adds the item %2$s	%1$sadaugă elementzl %2$s
@@ -1582,6 +2616,28 @@ ro_RO.mo	Network	Retea
 ro_RO.mo	Update Source	Actualizează  sursa
 ro_RO.mo	Location comments	Comentarii locaţie
 ro_RO.mo	Child entities	Subentitate
+ro_RO.mo	Size	Mărime
+ro_RO.mo	Microphone	Microfon
+ro_RO.mo	Speakers	Difuzoare
+ro_RO.mo	Sub-D	Sub-D
+ro_RO.mo	BNC	BNC
+ro_RO.mo	DVI	DVI
+ro_RO.mo	Pivot	Pivot
+ro_RO.mo	HDMI	HDMI
+ro_RO.mo	DisplayPort	DisplayPort
+ro_RO.mo	Global management	Management global
+ro_RO.mo	Serial	Serial
+ro_RO.mo	Parallel	Paralela
+ro_RO.mo	USB	USB
+ro_RO.mo	Ethernet	Ethernet
+ro_RO.mo	Wifi	Wifi
+ro_RO.mo	Memory	Memorie
+ro_RO.mo	Mio	MB
+ro_RO.mo	Initial page counter	Initial page counter
+ro_RO.mo	Current counter of pages	Număr pagină curentă
+ro_RO.mo	Power supply	Sursa alimentare
+ro_RO.mo	Headset	Casti
+ro_RO.mo	Speaker	Difuzor
 ru_RU.mo	%1$s log in from IP %2$s	%1$s вошел в систему с IP %2$s
 ru_RU.mo	Failed login for %1$s from IP %2$s	Неудачная попытка входа пользователя %1$s с IP %2$s
 ru_RU.mo	%1$s adds the item %2$s	%1$s добавил объект %2$s
@@ -1615,6 +2671,28 @@ ru_RU.mo	Network	Сеть
 ru_RU.mo	Update Source	Источник обновлений
 ru_RU.mo	Location comments	Примечания местоположения
 ru_RU.mo	Child entities	Подчинённые организации
+ru_RU.mo	Size	Размер
+ru_RU.mo	Microphone	Микрофон
+ru_RU.mo	Speakers	Колонки
+ru_RU.mo	Sub-D	Sub-D
+ru_RU.mo	BNC	BNC
+ru_RU.mo	DVI	DVI
+ru_RU.mo	Pivot	Поворачивается
+ru_RU.mo	HDMI	HDMI
+ru_RU.mo	DisplayPort	DisplayPort
+ru_RU.mo	Global management	Глобальное управление
+ru_RU.mo	Serial	COM-интерфейс
+ru_RU.mo	Parallel	LPT-интерфейс
+ru_RU.mo	USB	USB
+ru_RU.mo	Ethernet	Ethernet
+ru_RU.mo	Wifi	Wi-Fi
+ru_RU.mo	Memory	Память
+ru_RU.mo	Mio	Мб
+ru_RU.mo	Initial page counter	Начальное значение счетчика страниц
+ru_RU.mo	Current counter of pages	Текущий счетчик страниц
+ru_RU.mo	Power supply	Источник питания
+ru_RU.mo	Headset	Гарнитура
+ru_RU.mo	Speaker	Громкая связь
 sk_SK.mo	%1$s log in from IP %2$s	%1$s sa prihlásil z IP %2$s
 sk_SK.mo	Failed login for %1$s from IP %2$s	Neúspešné prihlásenie %1$s z IP %2$s
 sk_SK.mo	%1$s adds the item %2$s	%1$s pridal položku %2$s
@@ -1648,6 +2726,28 @@ sk_SK.mo	Network	Sieť
 sk_SK.mo	Update Source	Zdroj aktualizácií
 sk_SK.mo	Location comments	Komentáre umiestnenia
 sk_SK.mo	Child entities	Podriadené entity
+sk_SK.mo	Size	Veľkosť
+sk_SK.mo	Microphone	Mikrofón
+sk_SK.mo	Speakers	Reproduktory
+sk_SK.mo	Sub-D	D-sub
+sk_SK.mo	BNC	BNC
+sk_SK.mo	DVI	DVI
+sk_SK.mo	Pivot	Pivot
+sk_SK.mo	HDMI	HDMI
+sk_SK.mo	DisplayPort	DisplayPort
+sk_SK.mo	Global management	Globálna správa
+sk_SK.mo	Serial	Sériový
+sk_SK.mo	Parallel	Paralelný
+sk_SK.mo	USB	USB
+sk_SK.mo	Ethernet	Ethernet
+sk_SK.mo	Wifi	Wifi
+sk_SK.mo	Memory	Pamäť
+sk_SK.mo	Mio	MB
+sk_SK.mo	Initial page counter	Počiatočný počet stránok
+sk_SK.mo	Current counter of pages	Aktuálny stav počítadla stránok
+sk_SK.mo	Power supply	Zdroj napájania
+sk_SK.mo	Headset	Sluchátka
+sk_SK.mo	Speaker	Reproduktor
 sl_SI.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 sl_SI.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 sl_SI.mo	%1$s adds the item %2$s	%1$s doda predmet %2$s
@@ -1681,6 +2781,28 @@ sl_SI.mo	Network	Network
 sl_SI.mo	Update Source	Update Source
 sl_SI.mo	Location comments	Location comments
 sl_SI.mo	Child entities	Podrejene entitete
+sl_SI.mo	Size	Velikost
+sl_SI.mo	Microphone	Mikrofon
+sl_SI.mo	Speakers	Zvočniki
+sl_SI.mo	Sub-D	Sub-D
+sl_SI.mo	BNC	BNC
+sl_SI.mo	DVI	DVI
+sl_SI.mo	Pivot	Pivot - zasuk
+sl_SI.mo	HDMI	HDMI
+sl_SI.mo	DisplayPort	DisplayPort
+sl_SI.mo	Global management	Globalno upravljanje
+sl_SI.mo	Serial	Serijska (zaporedna)
+sl_SI.mo	Parallel	Pararelna (vzporedna)
+sl_SI.mo	USB	USB
+sl_SI.mo	Ethernet	Ethernet
+sl_SI.mo	Wifi	Brezžični (Wifi)
+sl_SI.mo	Memory	Memory
+sl_SI.mo	Mio	MB
+sl_SI.mo	Initial page counter	Prvoten števec strani
+sl_SI.mo	Current counter of pages	Current counter of pages
+sl_SI.mo	Power supply	Power supply
+sl_SI.mo	Headset	Slušalke
+sl_SI.mo	Speaker	Zvočnik
 sr_RS.mo	%1$s log in from IP %2$s	%1$s loguj se sa IP %2$s
 sr_RS.mo	Failed login for %1$s from IP %2$s	Neuspelo logovanje za %1$s sa IP %2$s
 sr_RS.mo	%1$s adds the item %2$s	%1$s dodavanje stavke %2$s
@@ -1714,6 +2836,28 @@ sr_RS.mo	Network	Network
 sr_RS.mo	Update Source	Update Source
 sr_RS.mo	Location comments	Komentar za lokaciju
 sr_RS.mo	Child entities	Naslednik entiteta
+sr_RS.mo	Size	Veličina
+sr_RS.mo	Microphone	Mikrofon
+sr_RS.mo	Speakers	Zvučnici
+sr_RS.mo	Sub-D	Sub-D
+sr_RS.mo	BNC	BNC
+sr_RS.mo	DVI	DVI
+sr_RS.mo	Pivot	Pivot
+sr_RS.mo	HDMI	HDMI
+sr_RS.mo	DisplayPort	Port Displeja
+sr_RS.mo	Global management	Globalno upravljanje
+sr_RS.mo	Serial	Serijski
+sr_RS.mo	Parallel	Paralelni
+sr_RS.mo	USB	USB
+sr_RS.mo	Ethernet	Ethernet
+sr_RS.mo	Wifi	Wifi
+sr_RS.mo	Memory	Memory
+sr_RS.mo	Mio	Mb
+sr_RS.mo	Initial page counter	Brojač početne stranice
+sr_RS.mo	Current counter of pages	Trenutni brojač stranica
+sr_RS.mo	Power supply	Power supply
+sr_RS.mo	Headset	Slušalice
+sr_RS.mo	Speaker	Zvučnik
 sv_SE.mo	%1$s log in from IP %2$s	%1$s är inloggad från ip %2$s
 sv_SE.mo	Failed login for %1$s from IP %2$s	%1$s misslyckades att logga in från IP %2$s
 sv_SE.mo	%1$s adds the item %2$s	%1$s lägger till objektet %2$s
@@ -1747,6 +2891,28 @@ sv_SE.mo	Network	Nätverk
 sv_SE.mo	Update Source	Uppdateringskälla
 sv_SE.mo	Location comments	Location comments
 sv_SE.mo	Child entities	Dotterenheter
+sv_SE.mo	Size	Storlek
+sv_SE.mo	Microphone	Mikrofon
+sv_SE.mo	Speakers	Högtalare
+sv_SE.mo	Sub-D	D-Sub
+sv_SE.mo	BNC	BNC
+sv_SE.mo	DVI	DVI
+sv_SE.mo	Pivot	Pivå
+sv_SE.mo	HDMI	HDMI
+sv_SE.mo	DisplayPort	Displayport
+sv_SE.mo	Global management	Global hantering
+sv_SE.mo	Serial	Seriellt gränssnitt
+sv_SE.mo	Parallel	Parallellt gränssnitt
+sv_SE.mo	USB	USB port
+sv_SE.mo	Ethernet	Ethernet
+sv_SE.mo	Wifi	Wifi
+sv_SE.mo	Memory	Memory
+sv_SE.mo	Mio	Mb
+sv_SE.mo	Initial page counter	Startvärde för sidräknare
+sv_SE.mo	Current counter of pages	Aktuell sid-mätning
+sv_SE.mo	Power supply	Nätaggregat
+sv_SE.mo	Headset	Headset
+sv_SE.mo	Speaker	Högtalare
 ta.mo	%1$s log in from IP %2$s	IP %2$s இலிருந்து %1$s உள்நுழைக
 ta.mo	Failed login for %1$s from IP %2$s	ஐபி %2$s இலிருந்து %1$s க்கான உள்நுழைவு தோல்வியுற்றது
 ta.mo	%1$s adds the item %2$s	%1$s உருப்படி %2$s ஐ சேர்க்கிறது
@@ -1780,6 +2946,28 @@ ta.mo	Network	பிணையம்
 ta.mo	Update Source	மூலத்தைப் புதுப்பிக்கவும்
 ta.mo	Location comments	இருப்பிட கருத்துகள்
 ta.mo	Child entities	குழந்தை நிறுவனங்கள்
+ta.mo	Size	அளவு
+ta.mo	Microphone	ஒலிவாங்கி
+ta.mo	Speakers	பேச்சாளர்கள்
+ta.mo	Sub-D	துணை-டி
+ta.mo	BNC	பி.என்.சி.
+ta.mo	DVI	டி.வி.ஐ.
+ta.mo	Pivot	முன்னிலை
+ta.mo	HDMI	HDMI
+ta.mo	DisplayPort	டிச்ப்ளே துறைமுகம்
+ta.mo	Global management	உலகளாவிய மேலாண்மை
+ta.mo	Serial	தொடர்
+ta.mo	Parallel	இணையான
+ta.mo	USB	யூ.எச்.பி
+ta.mo	Ethernet	தூயவெளியம், தூயவெளி வலை
+ta.mo	Wifi	வைஃபை
+ta.mo	Memory	நினைவகம்
+ta.mo	Mio	மியோ
+ta.mo	Initial page counter	தொடக்கப் பக்க கவுண்டர்
+ta.mo	Current counter of pages	பக்கங்களின் தற்போதைய கவுண்டர்
+ta.mo	Power supply	மின் வழங்கி
+ta.mo	Headset	எட்செட்
+ta.mo	Speaker	ஒலிபெருக்கி, ஒலிபரப்பி
 th_TH.mo	%1$s log in from IP %2$s	%1$s เข้าสู่ระบบจาก IP %2$s
 th_TH.mo	Failed login for %1$s from IP %2$s	เข้าสู่ระบบไม่ผ่าน %1$s จาก IP %2$s
 th_TH.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -1813,6 +3001,28 @@ th_TH.mo	Network	เน็ตเวร์ค
 th_TH.mo	Update Source	อัพเดทแหล่งที่มา
 th_TH.mo	Location comments	รายละเอียดเพิ่มเติม
 th_TH.mo	Child entities	เอ็นทิตี้ย่อย
+th_TH.mo	Size	ขนาด
+th_TH.mo	Microphone	ไมค์
+th_TH.mo	Speakers	ลำโพง
+th_TH.mo	Sub-D	Sub-D
+th_TH.mo	BNC	BNC
+th_TH.mo	DVI	DVI
+th_TH.mo	Pivot	Pivot
+th_TH.mo	HDMI	HDMI
+th_TH.mo	DisplayPort	DisplayPort
+th_TH.mo	Global management	จัดการโกลบอล
+th_TH.mo	Serial	Serial
+th_TH.mo	Parallel	Parallel
+th_TH.mo	USB	USB
+th_TH.mo	Ethernet	Ethernet
+th_TH.mo	Wifi	Wifi
+th_TH.mo	Memory	Memory
+th_TH.mo	Mio	MB
+th_TH.mo	Initial page counter	นับหน้าแรก
+th_TH.mo	Current counter of pages	นับหน้าปัจจบัน
+th_TH.mo	Power supply	พาวเวอร์ซัพพลาย
+th_TH.mo	Headset	หูฟัง
+th_TH.mo	Speaker	ลำโพง
 tr_TR.mo	%1$s log in from IP %2$s	%1$s, %2$s IP adresinden oturum açtı
 tr_TR.mo	Failed login for %1$s from IP %2$s	%1$s, %2$s IP adresinden oturum açamadı
 tr_TR.mo	%1$s adds the item %2$s	%1$s %2$s ögesini ekledi
@@ -1846,6 +3056,28 @@ tr_TR.mo	Network	Ağ
 tr_TR.mo	Update Source	Güncelleme Kaynağı
 tr_TR.mo	Location comments	Konum notları
 tr_TR.mo	Child entities	Alt birimler
+tr_TR.mo	Size	Boyut
+tr_TR.mo	Microphone	Mikrofon
+tr_TR.mo	Speakers	Hoparlör
+tr_TR.mo	Sub-D	Sub-D
+tr_TR.mo	BNC	BNC
+tr_TR.mo	DVI	DVI
+tr_TR.mo	Pivot	Oynak
+tr_TR.mo	HDMI	HDMI
+tr_TR.mo	DisplayPort	DisplayPort
+tr_TR.mo	Global management	Genel yönetim
+tr_TR.mo	Serial	Seri
+tr_TR.mo	Parallel	Paralel
+tr_TR.mo	USB	USB
+tr_TR.mo	Ethernet	Ethernet
+tr_TR.mo	Wifi	Wi-Fi
+tr_TR.mo	Memory	Bellek
+tr_TR.mo	Mio	MB
+tr_TR.mo	Initial page counter	Sayfa sayacı başlangıcı
+tr_TR.mo	Current counter of pages	Güncel sayfa sayacı
+tr_TR.mo	Power supply	Güç kaynağı
+tr_TR.mo	Headset	Kulaklık
+tr_TR.mo	Speaker	Hoparlör
 uk_UA.mo	%1$s log in from IP %2$s	%1$s зайшов з IP %2$s
 uk_UA.mo	Failed login for %1$s from IP %2$s	Невдала реєстрація %1$s з IP %2$s
 uk_UA.mo	%1$s adds the item %2$s	%1$s додав елемент %2$s
@@ -1879,6 +3111,28 @@ uk_UA.mo	Network	Мережа
 uk_UA.mo	Update Source	Джерело оновлення
 uk_UA.mo	Location comments	Примітки до приміщення
 uk_UA.mo	Child entities	Підпорядковані підрозділи
+uk_UA.mo	Size	Розмір
+uk_UA.mo	Microphone	Мікрофон
+uk_UA.mo	Speakers	Колонки
+uk_UA.mo	Sub-D	Sub-D
+uk_UA.mo	BNC	BNC
+uk_UA.mo	DVI	DVI
+uk_UA.mo	Pivot	Pivot
+uk_UA.mo	HDMI	HDMI
+uk_UA.mo	DisplayPort	DisplayPort
+uk_UA.mo	Global management	Глобальне керування
+uk_UA.mo	Serial	Послідовний інтерфейс
+uk_UA.mo	Parallel	Паралельний інтерфейс
+uk_UA.mo	USB	USB порт
+uk_UA.mo	Ethernet	Ethernet
+uk_UA.mo	Wifi	Wi-Fi
+uk_UA.mo	Memory	Пам'ять
+uk_UA.mo	Mio	Мб
+uk_UA.mo	Initial page counter	Початкове значення лічильника сторінок
+uk_UA.mo	Current counter of pages	Поточний лічильник сторінок
+uk_UA.mo	Power supply	Блок живлення
+uk_UA.mo	Headset	Гарнітура
+uk_UA.mo	Speaker	Гучний динамік
 vi_VN.mo	%1$s log in from IP %2$s	%1$s đăng nhập từ IP %2$s
 vi_VN.mo	Failed login for %1$s from IP %2$s	Đăng nhập thất bại cho %1$s từ IP %2$s
 vi_VN.mo	%1$s adds the item %2$s	%1$s thêm mục %2$s
@@ -1912,6 +3166,28 @@ vi_VN.mo	Network	Các mạng
 vi_VN.mo	Update Source	Các nguồn cập nhật
 vi_VN.mo	Location comments	Các bình luận địa điểm
 vi_VN.mo	Child entities	Các đối tượng con
+vi_VN.mo	Size	Kích cỡ
+vi_VN.mo	Microphone	Microphone
+vi_VN.mo	Speakers	Các loa
+vi_VN.mo	Sub-D	Sub-D
+vi_VN.mo	BNC	BNC
+vi_VN.mo	DVI	DVI
+vi_VN.mo	Pivot	Trục
+vi_VN.mo	HDMI	HDMI
+vi_VN.mo	DisplayPort	DisplayPort
+vi_VN.mo	Global management	Quản lý toàn cục
+vi_VN.mo	Serial	Nối tiếp
+vi_VN.mo	Parallel	Song song
+vi_VN.mo	USB	USB
+vi_VN.mo	Ethernet	Ethernet
+vi_VN.mo	Wifi	Wifi
+vi_VN.mo	Memory	Memory
+vi_VN.mo	Mio	Mio
+vi_VN.mo	Initial page counter	Bộ đếm trang ban đầu
+vi_VN.mo	Current counter of pages	Bộ đếm hiện tại của các trang
+vi_VN.mo	Power supply	Các bộ nguồn
+vi_VN.mo	Headset	Tai nghe không dây
+vi_VN.mo	Speaker	Loa
 zh_CN.mo	%1$s log in from IP %2$s	%1$s 登陆来自 IP %2$s
 zh_CN.mo	Failed login for %1$s from IP %2$s	 %1$s 从 IP %2$s登陆失败
 zh_CN.mo	%1$s adds the item %2$s	%1$s 添加项目 %2$s
@@ -1945,6 +3221,28 @@ zh_CN.mo	Network	网络
 zh_CN.mo	Update Source	更新来源
 zh_CN.mo	Location comments	地点注解
 zh_CN.mo	Child entities	从属组织
+zh_CN.mo	Size	大小
+zh_CN.mo	Microphone	麦克风
+zh_CN.mo	Speakers	扬声器
+zh_CN.mo	Sub-D	Sub-D接口
+zh_CN.mo	BNC	BNC接口
+zh_CN.mo	DVI	DVI接口
+zh_CN.mo	Pivot	Pivot
+zh_CN.mo	HDMI	HDMI接口
+zh_CN.mo	DisplayPort	显示端口
+zh_CN.mo	Global management	全局管理
+zh_CN.mo	Serial	串口
+zh_CN.mo	Parallel	并口
+zh_CN.mo	USB	USB
+zh_CN.mo	Ethernet	以太网
+zh_CN.mo	Wifi	WIFI
+zh_CN.mo	Memory	内存
+zh_CN.mo	Mio	MB
+zh_CN.mo	Initial page counter	初始页面计数器
+zh_CN.mo	Current counter of pages	页面当前计数
+zh_CN.mo	Power supply	电源
+zh_CN.mo	Headset	耳机
+zh_CN.mo	Speaker	扬声器
 zh_HK.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 zh_HK.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 zh_HK.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -1978,6 +3276,28 @@ zh_HK.mo	Network	Network
 zh_HK.mo	Update Source	Update Source
 zh_HK.mo	Location comments	Location comments
 zh_HK.mo	Child entities	Child entities
+zh_HK.mo	Size	Size
+zh_HK.mo	Microphone	Microphone
+zh_HK.mo	Speakers	Speakers
+zh_HK.mo	Sub-D	Sub-D
+zh_HK.mo	BNC	BNC
+zh_HK.mo	DVI	DVI
+zh_HK.mo	Pivot	Pivot
+zh_HK.mo	HDMI	HDMI
+zh_HK.mo	DisplayPort	DisplayPort
+zh_HK.mo	Global management	Global management
+zh_HK.mo	Serial	Serial
+zh_HK.mo	Parallel	Parallel
+zh_HK.mo	USB	USB
+zh_HK.mo	Ethernet	Ethernet
+zh_HK.mo	Wifi	Wifi
+zh_HK.mo	Memory	Memory
+zh_HK.mo	Mio	Mio
+zh_HK.mo	Initial page counter	Initial page counter
+zh_HK.mo	Current counter of pages	Current counter of pages
+zh_HK.mo	Power supply	Power supply
+zh_HK.mo	Headset	Headset
+zh_HK.mo	Speaker	Speaker
 zh_TW.mo	%1$s log in from IP %2$s	%1$s 登錄從 IP %2$s
 zh_TW.mo	Failed login for %1$s from IP %2$s	從IP %2$s的%1$s 的登錄失敗
 zh_TW.mo	%1$s adds the item %2$s	%1$s 新增項目 %2$s
@@ -2011,3 +3331,25 @@ zh_TW.mo	Network	網路設備
 zh_TW.mo	Update Source	更新來源
 zh_TW.mo	Location comments	位置註釋
 zh_TW.mo	Child entities	從屬實體
+zh_TW.mo	Size	大小
+zh_TW.mo	Microphone	話筒
+zh_TW.mo	Speakers	揚聲器
+zh_TW.mo	Sub-D	Sub-D
+zh_TW.mo	BNC	BNC
+zh_TW.mo	DVI	DVI
+zh_TW.mo	Pivot	Pivot
+zh_TW.mo	HDMI	HDMI
+zh_TW.mo	DisplayPort	顯示埠號
+zh_TW.mo	Global management	全部管理
+zh_TW.mo	Serial	序列
+zh_TW.mo	Parallel	Parallel
+zh_TW.mo	USB	USB
+zh_TW.mo	Ethernet	根據模板新增印表機
+zh_TW.mo	Wifi	Wifi
+zh_TW.mo	Memory	Memory
+zh_TW.mo	Mio	Mb
+zh_TW.mo	Initial page counter	初始頁面數量器
+zh_TW.mo	Current counter of pages	現在表的頁數
+zh_TW.mo	Power supply	電源供應器
+zh_TW.mo	Headset	耳機
+zh_TW.mo	Speaker	揚聲器

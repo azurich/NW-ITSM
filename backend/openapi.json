@@ -1158,387 +1158,488 @@
         ]
       },
       "AssetDetail": {
-        "type": "object",
-        "required": [
-          "kind",
-          "id",
-          "is_deleted",
-          "is_dynamic",
-          "is_recursive",
-          "is_global",
-          "entity",
-          "permissions"
-        ],
-        "properties": {
-          "brand": {
-            "type": [
-              "string",
-              "null"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Features",
+            "description": "Connectors and features of the type, `null` for the other types."
+          },
+          {
+            "type": "object",
+            "required": [
+              "kind",
+              "id",
+              "is_deleted",
+              "is_dynamic",
+              "is_recursive",
+              "is_global",
+              "entity",
+              "permissions"
             ],
-            "description": "Peripherals and phones only."
-          },
-          "comment": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "contact": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "contact_number": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "created_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "duplicates": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/DuplicateNotice"
-            },
-            "description": "After a write: items with the same values as this one, reported by\na unicity criterion that does not refuse them."
-          },
-          "entity": {
-            "$ref": "#/components/schemas/Ref"
-          },
-          "group": {
-            "oneOf": [
-              {
-                "type": "null"
+            "properties": {
+              "brand": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Peripherals and phones only."
               },
-              {
+              "comment": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact_number": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "duplicates": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DuplicateNotice"
+                },
+                "description": "After a write: items with the same values as this one, reported by\na unicity criterion that does not refuse them."
+              },
+              "entity": {
                 "$ref": "#/components/schemas/Ref"
-              }
-            ]
-          },
-          "id": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "inventory_number": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "is_deleted": {
-            "type": "boolean",
-            "description": "In the trash."
-          },
-          "is_dynamic": {
-            "type": "boolean",
-            "description": "Updated by an inventory tool."
-          },
-          "is_global": {
-            "type": "boolean",
-            "description": "Used by several computers at once."
-          },
-          "is_recursive": {
-            "type": "boolean",
-            "description": "Visible in sub-entities."
-          },
-          "kind": {
-            "$ref": "#/components/schemas/AssetType"
-          },
-          "location": {
-            "oneOf": [
-              {
-                "type": "null"
               },
-              {
-                "$ref": "#/components/schemas/Ref"
-              }
-            ]
-          },
-          "manufacturer": {
-            "oneOf": [
-              {
-                "type": "null"
+              "group": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
               },
-              {
-                "$ref": "#/components/schemas/Ref"
-              }
-            ]
-          },
-          "model": {
-            "oneOf": [
-              {
-                "type": "null"
+              "id": {
+                "type": "integer",
+                "format": "int32"
               },
-              {
-                "$ref": "#/components/schemas/Ref"
-              }
-            ]
-          },
-          "name": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "network": {
-            "oneOf": [
-              {
-                "type": "null"
+              "initial_page_counter": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Printers only."
               },
-              {
-                "$ref": "#/components/schemas/Ref",
-                "description": "Computers, printers and network equipment only."
-              }
-            ]
-          },
-          "number_line": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Phones only."
-          },
-          "permissions": {
-            "$ref": "#/components/schemas/AssetPermissions"
-          },
-          "serial": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "state": {
-            "oneOf": [
-              {
-                "type": "null"
+              "inventory_number": {
+                "type": [
+                  "string",
+                  "null"
+                ]
               },
-              {
-                "$ref": "#/components/schemas/Ref"
-              }
-            ]
-          },
-          "tech_group": {
-            "oneOf": [
-              {
-                "type": "null"
+              "is_deleted": {
+                "type": "boolean",
+                "description": "In the trash."
               },
-              {
-                "$ref": "#/components/schemas/Ref"
-              }
-            ]
-          },
-          "tech_user": {
-            "oneOf": [
-              {
-                "type": "null"
+              "is_dynamic": {
+                "type": "boolean",
+                "description": "Updated by an inventory tool."
               },
-              {
-                "$ref": "#/components/schemas/Ref"
-              }
-            ]
-          },
-          "type": {
-            "oneOf": [
-              {
-                "type": "null"
+              "is_global": {
+                "type": "boolean",
+                "description": "Used by several computers at once."
               },
-              {
-                "$ref": "#/components/schemas/Ref"
-              }
-            ]
-          },
-          "update_source": {
-            "oneOf": [
-              {
-                "type": "null"
+              "is_recursive": {
+                "type": "boolean",
+                "description": "Visible in sub-entities."
               },
-              {
-                "$ref": "#/components/schemas/Ref",
-                "description": "Computers only: how the computer is updated (inventory tool...)."
-              }
-            ]
-          },
-          "updated_at": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "format": "date-time"
-          },
-          "user": {
-            "oneOf": [
-              {
-                "type": "null"
+              "kind": {
+                "$ref": "#/components/schemas/AssetType"
               },
-              {
-                "$ref": "#/components/schemas/Ref"
+              "location": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "manufacturer": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "memory": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Printers (free text) and network equipment (MiB) only."
+              },
+              "model": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "network": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref",
+                    "description": "Computers, printers and network equipment only."
+                  }
+                ]
+              },
+              "number_line": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Phones only."
+              },
+              "page_counter": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Printers only: current counter of pages."
+              },
+              "permissions": {
+                "$ref": "#/components/schemas/AssetPermissions"
+              },
+              "power_supply": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref",
+                    "description": "Phones only."
+                  }
+                ]
+              },
+              "serial": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "size": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Monitors only: diagonal in inches, as stored (`\"21.50\"`)."
+              },
+              "state": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "tech_group": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "tech_user": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "type": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "update_source": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref",
+                    "description": "Computers only: how the computer is updated (inventory tool...)."
+                  }
+                ]
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "user": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "uuid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Computers only."
               }
-            ]
-          },
-          "uuid": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Computers only."
+            }
           }
-        }
+        ]
       },
       "AssetFields": {
-        "type": "object",
-        "description": "Fields of a creation or an update. Absent fields are left unchanged;\n`null` clears a field (empty text, no related object).",
-        "properties": {
-          "brand": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Peripherals and phones only."
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Features"
           },
-          "comment": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "contact": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "contact_number": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "group_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          },
-          "inventory_number": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "is_recursive": {
-            "type": [
-              "boolean",
-              "null"
-            ],
-            "description": "Visible in sub-entities. Can be set, not unset (classic interface)."
-          },
-          "location_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          },
-          "manufacturer_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          },
-          "model_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          },
-          "name": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "network_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "description": "Computers, printers and network equipment only."
-          },
-          "number_line": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Phones only."
-          },
-          "serial": {
-            "type": [
-              "string",
-              "null"
-            ]
-          },
-          "state_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          },
-          "tech_group_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          },
-          "tech_user_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          },
-          "type_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          },
-          "update_source_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32",
-            "description": "Computers only."
-          },
-          "user_id": {
-            "type": [
-              "integer",
-              "null"
-            ],
-            "format": "int32"
-          },
-          "uuid": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Computers only."
+          {
+            "type": "object",
+            "properties": {
+              "brand": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Peripherals and phones only."
+              },
+              "comment": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact_number": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "group_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "initial_page_counter": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Printers only."
+              },
+              "inventory_number": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "is_global": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "Monitors, printers, peripherals and phones only: one item for\nseveral computers."
+              },
+              "is_recursive": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "Visible in sub-entities. Can be set, not unset (classic interface)."
+              },
+              "location_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "manufacturer_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "memory": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Printers: free text. Network equipment: a whole number of MiB, or\nempty."
+              },
+              "model_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "network_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Computers, printers and network equipment only."
+              },
+              "number_line": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Phones only."
+              },
+              "page_counter": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Printers only."
+              },
+              "power_supply_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Phones only."
+              },
+              "serial": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "size": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Monitors only: decimal number of inches (`\"21.5\"`, `\"21,5\"`)."
+              },
+              "state_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "tech_group_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "tech_user_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "type_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "update_source_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Computers only."
+              },
+              "user_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "uuid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Computers only."
+              }
+            }
           }
-        }
+        ],
+        "description": "Fields of a creation or an update. Absent fields are left unchanged;\n`null` clears a field (empty text, no related object)."
       },
       "AssetPage": {
         "type": "object",
@@ -1724,7 +1825,8 @@
           "user",
           "group",
           "tech_user",
-          "tech_group"
+          "tech_group",
+          "power_supply"
         ]
       },
       "ChoiceList": {
@@ -1852,6 +1954,110 @@
           },
           "new_password": {
             "type": "string"
+          }
+        }
+      },
+      "Features": {
+        "type": "object",
+        "description": "Connectors and features of monitors, printers and phones (`have_*`).",
+        "properties": {
+          "has_bnc": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_displayport": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_dvi": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_ethernet": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Printers."
+          },
+          "has_hdmi": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_headset": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Phones."
+          },
+          "has_microphone": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_parallel": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Printers."
+          },
+          "has_pivot": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_serial": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Printers: serial port."
+          },
+          "has_speaker": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors and phones."
+          },
+          "has_subd": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_usb": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Printers."
+          },
+          "has_wifi": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Printers."
           }
         }
       },

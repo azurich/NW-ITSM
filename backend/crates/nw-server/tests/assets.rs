@@ -256,16 +256,16 @@ async fn update_writes_the_history_like_the_php_code() {
     assert_eq!(response.body["user"], json!({ "id": 11, "name": "paris" }));
     assert_eq!(response.body["comment"], "a < b");
 
-    // Unchanged serial: no entry.
+    // Unchanged serial: no entry. In the order of the legacy form.
     assert_eq!(
         history(&app, "Computer", 102).await,
         [
             row(1, "PC-PARIS-1", "PC-PARIS-1b"),
-            row(16, "", "a &lt; b"),
-            row(3, "Paris HQ &gt; Room 1 (1)", "&nbsp; (0)"),
             row(31, "&nbsp; (0)", "In use (1)"),
-            row(70, "admin (10)", "paris (11)"),
+            row(3, "Paris HQ &gt; Room 1 (1)", "&nbsp; (0)"),
             row(49, "&nbsp; (0)", "Support (1)"),
+            row(70, "admin (10)", "paris (11)"),
+            row(16, "", "a &lt; b"),
         ]
     );
     assert_eq!(
@@ -325,13 +325,14 @@ async fn computer_changes_follow_to_connected_items_and_components() {
         .await;
     assert_eq!(response.status, StatusCode::OK, "{}", response.body);
 
-    // The monitor follows (not the serial number); the global one does not.
+    // The monitor follows (not the serial number), in the order of the
+    // computer's changes; the global one does not.
     assert_eq!(
         history(&app, "Monitor", 200).await,
         [
-            row(7, "old", "jdupont"),
-            row(3, "Paris HQ &gt; Room 1 (1)", "Warehouse (3)"),
             row(31, "&nbsp; (0)", "In use (1)"),
+            row(3, "Paris HQ &gt; Room 1 (1)", "Warehouse (3)"),
+            row(7, "old", "jdupont"),
         ]
     );
     let monitor = app.get("/api/v2/assets/monitors/200", Some(&manager)).await;
@@ -347,8 +348,8 @@ async fn computer_changes_follow_to_connected_items_and_components() {
     assert_eq!(
         history(&app, "Item_DeviceProcessor", 1).await,
         [
-            row(13, "Paris HQ &gt; Room 1 (1)", "Warehouse (3)"),
-            row(14, "&nbsp; (0)", "In use (1)")
+            row(14, "&nbsp; (0)", "In use (1)"),
+            row(13, "Paris HQ &gt; Room 1 (1)", "Warehouse (3)")
         ]
     );
     let device_entries: Vec<_> = history(&app, "Computer", 102)
@@ -361,17 +362,17 @@ async fn computer_changes_follow_to_connected_items_and_components() {
         [
             (
                 0,
+                "0".into(),
                 "1".into(),
-                "3".into(),
-                "Item_DeviceProcessor#locations_id".into(),
+                "Item_DeviceProcessor#states_id".into(),
                 2,
                 "manager (19)".into()
             ),
             (
                 0,
-                "0".into(),
                 "1".into(),
-                "Item_DeviceProcessor#states_id".into(),
+                "3".into(),
+                "Item_DeviceProcessor#locations_id".into(),
                 2,
                 "manager (19)".into()
             ),
@@ -614,8 +615,8 @@ async fn business_rules_change_the_written_values() {
     assert_eq!(
         history(&app, "Computer", 102).await,
         [
-            row(7, "", "jdupont"),
             row(3, "Paris HQ &gt; Room 1 (1)", "Warehouse (3)"),
+            row(7, "", "jdupont"),
             row(16, "", "set by rule"),
         ]
     );
@@ -989,6 +990,152 @@ async fn unsharing_checks_the_items_of_other_entities() {
 }
 
 #[tokio::test]
+async fn fields_of_each_type_like_php() {
+    let app = test_app!();
+    app.sql(
+        "INSERT INTO glpi_printers (id, name, entities_id, date_mod) VALUES (300, 'PRN', 1, '2026-01-01'); \
+         INSERT INTO glpi_networkequipments (id, name, entities_id, ram, date_mod) VALUES (400, 'SW', 1, '512', '2026-01-01'); \
+         INSERT INTO glpi_phones (id, name, entities_id, date_mod) VALUES (500, 'TEL', 1, '2026-01-01'); \
+         INSERT INTO glpi_phonepowersupplies (id, name) VALUES (1, 'PoE')",
+    )
+    .await;
+    let manager = app.login("manager").await;
+    let patch = |uri: &'static str, body: Value| {
+        let manager = manager.clone();
+        let app = &app;
+        async move { app.patch(uri, &manager, body).await }
+    };
+
+    // Monitor: size filtered like the legacy form, flags, global
+    // management, contact.
+    let monitor = patch(
+        "/api/v2/assets/monitors/200",
+        json!({ "size": "21,50", "has_hdmi": true, "has_speaker": true, "is_global": true, "contact": "x" }),
+    )
+    .await;
+    assert_eq!(monitor.status, StatusCode::OK, "{}", monitor.body);
+    assert_eq!(monitor.body["size"], "21.50");
+    assert_eq!(monitor.body["has_hdmi"], true);
+    assert_eq!(monitor.body["has_dvi"], false);
+    assert_eq!(monitor.body["has_wifi"], Value::Null);
+    assert_eq!(monitor.body["is_global"], true);
+    // The same number written otherwise is no change.
+    patch("/api/v2/assets/monitors/200", json!({ "size": "21.5" })).await;
+    assert_eq!(
+        history(&app, "Monitor", 200).await,
+        [
+            row(7, "old", "x"),
+            row(11, "0.00", "21.5"),
+            row(82, "0", "1"),
+            row(42, "0", "1"),
+            row(47, "0", "1"),
+        ]
+    );
+    for (size, error) in [
+        ("abc", "size: a decimal number is required"),
+        ("", "size: a decimal number is required"),
+        ("1e2", "size: a decimal number is required"),
+        ("999.995", "size: out of range"),
+    ] {
+        let response = patch("/api/v2/assets/monitors/200", json!({ "size": size })).await;
+        assert_eq!(response.status, StatusCode::BAD_REQUEST, "{size}");
+        assert_eq!(response.body["error"]["message"], error, "{size}");
+    }
+    let response = patch("/api/v2/assets/monitors/200", json!({ "has_wifi": true })).await;
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+
+    // Printer: ports, memory, page counters, comment.
+    let printer = patch(
+        "/api/v2/assets/printers/300",
+        json!({ "has_wifi": true, "memory": "64 Mo <max>", "initial_page_counter": 10, "page_counter": 250, "comment": "c" }),
+    )
+    .await;
+    assert_eq!(printer.status, StatusCode::OK, "{}", printer.body);
+    assert_eq!(printer.body["memory"], "64 Mo <max>");
+    assert_eq!(printer.body["page_counter"], 250);
+    assert_eq!(printer.body["has_wifi"], true);
+    assert_eq!(printer.body["has_hdmi"], Value::Null);
+    assert_eq!(
+        history(&app, "Printer", 300).await,
+        [
+            row(13, "", "64 Mo &lt;max&gt;"),
+            row(11, "0", "10"),
+            row(12, "0", "250"),
+            row(16, "", "c"),
+            row(46, "0", "1"),
+        ]
+    );
+
+    // Network equipment: memory in MiB, compared as a number.
+    patch(
+        "/api/v2/assets/network-equipments/400",
+        json!({ "memory": "0512" }),
+    )
+    .await;
+    let network = patch(
+        "/api/v2/assets/network-equipments/400",
+        json!({ "memory": " 1024 " }),
+    )
+    .await;
+    assert_eq!(network.body["memory"], "1024");
+    let response = patch(
+        "/api/v2/assets/network-equipments/400",
+        json!({ "memory": "1.5" }),
+    )
+    .await;
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+    assert_eq!(
+        history(&app, "NetworkEquipment", 400).await,
+        [row(14, "512", "1024")]
+    );
+
+    // Phone: power supply, headset, speaker.
+    let phone = patch(
+        "/api/v2/assets/phones/500",
+        json!({ "power_supply_id": 1, "has_speaker": true, "has_headset": true }),
+    )
+    .await;
+    assert_eq!(phone.status, StatusCode::OK, "{}", phone.body);
+    assert_eq!(phone.body["power_supply"]["name"], "PoE");
+    assert_eq!(phone.body["has_speaker"], true);
+    assert_eq!(
+        history(&app, "Phone", 500).await,
+        [
+            row(42, "&nbsp; (0)", "PoE (1)"),
+            row(43, "0", "1"),
+            row(44, "0", "1")
+        ]
+    );
+    let choices = app
+        .get(
+            "/api/v2/assets/phones/choices/power_supply?entity_id=1",
+            Some(&manager),
+        )
+        .await;
+    assert_eq!(choices.body["items"], json!([{ "id": 1, "label": "PoE" }]));
+
+    // Creation: an empty size keeps its default, the counters are 0.
+    let created = app
+        .post(
+            "/api/v2/assets/monitors",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "NEW" })),
+        )
+        .await;
+    assert_eq!(created.body["size"], "0.00");
+    let created = app
+        .post(
+            "/api/v2/assets/printers",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "NEW", "initial_page_counter": 5 })),
+        )
+        .await;
+    assert_eq!(created.status, StatusCode::CREATED, "{}", created.body);
+    assert_eq!(created.body["initial_page_counter"], 5);
+    assert_eq!(created.body["page_counter"], 0);
+}
+
+#[tokio::test]
 async fn events_are_in_the_language_of_the_session() {
     let app = test_app!();
     app.sql(
@@ -1298,7 +1445,7 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
     // A unicity criterion on a field the form does not have.
     app.sql(
         "INSERT INTO glpi_fieldunicities (name, itemtype, entities_id, is_recursive, fields, is_active, action_refuse) \
-         VALUES ('Size', 'Monitor', 0, 1, 'size', 1, 1)",
+         VALUES ('TCO', 'Monitor', 0, 1, 'ticket_tco', 1, 1)",
     )
     .await;
     let response = app
@@ -1309,6 +1456,27 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
         )
         .await;
     refused(&response, "field_unicity");
+    app.sql("DELETE FROM glpi_fieldunicities").await;
+
+    // The size is in the form of a monitor, except on a creation without
+    // size (the PHP code drops it): the criterion is then skipped.
+    app.sql(
+        "INSERT INTO glpi_fieldunicities (name, itemtype, entities_id, is_recursive, fields, is_active, action_refuse) \
+         VALUES ('Size', 'Monitor', 0, 1, 'size', 1, 1)",
+    )
+    .await;
+    let response = app
+        .patch(
+            "/api/v2/assets/monitors/200",
+            &manager,
+            json!({ "name": "x" }),
+        )
+        .await;
+    assert_eq!(response.error_code(), "duplicate", "{}", response.body);
+    let response = app
+        .post("/api/v2/assets/monitors", &manager, Some(create.clone()))
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
     app.sql("DELETE FROM glpi_fieldunicities").await;
 
     // Hooks of the PHP plugins.

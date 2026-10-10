@@ -407,6 +407,28 @@ class Printer extends CommonDBTM
                        'value' => $this->fields["networks_id"],
                        'actions' => getItemActionButtons(['info', 'add'], "Network"),
                     ],
+                    _n('Memory', 'Memories', 1) => [
+                       'name' => 'memory_size',
+                       'type' => 'text',
+                       'value' => $this->fields["memory_size"],
+                    ],
+                    __('Initial page counter') => [
+                       'name' => 'init_pages_counter',
+                       'type' => 'number',
+                       'value' => $this->fields["init_pages_counter"],
+                       'step' => 1,
+                    ],
+                    __('Current counter of pages') => [
+                       'name' => 'last_pages_counter',
+                       'type' => 'number',
+                       'value' => $this->fields["last_pages_counter"],
+                       'step' => 1,
+                    ],
+                    __('Comments') => [
+                       'name' => 'comment',
+                       'type' => 'textarea',
+                       'value' => $this->fields["comment"],
+                    ],
                  ]
               ],
               __("Ports") => [

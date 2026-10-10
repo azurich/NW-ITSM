@@ -1,8 +1,10 @@
 //! Lists and details of the assets.
 
+use std::collections::HashMap;
+
 use chrono::{DateTime, Utc};
 use nw_domain::{asset::AssetKind, entity::EntityScope, text::to_stored};
-use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder};
+use sqlx::{FromRow, MySql, MySqlPool, QueryBuilder, Row};
 
 use crate::scope::restrict_entities;
 
@@ -261,6 +263,64 @@ pub async fn get(
     sql.push_bind(id);
     restrict_entities(&mut sql, "a", scope);
     sql.build_query_as().fetch_optional(pool).await
+}
+
+/// Every field of an asset as text (`1` or `0` for the flags), with the
+/// name of the power supply of a phone.
+#[derive(Debug, Clone, Default)]
+pub struct Specific {
+    pub values: HashMap<&'static str, Option<String>>,
+    pub power_supply: Option<String>,
+}
+
+impl Specific {
+    pub fn text(&self, column: &str) -> Option<String> {
+        self.values.get(column).cloned().flatten()
+    }
+
+    /// A flag of the type, `None` when the type does not have it.
+    pub fn flag(&self, column: &str) -> Option<bool> {
+        self.values
+            .get(column)
+            .map(|value| value.as_deref() == Some("1"))
+    }
+}
+
+/// Reads the fields of an asset as text. Call it once the asset is known
+/// to be visible ([`get`]).
+pub async fn specific(pool: &MySqlPool, kind: AssetKind, id: i32) -> Result<Specific, sqlx::Error> {
+    let fields = kind.fields();
+    let mut columns: Vec<String> = fields
+        .iter()
+        .map(|field| format!("CAST(a.{0} AS CHAR) AS {0}", field.column))
+        .collect();
+    let mut joins = String::new();
+    let has_power_supply = kind.field("phonepowersupplies_id").is_some();
+    if has_power_supply {
+        columns.push("ps.name AS power_supply".to_owned());
+        joins.push_str(" LEFT JOIN glpi_phonepowersupplies ps ON ps.id = a.phonepowersupplies_id");
+    }
+    let row = sqlx::query(&format!(
+        "SELECT {} FROM {} a{joins} WHERE a.id = ?",
+        columns.join(", "),
+        kind.table()
+    ))
+    .bind(id)
+    .fetch_optional(pool)
+    .await?;
+    let Some(row) = row else {
+        return Ok(Specific::default());
+    };
+    let mut specific = Specific::default();
+    for field in fields {
+        specific
+            .values
+            .insert(field.column, row.try_get(field.column)?);
+    }
+    if has_power_supply {
+        specific.power_supply = row.try_get("power_supply")?;
+    }
+    Ok(specific)
 }
 
 /// `%term%` with `!` escaping the LIKE wildcards (`!` is used instead of

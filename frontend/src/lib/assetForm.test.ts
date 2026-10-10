@@ -65,3 +65,43 @@ describe('changedFields', () => {
     expect(changedFields('peripherals', form)).toEqual({ name: 'PC', brand: 'Logi', is_recursive: true })
   })
 })
+
+describe('fields of one type', () => {
+  const monitor = {
+    ...detail,
+    size: '21.50',
+    is_global: true,
+    has_hdmi: true,
+    has_dvi: false,
+  } as AssetDetail
+
+  it('reads and sends the size, the management type and the features', () => {
+    const initial = formFromDetail(monitor)
+    expect(initial.text.size).toBe('21.50')
+    expect(initial.flags).toMatchObject({ is_global: true, has_hdmi: true, has_dvi: false, has_bnc: false })
+    const form = formFromDetail(monitor)
+    form.text.size = '22'
+    form.flags.has_hdmi = false
+    form.flags.has_pivot = true
+    expect(changedFields('monitors', form, initial)).toEqual({ size: '22', has_hdmi: false, has_pivot: true })
+  })
+
+  it('sends the page counters as numbers, 0 when empty', () => {
+    const printer = { ...detail, kind: 'printers', initial_page_counter: 10, page_counter: 250 } as AssetDetail
+    const initial = formFromDetail(printer)
+    const form = formFromDetail(printer)
+    form.numbers.page_counter = ''
+    expect(changedFields('printers', form, initial)).toEqual({ page_counter: 0 })
+    // Not a field of monitors.
+    expect(changedFields('monitors', form, initial)).toEqual({})
+  })
+
+  it('sends the switched features of a creation only', () => {
+    const form = emptyForm()
+    form.text.name = 'TEL'
+    form.flags.has_headset = true
+    form.flags.has_hdmi = true
+    form.refs.power_supply = { id: 1, label: 'PoE' }
+    expect(changedFields('phones', form)).toEqual({ name: 'TEL', has_headset: true, power_supply_id: 1 })
+  })
+})

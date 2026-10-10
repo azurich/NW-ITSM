@@ -346,7 +346,7 @@ export interface components {
              */
             entity_id: number;
         };
-        AssetDetail: {
+        AssetDetail: components["schemas"]["Features"] & {
             /** @description Peripherals and phones only. */
             brand?: string | null;
             comment?: string | null;
@@ -363,6 +363,11 @@ export interface components {
             group?: null | components["schemas"]["Ref"];
             /** Format: int32 */
             id: number;
+            /**
+             * Format: int32
+             * @description Printers only.
+             */
+            initial_page_counter?: number | null;
             inventory_number?: string | null;
             /** @description In the trash. */
             is_deleted: boolean;
@@ -375,13 +380,23 @@ export interface components {
             kind: components["schemas"]["AssetType"];
             location?: null | components["schemas"]["Ref"];
             manufacturer?: null | components["schemas"]["Ref"];
+            /** @description Printers (free text) and network equipment (MiB) only. */
+            memory?: string | null;
             model?: null | components["schemas"]["Ref"];
             name?: string | null;
             network?: null | components["schemas"]["Ref"];
             /** @description Phones only. */
             number_line?: string | null;
+            /**
+             * Format: int32
+             * @description Printers only: current counter of pages.
+             */
+            page_counter?: number | null;
             permissions: components["schemas"]["AssetPermissions"];
+            power_supply?: null | components["schemas"]["Ref"];
             serial?: string | null;
+            /** @description Monitors only: diagonal in inches, as stored (`"21.50"`). */
+            size?: string | null;
             state?: null | components["schemas"]["Ref"];
             tech_group?: null | components["schemas"]["Ref"];
             tech_user?: null | components["schemas"]["Ref"];
@@ -397,7 +412,7 @@ export interface components {
          * @description Fields of a creation or an update. Absent fields are left unchanged;
          *     `null` clears a field (empty text, no related object).
          */
-        AssetFields: {
+        AssetFields: components["schemas"]["Features"] & {
             /** @description Peripherals and phones only. */
             brand?: string | null;
             comment?: string | null;
@@ -405,13 +420,28 @@ export interface components {
             contact_number?: string | null;
             /** Format: int32 */
             group_id?: number | null;
+            /**
+             * Format: int32
+             * @description Printers only.
+             */
+            initial_page_counter?: number | null;
             inventory_number?: string | null;
+            /**
+             * @description Monitors, printers, peripherals and phones only: one item for
+             *     several computers.
+             */
+            is_global?: boolean | null;
             /** @description Visible in sub-entities. Can be set, not unset (classic interface). */
             is_recursive?: boolean | null;
             /** Format: int32 */
             location_id?: number | null;
             /** Format: int32 */
             manufacturer_id?: number | null;
+            /**
+             * @description Printers: free text. Network equipment: a whole number of MiB, or
+             *     empty.
+             */
+            memory?: string | null;
             /** Format: int32 */
             model_id?: number | null;
             name?: string | null;
@@ -422,7 +452,19 @@ export interface components {
             network_id?: number | null;
             /** @description Phones only. */
             number_line?: string | null;
+            /**
+             * Format: int32
+             * @description Printers only.
+             */
+            page_counter?: number | null;
+            /**
+             * Format: int32
+             * @description Phones only.
+             */
+            power_supply_id?: number | null;
             serial?: string | null;
+            /** @description Monitors only: decimal number of inches (`"21.5"`, `"21,5"`). */
+            size?: string | null;
             /** Format: int32 */
             state_id?: number | null;
             /** Format: int32 */
@@ -494,7 +536,7 @@ export interface components {
          * @description A field of the asset forms offering a list of values.
          * @enum {string}
          */
-        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group";
+        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group" | "power_supply";
         ChoiceList: {
             /** @description At most 50 values, sorted by label. */
             items: components["schemas"]["Choice"][];
@@ -542,6 +584,37 @@ export interface components {
             current_password: string;
             login: string;
             new_password: string;
+        };
+        /** @description Connectors and features of monitors, printers and phones (`have_*`). */
+        Features: {
+            /** @description Monitors. */
+            has_bnc?: boolean | null;
+            /** @description Monitors. */
+            has_displayport?: boolean | null;
+            /** @description Monitors. */
+            has_dvi?: boolean | null;
+            /** @description Printers. */
+            has_ethernet?: boolean | null;
+            /** @description Monitors. */
+            has_hdmi?: boolean | null;
+            /** @description Phones. */
+            has_headset?: boolean | null;
+            /** @description Monitors. */
+            has_microphone?: boolean | null;
+            /** @description Printers. */
+            has_parallel?: boolean | null;
+            /** @description Monitors. */
+            has_pivot?: boolean | null;
+            /** @description Printers: serial port. */
+            has_serial?: boolean | null;
+            /** @description Monitors and phones. */
+            has_speaker?: boolean | null;
+            /** @description Monitors. */
+            has_subd?: boolean | null;
+            /** @description Printers. */
+            has_usb?: boolean | null;
+            /** @description Printers. */
+            has_wifi?: boolean | null;
         };
         Health: {
             /** @description `ok` or `unreachable`. */

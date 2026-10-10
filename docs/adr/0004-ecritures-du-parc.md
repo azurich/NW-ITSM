@@ -223,6 +223,54 @@ français, doublon signalé en allemand sans les ID, changements de langue :
 mêmes messages que le PHP, au caractère près (hors adresse IP, que le
 serveur PHP de test ne fournit pas).
 
+### Champs propres à chaque type
+
+- Moniteurs : taille, connectique (microphone, haut-parleurs, Sub-D, BNC,
+  DVI, pivot, HDMI, DisplayPort). Imprimantes : ports (série, parallèle,
+  USB, Ethernet, Wi-Fi), mémoire, compteurs de pages initial et actuel.
+  Matériels réseau : mémoire (Mio). Téléphones : alimentation, casque,
+  haut-parleur. Moniteurs, imprimantes, périphériques et téléphones : type
+  de gestion (unitaire ou globale).
+- **Formulaires PHP rétablis** : en passant à Twig, ITSM-NG avait perdu
+  des champs du formulaire GLPI (contact et numéro de contact des
+  moniteurs ; commentaire, mémoire et compteurs de pages des imprimantes),
+  qui ne pouvaient plus être modifiés. Ils sont rétablis, pour que les deux
+  interfaces postent le même formulaire (que lisent les règles et
+  l'unicité).
+- Valeurs numériques comme le filtre d'entrée du PHP (`filterValues`) : la
+  taille passe par `floatval` (« 21,50 » donne 21.5, journalisé « 21.5 »),
+  la mémoire réseau et les compteurs par `intval`. Le PHP transforme
+  silencieusement une saisie ambiguë (« 1.5 » devient 15 pour la mémoire
+  réseau, « abc » devient 0 pour la taille) : l'API la refuse (`400`)
+  plutôt que d'enregistrer autre chose que ce qui a été saisi. Une taille
+  vide ou hors de `decimal(5,2)` est refusée, comme la base la refuse au
+  PHP en mode strict.
+- Comparaison comme le PHP : un nombre égal écrit autrement (« 21.5 » pour
+  21.50, « 0512 » pour 512) n'est pas un changement.
+- Un nouvel élément PHP a tous ses champs vides : à la création, une taille
+  non saisie garde sa valeur par défaut et n'est ni lue par les règles ni
+  par l'unicité (`prepareInputForAdd` la retire), les compteurs valent 0,
+  le compteur actuel ne reprend pas le compteur initial.
+- Le réglage « type de gestion » par type (`*_management_restrict`) n'a
+  plus d'effet dans ITSM-NG : le script du formulaire réactive toujours la
+  liste. L'API laisse donc choisir, comme le formulaire.
+- **Ordre de l'historique** : les changements sont écrits dans l'ordre du
+  formulaire PHP du type (entité d'abord), et les éléments connectés et
+  composants suivent l'ordre des changements de l'ordinateur, comme
+  `Computer::post_updateItem`. Une valeur posée par une règle garde sa
+  place.
+- Remarque : les filtres des listes de groupes de l'interface classique
+  varient selon le type (aucun pour les ordinateurs et matériels réseau,
+  groupes « assignables » pour le groupe des imprimantes et téléphones).
+  L'API garde ceux de GLPI pour tous ; les valeurs restent vérifiées en
+  existence seulement, comme en PHP.
+
+Vérification : formulaire de chaque type récupéré dans l'interface
+classique et posté comme par un navigateur (champs dans l'ordre de la
+page), et même modification par l'API sur un jumeau : mêmes valeurs et
+mêmes lignes d'historique, dans le même ordre. Créations par le formulaire
+« nouvel élément » : mêmes valeurs enregistrées.
+
 ### Ce qui renvoie vers l'interface classique
 
 | Motif (`details`) | Situation |
@@ -242,9 +290,8 @@ Une modification qui ne change rien, ou une mise à la corbeille d'un
   (connexions, ports, informations financières, documents, contrats,
   tickets) ; elle reste dans l'interface classique.
 - **Gabarits** : exclus des listes et des écritures.
-- Champs propres à un type (taille d'écran, ports de l'imprimante,
-  mémoire...) : affichés et modifiés dans l'interface classique, comme les
-  onglets (composants, connexions, logiciels, informations financières).
+- Les onglets (composants, connexions, logiciels, informations
+  financières) restent dans l'interface classique.
 - Les valeurs choisies sont vérifiées en existence, pas en visibilité,
   comme le PHP ; seule l'interface limite les choix à l'entité.
 

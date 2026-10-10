@@ -43,6 +43,8 @@ pub enum ChoiceField {
     Group,
     TechUser,
     TechGroup,
+    /// Phones only.
+    PowerSupply,
 }
 
 impl ChoiceField {
@@ -59,6 +61,7 @@ impl ChoiceField {
             Self::Group => "groups_id",
             Self::TechUser => "users_id_tech",
             Self::TechGroup => "groups_id_tech",
+            Self::PowerSupply => "phonepowersupplies_id",
         }
     }
 }
@@ -184,7 +187,7 @@ pub async fn choices(
             })
             .collect()
         }
-        FieldKind::Text | FieldKind::Bool => {
+        FieldKind::Text | FieldKind::Bool | FieldKind::Integer | FieldKind::Decimal => {
             return Err(ApiError::BadRequest("not a list field".to_owned()));
         }
     };

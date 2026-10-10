@@ -113,7 +113,13 @@ pub async fn check(
         let mut criteria = Vec::new();
         for field in config.fields.iter().filter(|field| !field.is_empty()) {
             let Some(value) = values.get(field) else {
-                if complete {
+                // A field the form leaves out (an empty size on creation)
+                // skips the criterion, as in PHP; another one cannot be
+                // checked like the PHP code.
+                let left_out = kind
+                    .field(field)
+                    .is_some_and(|field| field.form_default().is_none());
+                if complete && !left_out {
                     return Err(ApiError::LegacyRequired("field_unicity"));
                 }
                 continue 'configs;
@@ -215,7 +221,7 @@ fn message(kind: AssetKind, session: &Session, found: &Found) -> String {
         .iter()
         .zip(&found.values)
         .map(|(field, value)| {
-            let label = label(field).map(tr).unwrap_or_default();
+            let label = label(field, &tr);
             i18n::sprintf(&tr(text::EQUALS), &[&label, value])
         })
         .collect();
@@ -298,8 +304,8 @@ fn link(kind: AssetKind, session: &Session, double: &db::Double) -> String {
 /// key, the first option showing the `name` of its table (none for the
 /// trees and the entity, shown by their full name), else the first option
 /// on a column of that name, whatever its table.
-fn label(field: &str) -> Option<Source> {
-    Some(match field {
+fn label(field: &str, tr: &impl Fn(Source) -> String) -> String {
+    let source = match field {
         "name" => text::NAME,
         "serial" => text::SERIAL,
         "otherserial" => text::INVENTORY_NUMBER,
@@ -314,8 +320,32 @@ fn label(field: &str) -> Option<Source> {
         "manufacturers_id" => text::MANUFACTURER,
         "networks_id" => text::NETWORK,
         "autoupdatesystems_id" => text::UPDATE_SOURCE,
+        "size" => text::SIZE,
+        "have_micro" => text::MICROPHONE,
+        "have_speaker" => text::SPEAKERS,
+        "have_subd" => text::SUB_D,
+        "have_bnc" => text::BNC,
+        "have_dvi" => text::DVI,
+        "have_pivot" => text::PIVOT,
+        "have_hdmi" => text::HDMI,
+        "have_displayport" => text::DISPLAYPORT,
+        "is_global" => text::GLOBAL_MANAGEMENT,
+        "have_serial" => text::SERIAL_PORT,
+        "have_parallel" => text::PARALLEL,
+        "have_usb" => text::USB,
+        "have_ethernet" => text::ETHERNET,
+        "have_wifi" => text::WIFI,
+        "memory_size" => text::MEMORY,
+        "init_pages_counter" => text::INITIAL_PAGE_COUNTER,
+        "last_pages_counter" => text::PAGE_COUNTER,
+        "phonepowersupplies_id" => text::POWER_SUPPLY,
+        "have_headset" => text::HEADSET,
+        "have_hp" => text::SPEAKER,
+        // `Memory (Mio)`.
+        "ram" => return i18n::sprintf(&tr(text::NAME_ID), &[&tr(text::MEMORY), &tr(text::MIO)]),
         other if other.ends_with("types_id") => text::TYPE,
         other if other.ends_with("models_id") => text::MODEL,
-        _ => return None,
-    })
+        _ => return String::new(),
+    };
+    tr(source)
 }

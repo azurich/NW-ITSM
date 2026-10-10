@@ -46,6 +46,7 @@ export function AssetPage() {
   const legacyPath = `front/${info.legacy}.form.php?id=${asset.id}`
   const date = (value: string | null | undefined) => formatDateTime(value, i18n.language)
   const readOnly = !asset.permissions.update && !asset.permissions.trash
+  const hasFeatures = info.size || info.memory || info.pageCounters || info.powerSupply || info.global || info.features
 
   return (
     <article className="space-y-6">
@@ -138,6 +139,34 @@ export function AssetPage() {
         </Section>
       </div>
 
+      {hasFeatures && (
+        <Section title={t('asset.sections.features')}>
+          {info.size && <Field label={t('asset.fields.size')}>{asset.size && `${asset.size} "`}</Field>}
+          {info.memory && (
+            <Field label={t(info.memory === 'mib' ? 'asset.fields.memory_mib' : 'asset.fields.memory')}>
+              {asset.memory}
+            </Field>
+          )}
+          {info.pageCounters && (
+            <>
+              <Field label={t('asset.fields.initial_page_counter')}>{asset.initial_page_counter}</Field>
+              <Field label={t('asset.fields.page_counter')}>{asset.page_counter}</Field>
+            </>
+          )}
+          {info.powerSupply && <Field label={t('asset.fields.power_supply')}>{asset.power_supply?.name}</Field>}
+          {info.global && (
+            <Field label={t('asset.fields.is_global')}>
+              {asset.is_global ? t('asset.management.global') : t('asset.management.unit')}
+            </Field>
+          )}
+          {info.features?.map((feature) => (
+            <Field key={feature} label={t(`asset.features.${feature}`)}>
+              {asset[feature] ? t('asset.yes') : t('asset.no')}
+            </Field>
+          ))}
+        </Section>
+      )}
+
       {asset.comment && (
         <Section title={t('asset.fields.comment')}>
           <p className="col-span-2 whitespace-pre-wrap text-sm">{asset.comment}</p>
@@ -173,7 +202,7 @@ function Field({ label, children }: { label: string; children: ReactNode }) {
   return (
     <>
       <dt className="text-slate-500">{label}</dt>
-      <dd className="break-words">{children || '—'}</dd>
+      <dd className="break-words">{children == null || children === '' || children === false ? '—' : children}</dd>
     </>
   )
 }

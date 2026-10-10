@@ -1,8 +1,15 @@
 import { useState, type FormEvent, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ApiError } from '../api/client'
-import type { AssetType, ChoiceField } from '../api/assets'
-import { hasField, type AssetForm, type RefField, type TextField } from '../lib/assetForm'
+import { ASSET_TYPES, type AssetType, type ChoiceField, type Feature } from '../api/assets'
+import {
+  flagFields,
+  hasField,
+  type AssetForm,
+  type NumberField,
+  type RefField,
+  type TextField,
+} from '../lib/assetForm'
 import { ChoicePicker } from './ChoicePicker'
 import { LegacyLink } from './LegacyLink'
 import { inputClass } from './PasswordFields'
@@ -39,12 +46,14 @@ export function AssetFormView({
   const { t } = useTranslation()
   const [form, setForm] = useState(initial)
 
-  const text = (field: TextField) =>
+  const info = ASSET_TYPES[kind]
+  const text = (field: TextField, label = t(`asset.fields.${field}`), inputMode?: 'decimal' | 'numeric') =>
     hasField(kind, field) && (
       <label className="block text-sm font-medium">
-        {t(`asset.fields.${field}`)}
+        {label}
         <input
           type="text"
+          inputMode={inputMode}
           value={form.text[field]}
           maxLength={255}
           onChange={(event) => setForm({ ...form, text: { ...form.text, [field]: event.target.value } })}
@@ -52,6 +61,32 @@ export function AssetFormView({
         />
       </label>
     )
+  const number = (field: NumberField) =>
+    hasField(kind, field) && (
+      <label className="block text-sm font-medium">
+        {t(`asset.fields.${field}`)}
+        <input
+          type="number"
+          step={1}
+          value={form.numbers[field]}
+          onChange={(event) =>
+            setForm({ ...form, numbers: { ...form.numbers, [field]: event.target.value } })
+          }
+          className={inputClass}
+        />
+      </label>
+    )
+  const flag = (field: Feature) => (
+    <label key={field} className="flex items-center gap-2 text-sm">
+      <input
+        type="checkbox"
+        checked={form.flags[field] ?? false}
+        onChange={(event) => setForm({ ...form, flags: { ...form.flags, [field]: event.target.checked } })}
+      />
+      {t(`asset.features.${field}`)}
+    </label>
+  )
+  const hasFeatures = info.size || info.memory || info.pageCounters || info.powerSupply || flagFields(kind).length > 0
   const choice = (field: RefField) =>
     hasField(kind, field) && (
       <ChoicePicker
@@ -113,6 +148,43 @@ export function AssetFormView({
         </fieldset>
       </div>
 
+      {hasFeatures && (
+        <fieldset className={`${sectionClass} space-y-4`}>
+          <legend className="px-1 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            {t('asset.sections.features')}
+          </legend>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {text('size', undefined, 'decimal')}
+            {text(
+              'memory',
+              t(info.memory === 'mib' ? 'asset.fields.memory_mib' : 'asset.fields.memory'),
+              info.memory === 'mib' ? 'numeric' : undefined,
+            )}
+            {number('initial_page_counter')}
+            {number('page_counter')}
+            {choice('power_supply')}
+            {info.global && (
+              <label className="block text-sm font-medium">
+                {t('asset.fields.is_global')}
+                <select
+                  value={form.flags.is_global ? '1' : '0'}
+                  onChange={(event) =>
+                    setForm({ ...form, flags: { ...form.flags, is_global: event.target.value === '1' } })
+                  }
+                  className={inputClass}
+                >
+                  <option value="0">{t('asset.management.unit')}</option>
+                  <option value="1">{t('asset.management.global')}</option>
+                </select>
+              </label>
+            )}
+          </div>
+          {info.features && (
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">{info.features.map(flag)}</div>
+          )}
+        </fieldset>
+      )}
+
       <label className={`${sectionClass} block text-sm font-medium`}>
         {t('asset.fields.comment')}
         <textarea
@@ -172,12 +244,42 @@ const FIELD_OF_COLUMN: Record<string, string> = {
   groups_id: 'group',
   users_id_tech: 'tech_user',
   groups_id_tech: 'tech_group',
+  size: 'size',
+  memory_size: 'memory',
+  ram: 'memory_mib',
+  init_pages_counter: 'initial_page_counter',
+  last_pages_counter: 'page_counter',
+  phonepowersupplies_id: 'power_supply',
+  is_global: 'is_global',
+}
+
+/** Features by column. */
+const FEATURE_OF_COLUMN: Record<string, Feature> = {
+  have_micro: 'has_microphone',
+  have_speaker: 'has_speaker',
+  have_hp: 'has_speaker',
+  have_subd: 'has_subd',
+  have_bnc: 'has_bnc',
+  have_dvi: 'has_dvi',
+  have_pivot: 'has_pivot',
+  have_hdmi: 'has_hdmi',
+  have_displayport: 'has_displayport',
+  have_serial: 'has_serial',
+  have_parallel: 'has_parallel',
+  have_usb: 'has_usb',
+  have_ethernet: 'has_ethernet',
+  have_wifi: 'has_wifi',
+  have_headset: 'has_headset',
 }
 
 /** Name of a column: the label of its form field when there is one. */
 export function useColumnLabel() {
   const { t } = useTranslation()
   return (column: string) => {
+    const feature = FEATURE_OF_COLUMN[column]
+    if (feature) {
+      return t(`asset.features.${feature}`)
+    }
     const field =
       FIELD_OF_COLUMN[column] ??
       (column.endsWith('types_id') ? 'type' : column.endsWith('models_id') ? 'model' : undefined)

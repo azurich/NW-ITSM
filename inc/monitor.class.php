@@ -237,6 +237,16 @@ class Monitor extends CommonDBTM
                        'type' => 'text',
                        'value' => $this->fields['otherserial'],
                     ], // DOES NOT TAKE INTO ACCOUNT AUTOCOMPLETION FIELD
+                    __('Alternate username number') => [
+                       'name' => 'contact_num',
+                       'type' => 'text',
+                       'value' => $this->fields['contact_num'],
+                    ],
+                    __('Alternate username') => [
+                       'name' => 'contact',
+                       'type' => 'text',
+                       'value' => $this->fields['contact'],
+                    ],
                       User::getTypeName(1) => [
                        'type' => 'select',
                        'name' => 'users_id',

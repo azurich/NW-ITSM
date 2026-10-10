@@ -1,5 +1,6 @@
-//! PHP comparison semantics the legacy code relies on (PHP 8): loose
-//! equality of strings, `empty()`, `trim()` and case-insensitive search.
+//! PHP semantics the legacy code relies on (PHP 8): loose equality of
+//! strings, `empty()`, `trim()`, case-insensitive search, conversions of
+//! numbers and HTML entities.
 
 /// Number of a PHP numeric string (`is_numeric`): optional surrounding
 /// whitespace, sign, digits with an optional fraction and exponent.
@@ -64,6 +65,112 @@ pub fn contains_ci(haystack: &str, needle: &str, at_start: bool) -> bool {
     } else {
         haystack.contains(&needle)
     }
+}
+
+/// `intval()` of a string: the leading integer (after whitespace), else 0;
+/// saturated like PHP on 64 bits.
+pub fn intval(value: &str) -> i64 {
+    let value = value.trim_start_matches([' ', '\t', '\n', '\r', '\x0B', '\x0C']);
+    let (negative, digits) = match value.as_bytes().first() {
+        Some(b'-') => (true, &value[1..]),
+        Some(b'+') => (false, &value[1..]),
+        _ => (false, value),
+    };
+    let mut number: i64 = 0;
+    for byte in digits.bytes().take_while(u8::is_ascii_digit) {
+        let digit = i64::from(byte - b'0');
+        number = if negative {
+            number.saturating_mul(10).saturating_sub(digit)
+        } else {
+            number.saturating_mul(10).saturating_add(digit)
+        };
+    }
+    number
+}
+
+/// `floatval()` of a string: the leading decimal number (after
+/// whitespace), else 0.
+pub fn floatval(value: &str) -> f64 {
+    let value = value.trim_start_matches([' ', '\t', '\n', '\r', '\x0B', '\x0C']);
+    let bytes = value.as_bytes();
+    let mut end = 0;
+    if matches!(bytes.first(), Some(b'-' | b'+')) {
+        end = 1;
+    }
+    let integer_start = end;
+    while bytes.get(end).is_some_and(u8::is_ascii_digit) {
+        end += 1;
+    }
+    let mut digits = end - integer_start;
+    if bytes.get(end) == Some(&b'.') {
+        let fraction_start = end + 1;
+        let mut fraction_end = fraction_start;
+        while bytes.get(fraction_end).is_some_and(u8::is_ascii_digit) {
+            fraction_end += 1;
+        }
+        digits += fraction_end - fraction_start;
+        if digits > 0 {
+            end = fraction_end;
+        }
+    }
+    if digits == 0 {
+        return 0.0;
+    }
+    // An exponent counts only with digits after it.
+    if matches!(bytes.get(end), Some(b'e' | b'E')) {
+        let mut exponent_end = end + 1;
+        if matches!(bytes.get(exponent_end), Some(b'-' | b'+')) {
+            exponent_end += 1;
+        }
+        let exponent_digits = exponent_end;
+        while bytes.get(exponent_end).is_some_and(u8::is_ascii_digit) {
+            exponent_end += 1;
+        }
+        if exponent_end > exponent_digits {
+            end = exponent_end;
+        }
+    }
+    value[..end].parse().unwrap_or(0.0)
+}
+
+/// A float as PHP writes it in a string (`precision` 14, `%.14G`).
+pub fn float_to_string(value: f64) -> String {
+    if value.is_nan() {
+        return "NAN".to_owned();
+    }
+    if value.is_infinite() {
+        return if value < 0.0 { "-INF" } else { "INF" }.to_owned();
+    }
+    if value == 0.0 {
+        return if value.is_sign_negative() { "-0" } else { "0" }.to_owned();
+    }
+    // 14 significant digits, rounded once.
+    let scientific = format!("{:.13e}", value.abs());
+    let (mantissa, exponent) = scientific.split_once('e').unwrap_or((&scientific, "0"));
+    let exponent: i32 = exponent.parse().unwrap_or(0);
+    let digits: String = mantissa.chars().filter(char::is_ascii_digit).collect();
+    let digits = digits.trim_end_matches('0');
+    let sign = if value < 0.0 { "-" } else { "" };
+    if !(-4..14).contains(&exponent) {
+        let (first, rest) = digits.split_at(1);
+        let rest = if rest.is_empty() { "0" } else { rest };
+        let exponent_sign = if exponent < 0 { '-' } else { '+' };
+        return format!("{sign}{first}.{rest}E{exponent_sign}{}", exponent.abs());
+    }
+    let text = if exponent >= 0 {
+        let point = exponent as usize + 1;
+        if digits.len() <= point {
+            format!("{digits:0<point$}")
+        } else {
+            format!("{}.{}", &digits[..point], &digits[point..])
+        }
+    } else {
+        format!(
+            "0.{}{digits}",
+            "0".repeat(exponent.unsigned_abs() as usize - 1)
+        )
+    };
+    format!("{sign}{text}")
 }
 
 /// `htmlentities($text, ENT_QUOTES, 'utf-8')`.
@@ -376,5 +483,39 @@ mod tests {
             htmlentities("é<'\"&amp;€ ok"),
             "&eacute;&lt;&#039;&quot;&amp;amp;&euro; ok"
         );
+    }
+
+    #[test]
+    fn php_number_conversions() {
+        assert_eq!(intval(" 512"), 512);
+        assert_eq!(intval("1-2"), 1);
+        assert_eq!(intval("-12abc"), -12);
+        assert_eq!(intval("--1"), 0);
+        assert_eq!(intval(""), 0);
+        assert_eq!(intval("99999999999999999999"), i64::MAX);
+        assert_eq!(floatval("21.5"), 21.5);
+        assert_eq!(floatval("1.2.3"), 1.2);
+        assert_eq!(floatval("-.5"), -0.5);
+        assert_eq!(floatval("."), 0.0);
+        assert_eq!(floatval("5."), 5.0);
+        assert_eq!(floatval("1e2"), 100.0);
+        assert_eq!(floatval("1e"), 1.0);
+        for (value, text) in [
+            (21.5, "21.5"),
+            (22.0, "22"),
+            (-0.5, "-0.5"),
+            (0.1 + 0.2, "0.3"),
+            (0.000123, "0.000123"),
+            (0.00001, "1.0E-5"),
+            (1.25e-7, "1.25E-7"),
+            (1e25, "1.0E+25"),
+            (12345678901234.0, "12345678901234"),
+            (123456789012345.0, "1.2345678901234E+14"),
+            (999.995, "999.995"),
+            (21.123456789012345, "21.123456789012"),
+        ] {
+            assert_eq!(float_to_string(value), text, "{value}");
+        }
+        assert_eq!(float_to_string(-0.0), "-0");
     }
 }

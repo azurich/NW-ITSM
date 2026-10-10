@@ -116,7 +116,7 @@ pub async fn run(
             continue;
         };
         let value = match field.kind {
-            FieldKind::Text => Value::Text(Some(value)),
+            FieldKind::Text | FieldKind::Integer | FieldKind::Decimal => Value::Text(Some(value)),
             FieldKind::Dropdown { .. } | FieldKind::User => Value::Id(
                 value
                     .parse()
@@ -177,10 +177,20 @@ async fn rule_input(
     Ok(input)
 }
 
-/// Values for a write: those requested, then those of the rules.
+/// Values for a write: those requested, with those of the rules.
 pub fn merge(values: &mut Vec<(Field, Value)>, rule_values: Vec<(Field, Value)>) {
     for (field, value) in rule_values {
-        values.retain(|(existing, _)| existing.column != field.column);
-        values.push((field, value));
+        set(values, field, value);
+    }
+}
+
+/// `$input[$field] = $value`: a field keeps its place, a new one comes last.
+pub fn set(values: &mut Vec<(Field, Value)>, field: Field, value: Value) {
+    match values
+        .iter_mut()
+        .find(|(existing, _)| existing.column == field.column)
+    {
+        Some(existing) => existing.1 = value,
+        None => values.push((field, value)),
     }
 }

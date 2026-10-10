@@ -169,15 +169,20 @@ pub async fn update(
                     .filter_map(|column| Some((item_kind.field(column)?, new_value(column)?)))
                     .collect();
                 // The business rules of the item's update run on the copied
-                // fields; what they set wins.
+                // fields; what they set wins (in place, else last).
                 for (field, value) in effects
                     .connected_rules
                     .get(&item_kind)
                     .into_iter()
                     .flatten()
                 {
-                    item_values.retain(|(existing, _)| existing.column != field.column);
-                    item_values.push((*field, value.clone()));
+                    match item_values
+                        .iter_mut()
+                        .find(|(existing, _)| existing.column == field.column)
+                    {
+                        Some(existing) => existing.1 = value.clone(),
+                        None => item_values.push((*field, value.clone())),
+                    }
                 }
                 let changed = apply_changes(&mut tx, item_kind, &item, &item_values, actor).await?;
                 after_update(
@@ -342,15 +347,9 @@ async fn lock(
     id: i32,
 ) -> Result<Option<Current>, sqlx::Error> {
     let fields = kind.fields();
-    let columns: Vec<&str> = fields.iter().map(|field| field.column).collect();
-    // A number for every type: only some tables have the column.
-    let is_global = if kind.can_be_global() {
-        "CAST(is_global AS SIGNED) AS is_global"
-    } else {
-        "CAST(0 AS SIGNED) AS is_global"
-    };
+    let columns: Vec<String> = fields.iter().map(|field| select_column(*field)).collect();
     let row = sqlx::query(&format!(
-        "SELECT id, entities_id, is_deleted, is_dynamic, {is_global}, {} FROM {} WHERE id = ? FOR UPDATE",
+        "SELECT id, entities_id, is_deleted, is_dynamic, {} FROM {} WHERE id = ? FOR UPDATE",
         columns.join(", "),
         kind.table()
     ))
@@ -360,18 +359,32 @@ async fn lock(
     let Some(row) = row else {
         return Ok(None);
     };
-    let values = fields
+    let values: Vec<(Field, Value)> = fields
         .into_iter()
         .map(|field| Ok((field, read_value(&row, field)?)))
         .collect::<Result<_, sqlx::Error>>()?;
+    // Only some tables have the column.
+    let is_global = values
+        .iter()
+        .any(|(field, value)| field.column == "is_global" && *value == Value::Bool(true));
     Ok(Some(Current {
         id: row.try_get("id")?,
         entities_id: row.try_get("entities_id")?,
         is_deleted: row.try_get("is_deleted")?,
         is_dynamic: row.try_get("is_dynamic")?,
-        is_global: row.try_get::<i64, _>("is_global")? != 0,
+        is_global,
         values,
     }))
+}
+
+/// A column in a `SELECT`: numbers as text, compared as stored.
+fn select_column(field: Field) -> String {
+    match field.kind {
+        FieldKind::Integer | FieldKind::Decimal => {
+            format!("CAST({0} AS CHAR) AS {0}", field.column)
+        }
+        _ => field.column.to_owned(),
+    }
 }
 
 /// Reads and locks an asset, outside of a write.
@@ -388,7 +401,9 @@ pub async fn current(
 
 fn read_value(row: &MySqlRow, field: Field) -> Result<Value, sqlx::Error> {
     Ok(match field.kind {
-        FieldKind::Text => Value::Text(row.try_get(field.column)?),
+        FieldKind::Text | FieldKind::Integer | FieldKind::Decimal => {
+            Value::Text(row.try_get(field.column)?)
+        }
         FieldKind::Dropdown { .. } | FieldKind::User => Value::Id(row.try_get(field.column)?),
         FieldKind::Bool => Value::Bool(row.try_get(field.column)?),
     })
@@ -415,7 +430,7 @@ async fn apply_changes(
         .iter()
         .filter_map(|(field, new)| {
             let old = current.value(field.column)?;
-            new.differs_from(old).then(|| (*field, new, old.clone()))
+            field.changes(old, new).then(|| (*field, new, old.clone()))
         })
         .collect();
     if changes.is_empty() {
@@ -444,15 +459,18 @@ async fn apply_changes(
     Ok(changes.iter().map(|(field, _, _)| field.column).collect())
 }
 
-/// A value as `Log::constructHistory` writes it: raw for text and booleans,
-/// `"<name> (<id>)"` for dropdowns (users by login, trees by full name).
+/// A value as `Log::constructHistory` writes it: raw for text, numbers and
+/// booleans, `"<name> (<id>)"` for dropdowns (users by login, trees by full
+/// name).
 async fn history_label(
     conn: &mut MySqlConnection,
     kind: FieldKind,
     value: &Value,
 ) -> Result<String, sqlx::Error> {
     let id = match (kind, value) {
-        (FieldKind::Text | FieldKind::Bool, value) => return Ok(value.raw()),
+        (FieldKind::Text | FieldKind::Bool | FieldKind::Integer | FieldKind::Decimal, value) => {
+            return Ok(value.raw());
+        }
         (_, value) => value.id(),
     };
     let name = if id == 0 {
@@ -462,7 +480,9 @@ async fn history_label(
             FieldKind::User => ("glpi_users", "name"),
             FieldKind::Dropdown { table, tree: true } => (table, "completename"),
             FieldKind::Dropdown { table, tree: false } => (table, "name"),
-            FieldKind::Text | FieldKind::Bool => unreachable!("handled above"),
+            FieldKind::Text | FieldKind::Bool | FieldKind::Integer | FieldKind::Decimal => {
+                unreachable!("handled above")
+            }
         };
         let name: Option<Option<String>> =
             sqlx::query_scalar(&format!("SELECT {column} FROM {table} WHERE id = ?"))
@@ -508,7 +528,7 @@ pub async fn references_exist(
         let table = match field.kind {
             FieldKind::User => "glpi_users",
             FieldKind::Dropdown { table, .. } => table,
-            FieldKind::Text | FieldKind::Bool => continue,
+            FieldKind::Text | FieldKind::Bool | FieldKind::Integer | FieldKind::Decimal => continue,
         };
         let id = value.id();
         if id == 0 {
