@@ -1,7 +1,7 @@
 //! `/api/v2` routes.
 
+pub mod assets;
 pub mod auth;
-pub mod computers;
 pub mod health;
 pub mod session;
 
@@ -15,6 +15,6 @@ pub fn api() -> Router<AppState> {
         .merge(health::routes())
         .merge(auth::routes())
         .merge(session::routes())
-        .merge(computers::routes())
+        .merge(assets::routes())
         .route("/openapi.json", get(|| async { Json(ApiDoc::openapi()) }))
 }

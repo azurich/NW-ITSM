@@ -6,6 +6,8 @@
 --   ├── 1 Paris              password_update
 --   │   └── 3 Office A     2 Self-Service (helpdesk): computer right dropped
 --   └── 2 Lyon             3 Broken (no interface)
+--                          4 Asset manager (central): every right on the six
+--                            asset types, assigned tickets
 
 SET SESSION sql_mode = CONCAT(@@sql_mode, ',NO_AUTO_VALUE_ON_ZERO');
 
@@ -18,7 +20,8 @@ INSERT INTO glpi_entities (id, name, entities_id, completename, level) VALUES
 INSERT INTO glpi_profiles (id, name, interface) VALUES
   (1, 'Technician', 'central'),
   (2, 'Self-Service', 'helpdesk'),
-  (3, 'Broken', '');
+  (3, 'Broken', ''),
+  (4, 'Asset manager', 'central');
 
 INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES
   (1, 'computer', 3),
@@ -26,7 +29,14 @@ INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES
   (1, 'password_update', 1),
   (2, 'computer', 1),
   (2, 'ticket', 1),
-  (3, 'computer', 1);
+  (3, 'computer', 1),
+  (4, 'computer', 31),
+  (4, 'monitor', 31),
+  (4, 'printer', 31),
+  (4, 'networking', 31),
+  (4, 'peripheral', 31),
+  (4, 'phone', 31),
+  (4, 'ticket', 32768);
 
 INSERT INTO glpi_users (id, name, password, realname, firstname, authtype, auths_id, is_active, is_deleted, begin_date, end_date, profiles_id, entities_id, password_last_update) VALUES
   (10, 'admin', '$2y$10$cxuiz84fGGyx3k8v44yhaulzj6RUep9k743p0DuoTuHUnMb/HMIT6', 'Admin', 'Alice', 1, 0, 1, 0, NULL, NULL, 1, 0, NULL),
@@ -37,7 +47,8 @@ INSERT INTO glpi_users (id, name, password, realname, firstname, authtype, auths
   (15, 'expired', '$2y$10$cxuiz84fGGyx3k8v44yhaulzj6RUep9k743p0DuoTuHUnMb/HMIT6', NULL, NULL, 1, 0, 1, 0, NULL, '2000-01-01 00:00:00', 1, 0, NULL),
   (16, 'noprofile', '$2y$10$cxuiz84fGGyx3k8v44yhaulzj6RUep9k743p0DuoTuHUnMb/HMIT6', NULL, NULL, 1, 0, 1, 0, NULL, NULL, 0, 0, NULL),
   (17, 'ldapuser', '$2y$10$cxuiz84fGGyx3k8v44yhaulzj6RUep9k743p0DuoTuHUnMb/HMIT6', NULL, NULL, 3, 1, 1, 0, NULL, NULL, 1, 0, NULL),
-  (18, 'broken', '$2y$10$cxuiz84fGGyx3k8v44yhaulzj6RUep9k743p0DuoTuHUnMb/HMIT6', NULL, NULL, 1, 0, 1, 0, NULL, NULL, 3, 0, NULL);
+  (18, 'broken', '$2y$10$cxuiz84fGGyx3k8v44yhaulzj6RUep9k743p0DuoTuHUnMb/HMIT6', NULL, NULL, 1, 0, 1, 0, NULL, NULL, 3, 0, NULL),
+  (19, 'manager', '$2y$10$cxuiz84fGGyx3k8v44yhaulzj6RUep9k743p0DuoTuHUnMb/HMIT6', NULL, NULL, 1, 0, 1, 0, NULL, NULL, 4, 1, NULL);
 
 INSERT INTO glpi_profiles_users (users_id, profiles_id, entities_id, is_recursive) VALUES
   (10, 1, 0, 1),
@@ -48,10 +59,25 @@ INSERT INTO glpi_profiles_users (users_id, profiles_id, entities_id, is_recursiv
   (14, 1, 0, 1),
   (15, 1, 0, 1),
   (17, 1, 0, 1),
-  (18, 3, 0, 1);
+  (18, 3, 0, 1),
+  (19, 4, 1, 1);
 
 INSERT INTO glpi_locations (id, name, completename, entities_id, is_recursive, locations_id, level) VALUES
-  (1, 'Room 1', 'Paris HQ > Room 1', 1, 0, 0, 2);
+  (1, 'Room 1', 'Paris HQ > Room 1', 1, 0, 0, 2),
+  (2, 'Lyon site', 'Lyon site', 2, 0, 0, 1),
+  (3, 'Warehouse', 'Warehouse', 0, 1, 0, 1);
+
+-- "Stock" is not offered for computers.
+INSERT INTO glpi_states (id, name, completename, entities_id, is_recursive, level, is_visible_computer) VALUES
+  (1, 'In use', 'In use', 0, 1, 1, 1),
+  (2, 'Stock', 'Stock', 0, 1, 1, 0);
+
+-- "Owners" cannot be in charge of items.
+INSERT INTO glpi_groups (id, name, completename, entities_id, is_recursive, level, is_itemgroup, is_assign) VALUES
+  (1, 'Support', 'Support', 0, 1, 1, 1, 1),
+  (2, 'Owners', 'Owners', 1, 0, 1, 1, 0);
+
+INSERT INTO glpi_manufacturers (id, name) VALUES (1, 'Dell');
 
 INSERT INTO glpi_computertypes (id, name) VALUES (1, 'Laptop');
 
@@ -64,3 +90,19 @@ INSERT INTO glpi_computers (id, name, serial, otherserial, entities_id, is_recur
   (105, 'PC-PARIS-TRASH', NULL, NULL, 1, 0, 1, 0, 0, 0, 0, '2026-01-06 10:00:00'),
   (106, 'PC-PARIS-TEMPLATE', NULL, NULL, 1, 0, 0, 1, 0, 0, 0, '2026-01-07 10:00:00'),
   (107, '100%_PC', NULL, NULL, 1, 0, 0, 0, 0, 0, 0, '2026-01-08 10:00:00');
+
+INSERT INTO glpi_monitors (id, name, entities_id, is_global, is_deleted, is_template, contact, locations_id, date_mod) VALUES
+  (200, 'MON-PARIS-1', 1, 0, 0, 0, 'old', 1, '2026-01-01 10:00:00'),
+  (201, 'MON-SHARED', 1, 1, 0, 0, 'old', 1, '2026-01-01 10:00:00'),
+  (202, 'MON-LYON', 2, 0, 0, 0, NULL, 0, '2026-01-01 10:00:00');
+
+-- PC-PARIS-1 has two monitors (one global), a processor and a software.
+INSERT INTO glpi_computers_items (computers_id, itemtype, items_id) VALUES
+  (102, 'Monitor', 200),
+  (102, 'Monitor', 201);
+
+INSERT INTO glpi_items_deviceprocessors (id, items_id, itemtype, deviceprocessors_id, entities_id, locations_id) VALUES
+  (1, 102, 'Computer', 1, 1, 1);
+
+INSERT INTO glpi_items_softwareversions (items_id, itemtype, softwareversions_id, entities_id) VALUES
+  (102, 'Computer', 1, 1);

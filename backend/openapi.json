@@ -9,6 +9,608 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/v2/assets/{kind}": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the assets of a type visible to the session (templates excluded).",
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number, starting at 1.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Items per page.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Text searched in the name, serial number, inventory number (and UUID\nof computers).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "trash",
+            "in": "query",
+            "description": "List the items in the trash instead of the others.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "serial",
+                "inventory_number",
+                "entity",
+                "location",
+                "type",
+                "manufacturer",
+                "state",
+                "updated_at"
+              ]
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of assets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Creates an asset in one of the selected entities.",
+        "operationId": "create",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetCreation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be created in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/choices/{field}": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Values of a form field for an asset of the entity: the entity's own\nvalues and the recursive ones of its parents, like the legacy dropdowns.",
+        "operationId": "choices",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "field",
+            "in": "path",
+            "description": "Form field",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChoiceField"
+            }
+          },
+          {
+            "name": "entity_id",
+            "in": "query",
+            "description": "Entity of the asset being edited: one of the selected entities.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Text searched in the names.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChoiceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters, or no such field for this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create or update right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Returns an asset visible to the session, including one in the trash.",
+        "operationId": "get_one",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Updates an asset of a selected entity. For computers, the changes of\ncontact, user, group, location (and status, depending on the settings)\nare copied to the connected items and components, like the PHP code.",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be changed in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}/restore": {
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Restores an asset from the trash.",
+        "operationId": "restore",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No delete right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be done in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}/trash": {
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Moves an asset to the trash.",
+        "operationId": "trash",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "In the trash",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No delete right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be done in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/auth/bridge": {
       "get": {
         "tags": [
@@ -436,187 +1038,6 @@
         }
       }
     },
-    "/api/v2/computers": {
-      "get": {
-        "tags": [
-          "assets"
-        ],
-        "summary": "Lists the computers visible to the session (trash and templates excluded).",
-        "operationId": "list",
-        "parameters": [
-          {
-            "name": "page",
-            "in": "query",
-            "description": "Page number, starting at 1.",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 1,
-              "minimum": 1
-            }
-          },
-          {
-            "name": "per_page",
-            "in": "query",
-            "description": "Items per page.",
-            "required": false,
-            "schema": {
-              "type": "integer",
-              "format": "int32",
-              "default": 20,
-              "maximum": 100,
-              "minimum": 1
-            }
-          },
-          {
-            "name": "search",
-            "in": "query",
-            "description": "Text searched in the name, serial number, inventory number and UUID.",
-            "required": false,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "sort",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "name",
-                "serial",
-                "inventory_number",
-                "entity",
-                "location",
-                "type",
-                "manufacturer",
-                "state",
-                "updated_at"
-              ]
-            }
-          },
-          {
-            "name": "order",
-            "in": "query",
-            "required": false,
-            "schema": {
-              "type": "string",
-              "enum": [
-                "asc",
-                "desc"
-              ]
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "One page of computers",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ComputerPage"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid parameters",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Not logged in",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "No read right on computers",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v2/computers/{id}": {
-      "get": {
-        "tags": [
-          "assets"
-        ],
-        "summary": "Returns a computer visible to the session, including one in the trash.",
-        "operationId": "get_one",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "Computer id",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The computer",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ComputerDetail"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Not logged in",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "No read right on computers",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Unknown or not visible",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorBody"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/v2/health": {
       "get": {
         "tags": [
@@ -716,28 +1137,46 @@
   },
   "components": {
     "schemas": {
-      "BridgeToken": {
-        "type": "object",
-        "required": [
-          "token"
-        ],
-        "properties": {
-          "token": {
-            "type": "string",
-            "description": "To pass to `front/nw_bridge.php?token=...` within one minute, from\nthe same browser (a nonce cookie is set)."
+      "AssetCreation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AssetFields"
+          },
+          {
+            "type": "object",
+            "required": [
+              "entity_id"
+            ],
+            "properties": {
+              "entity_id": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Entity of the new asset: one of the selected entities."
+              }
+            }
           }
-        }
+        ]
       },
-      "ComputerDetail": {
+      "AssetDetail": {
         "type": "object",
         "required": [
+          "kind",
           "id",
           "is_deleted",
           "is_dynamic",
           "is_recursive",
-          "entity"
+          "is_global",
+          "entity",
+          "permissions"
         ],
         "properties": {
+          "brand": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Peripherals and phones only."
+          },
           "comment": {
             "type": [
               "string",
@@ -794,9 +1233,16 @@
             "type": "boolean",
             "description": "Updated by an inventory tool."
           },
+          "is_global": {
+            "type": "boolean",
+            "description": "Used by several computers at once."
+          },
           "is_recursive": {
             "type": "boolean",
             "description": "Visible in sub-entities."
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssetType"
           },
           "location": {
             "oneOf": [
@@ -833,6 +1279,27 @@
               "string",
               "null"
             ]
+          },
+          "network": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref",
+                "description": "Computers, printers and network equipment only."
+              }
+            ]
+          },
+          "number_line": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Phones only."
+          },
+          "permissions": {
+            "$ref": "#/components/schemas/AssetPermissions"
           },
           "serial": {
             "type": [
@@ -880,6 +1347,17 @@
               }
             ]
           },
+          "update_source": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref",
+                "description": "Computers only: how the computer is updated (inventory tool...)."
+              }
+            ]
+          },
           "updated_at": {
             "type": [
               "string",
@@ -901,11 +1379,161 @@
             "type": [
               "string",
               "null"
-            ]
+            ],
+            "description": "Computers only."
           }
         }
       },
-      "ComputerPage": {
+      "AssetFields": {
+        "type": "object",
+        "description": "Fields of a creation or an update. Absent fields are left unchanged;\n`null` clears a field (empty text, no related object).",
+        "properties": {
+          "brand": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Peripherals and phones only."
+          },
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contact": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "contact_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "group_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "inventory_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_recursive": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Visible in sub-entities. Can be set, not unset (classic interface)."
+          },
+          "location_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "manufacturer_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "model_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "network_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Computers, printers and network equipment only."
+          },
+          "number_line": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Phones only."
+          },
+          "serial": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "tech_group_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "tech_user_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "type_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "update_source_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Computers only."
+          },
+          "user_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "uuid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Computers only."
+          }
+        }
+      },
+      "AssetPage": {
         "type": "object",
         "required": [
           "items",
@@ -917,7 +1545,7 @@
           "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ComputerSummary"
+              "$ref": "#/components/schemas/AssetSummary"
             }
           },
           "page": {
@@ -933,11 +1561,28 @@
           "total": {
             "type": "integer",
             "format": "int64",
-            "description": "Number of matching computers on every page."
+            "description": "Number of matching assets on every page."
           }
         }
       },
-      "ComputerSummary": {
+      "AssetPermissions": {
+        "type": "object",
+        "description": "What the session may do with an asset.",
+        "required": [
+          "update",
+          "trash"
+        ],
+        "properties": {
+          "trash": {
+            "type": "boolean",
+            "description": "Move to the trash and restore."
+          },
+          "update": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AssetSummary": {
         "type": "object",
         "required": [
           "id",
@@ -1015,6 +1660,78 @@
               "null"
             ],
             "format": "date-time"
+          }
+        }
+      },
+      "AssetType": {
+        "type": "string",
+        "description": "Type of asset, in the paths.",
+        "enum": [
+          "computers",
+          "monitors",
+          "printers",
+          "network-equipments",
+          "peripherals",
+          "phones"
+        ]
+      },
+      "BridgeToken": {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "To pass to `front/nw_bridge.php?token=...` within one minute, from\nthe same browser (a nonce cookie is set)."
+          }
+        }
+      },
+      "Choice": {
+        "type": "object",
+        "required": [
+          "id",
+          "label"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "ChoiceField": {
+        "type": "string",
+        "description": "A field of the asset forms offering a list of values.",
+        "enum": [
+          "location",
+          "state",
+          "manufacturer",
+          "type",
+          "model",
+          "network",
+          "update_source",
+          "user",
+          "group",
+          "tech_user",
+          "tech_group"
+        ]
+      },
+      "ChoiceList": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Choice"
+            },
+            "description": "At most 50 values, sorted by label."
           }
         }
       },
@@ -1082,7 +1799,7 @@
             "items": {
               "type": "string"
             },
-            "description": "More codes, for example the broken rules of `weak_password`\n(`too_short`, `missing_digit`, `missing_lowercase`,\n`missing_uppercase`, `missing_symbol`)."
+            "description": "More codes, for example the broken rules of `weak_password`\n(`too_short`, `missing_digit`, `missing_lowercase`,\n`missing_uppercase`, `missing_symbol`) or the reason of\n`legacy_required` (`business_rules`, `field_unicity`,\n`infocom_creation`, `infocom_dates`, `plugins`, `unrecursive`)."
           },
           "message": {
             "type": "string"

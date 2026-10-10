@@ -7,6 +7,9 @@ export type Language = Schemas['Language']
 
 /** Legacy right bits (inc/define.php). */
 export const READ = 1
+export const UPDATE = 2
+export const CREATE = 4
+export const DELETE = 8
 
 export const sessionQuery = queryOptions({
   queryKey: ['session'],

@@ -36,6 +36,10 @@ pub enum ApiError {
     WeakPassword(Vec<&'static str>),
     #[error("the connection bridge with the classic interface is not configured")]
     BridgeDisabled,
+    /// A PHP feature that is not ported yet would run on this write: it
+    /// must be done in the classic interface. The reason is a stable code.
+    #[error("this change must be made in the classic interface ({0})")]
+    LegacyRequired(&'static str),
     #[error("access denied")]
     Forbidden,
     #[error("not found")]
@@ -61,7 +65,9 @@ pub struct ErrorDetail {
     pub message: String,
     /// More codes, for example the broken rules of `weak_password`
     /// (`too_short`, `missing_digit`, `missing_lowercase`,
-    /// `missing_uppercase`, `missing_symbol`).
+    /// `missing_uppercase`, `missing_symbol`) or the reason of
+    /// `legacy_required` (`business_rules`, `field_unicity`,
+    /// `infocom_creation`, `infocom_dates`, `plugins`, `unrecursive`).
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub details: Vec<&'static str>,
 }
@@ -81,6 +87,7 @@ impl ApiError {
             Self::SamePassword => (StatusCode::BAD_REQUEST, "same_password"),
             Self::WeakPassword(_) => (StatusCode::BAD_REQUEST, "weak_password"),
             Self::BridgeDisabled => (StatusCode::NOT_FOUND, "bridge_disabled"),
+            Self::LegacyRequired(_) => (StatusCode::CONFLICT, "legacy_required"),
             Self::Forbidden => (StatusCode::FORBIDDEN, "forbidden"),
             Self::NotFound => (StatusCode::NOT_FOUND, "not_found"),
             Self::BadRequest(_) => (StatusCode::BAD_REQUEST, "bad_request"),
@@ -111,6 +118,7 @@ impl IntoResponse for ApiError {
         };
         let details = match self {
             Self::WeakPassword(details) => details,
+            Self::LegacyRequired(reason) => vec![reason],
             _ => Vec::new(),
         };
         let mut response = (

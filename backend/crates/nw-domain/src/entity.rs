@@ -43,6 +43,11 @@ impl EntityTree {
         self.parents.is_empty()
     }
 
+    /// Parent of an entity, `None` for the root or an unknown entity.
+    pub fn parent_of(&self, id: i32) -> Option<i32> {
+        self.parents.get(&id).copied().flatten()
+    }
+
     /// The entity itself and all its descendants (legacy `getSonsOf`).
     pub fn sons_of(&self, id: i32) -> BTreeSet<i32> {
         let mut sons = BTreeSet::from([id]);
@@ -69,6 +74,31 @@ impl EntityTree {
         }
         ancestors
     }
+}
+
+/// `Entity::CONFIG_PARENT`: the setting is inherited from the parent.
+pub const CONFIG_PARENT: &str = "-2";
+
+/// Value of an entity setting, following `CONFIG_PARENT` up the tree like
+/// the legacy `Entity::getUsedConfig`. `value_of` returns the raw setting
+/// of one entity.
+pub fn used_config<'a>(
+    tree: &EntityTree,
+    entity: i32,
+    value_of: impl Fn(i32) -> Option<&'a str>,
+) -> Option<&'a str> {
+    let mut current = Some(entity);
+    let mut visited = BTreeSet::new();
+    while let Some(id) = current {
+        if !visited.insert(id) {
+            return None; // corrupted data: cycle in the tree
+        }
+        match value_of(id) {
+            Some(value) if value != CONFIG_PARENT => return Some(value),
+            _ => current = tree.parent_of(id),
+        }
+    }
+    None
 }
 
 /// An entity a profile is granted on (`glpi_profiles_users` row).
@@ -360,6 +390,16 @@ mod tests {
             ids,
             [(1, true), (2, false), (3, true), (4, true), (5, true)]
         );
+    }
+
+    #[test]
+    fn settings_are_inherited_from_parents() {
+        let values =
+            std::collections::HashMap::from([(0, "STATUS_2"), (1, "-2"), (4, "-2"), (2, "0")]);
+        let value_of = |id: i32| values.get(&id).copied();
+        assert_eq!(used_config(&tree(), 5, value_of), Some("STATUS_2"));
+        assert_eq!(used_config(&tree(), 2, value_of), Some("0"));
+        assert_eq!(used_config(&tree(), 3, |_| None), None);
     }
 
     #[test]

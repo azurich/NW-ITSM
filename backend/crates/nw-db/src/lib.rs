@@ -4,10 +4,12 @@
 //! crate only reads it (and later writes it) without changing its structure.
 //! Queries are built at runtime so the crate compiles without a database.
 
-pub mod computers;
+pub mod assets;
 pub mod config;
+pub mod dropdowns;
 pub mod entities;
 pub mod events;
+pub mod guards;
 pub mod history;
 pub mod profiles;
 mod scope;

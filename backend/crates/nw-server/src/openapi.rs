@@ -8,7 +8,7 @@ use utoipa::{
 
 use crate::{
     error::{ErrorBody, ErrorDetail},
-    routes::{auth, computers, health, session},
+    routes::{assets, auth, health, session},
 };
 
 #[derive(OpenApi)]
@@ -32,10 +32,15 @@ use crate::{
         session::change_password,
         session::update_preferences,
         session::list_languages,
-        computers::list,
-        computers::get_one,
+        assets::list,
+        assets::get_one,
+        assets::create,
+        assets::update,
+        assets::trash,
+        assets::restore,
+        assets::choices::choices,
     ),
-    components(schemas(ErrorBody, ErrorDetail)),
+    components(schemas(ErrorBody, ErrorDetail, assets::AssetType, assets::choices::ChoiceField)),
     modifiers(&SessionSecurity),
     security(("session_cookie" = []), ("bearer" = [])),
     tags(

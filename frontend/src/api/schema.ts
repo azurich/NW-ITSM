@@ -4,6 +4,100 @@
  */
 
 export interface paths {
+    "/api/v2/assets/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the assets of a type visible to the session (templates excluded). */
+        get: operations["list"];
+        put?: never;
+        /** Creates an asset in one of the selected entities. */
+        post: operations["create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/assets/{kind}/choices/{field}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Values of a form field for an asset of the entity: the entity's own
+         *     values and the recursive ones of its parents, like the legacy dropdowns.
+         */
+        get: operations["choices"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/assets/{kind}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Returns an asset visible to the session, including one in the trash. */
+        get: operations["get_one"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Updates an asset of a selected entity. For computers, the changes of
+         *     contact, user, group, location (and status, depending on the settings)
+         *     are copied to the connected items and components, like the PHP code.
+         */
+        patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v2/assets/{kind}/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Restores an asset from the trash. */
+        post: operations["restore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/assets/{kind}/{id}/trash": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Moves an asset to the trash. */
+        post: operations["trash"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/auth/bridge": {
         parameters: {
             query?: never;
@@ -187,40 +281,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v2/computers": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Lists the computers visible to the session (trash and templates excluded). */
-        get: operations["list"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v2/computers/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Returns a computer visible to the session, including one in the trash. */
-        get: operations["get_one"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/v2/health": {
         parameters: {
             query?: never;
@@ -279,14 +339,16 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        BridgeToken: {
+        AssetCreation: components["schemas"]["AssetFields"] & {
             /**
-             * @description To pass to `front/nw_bridge.php?token=...` within one minute, from
-             *     the same browser (a nonce cookie is set).
+             * Format: int32
+             * @description Entity of the new asset: one of the selected entities.
              */
-            token: string;
+            entity_id: number;
         };
-        ComputerDetail: {
+        AssetDetail: {
+            /** @description Peripherals and phones only. */
+            brand?: string | null;
             comment?: string | null;
             contact?: string | null;
             contact_number?: string | null;
@@ -301,35 +363,98 @@ export interface components {
             is_deleted: boolean;
             /** @description Updated by an inventory tool. */
             is_dynamic: boolean;
+            /** @description Used by several computers at once. */
+            is_global: boolean;
             /** @description Visible in sub-entities. */
             is_recursive: boolean;
+            kind: components["schemas"]["AssetType"];
             location?: null | components["schemas"]["Ref"];
             manufacturer?: null | components["schemas"]["Ref"];
             model?: null | components["schemas"]["Ref"];
             name?: string | null;
+            network?: null | components["schemas"]["Ref"];
+            /** @description Phones only. */
+            number_line?: string | null;
+            permissions: components["schemas"]["AssetPermissions"];
             serial?: string | null;
             state?: null | components["schemas"]["Ref"];
             tech_group?: null | components["schemas"]["Ref"];
             tech_user?: null | components["schemas"]["Ref"];
             type?: null | components["schemas"]["Ref"];
+            update_source?: null | components["schemas"]["Ref"];
             /** Format: date-time */
             updated_at?: string | null;
             user?: null | components["schemas"]["Ref"];
+            /** @description Computers only. */
             uuid?: string | null;
         };
-        ComputerPage: {
-            items: components["schemas"]["ComputerSummary"][];
+        /**
+         * @description Fields of a creation or an update. Absent fields are left unchanged;
+         *     `null` clears a field (empty text, no related object).
+         */
+        AssetFields: {
+            /** @description Peripherals and phones only. */
+            brand?: string | null;
+            comment?: string | null;
+            contact?: string | null;
+            contact_number?: string | null;
+            /** Format: int32 */
+            group_id?: number | null;
+            inventory_number?: string | null;
+            /** @description Visible in sub-entities. Can be set, not unset (classic interface). */
+            is_recursive?: boolean | null;
+            /** Format: int32 */
+            location_id?: number | null;
+            /** Format: int32 */
+            manufacturer_id?: number | null;
+            /** Format: int32 */
+            model_id?: number | null;
+            name?: string | null;
+            /**
+             * Format: int32
+             * @description Computers, printers and network equipment only.
+             */
+            network_id?: number | null;
+            /** @description Phones only. */
+            number_line?: string | null;
+            serial?: string | null;
+            /** Format: int32 */
+            state_id?: number | null;
+            /** Format: int32 */
+            tech_group_id?: number | null;
+            /** Format: int32 */
+            tech_user_id?: number | null;
+            /** Format: int32 */
+            type_id?: number | null;
+            /**
+             * Format: int32
+             * @description Computers only.
+             */
+            update_source_id?: number | null;
+            /** Format: int32 */
+            user_id?: number | null;
+            /** @description Computers only. */
+            uuid?: string | null;
+        };
+        AssetPage: {
+            items: components["schemas"]["AssetSummary"][];
             /** Format: int32 */
             page: number;
             /** Format: int32 */
             per_page: number;
             /**
              * Format: int64
-             * @description Number of matching computers on every page.
+             * @description Number of matching assets on every page.
              */
             total: number;
         };
-        ComputerSummary: {
+        /** @description What the session may do with an asset. */
+        AssetPermissions: {
+            /** @description Move to the trash and restore. */
+            trash: boolean;
+            update: boolean;
+        };
+        AssetSummary: {
             entity: components["schemas"]["Ref"];
             /** Format: int32 */
             id: number;
@@ -342,6 +467,32 @@ export interface components {
             type?: null | components["schemas"]["Ref"];
             /** Format: date-time */
             updated_at?: string | null;
+        };
+        /**
+         * @description Type of asset, in the paths.
+         * @enum {string}
+         */
+        AssetType: "computers" | "monitors" | "printers" | "network-equipments" | "peripherals" | "phones";
+        BridgeToken: {
+            /**
+             * @description To pass to `front/nw_bridge.php?token=...` within one minute, from
+             *     the same browser (a nonce cookie is set).
+             */
+            token: string;
+        };
+        Choice: {
+            /** Format: int32 */
+            id: number;
+            label: string;
+        };
+        /**
+         * @description A field of the asset forms offering a list of values.
+         * @enum {string}
+         */
+        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group";
+        ChoiceList: {
+            /** @description At most 50 values, sorted by label. */
+            items: components["schemas"]["Choice"][];
         };
         EntityRef: {
             /** Format: int32 */
@@ -368,7 +519,9 @@ export interface components {
             /**
              * @description More codes, for example the broken rules of `weak_password`
              *     (`too_short`, `missing_digit`, `missing_lowercase`,
-             *     `missing_uppercase`, `missing_symbol`).
+             *     `missing_uppercase`, `missing_symbol`) or the reason of
+             *     `legacy_required` (`business_rules`, `field_unicity`,
+             *     `infocom_creation`, `infocom_dates`, `plugins`, `unrecursive`).
              */
             details?: string[];
             message: string;
@@ -499,6 +652,402 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    list: {
+        parameters: {
+            query?: {
+                /** @description Page number, starting at 1. */
+                page?: number;
+                /** @description Items per page. */
+                per_page?: number;
+                /**
+                 * @description Text searched in the name, serial number, inventory number (and UUID
+                 *     of computers).
+                 */
+                search?: string;
+                /** @description List the items in the trash instead of the others. */
+                trash?: boolean;
+                sort?: "name" | "serial" | "inventory_number" | "entity" | "location" | "type" | "manufacturer" | "state" | "updated_at";
+                order?: "asc" | "desc";
+            };
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description One page of assets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetPage"];
+                };
+            };
+            /** @description Invalid parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No read right on this type */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssetCreation"];
+            };
+        };
+        responses: {
+            /** @description Created */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetDetail"];
+                };
+            };
+            /** @description Invalid fields */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No create right, or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Must be created in the classic interface (`legacy_required`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    choices: {
+        parameters: {
+            query: {
+                /** @description Entity of the asset being edited: one of the selected entities. */
+                entity_id: number;
+                /** @description Text searched in the names. */
+                search?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Form field */
+                field: components["schemas"]["ChoiceField"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Matching values */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChoiceList"];
+                };
+            };
+            /** @description Invalid parameters, or no such field for this type */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No create or update right, or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    get_one: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Asset id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The asset */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetDetail"];
+                };
+            };
+            /** @description Not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No read right on this type */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Asset id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssetFields"];
+            };
+        };
+        responses: {
+            /** @description Updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetDetail"];
+                };
+            };
+            /** @description Invalid fields */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No update right, or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Must be changed in the classic interface (`legacy_required`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    restore: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Asset id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Restored */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetDetail"];
+                };
+            };
+            /** @description No delete right, or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Must be done in the classic interface (`legacy_required`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    trash: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Asset id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description In the trash */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetDetail"];
+                };
+            };
+            /** @description No delete right, or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Must be done in the classic interface (`legacy_required`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
     bridge_from_legacy: {
         parameters: {
             query: {
@@ -855,112 +1404,6 @@ export interface operations {
             };
             /** @description Profile not granted or not usable */
             403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorBody"];
-                };
-            };
-        };
-    };
-    list: {
-        parameters: {
-            query?: {
-                /** @description Page number, starting at 1. */
-                page?: number;
-                /** @description Items per page. */
-                per_page?: number;
-                /** @description Text searched in the name, serial number, inventory number and UUID. */
-                search?: string;
-                sort?: "name" | "serial" | "inventory_number" | "entity" | "location" | "type" | "manufacturer" | "state" | "updated_at";
-                order?: "asc" | "desc";
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description One page of computers */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ComputerPage"];
-                };
-            };
-            /** @description Invalid parameters */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorBody"];
-                };
-            };
-            /** @description Not logged in */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorBody"];
-                };
-            };
-            /** @description No read right on computers */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorBody"];
-                };
-            };
-        };
-    };
-    get_one: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Computer id */
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The computer */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ComputerDetail"];
-                };
-            };
-            /** @description Not logged in */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorBody"];
-                };
-            };
-            /** @description No read right on computers */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorBody"];
-                };
-            };
-            /** @description Unknown or not visible */
-            404: {
                 headers: {
                     [name: string]: unknown;
                 };

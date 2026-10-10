@@ -61,8 +61,19 @@ Chaque lot suit la même « définition de terminé » :
 
 ### Lot 2 — Parc
 
-- [ ] Ordinateurs : écriture (création, modification, corbeille, restauration)
-- [ ] Autres types : moniteurs, imprimantes, matériel réseau, périphériques, téléphones, baies
+- [x] Ordinateurs, moniteurs, imprimantes, matériels réseau, périphériques et
+      téléphones : listes (avec corbeille), fiches, création, modification,
+      corbeille et restauration, avec l'historique, les événements et la
+      recopie vers les éléments connectés du PHP, vérifiés contre une
+      écriture PHP ([ADR 0004](adr/0004-ecritures-du-parc.md))
+- [x] Listes de choix des formulaires filtrées par entité comme le PHP
+- [x] Refus explicite (`409 legacy_required`) quand une fonction PHP non
+      portée s'appliquerait : plugins actifs, règles métier, unicité des
+      champs, informations financières automatiques, retrait du partage
+- [ ] Porter ces fonctions pour lever les refus : règles métier du parc,
+      unicité des champs, informations financières automatiques
+- [ ] Champs propres à chaque type, gabarits, suppression définitive
+- [ ] Baies et autres types (équipements passifs, PDU, enclos, clusters)
 - [ ] Logiciels, licences, versions installées
 - [ ] Liaisons entre objets (`itemtype` / `items_id`), composants, ports réseau
 - [ ] Gestion financière (`infocoms`), contrats, fournisseurs, documents

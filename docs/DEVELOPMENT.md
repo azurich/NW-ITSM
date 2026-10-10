@@ -107,7 +107,8 @@ cargo clippy --workspace --all-targets -- -D warnings
 NW_TEST_DATABASE_URL=mysql://root:root@127.0.0.1:3306 cargo test --workspace
 ```
 
-Les tests de l'API (`tests/api.rs`, `tests/session.rs`, `tests/bridge.rs`)
+Les tests de l'API (`tests/api.rs`, `tests/session.rs`, `tests/bridge.rs`,
+`tests/assets.rs`)
 créent une base temporaire par test à partir de
 `install/mysql/glpi-empty.sql` et de `backend/crates/nw-server/tests/fixtures/seed.sql`,
 puis la suppriment. `NW_TEST_DATABASE_URL` désigne le **serveur** (sans nom
@@ -152,6 +153,13 @@ modification : la CI échoue s'ils ne correspondent pas au code.
 3. `nw-server` : routes avec `Session::require(<droit>, <bit>)`, objets
    invisibles en `404`, types documentés avec utoipa, tests d'API dans
    `tests/`.
+   Pour une écriture : historique avec `nw_db::history::record` au format
+   du PHP, et refus `ApiError::LegacyRequired(<motif>)` dès qu'une fonction
+   PHP non portée pourrait s'appliquer ([ADR 0004](adr/0004-ecritures-du-parc.md)).
+   Vérifier la parité : appliquer la même modification par le code PHP
+   (script CLI qui charge `inc/includes.php`, ouvre une session et passe
+   l'entrée par `Toolbox::sanitize`, comme un formulaire) et par l'API à
+   un élément jumeau, puis comparer `glpi_logs` et les lignes modifiées.
 4. `frontend` : régénérer les types, ajouter les routes dans
    `src/router.tsx`, les textes dans `src/i18n/fr.ts` et `en.ts`, et un lien
    vers la page équivalente de l'interface classique.

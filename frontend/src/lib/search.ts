@@ -1,14 +1,16 @@
-import type { ComputerListParams, ComputerSort, SortOrder } from '../api/computers'
+import type { AssetListParams, AssetSort, SortOrder } from '../api/assets'
 
-/** Search parameters of the computer list, as found in the URL. */
-export interface ComputerListSearch {
+/** Search parameters of an asset list, as found in the URL. */
+export interface AssetListSearch {
   page?: number
   search?: string
-  sort?: ComputerSort
+  sort?: AssetSort
   order?: SortOrder
+  /** Show the trash instead of the other items. */
+  trash?: true
 }
 
-const SORTS: readonly ComputerSort[] = [
+const SORTS: readonly AssetSort[] = [
   'name',
   'serial',
   'inventory_number',
@@ -21,21 +23,23 @@ const SORTS: readonly ComputerSort[] = [
 ]
 
 /** Keeps only valid values: a hand-edited URL never breaks the page. */
-export function parseComputerListSearch(raw: Record<string, unknown>): ComputerListSearch {
+export function parseAssetListSearch(raw: Record<string, unknown>): AssetListSearch {
   const page = Number(raw.page)
   return {
     page: Number.isInteger(page) && page > 1 ? page : undefined,
     search: typeof raw.search === 'string' && raw.search.trim() !== '' ? raw.search : undefined,
     sort: SORTS.find((sort) => sort === raw.sort),
     order: raw.order === 'desc' ? 'desc' : undefined,
+    trash: raw.trash === true || raw.trash === 'true' ? true : undefined,
   }
 }
 
-export function withDefaults(search: ComputerListSearch): ComputerListParams {
+export function withDefaults(search: AssetListSearch): AssetListParams {
   return {
     page: search.page ?? 1,
     search: search.search?.trim() ?? '',
     sort: search.sort ?? 'name',
     order: search.order ?? 'asc',
+    trash: search.trash ?? false,
   }
 }

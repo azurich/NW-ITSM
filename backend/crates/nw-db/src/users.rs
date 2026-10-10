@@ -1,7 +1,7 @@
 //! Users (`glpi_users`).
 
 use chrono::{DateTime, Utc};
-use nw_domain::history::{self, Change};
+use nw_domain::history::{self, Change, Entry};
 use sqlx::{FromRow, MySqlPool};
 
 /// Legacy `Auth::DB_GLPI`: account stored in the ITSM-NG database.
@@ -145,7 +145,8 @@ pub async fn change_language(
         current.as_deref().unwrap_or_default(),
         language.unwrap_or_default(),
     );
-    crate::history::record(&mut tx, history::user::ITEMTYPE, id, actor, &change).await?;
+    let entry = Entry::field(history::user::ITEMTYPE, id, change);
+    crate::history::record(&mut tx, actor, &entry).await?;
     tx.commit().await?;
     Ok(true)
 }

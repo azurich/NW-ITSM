@@ -116,12 +116,15 @@ async fn password_expiration_policy_is_enforced() {
 #[tokio::test]
 async fn invalid_or_missing_session_is_unauthenticated() {
     let app = test_app!();
-    let response = app.get("/api/v2/computers", None).await;
+    let response = app.get("/api/v2/assets/computers", None).await;
     assert_eq!(response.status, StatusCode::UNAUTHORIZED);
     assert_eq!(response.body["error"]["code"], "unauthenticated");
 
     let response = app
-        .get("/api/v2/computers", Some("nw_session=forged.token.value"))
+        .get(
+            "/api/v2/assets/computers",
+            Some("nw_session=forged.token.value"),
+        )
         .await;
     assert_eq!(response.status, StatusCode::UNAUTHORIZED);
 }
@@ -158,7 +161,9 @@ async fn computers_follow_the_entity_scope() {
 
     // Root, recursive: everything but the trash and templates.
     let admin = app.login("admin").await;
-    let names = app.names("/api/v2/computers?per_page=100", &admin).await;
+    let names = app
+        .names("/api/v2/assets/computers?per_page=100", &admin)
+        .await;
     assert_eq!(
         names,
         [
@@ -174,7 +179,9 @@ async fn computers_follow_the_entity_scope() {
     // Paris, recursive: Paris and Office A, plus root items shared with
     // sub-entities.
     let paris = app.login("paris").await;
-    let names = app.names("/api/v2/computers?per_page=100", &paris).await;
+    let names = app
+        .names("/api/v2/assets/computers?per_page=100", &paris)
+        .await;
     assert_eq!(
         names,
         ["100%_PC", "PC-PARIS-1", "PC-PARIS-A", "PC-ROOT-SHARED"]
@@ -182,7 +189,9 @@ async fn computers_follow_the_entity_scope() {
 
     // Lyon, not recursive.
     let lyon = app.login("lyon").await;
-    let names = app.names("/api/v2/computers?per_page=100", &lyon).await;
+    let names = app
+        .names("/api/v2/assets/computers?per_page=100", &lyon)
+        .await;
     assert_eq!(names, ["PC-LYON-1", "PC-ROOT-SHARED"]);
 }
 
@@ -190,7 +199,7 @@ async fn computers_follow_the_entity_scope() {
 async fn helpdesk_profiles_cannot_read_computers() {
     let app = test_app!();
     let cookie = app.login("helpdesk").await;
-    let response = app.get("/api/v2/computers", Some(&cookie)).await;
+    let response = app.get("/api/v2/assets/computers", Some(&cookie)).await;
     assert_eq!(response.status, StatusCode::FORBIDDEN);
     assert_eq!(response.body["error"]["code"], "forbidden");
 }
@@ -200,7 +209,7 @@ async fn computer_detail_respects_scope_trash_and_templates() {
     let app = test_app!();
     let paris = app.login("paris").await;
 
-    let response = app.get("/api/v2/computers/102", Some(&paris)).await;
+    let response = app.get("/api/v2/assets/computers/102", Some(&paris)).await;
     assert_eq!(response.status, StatusCode::OK);
     assert_eq!(response.body["serial"], "SN-P1");
     assert_eq!(response.body["inventory_number"], "INV-P1");
@@ -216,17 +225,17 @@ async fn computer_detail_respects_scope_trash_and_templates() {
     );
     assert_eq!(response.body["model"], Value::Null);
 
-    let trashed = app.get("/api/v2/computers/105", Some(&paris)).await;
+    let trashed = app.get("/api/v2/assets/computers/105", Some(&paris)).await;
     assert_eq!(trashed.status, StatusCode::OK);
     assert_eq!(trashed.body["is_deleted"], true);
 
     for hidden in [104, 106, 100, 9999] {
         let response = app
-            .get(&format!("/api/v2/computers/{hidden}"), Some(&paris))
+            .get(&format!("/api/v2/assets/computers/{hidden}"), Some(&paris))
             .await;
         assert_eq!(response.status, StatusCode::NOT_FOUND, "computer {hidden}");
     }
-    let response = app.get("/api/v2/computers/abc", Some(&paris)).await;
+    let response = app.get("/api/v2/assets/computers/abc", Some(&paris)).await;
     assert_eq!(response.status, StatusCode::BAD_REQUEST);
 }
 
@@ -235,19 +244,21 @@ async fn computer_search_escapes_wildcards() {
     let app = test_app!();
     let admin = app.login("admin").await;
     assert_eq!(
-        app.names("/api/v2/computers?search=100%25_", &admin).await,
+        app.names("/api/v2/assets/computers?search=100%25_", &admin)
+            .await,
         ["100%_PC"]
     );
     assert_eq!(
-        app.names("/api/v2/computers?search=SN-P1", &admin).await,
+        app.names("/api/v2/assets/computers?search=SN-P1", &admin)
+            .await,
         ["PC-PARIS-1"]
     );
     assert_eq!(
-        app.names("/api/v2/computers?search=_", &admin).await,
+        app.names("/api/v2/assets/computers?search=_", &admin).await,
         ["100%_PC"]
     );
     assert!(
-        app.names("/api/v2/computers?search=nothing", &admin)
+        app.names("/api/v2/assets/computers?search=nothing", &admin)
             .await
             .is_empty()
     );
@@ -260,7 +271,7 @@ async fn computer_list_is_paginated_and_sorted() {
 
     let response = app
         .get(
-            "/api/v2/computers?per_page=2&page=2&sort=updated_at&order=desc",
+            "/api/v2/assets/computers?per_page=2&page=2&sort=updated_at&order=desc",
             Some(&admin),
         )
         .await;
@@ -277,12 +288,12 @@ async fn computer_list_is_paginated_and_sorted() {
     assert_eq!(names, ["PC-PARIS-A", "PC-PARIS-1"]);
 
     let response = app
-        .get("/api/v2/computers?per_page=1000", Some(&admin))
+        .get("/api/v2/assets/computers?per_page=1000", Some(&admin))
         .await;
     assert_eq!(response.body["per_page"], 100);
 
     let response = app
-        .get("/api/v2/computers?sort=password", Some(&admin))
+        .get("/api/v2/assets/computers?sort=password", Some(&admin))
         .await;
     assert_eq!(response.status, StatusCode::BAD_REQUEST);
     assert_eq!(response.body["error"]["code"], "bad_request");

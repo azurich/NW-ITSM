@@ -4,17 +4,20 @@ import {
   createRootRouteWithContext,
   createRoute,
   createRouter,
+  notFound,
   redirect,
 } from '@tanstack/react-router'
+import { ASSET_TYPE_LIST, ASSET_TYPES, isAssetType, type AssetType } from './api/assets'
 import { isUnauthenticated } from './api/client'
-import { sessionQuery } from './api/session'
+import { READ, hasRight, sessionQuery } from './api/session'
 import { Layout } from './components/Layout'
 import { NotFound } from './components/States'
 import { applyUserLanguage } from './i18n'
 import { isSafeRedirect } from './lib/redirect'
-import { parseComputerListSearch } from './lib/search'
-import { ComputerPage } from './pages/ComputerPage'
-import { ComputersPage } from './pages/ComputersPage'
+import { parseAssetListSearch } from './lib/search'
+import { AssetCreatePage, AssetEditPage } from './pages/AssetEditPage'
+import { AssetPage } from './pages/AssetPage'
+import { AssetsPage } from './pages/AssetsPage'
 import { LoginPage } from './pages/LoginPage'
 import { PreferencesPage } from './pages/PreferencesPage'
 
@@ -56,29 +59,62 @@ const authenticatedRoute = createRoute({
   component: Layout,
 })
 
+/** Home: the first asset list the profile can read. */
 const indexRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
   path: '/',
-  beforeLoad: () => {
-    throw redirect({ to: '/assets/computers' })
+  beforeLoad: async ({ context }) => {
+    const session = await context.queryClient.ensureQueryData(sessionQuery)
+    const kind = ASSET_TYPE_LIST.find((candidate) => hasRight(session, ASSET_TYPES[candidate].right, READ))
+    throw kind ? redirect({ to: '/assets/$kind', params: { kind } }) : redirect({ to: '/preferences' })
   },
 })
 
-export const computersRoute = createRoute({
+/** Pages of one asset type; unknown types are not found. */
+const assetTypeRoute = createRoute({
   getParentRoute: () => authenticatedRoute,
-  path: '/assets/computers',
-  validateSearch: parseComputerListSearch,
-  component: ComputersPage,
-})
-
-export const computerRoute = createRoute({
-  getParentRoute: () => authenticatedRoute,
-  path: '/assets/computers/$computerId',
+  path: '/assets/$kind',
   params: {
-    parse: ({ computerId }) => ({ computerId: Number(computerId) }),
-    stringify: ({ computerId }) => ({ computerId: String(computerId) }),
+    parse: ({ kind }) => ({ kind: kind as AssetType }),
+    stringify: ({ kind }) => ({ kind }),
   },
-  component: ComputerPage,
+  beforeLoad: ({ params }) => {
+    if (!isAssetType(params.kind)) {
+      throw notFound()
+    }
+  },
+})
+
+const assetListRoute = createRoute({
+  getParentRoute: () => assetTypeRoute,
+  path: '/',
+  validateSearch: parseAssetListSearch,
+  component: AssetsPage,
+})
+
+const assetCreateRoute = createRoute({
+  getParentRoute: () => assetTypeRoute,
+  path: '/new',
+  component: AssetCreatePage,
+})
+
+const idParams = {
+  parse: ({ id }: { id: string }) => ({ id: Number(id) }),
+  stringify: ({ id }: { id: number }) => ({ id: String(id) }),
+}
+
+const assetRoute = createRoute({
+  getParentRoute: () => assetTypeRoute,
+  path: '/$id',
+  params: idParams,
+  component: AssetPage,
+})
+
+const assetEditRoute = createRoute({
+  getParentRoute: () => assetTypeRoute,
+  path: '/$id/edit',
+  params: idParams,
+  component: AssetEditPage,
 })
 
 const preferencesRoute = createRoute({
@@ -89,7 +125,11 @@ const preferencesRoute = createRoute({
 
 const routeTree = rootRoute.addChildren([
   loginRoute,
-  authenticatedRoute.addChildren([indexRoute, computersRoute, computerRoute, preferencesRoute]),
+  authenticatedRoute.addChildren([
+    indexRoute,
+    assetTypeRoute.addChildren([assetListRoute, assetCreateRoute, assetRoute, assetEditRoute]),
+    preferencesRoute,
+  ]),
 ])
 
 export function createAppRouter(queryClient: QueryClient) {

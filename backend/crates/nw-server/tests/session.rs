@@ -128,7 +128,7 @@ async fn switching_profile_changes_rights() {
     assert_eq!(response.status, StatusCode::OK, "{}", response.body);
     assert_eq!(response.body["profile"]["interface"], "helpdesk");
     let helpdesk = response.cookie("nw_session").unwrap();
-    let computers = app.get("/api/v2/computers", Some(&helpdesk)).await;
+    let computers = app.get("/api/v2/assets/computers", Some(&helpdesk)).await;
     assert_eq!(computers.status, StatusCode::FORBIDDEN);
 
     // A profile that is not granted.
@@ -179,13 +179,13 @@ async fn selecting_entities_restricts_the_items() {
     );
     let office_cookie = office.cookie("nw_session").unwrap();
     assert_eq!(
-        app.names("/api/v2/computers", &office_cookie).await,
+        app.names("/api/v2/assets/computers", &office_cookie).await,
         ["PC-PARIS-A", "PC-ROOT-SHARED"]
     );
 
     let paris_only = select(json!(1), false).await.cookie("nw_session").unwrap();
     assert_eq!(
-        app.names("/api/v2/computers", &paris_only).await,
+        app.names("/api/v2/assets/computers", &paris_only).await,
         ["100%_PC", "PC-PARIS-1", "PC-ROOT-SHARED"]
     );
 
