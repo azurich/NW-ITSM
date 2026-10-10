@@ -84,7 +84,10 @@ Chaque lot suit la même « définition de terminé » :
       ports, mémoire et compteurs des imprimantes, mémoire des matériels
       réseau, alimentation des téléphones, type de gestion), avec les
       champs perdus des formulaires PHP rétablis, vérifiés contre le PHP
-- [ ] Gabarits, suppression définitive
+- [x] Suppression définitive depuis la corbeille, avec les liens que le PHP
+      supprime, vérifiée contre le PHP (refus explicite pour les ports
+      réseau, composants, logiciels, tickets...)
+- [ ] Gabarits
 - [ ] Baies et autres types (équipements passifs, PDU, enclos, clusters)
 - [ ] Logiciels, licences, versions installées
 - [ ] Liaisons entre objets (`itemtype` / `items_id`), composants, ports réseau

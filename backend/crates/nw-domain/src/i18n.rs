@@ -42,6 +42,7 @@ pub mod text {
     pub const UPDATES_ITEM: Source = Text("%s updates an item");
     pub const DELETES_ITEM: Source = Text("%s deletes an item");
     pub const RESTORES_ITEM: Source = Text("%s restores an item");
+    pub const PURGES_ITEM: Source = Text("%s purges an item");
     pub const DUPLICATE_EVENT: Source =
         Text("%1$s trying to add an item that already exists: %2$s");
     pub const IMPOSSIBLE_RECORD: Source = Text("Impossible record for %s");
@@ -94,13 +95,14 @@ pub mod text {
     pub const SPEAKER: Source = Text("Speaker");
 
     /// Every text, for the catalog.
-    pub const ALL: [Source; 55] = [
+    pub const ALL: [Source; 56] = [
         LOGIN,
         FAILED_LOGIN,
         ADDS_ITEM,
         UPDATES_ITEM,
         DELETES_ITEM,
         RESTORES_ITEM,
+        PURGES_ITEM,
         DUPLICATE_EVENT,
         IMPOSSIBLE_RECORD,
         DUPLICATE_RECORD,

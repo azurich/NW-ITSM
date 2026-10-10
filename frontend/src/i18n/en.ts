@@ -119,6 +119,9 @@ export const en: typeof fr = {
     restore: 'Restore',
     trashed: 'Item moved to the trash.',
     restored: 'Item restored.',
+    purge: 'Delete permanently',
+    purgeConfirm: 'Delete this item, its history and its links permanently? This cannot be undone.',
+    purgeConfirmButton: 'Delete permanently',
     duplicates: 'Saved, but other items have the same values ({{fields}}):',
     sections: {
       general: 'General',
@@ -201,12 +204,15 @@ export const en: typeof fr = {
       legacy_required: {
         business_rules: 'a business rule uses a criterion, an action or a regular expression not supported here.',
         field_unicity: 'field unicity criteria are configured.',
+        linked_data:
+          'it has linked data (network ports, components, software, tickets, racks…) whose deletion is not handled here yet.',
         linked_items: 'sharing the item also changes its linked items (software, network ports, disks...).',
         notifications: 'a unicity criterion sends notifications, not handled here yet.',
         plugins: 'plugins of the classic interface react to changes.',
       },
       openLegacy: 'Continue in the classic interface',
       duplicate: 'Another item already has these values: {{fields}}.',
+      not_in_trash: 'Only an item in the trash can be deleted permanently.',
       sharing_in_use: 'Items of other entities use this shared item: it must stay visible in the sub-entities.',
     },
   },

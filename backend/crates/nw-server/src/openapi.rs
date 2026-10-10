@@ -38,6 +38,7 @@ use crate::{
         assets::update,
         assets::trash,
         assets::restore,
+        assets::purge,
         assets::choices::choices,
     ),
     components(schemas(ErrorBody, ErrorDetail, assets::AssetType, assets::choices::ChoiceField)),

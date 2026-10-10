@@ -4,6 +4,7 @@ ar_SA.mo	%1$s adds the item %2$s	%1$s قام بإضافة %2$s
 ar_SA.mo	%s updates an item	%s قام بتعديل عنصر
 ar_SA.mo	%s deletes an item	%s قام بحذف عنصر
 ar_SA.mo	%s restores an item	%s قام بإسترجاع عنصر
+ar_SA.mo	%s purges an item	%s يُطهر بندًا
 ar_SA.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 ar_SA.mo	Impossible record for %s	Impossible record for %s
 ar_SA.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
@@ -59,6 +60,7 @@ be_BY.mo	%1$s adds the item %2$s	%1$s дадае элемент %2$s
 be_BY.mo	%s updates an item	%s змяняе элемент
 be_BY.mo	%s deletes an item	%s выдаляе элемент
 be_BY.mo	%s restores an item	%s аднаўляе элемент
+be_BY.mo	%s purges an item	%s знішчае элемент
 be_BY.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 be_BY.mo	Impossible record for %s	Impossible record for %s
 be_BY.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
@@ -114,6 +116,7 @@ bg_BG.mo	%1$s adds the item %2$s	%1$s добави елемента %2$s
 bg_BG.mo	%s updates an item	%s обновяване на елемента
 bg_BG.mo	%s deletes an item	%s изтриване на елемента
 bg_BG.mo	%s restores an item	%s възстановяване на елемента
+bg_BG.mo	%s purges an item	%s изчиства елемент
 bg_BG.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 bg_BG.mo	Impossible record for %s	Impossible record for %s
 bg_BG.mo	Item successfully added but duplicate record on %s	Елементът е добавен успешно, но дублиран запис на %s
@@ -169,6 +172,7 @@ ca_ES.mo	%1$s adds the item %2$s	%1$s afegeix l'element %2$s
 ca_ES.mo	%s updates an item	%s actualitza un element
 ca_ES.mo	%s deletes an item	%s suprimeix un element
 ca_ES.mo	%s restores an item	%s restaura un element
+ca_ES.mo	%s purges an item	%s elimina un element
 ca_ES.mo	%1$s trying to add an item that already exists: %2$s	%1$s intenta afegir un element que ja existeix: %2$s
 ca_ES.mo	Impossible record for %s	Registre impossible per a %s
 ca_ES.mo	Item successfully added but duplicate record on %s	Element afegit amb èxit, però hi ha un registre duplicat en %s
@@ -224,6 +228,7 @@ cs_CZ.mo	%1$s adds the item %2$s	%1$s přidal položku %2$s
 cs_CZ.mo	%s updates an item	%s  změnil položku
 cs_CZ.mo	%s deletes an item	%s smazal položku
 cs_CZ.mo	%s restores an item	%s obnovil položku
+cs_CZ.mo	%s purges an item	%s odstranil položku
 cs_CZ.mo	%1$s trying to add an item that already exists: %2$s	%1$s se pokusil přidat položku, která už existuje: %2$s
 cs_CZ.mo	Impossible record for %s	Není možné zaznamenat pro %s
 cs_CZ.mo	Item successfully added but duplicate record on %s	Položka úspěšně přidána, ale duplicitní záznam na %s
@@ -279,6 +284,7 @@ da_DK.mo	%1$s adds the item %2$s	%1$s tilføjer emnet %2$s
 da_DK.mo	%s updates an item	%s opdaterer et emne
 da_DK.mo	%s deletes an item	%s sletter et emne
 da_DK.mo	%s restores an item	%s gendanner et emne
+da_DK.mo	%s purges an item	%s fjerner et emne
 da_DK.mo	%1$s trying to add an item that already exists: %2$s	%1$s prøver at tilføje et emne der allerede eksisterer: %2$s
 da_DK.mo	Impossible record for %s	Umulig post for %s
 da_DK.mo	Item successfully added but duplicate record on %s	Emne korrekt tilføjet, men duplikeret post på %s
@@ -334,6 +340,7 @@ de_DE.mo	%1$s adds the item %2$s	%1$s fügt das Element %2$s hinzu
 de_DE.mo	%s updates an item	%s aktualisiert ein Element
 de_DE.mo	%s deletes an item	%s löscht ein Element
 de_DE.mo	%s restores an item	%s stellt ein Element wieder her
+de_DE.mo	%s purges an item	%s bereinigt ein Element
 de_DE.mo	%1$s trying to add an item that already exists: %2$s	%1$s hinzuzufügendes Element existiert bereits: %2$s
 de_DE.mo	Impossible record for %s	Speichern nicht möglich für %s
 de_DE.mo	Item successfully added but duplicate record on %s	Speichern erfolgreich aber Duplikat auf %s
@@ -389,6 +396,7 @@ el_GR.mo	%1$s adds the item %2$s	%1$s προσθέτει το στοιχείο %
 el_GR.mo	%s updates an item	%s ενημερώνει το αντικείμενο
 el_GR.mo	%s deletes an item	%s διαγράφει το αντικείμενο
 el_GR.mo	%s restores an item	%s επαναφέρει το αντικείμενο
+el_GR.mo	%s purges an item	%s εκκαθαρίζει το αντικείμενο
 el_GR.mo	%1$s trying to add an item that already exists: %2$s	%1$s προσπαθεί να προσθέσει ένα στοιχείο που ήδη υπάρχει: %2$s
 el_GR.mo	Impossible record for %s	Αδύνατη εγγραφή για %s
 el_GR.mo	Item successfully added but duplicate record on %s	Επιτυχής προσθήκη αντικειμένου αλλά διπλότυπη εγγραφή σε %s
@@ -444,6 +452,7 @@ en_GB.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
 en_GB.mo	%s updates an item	%s updates an item
 en_GB.mo	%s deletes an item	%s deletes an item
 en_GB.mo	%s restores an item	%s restores an item
+en_GB.mo	%s purges an item	%s purges an item
 en_GB.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 en_GB.mo	Impossible record for %s	Impossible record for %s
 en_GB.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
@@ -499,6 +508,7 @@ en_US.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
 en_US.mo	%s updates an item	%s Updates an Item
 en_US.mo	%s deletes an item	%s Deletes an Item
 en_US.mo	%s restores an item	%s Restores an Item
+en_US.mo	%s purges an item	%s Purges an Item
 en_US.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 en_US.mo	Impossible record for %s	Impossible record for %s
 en_US.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
@@ -554,6 +564,7 @@ eo.mo	%1$s adds the item %2$s	%1$s aldonis objekto %2$s
 eo.mo	%s updates an item	%s ĝisdatigas eron
 eo.mo	%s deletes an item	%s forviŝis la celon
 eo.mo	%s restores an item	%s restarigas eron
+eo.mo	%s purges an item	%s purigas la elementon
 eo.mo	%1$s trying to add an item that already exists: %2$s	%1$s попытался добавить существующий элемент : %2$s
 eo.mo	Impossible record for %s	Невозможная запись для %s
 eo.mo	Item successfully added but duplicate record on %s	Объект успешно добавлен, но дублирует запись %s
@@ -609,6 +620,7 @@ es_419.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
 es_419.mo	%s updates an item	%s actualiza el elemento
 es_419.mo	%s deletes an item	%s elimina el elemento
 es_419.mo	%s restores an item	%s restaura el elemento
+es_419.mo	%s purges an item	%s purga el elemento
 es_419.mo	%1$s trying to add an item that already exists: %2$s	%1$s intenta agregar un elemento que ya existe: %2$s
 es_419.mo	Impossible record for %s	Registro imposible para %s
 es_419.mo	Item successfully added but duplicate record on %s	Elemento agregado exitosamente pero hay un registro duplicado en %s
@@ -664,6 +676,7 @@ es_AR.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
 es_AR.mo	%s updates an item	%s actualiza un elemento
 es_AR.mo	%s deletes an item	%s elimina un elemento
 es_AR.mo	%s restores an item	%s restaura un elemento
+es_AR.mo	%s purges an item	%s elimina un elemento
 es_AR.mo	%1$s trying to add an item that already exists: %2$s	%1$s intentando agregar un elemento que ya existe: %2$s
 es_AR.mo	Impossible record for %s	Imposible registrar %s
 es_AR.mo	Item successfully added but duplicate record on %s	Elemento agregado exitosamente pero se encontró registro duplicado en %s
@@ -719,6 +732,7 @@ es_CL.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
 es_CL.mo	%s updates an item	%s actualiza el elemento
 es_CL.mo	%s deletes an item	%s elimina el elemento
 es_CL.mo	%s restores an item	%s restaura el elemento
+es_CL.mo	%s purges an item	%s purga el elemento
 es_CL.mo	%1$s trying to add an item that already exists: %2$s	%1$s intenta agregar un elemento que ya existe: %2$s
 es_CL.mo	Impossible record for %s	Registro imposible para %s
 es_CL.mo	Item successfully added but duplicate record on %s	Elemento agregado exitosamente pero hay un registro duplicado en %s
@@ -774,6 +788,7 @@ es_CO.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
 es_CO.mo	%s updates an item	%s actualiza un elemento
 es_CO.mo	%s deletes an item	%s borra un elemento
 es_CO.mo	%s restores an item	%s restaura un elemento
+es_CO.mo	%s purges an item	%s limpia un elemento
 es_CO.mo	%1$s trying to add an item that already exists: %2$s	%1$s intentando aagregar un elemento ya existente: %2$s
 es_CO.mo	Impossible record for %s	Registro imposible para %s
 es_CO.mo	Item successfully added but duplicate record on %s	Artículo agregado con éxito, pero registro duplicado en %s
@@ -829,6 +844,7 @@ es_ES.mo	%1$s adds the item %2$s	%1$s añade el elemento %2$s
 es_ES.mo	%s updates an item	%s actualiza un elemento
 es_ES.mo	%s deletes an item	%s suprime un elemento
 es_ES.mo	%s restores an item	%s restablece un elemento
+es_ES.mo	%s purges an item	%s purga un elemento
 es_ES.mo	%1$s trying to add an item that already exists: %2$s	%1$s intenta añadir un elemento que ya existe: %2$s
 es_ES.mo	Impossible record for %s	Registro imposible para %s
 es_ES.mo	Item successfully added but duplicate record on %s	Elemento añadido correctamente pero registro duplicado en %s
@@ -884,6 +900,7 @@ es_MX.mo	%1$s adds the item %2$s	%1$s añade un elemento %2$s
 es_MX.mo	%s updates an item	%s actualiza un elemento
 es_MX.mo	%s deletes an item	%s elimina un elemento
 es_MX.mo	%s restores an item	%s restablece un elemento
+es_MX.mo	%s purges an item	%s elimina un elemento
 es_MX.mo	%1$s trying to add an item that already exists: %2$s	%1$s intentando aagregar un elemento ya existente: %2$s
 es_MX.mo	Impossible record for %s	Registro imposible para %s
 es_MX.mo	Item successfully added but duplicate record on %s	Elemento añadido correctamente pero registro duplicado en %s
@@ -939,6 +956,7 @@ es_VE.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
 es_VE.mo	%s updates an item	%s actualiza un elemento
 es_VE.mo	%s deletes an item	%s elimina un elemento
 es_VE.mo	%s restores an item	%s restaura un elemento
+es_VE.mo	%s purges an item	%s elimina un elemento
 es_VE.mo	%1$s trying to add an item that already exists: %2$s	%1$s intentando agregar un elemento que ya existe: %2$s
 es_VE.mo	Impossible record for %s	Imposible registrar %s
 es_VE.mo	Item successfully added but duplicate record on %s	Elemento agregado exitosamente pero se encontró registro duplicado en %s
@@ -994,6 +1012,7 @@ et_EE.mo	%1$s adds the item %2$s	%1$s lisas asja %2$s
 et_EE.mo	%s updates an item	%s muutis asja
 et_EE.mo	%s deletes an item	%s kustutas asja
 et_EE.mo	%s restores an item	%s taastas asja
+et_EE.mo	%s purges an item	%s kustutas jäädavalt asja
 et_EE.mo	%1$s trying to add an item that already exists: %2$s	%1$s püüab sisestada üksust, mis juba eksisteerib: %2$s
 et_EE.mo	Impossible record for %s	Võimatu salvestada %s
 et_EE.mo	Item successfully added but duplicate record on %s	Üksus on edukalt lisatud aga duplikeerib kirjet %s
@@ -1049,6 +1068,7 @@ eu_ES.mo	%1$s adds the item %2$s	%1$s-k %2$s elementua gehitzen du
 eu_ES.mo	%s updates an item	%s elementu bat eguneratzen du
 eu_ES.mo	%s deletes an item	%s elementu bat ezabatzen du
 eu_ES.mo	%s restores an item	%s elementu bat berrezartzen du
+eu_ES.mo	%s purges an item	%s elementu bat purgatzen du
 eu_ES.mo	%1$s trying to add an item that already exists: %2$s	%1$s existitzen den elementu bat berriz gehitzen saiatzen ari da: %2$s
 eu_ES.mo	Impossible record for %s	Ezinezko erregistroa %s-(r)entzako
 eu_ES.mo	Item successfully added but duplicate record on %s	Elementua ondo gehitu da, baina %s erregistroan duplikatua dago
@@ -1104,6 +1124,7 @@ fa_IR.mo	%1$s adds the item %2$s	%1$s قلم به آيتم  %2$s شد.
 fa_IR.mo	%s updates an item	%s updates an item
 fa_IR.mo	%s deletes an item	%s قلم از آيتم حذف شد.
 fa_IR.mo	%s restores an item	%s restores an item
+fa_IR.mo	%s purges an item	%s purges an item
 fa_IR.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 fa_IR.mo	Impossible record for %s	ضبط غیرممکن است برای %s
 fa_IR.mo	Item successfully added but duplicate record on %s	مورد با موفقیت اضافه شده، اما در سابقه تکراری است %s
@@ -1159,6 +1180,7 @@ fi_FI.mo	%1$s adds the item %2$s	%1$s lisää kohteen %2$s
 fi_FI.mo	%s updates an item	%s päivittää kohteen
 fi_FI.mo	%s deletes an item	%s poistaa kohteen
 fi_FI.mo	%s restores an item	%s palauttaa kohteen
+fi_FI.mo	%s purges an item	%s poistaa kohteen pysyvästi
 fi_FI.mo	%1$s trying to add an item that already exists: %2$s	%1$s yrittää lisätä kohdetta, joka on jo olemassa: %2$s
 fi_FI.mo	Impossible record for %s	Mahdoton tietue kohteelle %s
 fi_FI.mo	Item successfully added but duplicate record on %s	Kohteen lisäys onnistui mutta kaksoistietue kohdassa %s
@@ -1214,6 +1236,7 @@ fr_BE.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
 fr_BE.mo	%s updates an item	%s met à jour un élément
 fr_BE.mo	%s deletes an item	%s supprime un élément
 fr_BE.mo	%s restores an item	%s restaure un élément
+fr_BE.mo	%s purges an item	%s purge un élément
 fr_BE.mo	%1$s trying to add an item that already exists: %2$s	%1$s essaie d'ajouter un élément qui existe déjà : %2$s
 fr_BE.mo	Impossible record for %s	Enregistrement impossible pour  %s
 fr_BE.mo	Item successfully added but duplicate record on %s	Enregistrement effectué mais doublon sur %s
@@ -1269,6 +1292,7 @@ fr_CA.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
 fr_CA.mo	%s updates an item	%s met à jour un élément
 fr_CA.mo	%s deletes an item	%s supprime un élément
 fr_CA.mo	%s restores an item	%s restaure un élément
+fr_CA.mo	%s purges an item	%s purge un élément
 fr_CA.mo	%1$s trying to add an item that already exists: %2$s	%1$s essaie d'ajouter un élément qui existe déjà : %2$s
 fr_CA.mo	Impossible record for %s	Enregistrement impossible pour %s
 fr_CA.mo	Item successfully added but duplicate record on %s	Enregistrement effectué mais en créant un doublon sur %s
@@ -1324,6 +1348,7 @@ fr_FR.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
 fr_FR.mo	%s updates an item	%s met à jour un élément
 fr_FR.mo	%s deletes an item	%s supprime un élément
 fr_FR.mo	%s restores an item	%s restaure un élément
+fr_FR.mo	%s purges an item	%s purge un élément
 fr_FR.mo	%1$s trying to add an item that already exists: %2$s	%1$s essaie d'ajouter un élément qui existe déjà : %2$s
 fr_FR.mo	Impossible record for %s	Enregistrement impossible pour %s
 fr_FR.mo	Item successfully added but duplicate record on %s	Enregistrement effectué mais doublon sur %s
@@ -1379,6 +1404,7 @@ gl_ES.mo	%1$s adds the item %2$s	%1$s engade o elemento %2$s
 gl_ES.mo	%s updates an item	%s actualiza un elemento
 gl_ES.mo	%s deletes an item	%s elimina o elemento
 gl_ES.mo	%s restores an item	%s recupera un elemento
+gl_ES.mo	%s purges an item	%s purga un elemento
 gl_ES.mo	%1$s trying to add an item that already exists: %2$s	%1$s tenta engadir un elemento que xa existe: %2$s
 gl_ES.mo	Impossible record for %s	Rexistro imposible para %s
 gl_ES.mo	Item successfully added but duplicate record on %s	Artigo engadido con éxito, pero rexistro duplicado en %s
@@ -1434,6 +1460,7 @@ he_IL.mo	%1$s adds the item %2$s	%1$sהוסיף את הפריט %2$s
 he_IL.mo	%s updates an item	%s עדכן פריט
 he_IL.mo	%s deletes an item	%s מחק פריט
 he_IL.mo	%s restores an item	%s שחזר פריט
+he_IL.mo	%s purges an item	%s מחק פריט לצמיתות
 he_IL.mo	%1$s trying to add an item that already exists: %2$s	%1$sמנסה להוסיף פריט שכבר קיים: %2$s
 he_IL.mo	Impossible record for %s	Impossible record for %s
 he_IL.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
@@ -1489,6 +1516,7 @@ hi_IN.mo	%1$s adds the item %2$s	1%1$sआइटम 2%2$sजोड़ता ह�
 hi_IN.mo	%s updates an item	%sएक आइटम अद्यतन करता है
 hi_IN.mo	%s deletes an item	%s एक आइटम हटा देता है
 hi_IN.mo	%s restores an item	%sएक आइटम बहाल करता है
+hi_IN.mo	%s purges an item	 %sएक वस्तु परिष्करण 
 hi_IN.mo	%1$s trying to add an item that already exists: %2$s	%1$s एक आइटम जोड़ने की कोशिश कर रहा है जो पहले से मौजूद है: %2$s
 hi_IN.mo	Impossible record for %s	%s के लिए असंभव रिकॉर्ड
 hi_IN.mo	Item successfully added but duplicate record on %s	आइटम सफलतापूर्वक जोड़ा गया लेकिन %s पर डुप्लिकेट रिकॉर्ड
@@ -1544,6 +1572,7 @@ hr_HR.mo	%1$s adds the item %2$s	%1$s dodaje predmet. %2$s
 hr_HR.mo	%s updates an item	%s aktualizira predmet
 hr_HR.mo	%s deletes an item	%s briše predmet
 hr_HR.mo	%s restores an item	%s vraća predmet
+hr_HR.mo	%s purges an item	%s briše predmet
 hr_HR.mo	%1$s trying to add an item that already exists: %2$s	%1$s pokušava dodati predmet koji već postoji: %2$s
 hr_HR.mo	Impossible record for %s	Nemoguć zapis za %s
 hr_HR.mo	Item successfully added but duplicate record on %s	Predmet usješno dodan, ali postoji dvostruki zapis na %s
@@ -1599,6 +1628,7 @@ hu_HU.mo	%1$s adds the item %2$s	%1$s hozzáadta a %2$s elemet
 hu_HU.mo	%s updates an item	%s frissít egy elemet
 hu_HU.mo	%s deletes an item	%s töröl egy elemet
 hu_HU.mo	%s restores an item	%s visszaállít egy elemet
+hu_HU.mo	%s purges an item	%s végleg töröl egy elemet
 hu_HU.mo	%1$s trying to add an item that already exists: %2$s	%1$s elemet próbált hozzáadni már létezőhöz: %2$s
 hu_HU.mo	Impossible record for %s	Érvénytelen rekord a következőhöz %s
 hu_HU.mo	Item successfully added but duplicate record on %s	Elem sikeresen hozzáadva, de duplikált %s
@@ -1654,6 +1684,7 @@ id_ID.mo	%1$s adds the item %2$s	%1$s menambahkan item %2$s
 id_ID.mo	%s updates an item	1%s memperbarui item
 id_ID.mo	%s deletes an item	%s menghapus item
 id_ID.mo	%s restores an item	%s mengembalikan item
+id_ID.mo	%s purges an item	%s  pembersihan item
 id_ID.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 id_ID.mo	Impossible record for %s	Impossible record for %s
 id_ID.mo	Item successfully added but duplicate record on %s	Barang berhasil ditambahkan namun terjadi duplikasi pada %s
@@ -1709,6 +1740,7 @@ is_IS.mo	%1$s adds the item %2$s	%1$s bætir við %2$s
 is_IS.mo	%s updates an item	%s uppfærir hlut
 is_IS.mo	%s deletes an item	%s eyðir hlut
 is_IS.mo	%s restores an item	%s endurheimtir hlut
+is_IS.mo	%s purges an item	%s eyðir viðkomandi hlut
 is_IS.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 is_IS.mo	Impossible record for %s	Impossible record for %s
 is_IS.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
@@ -1764,6 +1796,7 @@ it_IT.mo	%1$s adds the item %2$s	%1$s aggiunge l'elemento %2$s
 it_IT.mo	%s updates an item	%s aggiorna un elemento
 it_IT.mo	%s deletes an item	%s elimina un elemento
 it_IT.mo	%s restores an item	%s ripristina un elemento
+it_IT.mo	%s purges an item	%s ha cancellato un elemento
 it_IT.mo	%1$s trying to add an item that already exists: %2$s	%1$s tenta di aggiungere un elemento che esiste già: %2$s
 it_IT.mo	Impossible record for %s	Record impossibile per %s
 it_IT.mo	Item successfully added but duplicate record on %s	Elemento aggiunto con successo ma record duplicato su %s
@@ -1819,6 +1852,7 @@ ja_JP.mo	%1$s adds the item %2$s	%1$s がアイテム %2$s を追加
 ja_JP.mo	%s updates an item	%s がアイテムを更新
 ja_JP.mo	%s deletes an item	%s がアイテムを削除
 ja_JP.mo	%s restores an item	%s がアイテムを復元
+ja_JP.mo	%s purges an item	%s がアイテムを抹消
 ja_JP.mo	%1$s trying to add an item that already exists: %2$s	%1$s が既存のアイテムを追加しようとした: %2$s
 ja_JP.mo	Impossible record for %s	%s の記録ができません
 ja_JP.mo	Item successfully added but duplicate record on %s	アイテムを追加しましたが、重複レコードが %s にあります
@@ -1874,6 +1908,7 @@ kn.mo	%1$s adds the item %2$s	%1$sಐಟಂ ಸೇರಿಸುತ್ತದೆ %2
 kn.mo	%s updates an item	%sಐಟಂ ನವೀಕರಿಸುತ್ತದೆ 
 kn.mo	%s deletes an item	%sಐಟಂ ಅನ್ನು ಅಳಿಸಲಾಗುತ್ತದೆ 
 kn.mo	%s restores an item	%sಐಟಂ ಮರುಸ್ಥಾಪನೆ 
+kn.mo	%s purges an item	%s ಐಟಂ ಅನ್ನು ಶುದ್ಧೀಕರಿಸುತ್ತದೆ 
 kn.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 kn.mo	Impossible record for %s	ಇಂಪಾಸಿಬಲ್ ರೆಕಾರ್ಡ್ಗಾಗಿ %s
 kn.mo	Item successfully added but duplicate record on %s	ಐಟಂ ಯಶಸ್ವಿಯಾಗಿ ಸೇರಿಸಲಾಗಿದೆ ಆದರೆ ರೆಕಾರ್ಡ್ ನಕಲು%s
@@ -1929,6 +1964,7 @@ ko_KR.mo	%1$s adds the item %2$s	%1$s 는 %2$s 아이템을 추가합니다.
 ko_KR.mo	%s updates an item	%s는 아이템을 업데이트합니다.
 ko_KR.mo	%s deletes an item	%s는 아이템을 삭제합니다.
 ko_KR.mo	%s restores an item	%s는 아이템을 복구합니다.
+ko_KR.mo	%s purges an item	%s는 아이템을 정리합니다.
 ko_KR.mo	%1$s trying to add an item that already exists: %2$s	%1$s가 이미 존재하는 품목을 추가하려고 합니다: %2$s
 ko_KR.mo	Impossible record for %s	%s에 기록 불가
 ko_KR.mo	Item successfully added but duplicate record on %s	품목이 추가되었지만 %s에 사본이 기록되었습니다
@@ -1984,6 +2020,7 @@ lt_LT.mo	%1$s adds the item %2$s	%1$s pridėjo elementą %2$s
 lt_LT.mo	%s updates an item	%s atnaujina daiktą
 lt_LT.mo	%s deletes an item	%s ištrina elementą
 lt_LT.mo	%s restores an item	%s  atkuria daiktą
+lt_LT.mo	%s purges an item	%s išvalo daiktą
 lt_LT.mo	%1$s trying to add an item that already exists: %2$s	%1$s bandymas pridėti elementą, kuris jau egzistuoja: %2$s
 lt_LT.mo	Impossible record for %s	Neįmanomas įrašas %s
 lt_LT.mo	Item successfully added but duplicate record on %s	Elementas sėkmingai pridėtas, tačiau egzistuoja du egzemplioriai %s
@@ -2039,6 +2076,7 @@ lv_LV.mo	%1$s adds the item %2$s	%1$s pievieno ierakstu %2$s
 lv_LV.mo	%s updates an item	%s atjaunoja ierakstu
 lv_LV.mo	%s deletes an item	%s dzēsa ierakstu
 lv_LV.mo	%s restores an item	%s atjaunoja ierakstu
+lv_LV.mo	%s purges an item	%s attīra ierakstu
 lv_LV.mo	%1$s trying to add an item that already exists: %2$s	%1$s mēģināja pievienot jau esošu ierakstu: %2$s
 lv_LV.mo	Impossible record for %s	Neiespējami ierakstīt %s
 lv_LV.mo	Item successfully added but duplicate record on %s	Vienība ir veiksmīgi pievienota, bet ir dublējošs ieraksts %s
@@ -2094,6 +2132,7 @@ mn_MN.mo	%1$s adds the item %2$s	%1$sтөхөөрөмжийг нэмэх%2$s
 mn_MN.mo	%s updates an item	%sтөхөөрөмжийг шинэчлэх
 mn_MN.mo	%s deletes an item	%sтөхөөрөмжийг устгах
 mn_MN.mo	%s restores an item	%sтөхөөрөмжийг дахин сэргээх
+mn_MN.mo	%s purges an item	%sтөхөөрөмжийг цэвэрлэх
 mn_MN.mo	%1$s trying to add an item that already exists: %2$s	%1$s өмнө нь байсан зүйлийг нэмэх гэж оролдож байна: %2$s
 mn_MN.mo	Impossible record for %s	%s-ийн хувьд боломжгүй бичлэг
 mn_MN.mo	Item successfully added but duplicate record on %s	Зүйлийг амжилттай нэмсэн боловч %s дээрх бичлэгийг хуулбарласан болно
@@ -2149,6 +2188,7 @@ ms_MY.mo	%1$s adds the item %2$s	%1$s menambah kepada item %2$s
 ms_MY.mo	%s updates an item	%s updates an item
 ms_MY.mo	%s deletes an item	%s deletes an item
 ms_MY.mo	%s restores an item	%s restores an item
+ms_MY.mo	%s purges an item	%s purges an item
 ms_MY.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 ms_MY.mo	Impossible record for %s	Impossible record for %s
 ms_MY.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
@@ -2204,6 +2244,7 @@ nb_NO.mo	%1$s adds the item %2$s	%1$s legger til elementet %2$s
 nb_NO.mo	%s updates an item	%s oppdaterer et element
 nb_NO.mo	%s deletes an item	%s sletter et element
 nb_NO.mo	%s restores an item	%s gjenoppretter et element
+nb_NO.mo	%s purges an item	%s slettet et element permanent
 nb_NO.mo	%1$s trying to add an item that already exists: %2$s	%1$s prøver å legge til et objekt som allerede eksisterer: %2$s
 nb_NO.mo	Impossible record for %s	Ugyldig oppføring for %s
 nb_NO.mo	Item successfully added but duplicate record on %s	Element vellykket lagt til, men registrert duplikat på %s
@@ -2259,6 +2300,7 @@ nl_BE.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
 nl_BE.mo	%s updates an item	%s actualiseert een item
 nl_BE.mo	%s deletes an item	%s verwijdert een item
 nl_BE.mo	%s restores an item	%s zet een item terug
+nl_BE.mo	%s purges an item	%s verwijdert een item
 nl_BE.mo	%1$s trying to add an item that already exists: %2$s	%1$s probeert een item toe te voegen dat al bestaat: %2$s
 nl_BE.mo	Impossible record for %s	Onmogelijk record voor %s
 nl_BE.mo	Item successfully added but duplicate record on %s	Item succesvol toegevoegd maar er is een duplicaat record op %s
@@ -2314,6 +2356,7 @@ nl_NL.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
 nl_NL.mo	%s updates an item	%s actualiseert een item
 nl_NL.mo	%s deletes an item	%s verwijdert een item
 nl_NL.mo	%s restores an item	%s zet een item terug
+nl_NL.mo	%s purges an item	%s verwijdert een item
 nl_NL.mo	%1$s trying to add an item that already exists: %2$s	%1$s probeert een item toe te voegen dat al bestaat: %2$s
 nl_NL.mo	Impossible record for %s	Onmogelijk record voor %s
 nl_NL.mo	Item successfully added but duplicate record on %s	Item succesvol toegevoegd maar er is een duplicaat record op %s
@@ -2369,6 +2412,7 @@ nn_NO.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
 nn_NO.mo	%s updates an item	%s updates an item
 nn_NO.mo	%s deletes an item	%s deletes an item
 nn_NO.mo	%s restores an item	%s restores an item
+nn_NO.mo	%s purges an item	%s purges an item
 nn_NO.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 nn_NO.mo	Impossible record for %s	Impossible record for %s
 nn_NO.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
@@ -2424,6 +2468,7 @@ pl_PL.mo	%1$s adds the item %2$s	%1$s dodał element %2$s
 pl_PL.mo	%s updates an item	%s zaktualizował element
 pl_PL.mo	%s deletes an item	%s usunął element
 pl_PL.mo	%s restores an item	%s przywrócił element
+pl_PL.mo	%s purges an item	%s wyczyścił element
 pl_PL.mo	%1$s trying to add an item that already exists: %2$s	%1$s próbuje dodać element, który już istnieje: %2$s
 pl_PL.mo	Impossible record for %s	Niemożliwy rekord dla %s
 pl_PL.mo	Item successfully added but duplicate record on %s	Element poprawnie dodany ale znaleziono duplikat %s
@@ -2479,6 +2524,7 @@ pt_BR.mo	%1$s adds the item %2$s	%1$s adicionou o item %2$s
 pt_BR.mo	%s updates an item	%s atualizou um item
 pt_BR.mo	%s deletes an item	%s excluiu um item
 pt_BR.mo	%s restores an item	%s restaurou um item
+pt_BR.mo	%s purges an item	%s apagou um item
 pt_BR.mo	%1$s trying to add an item that already exists: %2$s	%1$s está tentando adicionar um item que já existe: %2$s
 pt_BR.mo	Impossible record for %s	Registro impossível para %s
 pt_BR.mo	Item successfully added but duplicate record on %s	Item adicionado com sucesso, mas registro duplicado em %s
@@ -2534,6 +2580,7 @@ pt_PT.mo	%1$s adds the item %2$s	%1$s adiciona o item %2$s
 pt_PT.mo	%s updates an item	%s atualizou um item
 pt_PT.mo	%s deletes an item	%s eliminou um item
 pt_PT.mo	%s restores an item	%s restaurou um item
+pt_PT.mo	%s purges an item	%s remove um item
 pt_PT.mo	%1$s trying to add an item that already exists: %2$s	%1$s tenta adicionar um item que já existe: %2$s
 pt_PT.mo	Impossible record for %s	Registo impossível para %s
 pt_PT.mo	Item successfully added but duplicate record on %s	Item adicionado com sucesso mas registo duplicado em %s
@@ -2589,6 +2636,7 @@ ro_RO.mo	%1$s adds the item %2$s	%1$sadaugă elementzl %2$s
 ro_RO.mo	%s updates an item	%s actualizează  un element
 ro_RO.mo	%s deletes an item	%s şterge un element
 ro_RO.mo	%s restores an item	%s restaurează un element
+ro_RO.mo	%s purges an item	%s elimină un element
 ro_RO.mo	%1$s trying to add an item that already exists: %2$s	%1$s încearca să adauge un element care deja există: %2$s
 ro_RO.mo	Impossible record for %s	Înregistrare imposibilă pentru %s
 ro_RO.mo	Item successfully added but duplicate record on %s	Înregistrare efectuată dar dubluri pe %s
@@ -2644,6 +2692,7 @@ ru_RU.mo	%1$s adds the item %2$s	%1$s добавил объект %2$s
 ru_RU.mo	%s updates an item	%s обновил объект
 ru_RU.mo	%s deletes an item	%s удалил объект
 ru_RU.mo	%s restores an item	%s восстановил объект
+ru_RU.mo	%s purges an item	%s очистил объект
 ru_RU.mo	%1$s trying to add an item that already exists: %2$s	%1$s попытался добавить существующий элемент : %2$s
 ru_RU.mo	Impossible record for %s	Невозможная запись для %s
 ru_RU.mo	Item successfully added but duplicate record on %s	Объект успешно добавлен, но дублирует запись %s
@@ -2699,6 +2748,7 @@ sk_SK.mo	%1$s adds the item %2$s	%1$s pridal položku %2$s
 sk_SK.mo	%s updates an item	%s aktualizoval položku
 sk_SK.mo	%s deletes an item	%s zmazal položku
 sk_SK.mo	%s restores an item	%s obnovil položku
+sk_SK.mo	%s purges an item	%s vymazal položku
 sk_SK.mo	%1$s trying to add an item that already exists: %2$s	%1$s sa snaží pridať položku, ktorá už existuje: %2$s
 sk_SK.mo	Impossible record for %s	Nemožný zápis pre %s
 sk_SK.mo	Item successfully added but duplicate record on %s	Položka úspešne pridaná ale je to duplicitný záznam %s
@@ -2754,6 +2804,7 @@ sl_SI.mo	%1$s adds the item %2$s	%1$s doda predmet %2$s
 sl_SI.mo	%s updates an item	%s posodobi predmet
 sl_SI.mo	%s deletes an item	%s izbriše predmet
 sl_SI.mo	%s restores an item	%s obnavlja predmet
+sl_SI.mo	%s purges an item	%s počisti predmet
 sl_SI.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 sl_SI.mo	Impossible record for %s	Impossible record for %s
 sl_SI.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
@@ -2809,6 +2860,7 @@ sr_RS.mo	%1$s adds the item %2$s	%1$s dodavanje stavke %2$s
 sr_RS.mo	%s updates an item	%s ažurira stavku
 sr_RS.mo	%s deletes an item	%s briše stavke
 sr_RS.mo	%s restores an item	%s povraća stavku
+sr_RS.mo	%s purges an item	%s prečišćava stavku
 sr_RS.mo	%1$s trying to add an item that already exists: %2$s	%1$s pokušaj dodavanja stavke koja već postoji: %2$s
 sr_RS.mo	Impossible record for %s	Nemoguće izvršiti zapis za %s
 sr_RS.mo	Item successfully added but duplicate record on %s	Stavka uspešno dodata ali duplikat zapusan u %s
@@ -2864,6 +2916,7 @@ sv_SE.mo	%1$s adds the item %2$s	%1$s lägger till objektet %2$s
 sv_SE.mo	%s updates an item	%s uppdaterar ett objekt
 sv_SE.mo	%s deletes an item	%s tar bort ett objekt
 sv_SE.mo	%s restores an item	%s återställer ett objekt
+sv_SE.mo	%s purges an item	%s rensar bort ett objekt
 sv_SE.mo	%1$s trying to add an item that already exists: %2$s	%1$s försöker lägga till ett objekt som redan finns: %2$s
 sv_SE.mo	Impossible record for %s	Impossible record for %s
 sv_SE.mo	Item successfully added but duplicate record on %s	Objekt tillagt men dubbel registrering på %s
@@ -2919,6 +2972,7 @@ ta.mo	%1$s adds the item %2$s	%1$s உருப்படி %2$s ஐ சேர�
 ta.mo	%s updates an item	%s ஒரு பொருளைப் புதுப்பிக்கிறது
 ta.mo	%s deletes an item	%s ஒரு பொருளை நீக்குகிறது
 ta.mo	%s restores an item	%s ஒரு பொருளை மீட்டமைக்கிறது
+ta.mo	%s purges an item	%s ஒரு பொருளை தூய்மைப்படுத்துகின்றன
 ta.mo	%1$s trying to add an item that already exists: %2$s	%1$s ஏற்கனவே இருக்கும் ஒரு பொருளைச் சேர்க்க முயற்சிக்கின்றன: %2$s
 ta.mo	Impossible record for %s	%s க்கு சாத்தியமற்ற பதிவு
 ta.mo	Item successfully added but duplicate record on %s	உருப்படி வெற்றிகரமாகச் சேர்த்தது, ஆனால் %s இல் நகல் பதிவு
@@ -2974,6 +3028,7 @@ th_TH.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
 th_TH.mo	%s updates an item	%s อัพเดทรายการ
 th_TH.mo	%s deletes an item	%s ลบรายการ
 th_TH.mo	%s restores an item	%s กู้คืนรายการ
+th_TH.mo	%s purges an item	%s ล้างรายการ
 th_TH.mo	%1$s trying to add an item that already exists: %2$s	%1$s พยายามที่จะเพิ่มรายการที่มีอยู่แล้ว: %2$s
 th_TH.mo	Impossible record for %s	เป็นไปไม่ได้สำหรับการบันทึก %s
 th_TH.mo	Item successfully added but duplicate record on %s	รายการที่ประสบความสำเร็จในการเพิ่ม แต่บันทึกที่ซ้ำกันใน %s
@@ -3029,6 +3084,7 @@ tr_TR.mo	%1$s adds the item %2$s	%1$s %2$s ögesini ekledi
 tr_TR.mo	%s updates an item	%s bir ögeyi güncelledi
 tr_TR.mo	%s deletes an item	%s bir ögeyi sildi
 tr_TR.mo	%s restores an item	%s bir ögeyi geri yükledi
+tr_TR.mo	%s purges an item	%s bir ögeyi çöpe attı
 tr_TR.mo	%1$s trying to add an item that already exists: %2$s	%1$s zaten var olan bir ögeyi eklemeye çalışıyor: %2$s
 tr_TR.mo	Impossible record for %s	%s için olanaksız kayıt
 tr_TR.mo	Item successfully added but duplicate record on %s	Öge eklendi, ancak %s üzerinde çift kayıt
@@ -3084,6 +3140,7 @@ uk_UA.mo	%1$s adds the item %2$s	%1$s додав елемент %2$s
 uk_UA.mo	%s updates an item	%s змінив елемент
 uk_UA.mo	%s deletes an item	%s видалив елемент
 uk_UA.mo	%s restores an item	%s відновив елемент
+uk_UA.mo	%s purges an item	%s знищив елемент
 uk_UA.mo	%1$s trying to add an item that already exists: %2$s	%1$s намагався додати елемент, який вже існує: %2$s
 uk_UA.mo	Impossible record for %s	Неможливий запис для %s
 uk_UA.mo	Item successfully added but duplicate record on %s	Елемент успішно додано, але запис однаковий з %s
@@ -3139,6 +3196,7 @@ vi_VN.mo	%1$s adds the item %2$s	%1$s thêm mục %2$s
 vi_VN.mo	%s updates an item	%s cập nhật một mục
 vi_VN.mo	%s deletes an item	%s xóa một mục
 vi_VN.mo	%s restores an item	%s phục hồi một mục
+vi_VN.mo	%s purges an item	%s loại bỏ một mục
 vi_VN.mo	%1$s trying to add an item that already exists: %2$s	%1$s đang cố thêm một mục đang tồn tại: %2$s
 vi_VN.mo	Impossible record for %s	Không thể lưu cho %s
 vi_VN.mo	Item successfully added but duplicate record on %s	Đã thêm mục thành công, nhưng lặp lại bản lưu trên %s
@@ -3194,6 +3252,7 @@ zh_CN.mo	%1$s adds the item %2$s	%1$s 添加项目 %2$s
 zh_CN.mo	%s updates an item	%s 更新一个项目
 zh_CN.mo	%s deletes an item	%s 删除一个项目
 zh_CN.mo	%s restores an item	%s 恢复一个项目
+zh_CN.mo	%s purges an item	%s 清除一个项目
 zh_CN.mo	%1$s trying to add an item that already exists: %2$s	%1$s 尝试添加已经存在的项目: %2$s
 zh_CN.mo	Impossible record for %s	不能记录 %s
 zh_CN.mo	Item successfully added but duplicate record on %s	项目添加成功，但是与记录 %s重复
@@ -3249,6 +3308,7 @@ zh_HK.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
 zh_HK.mo	%s updates an item	%s updates an item
 zh_HK.mo	%s deletes an item	%s deletes an item
 zh_HK.mo	%s restores an item	%s restores an item
+zh_HK.mo	%s purges an item	%s purges an item
 zh_HK.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
 zh_HK.mo	Impossible record for %s	Impossible record for %s
 zh_HK.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
@@ -3304,6 +3364,7 @@ zh_TW.mo	%1$s adds the item %2$s	%1$s 新增項目 %2$s
 zh_TW.mo	%s updates an item	%s 更新項目
 zh_TW.mo	%s deletes an item	%s 刪除項目
 zh_TW.mo	%s restores an item	%s 還原項目
+zh_TW.mo	%s purges an item	%s 清除項目
 zh_TW.mo	%1$s trying to add an item that already exists: %2$s	%1$s 嘗試去新增一個已存在項目: %2$s
 zh_TW.mo	Impossible record for %s	不可能紀錄 %s
 zh_TW.mo	Item successfully added but duplicate record on %s	項目成功添加，但重複的記錄在 %s

@@ -220,6 +220,7 @@ export function AssetFormView({
 const LEGACY_REASONS = [
   'business_rules',
   'field_unicity',
+  'linked_data',
   'linked_items',
   'notifications',
   'plugins',
@@ -302,6 +303,8 @@ export function WriteError({ error, legacyPath }: { error: unknown; legacyPath: 
       message = t('asset.errors.duplicate', { fields: error.details.map(columnLabel).join(', ') })
     } else if (error.code === 'sharing_in_use') {
       message = t('asset.errors.sharing_in_use')
+    } else if (error.code === 'not_in_trash') {
+      message = t('asset.errors.not_in_trash')
     } else if (error.status === 403) {
       message = t('asset.errors.forbidden')
     } else if (error.status === 404) {

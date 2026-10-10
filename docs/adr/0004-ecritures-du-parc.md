@@ -271,6 +271,35 @@ page), et même modification par l'API sur un jumeau : mêmes valeurs et
 mêmes lignes d'historique, dans le même ordre. Créations par le formulaire
 « nouvel élément » : mêmes valeurs enregistrées.
 
+### Suppression définitive (purge)
+
+- Depuis la corbeille, avec le droit « Purger » du type, dans une entité
+  active, et le droit de purger les informations financières si l'élément
+  en a (`canPurgeItem`). Événement « purge un élément ».
+- Supprimés avec l'élément, comme `CommonDBTM::deleteFromDB` : son
+  historique ; ses informations financières, avec leur historique et
+  leurs alertes ; ses connexions ; ses liens vers contrats, documents,
+  articles de la base de connaissances (avec leur historique), projets,
+  changements, problèmes, domaines, systèmes d'exploitation ; ses notes et
+  ses objets de réservation (avec leurs alertes). Selon le type, comme le
+  PHP : certificats (ordinateurs, imprimantes, matériels réseau,
+  périphériques), grappes (ordinateurs, matériels réseau), disques,
+  antivirus et machines virtuelles (ordinateurs). Ce que le PHP laisse
+  (disques d'un autre type, applicatifs...) reste aussi.
+- Renvoyé vers l'interface classique (`linked_data`) quand le PHP ferait
+  plus que supprimer des lignes : ports réseau (noms, adresses, liens),
+  composants, logiciels installés et licences, tickets (mis à jour, mis à
+  la corbeille s'ils n'avaient que cet élément), baies et châssis,
+  cartouches, réservations en cours, analyse d'impact, et connexions quand
+  le nettoyage à la déconnexion est activé (`is_*_autoclean`,
+  `state_autoclean_mode` : l'élément déconnecté est modifié comme par un
+  formulaire).
+
+Vérification : sur deux copies de la base de référence, un moniteur et un
+ordinateur de la corbeille avec toutes les sortes de liens portés (et
+quelques-uns que le PHP laisse), purgés par le formulaire PHP sur l'une et
+par l'API sur l'autre : bases identiques, mêmes événements.
+
 ### Ce qui renvoie vers l'interface classique
 
 | Motif (`details`) | Situation |
@@ -279,6 +308,7 @@ mêmes lignes d'historique, dans le même ordre. Créations par le formulaire
 | `business_rules` | Une règle métier utilise un critère ou une action de plugin, une condition textuelle sur « inventaire automatique » (libellé traduit), ou une expression régulière que les deux moteurs ne lisent pas pareil |
 | `field_unicity` | Un critère d'unicité porte sur un champ que le formulaire n'a pas, ou pourrait s'appliquer aux informations financières ou aux cartes SIM écrites en même temps |
 | `notifications` | Un doublon relève d'un critère qui envoie des notifications, et elles sont actives |
+| `linked_data` | Une purge toucherait des données liées dont la suppression n'est pas portée (ports réseau, composants, logiciels, tickets, baies, cartouches, réservations en cours, impact, connexions avec nettoyage à la déconnexion) |
 | `linked_items` | Partager l'élément changerait l'entité d'objets liés rangés dans une autre entité (données incohérentes : seule la recopie du partage est portée) |
 
 Une modification qui ne change rien, ou une mise à la corbeille d'un
@@ -286,9 +316,6 @@ Une modification qui ne change rien, ou une mise à la corbeille d'un
 
 ### Hors périmètre de cette étape
 
-- **Suppression définitive** : elle nettoie de nombreuses tables liées
-  (connexions, ports, informations financières, documents, contrats,
-  tickets) ; elle reste dans l'interface classique.
 - **Gabarits** : exclus des listes et des écritures.
 - Les onglets (composants, connexions, logiciels, informations
   financières) restent dans l'interface classique.

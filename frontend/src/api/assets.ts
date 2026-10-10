@@ -1,5 +1,5 @@
 import { keepPreviousData, queryOptions } from '@tanstack/react-query'
-import { api, unwrap, type Schemas } from './client'
+import { api, toApiError, unwrap, type Schemas } from './client'
 import type { paths } from './schema'
 
 export type AssetType = Schemas['AssetType']
@@ -165,4 +165,12 @@ export async function setTrashed(kind: AssetType, id: number, trashed: boolean):
       ? await api.POST('/api/v2/assets/{kind}/{id}/trash', options)
       : await api.POST('/api/v2/assets/{kind}/{id}/restore', options),
   )
+}
+
+/** Deletes an asset of the trash for good. */
+export async function purgeAsset(kind: AssetType, id: number): Promise<void> {
+  const { response, error } = await api.DELETE('/api/v2/assets/{kind}/{id}', { params: { path: { kind, id } } })
+  if (!response.ok) {
+    throw toApiError(response.status, error)
+  }
 }

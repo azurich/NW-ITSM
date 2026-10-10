@@ -376,6 +376,69 @@
           }
         }
       },
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Deletes an asset of the trash for good, with its history and the rows\nthe PHP code deletes with it (contracts, documents, connections,\ninfocom...). Linked data whose purge is not ported (network ports,\ncomponents, software, tickets...) leaves it to the classic interface.",
+        "operationId": "purge",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted for good"
+          },
+          "403": {
+            "description": "No purge right (on the type, or on its infocom), or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Not in the trash (`not_in_trash`), or must be done in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
       "patch": {
         "tags": [
           "assets"
@@ -1678,9 +1741,14 @@
         "description": "What the session may do with an asset.",
         "required": [
           "update",
-          "trash"
+          "trash",
+          "purge"
         ],
         "properties": {
+          "purge": {
+            "type": "boolean",
+            "description": "Delete for good, from the trash."
+          },
           "trash": {
             "type": "boolean",
             "description": "Move to the trash and restore."

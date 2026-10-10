@@ -1,9 +1,9 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useParams, useRouterState } from '@tanstack/react-router'
-import type { ReactNode } from 'react'
+import { Link, useNavigate, useParams, useRouterState } from '@tanstack/react-router'
+import { useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ApiError } from '../api/client'
-import { ASSET_TYPES, assetQuery, setTrashed, type AssetType } from '../api/assets'
+import { ASSET_TYPES, assetQuery, purgeAsset, setTrashed, type AssetType } from '../api/assets'
 import { WriteError, useColumnLabel } from '../components/AssetForm'
 import { LegacyLink } from '../components/LegacyLink'
 import { ErrorState, Loading } from '../components/States'
@@ -17,11 +17,21 @@ export function AssetPage() {
   // Reported by the write that led here.
   const duplicates = useRouterState({ select: (state) => state.location.state.duplicates }) ?? []
   const columnLabel = useColumnLabel()
+  const navigate = useNavigate()
   const trash = useMutation({
     mutationFn: (trashed: boolean) => setTrashed(kind, id, trashed),
     onSuccess: async (asset) => {
       queryClient.setQueryData(assetQuery(kind, id).queryKey, asset)
       await queryClient.invalidateQueries({ queryKey: ['assets', kind] })
+    },
+  })
+  const [confirmPurge, setConfirmPurge] = useState(false)
+  const purge = useMutation({
+    mutationFn: () => purgeAsset(kind, id),
+    onSuccess: async () => {
+      queryClient.removeQueries({ queryKey: assetQuery(kind, id).queryKey })
+      await queryClient.invalidateQueries({ queryKey: ['assets', kind] })
+      await navigate({ to: '/assets/$kind', params: { kind }, search: { trash: true } })
     },
   })
 
@@ -78,6 +88,15 @@ export function AssetPage() {
                 {asset.is_deleted ? t('asset.restore') : t('asset.moveToTrash')}
               </button>
             )}
+            {asset.is_deleted && asset.permissions.purge && !confirmPurge && (
+              <button
+                type="button"
+                onClick={() => setConfirmPurge(true)}
+                className="rounded-md border border-red-300 px-3 py-1.5 text-red-700 hover:bg-red-50 dark:border-red-800 dark:text-red-300 dark:hover:bg-red-950"
+              >
+                {t('asset.purge')}
+              </button>
+            )}
             <LegacyLink path={legacyPath} className="text-slate-500 hover:underline">
               {t('asset.openLegacy')} ↗
             </LegacyLink>
@@ -90,6 +109,34 @@ export function AssetPage() {
           </p>
         )}
         {trash.isError && <WriteError error={trash.error} legacyPath={legacyPath} />}
+        {confirmPurge && (
+          <div
+            role="alertdialog"
+            aria-label={t('asset.purge')}
+            className="flex flex-wrap items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-100"
+          >
+            <p>{t('asset.purgeConfirm')}</p>
+            <button
+              type="button"
+              disabled={purge.isPending}
+              onClick={() => purge.mutate()}
+              className="rounded-md bg-red-600 px-3 py-1.5 font-medium text-white hover:bg-red-500 disabled:opacity-60"
+            >
+              {t('asset.purgeConfirmButton')}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setConfirmPurge(false)
+                purge.reset()
+              }}
+              className="rounded-md border border-slate-300 px-3 py-1.5 hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
+            >
+              {t('asset.form.cancel')}
+            </button>
+          </div>
+        )}
+        {purge.isError && <WriteError error={purge.error} legacyPath={legacyPath} />}
         {duplicates.map((duplicate) => (
           <div
             key={duplicate.fields.join()}

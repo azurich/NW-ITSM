@@ -44,6 +44,34 @@ pub async fn check_trash(pool: &MySqlPool) -> ApiResult<()> {
     check_plugins(pool).await
 }
 
+/// Checks a purge: the linked rows must all be deleted by it like the PHP
+/// code does (`nw_domain::purge`).
+pub async fn check_purge(pool: &MySqlPool, kind: AssetKind, id: i32) -> ApiResult<()> {
+    check_plugins(pool).await?;
+    // Disconnecting an item may update it (`Computer_Item::cleanDBonPurge`).
+    let settings = config::core_values(
+        pool,
+        &[
+            "is_contact_autoclean",
+            "is_user_autoclean",
+            "is_group_autoclean",
+            "is_location_autoclean",
+            "state_autoclean_mode",
+        ],
+    )
+    .await?;
+    let autoclean = settings
+        .values()
+        .any(|value| value.parse::<i32>().unwrap_or(0) != 0);
+    let blockers = assets::purge_blockers(pool, kind, id, autoclean).await?;
+    if blockers.is_empty() {
+        Ok(())
+    } else {
+        tracing::info!(?blockers, "purge left to the classic interface");
+        Err(ApiError::LegacyRequired("linked_data"))
+    }
+}
+
 /// Checks a creation.
 pub async fn check_create(pool: &MySqlPool, infocoms: &InfocomSettings) -> ApiResult<()> {
     check_plugins(pool).await?;

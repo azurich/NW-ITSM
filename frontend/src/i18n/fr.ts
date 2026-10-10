@@ -117,6 +117,9 @@ export const fr = {
     restore: 'Restaurer',
     trashed: 'Élément mis à la corbeille.',
     restored: 'Élément restauré.',
+    purge: 'Supprimer définitivement',
+    purgeConfirm: 'Supprimer définitivement cet élément, son historique et ses liens ? Cette action est irréversible.',
+    purgeConfirmButton: 'Supprimer définitivement',
     duplicates: 'Enregistré, mais d’autres éléments ont les mêmes valeurs ({{fields}}) :',
     sections: {
       general: 'Général',
@@ -199,12 +202,15 @@ export const fr = {
       legacy_required: {
         business_rules: 'une règle métier utilise un critère, une action ou une expression régulière non prise en charge ici.',
         field_unicity: 'des critères d’unicité des champs sont configurés.',
+        linked_data:
+          'il a des données liées (ports réseau, composants, logiciels, tickets, baies…) dont la suppression n’est pas encore prise en charge ici.',
         linked_items: 'partager l’élément modifie aussi ses objets liés (logiciels, ports réseau, disques…).',
         notifications: 'un critère d’unicité envoie des notifications, qui ne sont pas encore gérées ici.',
         plugins: 'des plugins de l’interface classique réagissent aux modifications.',
       },
       openLegacy: 'Continuer dans l’interface classique',
       duplicate: 'Un autre élément a déjà ces valeurs : {{fields}}.',
+      not_in_trash: 'Seul un élément de la corbeille peut être supprimé définitivement.',
       sharing_in_use: 'Des éléments d’autres entités utilisent cet élément partagé : il doit rester visible dans les sous-entités.',
     },
   },

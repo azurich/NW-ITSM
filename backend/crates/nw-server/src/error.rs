@@ -50,6 +50,8 @@ pub enum ApiError {
     /// Unsharing an item that items of other entities use.
     #[error("items of other entities use this shared item ({0})")]
     SharingInUse(String),
+    #[error("only an item in the trash can be purged")]
+    NotInTrash,
     #[error("access denied")]
     Forbidden,
     #[error("not found")]
@@ -101,6 +103,7 @@ impl ApiError {
             Self::LegacyRequired(_) => (StatusCode::CONFLICT, "legacy_required"),
             Self::Duplicate { .. } => (StatusCode::CONFLICT, "duplicate"),
             Self::SharingInUse(_) => (StatusCode::CONFLICT, "sharing_in_use"),
+            Self::NotInTrash => (StatusCode::CONFLICT, "not_in_trash"),
             Self::Forbidden => (StatusCode::FORBIDDEN, "forbidden"),
             Self::NotFound => (StatusCode::NOT_FOUND, "not_found"),
             Self::BadRequest(_) => (StatusCode::BAD_REQUEST, "bad_request"),

@@ -27,7 +27,7 @@ use nw_domain::{
     fk::fk,
     history,
     i18n::{self, Source, text},
-    rights::{CREATE, DELETE, READ, UPDATE},
+    rights::{CREATE, DELETE, PURGE, READ, UPDATE},
     rules::Operation,
     text::{from_stored, to_stored},
 };
@@ -51,7 +51,10 @@ const MAX_LONG_TEXT_BYTES: usize = 65_535;
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/assets/{kind}", get(list).post(create))
-        .route("/assets/{kind}/{id}", get(get_one).patch(update))
+        .route(
+            "/assets/{kind}/{id}",
+            get(get_one).patch(update).delete(purge),
+        )
         .route("/assets/{kind}/{id}/trash", post(trash))
         .route("/assets/{kind}/{id}/restore", post(restore))
         .route("/assets/{kind}/choices/{field}", get(choices::choices))
@@ -185,6 +188,8 @@ pub struct AssetPermissions {
     pub update: bool,
     /// Move to the trash and restore.
     pub trash: bool,
+    /// Delete for good, from the trash.
+    pub purge: bool,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -814,6 +819,51 @@ pub async fn restore(
     set_trashed(state, session, path, false).await
 }
 
+/// Deletes an asset of the trash for good, with its history and the rows
+/// the PHP code deletes with it (contracts, documents, connections,
+/// infocom...). Linked data whose purge is not ported (network ports,
+/// components, software, tickets...) leaves it to the classic interface.
+#[utoipa::path(
+    delete,
+    path = "/api/v2/assets/{kind}/{id}",
+    tag = "assets",
+    params(
+        ("kind" = AssetType, Path, description = "Type of asset"),
+        ("id" = i32, Path, description = "Asset id"),
+    ),
+    responses(
+        (status = 204, description = "Deleted for good"),
+        (status = 403, description = "No purge right (on the type, or on its infocom), or entity not selected", body = ErrorBody),
+        (status = 404, description = "Unknown or not visible", body = ErrorBody),
+        (status = 409, description = "Not in the trash (`not_in_trash`), or must be done in the classic interface (`legacy_required`)", body = ErrorBody),
+    )
+)]
+pub async fn purge(
+    State(state): State<AppState>,
+    session: Session,
+    path: Result<Path<(AssetType, i32)>, PathRejection>,
+) -> ApiResult<StatusCode> {
+    let (kind, id) = parse_path(path)?;
+    session.require(kind.right(), PURGE)?;
+    let current = writable(&state, &session, kind, id).await?;
+    // The classic interface offers it in the trash only.
+    if !current.is_deleted {
+        return Err(ApiError::NotInTrash);
+    }
+    // `canPurgeItem`: purging the infocom too.
+    if infocoms::exists(&state.pool, kind.itemtype(), id).await?
+        && !session.rights.has("infocom", PURGE)
+    {
+        return Err(ApiError::Forbidden);
+    }
+    guards::check_purge(&state.pool, kind, id).await?;
+    if !assets::purge(&state.pool, kind, id).await? {
+        return Err(ApiError::NotFound);
+    }
+    log_asset_event(&state, &session, kind, id, text::PURGES_ITEM, &[]).await;
+    Ok(StatusCode::NO_CONTENT)
+}
+
 async fn set_trashed(
     state: AppState,
     session: Session,
@@ -879,6 +929,7 @@ async fn detail(
     let permissions = AssetPermissions {
         update: in_selected_entity && session.rights.has(kind.right(), UPDATE),
         trash: in_selected_entity && session.rights.has(kind.right(), DELETE),
+        purge: in_selected_entity && session.rights.has(kind.right(), PURGE),
     };
     let specific = assets::specific(&state.pool, kind, id).await?;
     Ok(AssetDetail::from_row(

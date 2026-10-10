@@ -101,7 +101,7 @@ async fn every_asset_type_is_listed() {
     assert_eq!(detail.body["network"], Value::Null);
     assert_eq!(
         detail.body["permissions"],
-        json!({ "update": true, "trash": true })
+        json!({ "update": true, "trash": true, "purge": true })
     );
 }
 
@@ -470,7 +470,7 @@ async fn writes_stay_in_the_selected_entities() {
     assert_eq!(shared.status, StatusCode::OK);
     assert_eq!(
         shared.body["permissions"],
-        json!({ "update": false, "trash": false })
+        json!({ "update": false, "trash": false, "purge": false })
     );
     let response = app
         .patch(
@@ -1133,6 +1133,139 @@ async fn fields_of_each_type_like_php() {
     assert_eq!(created.status, StatusCode::CREATED, "{}", created.body);
     assert_eq!(created.body["initial_page_counter"], 5);
     assert_eq!(created.body["page_counter"], 0);
+}
+
+async fn count(app: &common::TestApp, sql: &str) -> i64 {
+    sqlx::query_scalar(sql).fetch_one(&app.pool).await.unwrap()
+}
+
+#[tokio::test]
+async fn purge_like_php() {
+    let app = test_app!();
+    let manager = app.login("manager").await;
+    let purge = |uri: &'static str| {
+        let manager = manager.clone();
+        let app = &app;
+        async move { app.send(Method::DELETE, uri, Some(&manager), None).await }
+    };
+    // A monitor connected to computer 102, with linked rows the PHP code
+    // deletes with it, and some of its history.
+    app.sql(
+        "INSERT INTO glpi_infocoms (id, itemtype, items_id, entities_id, value) VALUES (7, 'Monitor', 200, 1, 10); \
+         INSERT INTO glpi_alerts (itemtype, items_id, type) VALUES ('Infocom', 7, 2); \
+         INSERT INTO glpi_logs (itemtype, items_id, itemtype_link, linked_action, user_name, date_mod, id_search_option, old_value, new_value) VALUES \
+           ('Infocom', 7, '', 20, 'x', NOW(), 0, '', ''), ('Monitor', 200, '', 20, 'x', NOW(), 0, '', ''); \
+         INSERT INTO glpi_contracts_items (contracts_id, itemtype, items_id) VALUES (1, 'Monitor', 200); \
+         INSERT INTO glpi_documents_items (documents_id, itemtype, items_id) VALUES (1, 'Monitor', 200), (1, 'Monitor', 201); \
+         INSERT INTO glpi_notepads (itemtype, items_id, content) VALUES ('Monitor', 200, 'n'); \
+         INSERT INTO glpi_reservationitems (id, itemtype, items_id, entities_id) VALUES (5, 'Monitor', 200, 1); \
+         INSERT INTO glpi_items_operatingsystems (itemtype, items_id, operatingsystems_id) VALUES ('Monitor', 200, 1); \
+         INSERT INTO glpi_domains_items (domains_id, itemtype, items_id) VALUES (1, 'Monitor', 200)",
+    )
+    .await;
+
+    // From the trash only, and purging its infocom needs that right too.
+    assert_eq!(
+        purge("/api/v2/assets/monitors/200").await.error_code(),
+        "not_in_trash"
+    );
+    app.post("/api/v2/assets/monitors/200/trash", &manager, None)
+        .await;
+    assert_eq!(
+        purge("/api/v2/assets/monitors/200").await.status,
+        StatusCode::FORBIDDEN
+    );
+    app.sql("INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES (4, 'infocom', 31)")
+        .await;
+
+    // Linked rows whose purge is not ported.
+    for sql in [
+        "INSERT INTO glpi_networkports (id, itemtype, items_id, entities_id) VALUES (9, 'Monitor', 200, 1)",
+        "INSERT INTO glpi_items_devicecases (id, itemtype, items_id, devicecases_id) VALUES (9, 'Monitor', 200, 1)",
+        "INSERT INTO glpi_items_tickets (id, itemtype, items_id, tickets_id) VALUES (9, 'Monitor', 200, 1)",
+        "INSERT INTO glpi_reservations (id, reservationitems_id, users_id) VALUES (9, 5, 19)",
+        "INSERT INTO glpi_configs (context, name, value) VALUES ('core', 'is_location_autoclean', '1')",
+    ] {
+        app.sql(sql).await;
+        let response = purge("/api/v2/assets/monitors/200").await;
+        assert_eq!(response.error_code(), "legacy_required", "{sql}");
+        assert_eq!(response.body["error"]["details"], json!(["linked_data"]));
+        app.sql(
+            "DELETE FROM glpi_networkports WHERE id = 9; DELETE FROM glpi_items_devicecases WHERE id = 9; \
+             DELETE FROM glpi_items_tickets WHERE id = 9; DELETE FROM glpi_reservations WHERE id = 9; \
+             DELETE FROM glpi_configs WHERE name = 'is_location_autoclean'",
+        )
+        .await;
+    }
+
+    let response = purge("/api/v2/assets/monitors/200").await;
+    assert_eq!(response.status, StatusCode::NO_CONTENT, "{}", response.body);
+    assert_eq!(
+        app.get("/api/v2/assets/monitors/200", Some(&manager))
+            .await
+            .status,
+        StatusCode::NOT_FOUND
+    );
+    for (table, left) in [
+        ("glpi_monitors WHERE id = 200", 0),
+        ("glpi_infocoms", 0),
+        ("glpi_alerts", 0),
+        (
+            "glpi_logs WHERE (itemtype = 'Monitor' AND items_id = 200) OR itemtype = 'Infocom'",
+            0,
+        ),
+        ("glpi_computers_items WHERE items_id = 200", 0),
+        ("glpi_contracts_items", 0),
+        // Another monitor keeps its document.
+        ("glpi_documents_items", 1),
+        ("glpi_notepads", 0),
+        ("glpi_reservationitems", 0),
+        ("glpi_items_operatingsystems", 0),
+        ("glpi_domains_items", 0),
+        // The computer keeps its other connection.
+        ("glpi_computers_items WHERE computers_id = 102", 1),
+    ] {
+        assert_eq!(
+            count(&app, &format!("SELECT COUNT(*) FROM {table}")).await,
+            left,
+            "{table}"
+        );
+    }
+    let last = events(&app).await.pop().unwrap();
+    assert_eq!(
+        last,
+        (
+            200,
+            "monitors".into(),
+            "inventory".into(),
+            4,
+            "manager purges an item".into()
+        )
+    );
+
+    // A computer: its disks, antivirus and virtual machines, with their
+    // history.
+    app.sql(
+        "UPDATE glpi_computers SET is_deleted = 1 WHERE id = 107; \
+         INSERT INTO glpi_items_disks (id, itemtype, items_id, entities_id) VALUES (3, 'Computer', 107, 1); \
+         INSERT INTO glpi_computerantiviruses (id, computers_id) VALUES (4, 107); \
+         INSERT INTO glpi_computervirtualmachines (id, computers_id, entities_id) VALUES (5, 107, 1); \
+         INSERT INTO glpi_logs (itemtype, items_id, itemtype_link, linked_action, user_name, date_mod, id_search_option, old_value, new_value) VALUES \
+           ('Item_Disk', 3, '', 20, 'x', NOW(), 0, '', ''), ('ComputerAntivirus', 4, '', 20, 'x', NOW(), 0, '', '')",
+    )
+    .await;
+    let response = purge("/api/v2/assets/computers/107").await;
+    assert_eq!(response.status, StatusCode::NO_CONTENT, "{}", response.body);
+    assert_eq!(
+        count(
+            &app,
+            "SELECT (SELECT COUNT(*) FROM glpi_items_disks) + (SELECT COUNT(*) FROM glpi_computerantiviruses) \
+             + (SELECT COUNT(*) FROM glpi_computervirtualmachines) \
+             + (SELECT COUNT(*) FROM glpi_logs WHERE itemtype IN ('Item_Disk', 'ComputerAntivirus'))"
+        )
+        .await,
+        0
+    );
 }
 
 #[tokio::test]

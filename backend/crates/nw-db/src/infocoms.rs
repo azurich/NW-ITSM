@@ -291,3 +291,14 @@ fn stored_value(date: AutoDate, now: &str) -> &str {
         now.get(..10).unwrap_or(now)
     }
 }
+
+/// Whether the item has an infocom.
+pub async fn exists(pool: &MySqlPool, itemtype: &str, items_id: i32) -> Result<bool, sqlx::Error> {
+    let found: Option<i32> =
+        sqlx::query_scalar("SELECT id FROM glpi_infocoms WHERE itemtype = ? AND items_id = ?")
+            .bind(itemtype)
+            .bind(items_id)
+            .fetch_optional(pool)
+            .await?;
+    Ok(found.is_some())
+}

@@ -53,7 +53,13 @@ export interface paths {
         get: operations["get_one"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Deletes an asset of the trash for good, with its history and the rows
+         *     the PHP code deletes with it (contracts, documents, connections,
+         *     infocom...). Linked data whose purge is not ported (network ports,
+         *     components, software, tickets...) leaves it to the classic interface.
+         */
+        delete: operations["purge"];
         options?: never;
         head?: never;
         /**
@@ -497,6 +503,8 @@ export interface components {
         };
         /** @description What the session may do with an asset. */
         AssetPermissions: {
+            /** @description Delete for good, from the trash. */
+            purge: boolean;
             /** @description Move to the trash and restore. */
             trash: boolean;
             update: boolean;
@@ -955,6 +963,56 @@ export interface operations {
             };
             /** @description Unknown or not visible */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    purge: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Asset id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted for good */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No purge right (on the type, or on its infocom), or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not in the trash (`not_in_trash`), or must be done in the classic interface (`legacy_required`) */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -15,6 +15,7 @@ pub mod languages;
 pub mod naming;
 pub mod password;
 pub mod php;
+pub mod purge;
 pub mod rights;
 pub mod rules;
 pub mod text;
