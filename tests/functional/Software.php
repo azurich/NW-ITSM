@@ -266,7 +266,8 @@ class Software extends DbTestCase
 
         $this->boolean($software->getFromDB($softwares_id_2))->isTrue();
         $this->variable($software->fields['is_template'])->isEqualTo(0);
-        $this->string($software->fields['name'])->isIdenticalTo('MySoft (copy)');
+        // An item created from a template keeps the name it is given.
+        $this->string($software->fields['name'])->isIdenticalTo('MySoft');
 
         $query = ['itemtype' => 'Software', 'items_id' => $softwares_id_2];
         $this->integer((int)countElementsInTable('glpi_infocoms', $query))->isIdenticalTo(1);
