@@ -354,6 +354,11 @@ export interface components {
             contact_number?: string | null;
             /** Format: date-time */
             created_at?: string | null;
+            /**
+             * @description After a write: items with the same values as this one, reported by
+             *     a unicity criterion that does not refuse them.
+             */
+            duplicates?: components["schemas"]["DuplicateNotice"][];
             entity: components["schemas"]["Ref"];
             group?: null | components["schemas"]["Ref"];
             /** Format: int32 */
@@ -494,6 +499,12 @@ export interface components {
             /** @description At most 50 values, sorted by label. */
             items: components["schemas"]["Choice"][];
         };
+        /** @description Items with the same values, reported but not refused. */
+        DuplicateNotice: {
+            /** @description Columns of the unicity criterion. */
+            fields: string[];
+            items: components["schemas"]["Ref"][];
+        };
         EntityRef: {
             /** Format: int32 */
             id: number;
@@ -521,7 +532,8 @@ export interface components {
              *     (`too_short`, `missing_digit`, `missing_lowercase`,
              *     `missing_uppercase`, `missing_symbol`) or the reason of
              *     `legacy_required` (`business_rules`, `field_unicity`,
-             *     `linked_items`, `plugins`, `unrecursive`).
+             *     `linked_items`, `notifications`, `plugins`), or the fields of a
+             *     `duplicate`.
              */
             details?: string[];
             message: string;
@@ -759,7 +771,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorBody"];
                 };
             };
-            /** @description Must be created in the classic interface (`legacy_required`) */
+            /** @description Another item has the same values (`duplicate`), or must be created in the classic interface (`legacy_required`) */
             409: {
                 headers: {
                     [name: string]: unknown;
@@ -933,7 +945,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorBody"];
                 };
             };
-            /** @description Must be changed in the classic interface (`legacy_required`) */
+            /** @description Another item has the same values (`duplicate`), items of other entities use the shared item (`sharing_in_use`), or must be changed in the classic interface (`legacy_required`) */
             409: {
                 headers: {
                     [name: string]: unknown;

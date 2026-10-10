@@ -1,10 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Link, useParams } from '@tanstack/react-router'
+import { Link, useParams, useRouterState } from '@tanstack/react-router'
 import type { ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ApiError } from '../api/client'
 import { ASSET_TYPES, assetQuery, setTrashed, type AssetType } from '../api/assets'
-import { WriteError } from '../components/AssetForm'
+import { WriteError, useColumnLabel } from '../components/AssetForm'
 import { LegacyLink } from '../components/LegacyLink'
 import { ErrorState, Loading } from '../components/States'
 import { formatDateTime } from '../lib/format'
@@ -14,6 +14,9 @@ export function AssetPage() {
   const { kind, id } = useParams({ from: '/authenticated/assets/$kind/$id' })
   const queryClient = useQueryClient()
   const query = useQuery({ ...assetQuery(kind, id), enabled: Number.isInteger(id) })
+  // Reported by the write that led here.
+  const duplicates = useRouterState({ select: (state) => state.location.state.duplicates }) ?? []
+  const columnLabel = useColumnLabel()
   const trash = useMutation({
     mutationFn: (trashed: boolean) => setTrashed(kind, id, trashed),
     onSuccess: async (asset) => {
@@ -86,6 +89,23 @@ export function AssetPage() {
           </p>
         )}
         {trash.isError && <WriteError error={trash.error} legacyPath={legacyPath} />}
+        {duplicates.map((duplicate) => (
+          <div
+            key={duplicate.fields.join()}
+            role="status"
+            className="rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-100"
+          >
+            {t('asset.duplicates', { fields: duplicate.fields.map(columnLabel).join(', ') })}{' '}
+            {duplicate.items.map((item, index) => (
+              <span key={item.id}>
+                {index > 0 && ', '}
+                <Link to="/assets/$kind/$id" params={{ kind, id: item.id }} className="font-medium underline">
+                  {item.name || `#${item.id}`}
+                </Link>
+              </span>
+            ))}
+          </div>
+        ))}
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">

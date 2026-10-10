@@ -4,8 +4,9 @@
 mod business;
 pub mod choices;
 mod guards;
+pub mod unicity;
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet, hash_map::Entry};
 
 use axum::{
     Json, Router,
@@ -136,7 +137,7 @@ pub struct ListParams {
 }
 
 /// A related object: id and display name.
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, ToSchema)]
 pub struct Ref {
     pub id: i32,
     /// `null` when the related row no longer exists.
@@ -226,6 +227,10 @@ pub struct AssetDetail {
     pub tech_user: Option<Ref>,
     pub tech_group: Option<Ref>,
     pub permissions: AssetPermissions,
+    /// After a write: items with the same values as this one, reported by
+    /// a unicity criterion that does not refuse them.
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub duplicates: Vec<unicity::DuplicateNotice>,
 }
 
 /// Fields of a creation or an update. Absent fields are left unchanged;
@@ -404,7 +409,7 @@ pub async fn get_one(
         (status = 201, description = "Created", body = AssetDetail),
         (status = 400, description = "Invalid fields", body = ErrorBody),
         (status = 403, description = "No create right, or entity not selected", body = ErrorBody),
-        (status = 409, description = "Must be created in the classic interface (`legacy_required`)", body = ErrorBody),
+        (status = 409, description = "Another item has the same values (`duplicate`), or must be created in the classic interface (`legacy_required`)", body = ErrorBody),
     )
 )]
 pub async fn create(
@@ -424,7 +429,7 @@ pub async fn create(
     let requested = field_values(kind, &request.fields)?;
     check_references(&state, &requested).await?;
     let infocom_settings = infocoms::settings(&state.pool).await?;
-    guards::check_create(&state.pool, kind, &infocom_settings).await?;
+    guards::check_create(&state.pool, &infocom_settings).await?;
 
     // Every field of the form is written, empty when not given (an empty
     // text, not NULL), and seen by the rules, as the classic interface does.
@@ -452,6 +457,20 @@ pub async fn create(
     .await?;
     business::merge(&mut values, rule_values);
 
+    // Unicity of the values the rules leave.
+    let posted = business::FormInput::form(&values, request.entity_id, None).by_field();
+    let notices = unicity::check(
+        &state,
+        &session,
+        kind,
+        request.entity_id,
+        unicity::Posted::Form(&posted),
+        None,
+    )
+    .await?
+    .log_and_enforce(&state, kind, None)
+    .await?;
+
     let actor = history::actor(session.user.id, &session.own_name());
     let id = assets::create(
         &state.pool,
@@ -469,10 +488,9 @@ pub async fn create(
         .map(to_stored)
         .unwrap_or_default();
     log_asset_event(&state, &session, kind, id, &format!("adds the item {name}")).await;
-    Ok((
-        StatusCode::CREATED,
-        Json(detail(&state, &session, kind, id).await?),
-    ))
+    let mut created = detail(&state, &session, kind, id).await?;
+    created.duplicates = notices;
+    Ok((StatusCode::CREATED, Json(created)))
 }
 
 /// Updates an asset of a selected entity. For computers, the changes of
@@ -492,7 +510,7 @@ pub async fn create(
         (status = 400, description = "Invalid fields", body = ErrorBody),
         (status = 403, description = "No update right, or entity not selected", body = ErrorBody),
         (status = 404, description = "Unknown or not visible", body = ErrorBody),
-        (status = 409, description = "Must be changed in the classic interface (`legacy_required`)", body = ErrorBody),
+        (status = 409, description = "Another item has the same values (`duplicate`), items of other entities use the shared item (`sharing_in_use`), or must be changed in the classic interface (`legacy_required`)", body = ErrorBody),
     )
 )]
 pub async fn update(
@@ -522,8 +540,21 @@ pub async fn update(
     .await?;
     business::merge(&mut values, rule_values);
 
+    // Unicity of the whole form, checked even when nothing changes.
+    business::merge(&mut form, values.clone());
+    let posted = business::FormInput::form(&form, current.entities_id, Some(id)).by_field();
+    let checked = unicity::check(
+        &state,
+        &session,
+        kind,
+        current.entities_id,
+        unicity::Posted::Form(&posted),
+        Some(id),
+    )
+    .await?;
+
     // A computer copies some changes to its connected items, whose own
-    // update runs the rules on the copied fields.
+    // update runs the rules, then the unicity check, on the copied fields.
     let changed = guards::changed_columns(&current, &values);
     let propagation = guards::propagation(&state.pool).await?;
     let copied: Vec<(Field, Value)> = propagation
@@ -536,43 +567,70 @@ pub async fn update(
                 .cloned()
         })
         .collect();
-    let mut connected = Vec::new();
-    let mut connected_rules = HashMap::new();
+    let mut connected_rules: HashMap<AssetKind, Vec<(Field, Value)>> = HashMap::new();
+    let mut connected_checks = Vec::new();
     if kind == AssetKind::Computer && !copied.is_empty() {
-        connected = assets::connected_kinds(&state.pool, id).await?;
-        for &item_kind in &connected {
-            let item_copied: Vec<(Field, Value)> = copied
+        for item in assets::connected(&state.pool, id).await? {
+            let mut item_values: Vec<(Field, Value)> = copied
                 .iter()
-                .filter_map(|(field, value)| Some((item_kind.field(field.column)?, value.clone())))
+                .filter_map(|(field, value)| Some((item.kind.field(field.column)?, value.clone())))
                 .collect();
-            let input = business::FormInput::fields(&item_copied);
-            let item_values =
-                business::run(&state.pool, &session, &rules, item_kind, &input).await?;
-            connected_rules.insert(item_kind, item_values);
+            if let Entry::Vacant(entry) = connected_rules.entry(item.kind) {
+                let input = business::FormInput::fields(&item_values);
+                let rule_values =
+                    business::run(&state.pool, &session, &rules, item.kind, &input).await?;
+                entry.insert(rule_values);
+            }
+            business::merge(&mut item_values, connected_rules[&item.kind].clone());
+            let mut posted = business::FormInput::fields(&item_values).by_field();
+            posted.insert("id".to_owned(), item.id.to_string());
+            let checked = unicity::check(
+                &state,
+                &session,
+                item.kind,
+                item.entities_id,
+                unicity::Posted::Fields(&posted),
+                Some(item.id),
+            )
+            .await?;
+            connected_checks.push((item, checked));
         }
     }
     let infocom_settings = infocoms::settings(&state.pool).await?;
     guards::check_update(
         &state.pool,
+        &session.tree,
         kind,
         &current,
         &changed,
-        &connected,
+        propagation,
         &infocom_settings,
     )
     .await?;
+
+    // Events of the duplicates, as the PHP code logs them on the way.
+    let notices = checked.log_and_enforce(&state, kind, Some(id)).await?;
+    let mut refused_items = HashSet::new();
+    for (item, checked) in &connected_checks {
+        if checked.log(&state, item.kind, Some(item.id)).await {
+            refused_items.insert((item.kind, item.id));
+        }
+    }
 
     let actor = history::actor(session.user.id, &session.own_name());
     let effects = assets::UpdateEffects {
         propagation,
         connected_rules: &connected_rules,
+        refused_items: &refused_items,
         infocoms: &infocom_settings,
     };
     assets::update(&state.pool, kind, id, &values, &actor, effects)
         .await?
         .ok_or(ApiError::NotFound)?;
     log_asset_event(&state, &session, kind, id, "updates an item").await;
-    Ok(Json(detail(&state, &session, kind, id).await?))
+    let mut updated = detail(&state, &session, kind, id).await?;
+    updated.duplicates = notices;
+    Ok(Json(updated))
 }
 
 /// Moves an asset to the trash.
@@ -921,6 +979,7 @@ impl AssetDetail {
             ),
             tech_group: Ref::optional(row.groups_id_tech, row.tech_group),
             permissions,
+            duplicates: Vec::new(),
         }
     }
 }

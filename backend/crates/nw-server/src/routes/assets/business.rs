@@ -1,6 +1,8 @@
 //! Business rules of the assets, run on the writes like
 //! `CommonDBTM::assetBusinessRules` (see `docs/adr/0004-ecritures-du-parc.md`).
 
+use std::collections::HashMap;
+
 use nw_db::{MySqlPool, rules as db};
 use nw_domain::{
     asset::{AssetKind, Field, FieldKind, Value},
@@ -48,6 +50,13 @@ impl FormInput {
                 .map(|(field, value)| (field.column.to_owned(), as_posted(value)))
                 .collect(),
         }
+    }
+}
+
+impl FormInput {
+    /// The posted values by field.
+    pub fn by_field(&self) -> HashMap<String, String> {
+        self.values.iter().cloned().collect()
     }
 }
 

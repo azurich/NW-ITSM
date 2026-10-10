@@ -1,7 +1,7 @@
 # ADR 0004 — Écritures du parc
 
-- **Statut** : accepté (complété le 2026-10-10 : règles métier et
-  informations financières portées)
+- **Statut** : accepté (complété le 2026-10-10 : règles métier,
+  informations financières, unicité des champs et partage portés)
 - **Date** : 2026-10-10
 
 ## Contexte
@@ -62,9 +62,6 @@ classique, sur le même élément. Rien n'est écrit en cas de refus.
   le statut des composants, selon la configuration
   (`is_*_autoupdate`, `state_autoupdate_mode`), avec leur historique ;
   logiciels installés marqués à la corbeille et à la restauration.
-- Partage avec les sous-entités (`is_recursive` de 0 à 1) : recopié sans
-  historique vers les informations financières de l'élément
-  (`forwardEntityInformations`).
 - Listes de choix des formulaires : valeurs de l'entité de l'élément et
   valeurs récursives de ses parents ; statuts visibles pour le type,
   groupes « éléments » pour le groupe, groupes « assignables » pour le
@@ -136,15 +133,60 @@ Vérification : création automatique, dates à la création et à la
 modification, date ancienne, date déjà au jour, date vide, partage recopié :
 identiques au PHP.
 
+### Unicité des champs (`FieldUnicity`)
+
+Portée comme `CommonDBTM::checkUnicity`, mesurée sur la base de
+référence :
+
+- Critères actifs du type, de l'entité de l'élément ou récursifs d'une
+  entité parente ; seuls ceux de la première entité par identifiant
+  décroissant s'appliquent (`getUnicityFieldsConfig`).
+- Vérifiés sur **tout le formulaire** après les règles métier : modifier un
+  autre champ d'un élément déjà en double est aussi refusé. Un élément
+  connecté qui suit son ordinateur n'est vérifié que sur les champs
+  recopiés ; refusé, il ne suit pas, l'ordinateur est quand même modifié.
+- Un champ vide (une clé étrangère à 0) ou une valeur de la liste noire
+  (`glpi_fieldblacklists`) écarte le critère. Les doublons sont cherchés par
+  la base (sans casse ni espaces finaux), dans l'entité du critère et ses
+  sous-entités s'il est récursif, gabarits exceptés, corbeille comprise.
+- Doublon refusé : `409 duplicate` avec les champs du critère. Doublon
+  seulement signalé : l'écriture a lieu et la réponse liste les doublons
+  (`duplicates`), affichés sur la fiche. Dans les deux cas, l'événement du
+  PHP est journalisé (type de l'objet, `trying to add an item that already
+  exists`, avec les doublons).
+- Les notifications ne sont pas portées : un doublon d'un critère qui en
+  envoie, quand elles sont actives, renvoie vers l'interface classique.
+
+### Partage avec les sous-entités
+
+- Partager ou ne plus partager l'élément est recopié, sans historique,
+  vers ses objets liés qui ont l'indicateur
+  (`forwardEntityInformations`) : informations financières, ports réseau,
+  réservations, systèmes d'exploitation, avec une nouvelle date de
+  modification là où la table en a une. Les objets sans indicateur
+  (logiciels installés, disques, machines virtuelles, noms réseau) ne
+  changent pas, comme en PHP.
+- Le formulaire PHP permet de ne plus partager sans vérification
+  (`canUnrecurs` n'y est plus appelé). Le Rust garde cette vérification de
+  GLPI : si des objets d'autres entités utilisent l'élément (logiciel
+  installé ou machine virtuelle d'une autre entité, port d'une imprimante ou
+  d'un matériel réseau relié à un élément d'une autre entité), le retrait est
+  refusé (`409 sharing_in_use`).
+
+Vérification : doublon refusé à la création, doublon signalé à la
+modification, partage puis retrait avec informations financières, port
+réseau (et son nom réseau), réservation, système d'exploitation et logiciel
+liés : mêmes écritures et même historique que le PHP.
+
 ### Ce qui renvoie vers l'interface classique
 
 | Motif (`details`) | Situation |
 | --- | --- |
 | `plugins` | Un plugin est activé : ses hooks ne s'exécuteraient pas |
 | `business_rules` | Une règle métier utilise un critère ou une action de plugin, une condition textuelle sur « inventaire automatique » (libellé traduit), ou une expression régulière que les deux moteurs ne lisent pas pareil |
-| `field_unicity` | Un critère d'unicité actif existe pour un type écrit (l'élément, les éléments connectés qui le suivent, les informations financières quand elles sont écrites) |
-| `linked_items` | Partager l'élément le recopierait aussi vers ses objets liés autres que les informations financières (logiciels installés, ports réseau, disques, systèmes d'exploitation, réservations, machines virtuelles) |
-| `unrecursive` | Retirer le partage avec les sous-entités : le PHP vérifie d'abord les éléments des autres entités qui l'utilisent |
+| `field_unicity` | Un critère d'unicité porte sur un champ que le formulaire n'a pas, ou pourrait s'appliquer aux informations financières ou aux cartes SIM écrites en même temps |
+| `notifications` | Un doublon relève d'un critère qui envoie des notifications, et elles sont actives |
+| `linked_items` | Partager l'élément changerait l'entité d'objets liés rangés dans une autre entité (données incohérentes : seule la recopie du partage est portée) |
 
 Une modification qui ne change rien, ou une mise à la corbeille d'un
 élément déjà à la corbeille, n'est jamais refusée.
@@ -165,9 +207,12 @@ Une modification qui ne change rien, ou une mise à la corbeille d'un
 
 - Les écritures courantes du parc se font dans la nouvelle interface sans
   dépendre du PHP, avec des données identiques à celles du PHP.
-- Une installation avec des plugins actifs ou des critères d'unicité
-  continue d'écrire par l'interface classique, sans perte silencieuse ;
-  chaque fonction portée plus tard retire un motif de refus.
+- Une installation avec des plugins actifs continue d'écrire par
+  l'interface classique, sans perte silencieuse ; chaque fonction portée
+  plus tard retire un motif de refus.
+- Les messages du journal des événements sont écrits en anglais, alors que
+  le PHP les écrit dans la langue de l'utilisateur : à aligner quand les
+  traductions de l'application seront reprises.
 - Le motif `plugins` disparaîtra avec la phase 2 (modèle d'extension
   natif) : en attendant, désactiver un plugin inutile ouvre les écritures
   natives.

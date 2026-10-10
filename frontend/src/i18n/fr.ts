@@ -117,6 +117,7 @@ export const fr = {
     restore: 'Restaurer',
     trashed: 'Élément mis à la corbeille.',
     restored: 'Élément restauré.',
+    duplicates: 'Enregistré, mais d’autres éléments ont les mêmes valeurs ({{fields}}) :',
     sections: {
       general: 'Général',
       management: 'Gestion',
@@ -159,7 +160,6 @@ export const fr = {
       noChoice: 'Aucune valeur trouvée.',
       noEntity: 'Aucune entité sélectionnée ne permet d’ajouter des éléments.',
       inTrash: 'Restaurez cet élément avant de le modifier.',
-      recursiveLocked: 'Pour ne plus le partager avec les sous-entités, utilisez l’interface classique.',
     },
     errors: {
       generic: 'L’enregistrement a échoué.',
@@ -170,10 +170,12 @@ export const fr = {
         business_rules: 'une règle métier utilise un critère, une action ou une expression régulière non prise en charge ici.',
         field_unicity: 'des critères d’unicité des champs sont configurés.',
         linked_items: 'partager l’élément modifie aussi ses objets liés (logiciels, ports réseau, disques…).',
+        notifications: 'un critère d’unicité envoie des notifications, qui ne sont pas encore gérées ici.',
         plugins: 'des plugins de l’interface classique réagissent aux modifications.',
-        unrecursive: 'retirer le partage avec les sous-entités demande des vérifications.',
       },
       openLegacy: 'Continuer dans l’interface classique',
+      duplicate: 'Un autre élément a déjà ces valeurs : {{fields}}.',
+      sharing_in_use: 'Des éléments d’autres entités utilisent cet élément partagé : il doit rester visible dans les sous-entités.',
     },
   },
   errors: {

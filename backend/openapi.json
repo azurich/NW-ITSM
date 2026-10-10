@@ -203,7 +203,7 @@
             }
           },
           "409": {
-            "description": "Must be created in the classic interface (`legacy_required`)",
+            "description": "Another item has the same values (`duplicate`), or must be created in the classic interface (`legacy_required`)",
             "content": {
               "application/json": {
                 "schema": {
@@ -455,7 +455,7 @@
             }
           },
           "409": {
-            "description": "Must be changed in the classic interface (`legacy_required`)",
+            "description": "Another item has the same values (`duplicate`), items of other entities use the shared item (`sharing_in_use`), or must be changed in the classic interface (`legacy_required`)",
             "content": {
               "application/json": {
                 "schema": {
@@ -1202,6 +1202,13 @@
             ],
             "format": "date-time"
           },
+          "duplicates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DuplicateNotice"
+            },
+            "description": "After a write: items with the same values as this one, reported by\na unicity criterion that does not refuse them."
+          },
           "entity": {
             "$ref": "#/components/schemas/Ref"
           },
@@ -1735,6 +1742,29 @@
           }
         }
       },
+      "DuplicateNotice": {
+        "type": "object",
+        "description": "Items with the same values, reported but not refused.",
+        "required": [
+          "fields",
+          "items"
+        ],
+        "properties": {
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Columns of the unicity criterion."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            }
+          }
+        }
+      },
       "EntityRef": {
         "type": "object",
         "required": [
@@ -1799,7 +1829,7 @@
             "items": {
               "type": "string"
             },
-            "description": "More codes, for example the broken rules of `weak_password`\n(`too_short`, `missing_digit`, `missing_lowercase`,\n`missing_uppercase`, `missing_symbol`) or the reason of\n`legacy_required` (`business_rules`, `field_unicity`,\n`linked_items`, `plugins`, `unrecursive`)."
+            "description": "More codes, for example the broken rules of `weak_password`\n(`too_short`, `missing_digit`, `missing_lowercase`,\n`missing_uppercase`, `missing_symbol`) or the reason of\n`legacy_required` (`business_rules`, `field_unicity`,\n`linked_items`, `notifications`, `plugins`), or the fields of a\n`duplicate`."
           },
           "message": {
             "type": "string"

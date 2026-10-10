@@ -9,6 +9,7 @@ export type AssetDetail = Schemas['AssetDetail']
 export type AssetFields = Schemas['AssetFields']
 export type ChoiceField = Schemas['ChoiceField']
 export type Choice = Schemas['Choice']
+export type DuplicateNotice = Schemas['DuplicateNotice']
 
 type ListQuery = NonNullable<paths['/api/v2/assets/{kind}']['get']['parameters']['query']>
 export type AssetSort = NonNullable<ListQuery['sort']>

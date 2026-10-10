@@ -17,3 +17,4 @@ pub mod php;
 pub mod rights;
 pub mod rules;
 pub mod text;
+pub mod unicity;

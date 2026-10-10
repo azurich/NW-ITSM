@@ -15,6 +15,7 @@ pub mod infocoms;
 pub mod profiles;
 pub mod rules;
 mod scope;
+pub mod unicity;
 pub mod users;
 
 use std::str::FromStr;

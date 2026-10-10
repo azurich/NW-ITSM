@@ -119,6 +119,7 @@ export const en: typeof fr = {
     restore: 'Restore',
     trashed: 'Item moved to the trash.',
     restored: 'Item restored.',
+    duplicates: 'Saved, but other items have the same values ({{fields}}):',
     sections: {
       general: 'General',
       management: 'Management',
@@ -161,7 +162,6 @@ export const en: typeof fr = {
       noChoice: 'No value found.',
       noEntity: 'No selected entity allows adding items.',
       inTrash: 'Restore this item before changing it.',
-      recursiveLocked: 'To stop sharing it with the sub-entities, use the classic interface.',
     },
     errors: {
       generic: 'Saving failed.',
@@ -172,10 +172,12 @@ export const en: typeof fr = {
         business_rules: 'a business rule uses a criterion, an action or a regular expression not supported here.',
         field_unicity: 'field unicity criteria are configured.',
         linked_items: 'sharing the item also changes its linked items (software, network ports, disks...).',
+        notifications: 'a unicity criterion sends notifications, not handled here yet.',
         plugins: 'plugins of the classic interface react to changes.',
-        unrecursive: 'unsharing with the sub-entities needs checks.',
       },
       openLegacy: 'Continue in the classic interface',
+      duplicate: 'Another item already has these values: {{fields}}.',
+      sharing_in_use: 'Items of other entities use this shared item: it must stay visible in the sub-entities.',
     },
   },
   errors: {

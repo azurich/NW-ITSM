@@ -3,7 +3,14 @@ import { useNavigate, useParams } from '@tanstack/react-router'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ApiError } from '../api/client'
-import { ASSET_TYPES, assetQuery, createAsset, updateAsset, type AssetDetail } from '../api/assets'
+import {
+  ASSET_TYPES,
+  assetQuery,
+  createAsset,
+  updateAsset,
+  type AssetDetail,
+  type DuplicateNotice,
+} from '../api/assets'
 import { CREATE, hasRight, selectableEntitiesQuery, sessionQuery } from '../api/session'
 import { AssetFormView } from '../components/AssetForm'
 import { inputClass } from '../components/PasswordFields'
@@ -34,7 +41,11 @@ export function AssetCreatePage() {
       createAsset(kind, entity, changedFields(kind, form)),
     onSuccess: async (asset) => {
       await store(asset)
-      await navigate({ to: '/assets/$kind/$id', params: { kind, id: asset.id } })
+      await navigate({
+        to: '/assets/$kind/$id',
+        params: { kind, id: asset.id },
+        state: { duplicates: asset.duplicates },
+      })
     },
   })
 
@@ -120,7 +131,8 @@ export function AssetEditPage() {
   const query = useQuery({ ...assetQuery(kind, id), enabled: Number.isInteger(id) })
   const navigate = useNavigate()
   const store = useStoreAsset()
-  const toDetail = () => navigate({ to: '/assets/$kind/$id', params: { kind, id } })
+  const toDetail = (duplicates?: DuplicateNotice[]) =>
+    navigate({ to: '/assets/$kind/$id', params: { kind, id }, state: { duplicates } })
   const mutation = useMutation({
     mutationFn: async ({ form, initial }: { form: AssetForm; initial: AssetForm }) => {
       const fields = changedFields(kind, form, initial)
@@ -130,7 +142,7 @@ export function AssetEditPage() {
       if (asset) {
         await store(asset)
       }
-      await toDetail()
+      await toDetail(asset?.duplicates)
     },
   })
 
@@ -177,7 +189,6 @@ export function AssetEditPage() {
         kind={kind}
         entityId={asset.entity.id}
         initial={initial}
-        recursiveLocked={asset.is_recursive}
         submitLabel={t('asset.form.save')}
         pending={mutation.isPending}
         error={mutation.error}

@@ -2,8 +2,12 @@
 //! that they are made in the classic interface instead of silently
 //! skipping it (see `docs/adr/0004-ecritures-du-parc.md`).
 
-use nw_db::{MySqlPool, assets, config, guards, infocoms::InfocomSettings};
-use nw_domain::asset::{AssetKind, Field, Propagation, Value};
+use nw_db::{MySqlPool, assets, config, guards, infocoms::InfocomSettings, unicity};
+use nw_domain::{
+    asset::{AssetKind, DEVICE_FIELDS, Field, Propagation, Value},
+    entity::EntityTree,
+    infocom::AUTO_DATES,
+};
 
 use crate::error::{ApiError, ApiResult};
 
@@ -41,18 +45,12 @@ pub async fn check_trash(pool: &MySqlPool) -> ApiResult<()> {
 }
 
 /// Checks a creation.
-pub async fn check_create(
-    pool: &MySqlPool,
-    kind: AssetKind,
-    infocoms: &InfocomSettings,
-) -> ApiResult<()> {
+pub async fn check_create(pool: &MySqlPool, infocoms: &InfocomSettings) -> ApiResult<()> {
     check_plugins(pool).await?;
-    check_unicity(
-        pool,
-        &[kind],
-        infocoms.auto_create || infocoms.any_status_date(),
-    )
-    .await
+    if infocoms.auto_create || infocoms.any_status_date() {
+        check_side_unicity(pool, "Infocom", &INFOCOM_INPUT).await?;
+    }
+    Ok(())
 }
 
 /// Columns a write changes on an item.
@@ -68,14 +66,14 @@ pub fn changed_columns(current: &assets::Current, values: &[(Field, Value)]) -> 
         .collect()
 }
 
-/// Checks an update, with the items that follow a computer change
-/// (`connected`: their types).
+/// Checks an update that changes these columns.
 pub async fn check_update(
     pool: &MySqlPool,
+    tree: &EntityTree,
     kind: AssetKind,
     current: &assets::Current,
     changed: &[&str],
-    connected: &[AssetKind],
+    propagation: Propagation,
     infocoms: &InfocomSettings,
 ) -> ApiResult<()> {
     if changed.is_empty() {
@@ -84,23 +82,77 @@ pub async fn check_update(
     check_plugins(pool).await?;
     if changed.contains(&"is_recursive") {
         if current.value("is_recursive") == Some(&Value::Bool(true)) {
-            // Legacy CommonDBTM::canUnrecurs checks the items of other
-            // entities that use this one.
-            return Err(ApiError::LegacyRequired("unrecursive"));
+            // `CommonDBTM::canUnrecurs`: the items of other entities using
+            // this one would no longer see it.
+            let mut entities: Vec<i32> =
+                tree.ancestors_of(current.entities_id).into_iter().collect();
+            entities.push(current.entities_id);
+            let blockers = assets::unshare_blockers(pool, kind, current.id, &entities).await?;
+            if !blockers.is_empty() {
+                return Err(ApiError::SharingInUse(blockers.join(", ")));
+            }
         }
-        // The sharing is copied to the linked items, infocoms excepted.
-        if !assets::forwarded_items(pool, kind, current.id)
+        // Copying the entity to linked items of another entity is not
+        // ported, only the sharing.
+        if !assets::entity_mismatches(pool, kind, current.id, current.entities_id)
             .await?
             .is_empty()
         {
             return Err(ApiError::LegacyRequired("linked_items"));
         }
     }
-    let mut kinds = vec![kind];
-    kinds.extend(connected);
     let infocom_writes = (changed.contains(&"states_id") && infocoms.any_status_date())
         || changed.contains(&"is_recursive");
-    check_unicity(pool, &kinds, infocom_writes).await
+    if infocom_writes {
+        check_side_unicity(pool, "Infocom", &INFOCOM_INPUT).await?;
+    }
+    if kind == AssetKind::Computer && !propagation.to_devices(changed).is_empty() {
+        let device_input: Vec<&str> = DEVICE_FIELDS
+            .iter()
+            .map(|field| field.column)
+            .chain(["id"])
+            .collect();
+        check_side_unicity(pool, "Item_DeviceSimcard", &device_input).await?;
+    }
+    Ok(())
+}
+
+/// Fields an infocom write posts (creation, dates, sharing).
+const INFOCOM_INPUT: [&str; 13] = [
+    "itemtype",
+    "items_id",
+    "id",
+    "entities_id",
+    "is_recursive",
+    "alert",
+    "_transfer",
+    AUTO_DATES[0].field,
+    AUTO_DATES[1].field,
+    AUTO_DATES[2].field,
+    AUTO_DATES[3].field,
+    AUTO_DATES[4].field,
+    AUTO_DATES[5].field,
+];
+
+/// Unicity of the items written along (infocoms, SIM cards): not ported.
+/// A criterion only on fields such a write posts could apply to it.
+async fn check_side_unicity(pool: &MySqlPool, itemtype: &str, posted: &[&str]) -> ApiResult<()> {
+    let applies = unicity::active_fields(pool, itemtype)
+        .await?
+        .iter()
+        .any(|fields| {
+            let fields: Vec<&str> = fields
+                .iter()
+                .map(String::as_str)
+                .filter(|field| !field.is_empty())
+                .collect();
+            !fields.is_empty() && fields.iter().all(|field| posted.contains(field))
+        });
+    if applies {
+        Err(ApiError::LegacyRequired("field_unicity"))
+    } else {
+        Ok(())
+    }
 }
 
 /// The hooks of the PHP plugins (`pre_item_add`, `item_update`...) do not
@@ -111,19 +163,4 @@ async fn check_plugins(pool: &MySqlPool) -> ApiResult<()> {
     } else {
         Ok(())
     }
-}
-
-/// Unicity criteria of the written types, infocoms included when they may
-/// be written too.
-async fn check_unicity(pool: &MySqlPool, kinds: &[AssetKind], infocoms: bool) -> ApiResult<()> {
-    let mut itemtypes: Vec<&str> = kinds.iter().map(|kind| kind.itemtype()).collect();
-    if infocoms {
-        itemtypes.push("Infocom");
-    }
-    for itemtype in itemtypes {
-        if guards::has_field_unicity(pool, itemtype).await? {
-            return Err(ApiError::LegacyRequired("field_unicity"));
-        }
-    }
-    Ok(())
 }

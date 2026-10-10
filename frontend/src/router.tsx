@@ -7,7 +7,7 @@ import {
   notFound,
   redirect,
 } from '@tanstack/react-router'
-import { ASSET_TYPE_LIST, ASSET_TYPES, isAssetType, type AssetType } from './api/assets'
+import { ASSET_TYPE_LIST, ASSET_TYPES, isAssetType, type AssetType, type DuplicateNotice } from './api/assets'
 import { isUnauthenticated } from './api/client'
 import { READ, hasRight, sessionQuery } from './api/session'
 import { Layout } from './components/Layout'
@@ -145,5 +145,9 @@ export function createAppRouter(queryClient: QueryClient) {
 declare module '@tanstack/react-router' {
   interface Register {
     router: ReturnType<typeof createAppRouter>
+  }
+  interface HistoryState {
+    /** Items with the same values as the asset just written. */
+    duplicates?: DuplicateNotice[]
   }
 }

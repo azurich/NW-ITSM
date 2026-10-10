@@ -843,28 +843,308 @@ async fn infocoms_are_created_and_dated_like_php() {
 }
 
 #[tokio::test]
-async fn sharing_follows_to_the_infocom() {
+async fn sharing_follows_to_the_linked_items() {
     let app = test_app!();
     let manager = app.login("manager").await;
+    // PC-PARIS-1 also has an installed software (no sharing flag).
     app.sql(
-        "INSERT INTO glpi_infocoms (itemtype, items_id, entities_id, is_recursive) VALUES ('Computer', 107, 1, 0)",
+        "INSERT INTO glpi_infocoms (itemtype, items_id, entities_id, is_recursive) VALUES ('Computer', 102, 1, 0); \
+         INSERT INTO glpi_networkports (itemtype, items_id, entities_id, is_recursive, date_mod) \
+           VALUES ('Computer', 102, 1, 0, '2026-01-01 00:00:00'); \
+         INSERT INTO glpi_reservationitems (itemtype, items_id, entities_id, is_recursive) VALUES ('Computer', 102, 1, 0); \
+         INSERT INTO glpi_items_operatingsystems (itemtype, items_id, entities_id, is_recursive, date_mod) \
+           VALUES ('Computer', 102, 1, 0, '2026-01-01 00:00:00')",
     )
     .await;
+    let flags = || async {
+        let mut flags = Vec::new();
+        for table in [
+            "glpi_infocoms",
+            "glpi_networkports",
+            "glpi_reservationitems",
+            "glpi_items_operatingsystems",
+        ] {
+            let flag: bool = sqlx::query_scalar(&format!(
+                "SELECT is_recursive FROM {table} WHERE itemtype = 'Computer' AND items_id = 102"
+            ))
+            .fetch_one(&app.pool)
+            .await
+            .unwrap();
+            flags.push(flag);
+        }
+        flags
+    };
+
     let response = app
         .patch(
-            "/api/v2/assets/computers/107",
+            "/api/v2/assets/computers/102",
             &manager,
             json!({ "is_recursive": true }),
         )
         .await;
     assert_eq!(response.status, StatusCode::OK, "{}", response.body);
-    let recursive: bool = sqlx::query_scalar(
-        "SELECT is_recursive FROM glpi_infocoms WHERE itemtype = 'Computer' AND items_id = 107",
+    assert_eq!(flags().await, [true; 4]);
+    let port_date: Option<String> = sqlx::query_scalar(
+        "SELECT CAST(date_mod AS CHAR) FROM glpi_networkports WHERE itemtype = 'Computer' AND items_id = 102",
     )
     .fetch_one(&app.pool)
     .await
     .unwrap();
-    assert!(recursive);
+    assert_ne!(port_date.as_deref(), Some("2026-01-01 00:00:00"));
+    // Only the change of the computer is logged.
+    let logged: Vec<_> = history(&app, "Computer", 102)
+        .await
+        .into_iter()
+        .map(|entry| entry.0)
+        .collect();
+    assert_eq!(logged, [86]);
+
+    // Unshared: nothing of another entity uses it.
+    let response = app
+        .patch(
+            "/api/v2/assets/computers/102",
+            &manager,
+            json!({ "is_recursive": false }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(flags().await, [false; 4]);
+}
+
+#[tokio::test]
+async fn unsharing_checks_the_items_of_other_entities() {
+    let app = test_app!();
+    let manager = app.login("manager").await;
+    let refused = |response: &common::Response| {
+        assert_eq!(response.status, StatusCode::CONFLICT, "{}", response.body);
+        assert_eq!(response.error_code(), "sharing_in_use");
+    };
+
+    // A software installed from Lyon, which sees PC-PARIS-1 only shared.
+    app.sql(
+        "UPDATE glpi_computers SET is_recursive = 1 WHERE id = 102; \
+         INSERT INTO glpi_items_softwareversions (items_id, itemtype, softwareversions_id, entities_id) \
+           VALUES (102, 'Computer', 2, 2)",
+    )
+    .await;
+    let response = app
+        .patch(
+            "/api/v2/assets/computers/102",
+            &manager,
+            json!({ "is_recursive": false }),
+        )
+        .await;
+    refused(&response);
+    // Without it, the computer can be unshared.
+    app.sql("DELETE FROM glpi_items_softwareversions WHERE entities_id = 2")
+        .await;
+    let response = app
+        .patch(
+            "/api/v2/assets/computers/102",
+            &manager,
+            json!({ "is_recursive": false }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+
+    // A shared printer wired to a computer of Lyon.
+    app.sql(
+        "INSERT INTO glpi_printers (id, name, entities_id, is_recursive) VALUES (300, 'PRN', 1, 1); \
+         INSERT INTO glpi_networkports (id, itemtype, items_id, entities_id, is_recursive) VALUES \
+           (10, 'Printer', 300, 1, 1), (11, 'Computer', 104, 2, 0); \
+         INSERT INTO glpi_networkports_networkports (networkports_id_1, networkports_id_2) VALUES (11, 10)",
+    )
+    .await;
+    let response = app
+        .patch(
+            "/api/v2/assets/printers/300",
+            &manager,
+            json!({ "is_recursive": false }),
+        )
+        .await;
+    refused(&response);
+    assert_eq!(history(&app, "Printer", 300).await, []);
+}
+
+#[tokio::test]
+async fn field_unicity_like_php() {
+    let app = test_app!();
+    let manager = app.login("manager").await;
+    let duplicate = |response: &common::Response| {
+        assert_eq!(response.status, StatusCode::CONFLICT, "{}", response.body);
+        assert_eq!(response.error_code(), "duplicate");
+        assert_eq!(response.body["error"]["details"], json!(["serial"]));
+    };
+    let new = |serial: &str| Some(json!({ "entity_id": 1, "name": "NEW", "serial": serial }));
+    app.sql(
+        "INSERT INTO glpi_fieldunicities (id, name, itemtype, entities_id, is_recursive, fields, is_active, action_refuse) \
+         VALUES (1, 'Serial', 'Computer', 0, 1, 'serial', 1, 1)",
+    )
+    .await;
+
+    // Refused, with the event of the PHP code.
+    duplicate(
+        &app.post("/api/v2/assets/computers", &manager, new("SN-P1"))
+            .await,
+    );
+    assert_eq!(
+        events(&app).await,
+        [(
+            0,
+            "Computer".into(),
+            "inventory".into(),
+            4,
+            "manager trying to add an item that already exists: Impossible record for Serial number = SN-P1\
+             <br>Other item exist<br>[<a  href='/front/computer.form.php?id=102'  title=\"PC-PARIS-1\">PC-PARIS-1</a> \
+             - ID: 102 - Serial number: SN-P1 - Entity: Root &gt; Paris]"
+                .into()
+        )]
+    );
+    // Compared by the database: case and trailing spaces do not count.
+    duplicate(
+        &app.post("/api/v2/assets/computers", &manager, new("sn-p1 "))
+            .await,
+    );
+    // Items in the trash count, templates do not.
+    app.sql("UPDATE glpi_computers SET serial = 'SN-T' WHERE id = 105; UPDATE glpi_computers SET serial = 'SN-TPL' WHERE id = 106")
+        .await;
+    duplicate(
+        &app.post("/api/v2/assets/computers", &manager, new("SN-T"))
+            .await,
+    );
+    let response = app
+        .post("/api/v2/assets/computers", &manager, new("SN-TPL"))
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    // Empty values and blacklisted ones are not compared.
+    let response = app
+        .post("/api/v2/assets/computers", &manager, new(""))
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED);
+    app.sql(
+        "INSERT INTO glpi_fieldblacklists (name, field, value, itemtype, entities_id, is_recursive) \
+         VALUES ('OEM', 'serial', 'SN-P1', 'Computer', 0, 1)",
+    )
+    .await;
+    let response = app
+        .post("/api/v2/assets/computers", &manager, new("SN-P1"))
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED);
+    app.sql("DELETE FROM glpi_fieldblacklists").await;
+
+    // The whole form is checked: another field of a duplicate is refused.
+    app.sql("UPDATE glpi_computers SET serial = 'SN-P1' WHERE id = 107")
+        .await;
+    duplicate(
+        &app.patch(
+            "/api/v2/assets/computers/107",
+            &manager,
+            json!({ "contact": "x" }),
+        )
+        .await,
+    );
+
+    // Reported only: written, with the duplicates in the answer.
+    app.sql("UPDATE glpi_fieldunicities SET action_refuse = 0")
+        .await;
+    let response = app
+        .patch(
+            "/api/v2/assets/computers/107",
+            &manager,
+            json!({ "contact": "x" }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["contact"], "x");
+    let items: Vec<i64> = response.body["duplicates"][0]["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|item| item["id"].as_i64().unwrap())
+        .collect();
+    assert!(items.contains(&102), "{}", response.body);
+    let last = events(&app).await.into_iter().rev().nth(1).unwrap();
+    assert_eq!((last.0, last.1.as_str()), (107, "Computer"));
+    assert!(
+        last.4
+            .contains("Item successfully added but duplicate record on Serial number = SN-P1"),
+        "{}",
+        last.4
+    );
+
+    // The criteria of the nearest entity win: Paris only checks the
+    // inventory number, Office A (not covered by Paris) the serial number.
+    app.sql(
+        "UPDATE glpi_fieldunicities SET action_refuse = 1; \
+         INSERT INTO glpi_fieldunicities (name, itemtype, entities_id, is_recursive, fields, is_active, action_refuse) \
+         VALUES ('Inventory', 'Computer', 1, 0, 'otherserial', 1, 1)",
+    )
+    .await;
+    let response = app
+        .post("/api/v2/assets/computers", &manager, new("SN-P1"))
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    let office = Some(json!({ "entity_id": 3, "name": "NEW", "serial": "SN-P1" }));
+    duplicate(&app.post("/api/v2/assets/computers", &manager, office).await);
+    app.sql("DELETE FROM glpi_fieldunicities WHERE id <> 1")
+        .await;
+
+    // A criterion sending notifications: left to the classic interface
+    // when they are on, without event.
+    app.sql(
+        "UPDATE glpi_fieldunicities SET action_notify = 1; \
+         INSERT INTO glpi_configs (context, name, value) VALUES \
+           ('core', 'use_notifications', '1'), ('core', 'notifications_mailing', '1'); \
+         INSERT INTO glpi_notifications (name, entities_id, itemtype, event, is_recursive, is_active) \
+           VALUES ('Unicity', 0, 'FieldUnicity', 'refuse', 1, 1)",
+    )
+    .await;
+    let before = events(&app).await.len();
+    let response = app
+        .post("/api/v2/assets/computers", &manager, new("SN-P1"))
+        .await;
+    assert_eq!(response.error_code(), "legacy_required");
+    assert_eq!(response.body["error"]["details"], json!(["notifications"]));
+    assert_eq!(events(&app).await.len(), before);
+    app.sql("UPDATE glpi_configs SET value = '0' WHERE name = 'use_notifications'")
+        .await;
+    duplicate(
+        &app.post("/api/v2/assets/computers", &manager, new("SN-P1"))
+            .await,
+    );
+}
+
+#[tokio::test]
+async fn connected_items_refused_by_unicity_do_not_follow() {
+    let app = test_app!();
+    app.sql(
+        "INSERT INTO glpi_configs (context, name, value) VALUES ('core', 'is_contact_autoupdate', '1'); \
+         INSERT INTO glpi_monitors (id, name, entities_id, contact) VALUES (203, 'MON-JD', 1, 'jd'); \
+         INSERT INTO glpi_fieldunicities (name, itemtype, entities_id, is_recursive, fields, is_active, action_refuse) \
+         VALUES ('Contact', 'Monitor', 0, 1, 'contact', 1, 1)",
+    )
+    .await;
+    let manager = app.login("manager").await;
+    let response = app
+        .patch(
+            "/api/v2/assets/computers/102",
+            &manager,
+            json!({ "contact": "jd" }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["contact"], "jd");
+    let monitor = app.get("/api/v2/assets/monitors/200", Some(&manager)).await;
+    assert_eq!(monitor.body["contact"], "old");
+    let logged: Vec<_> = events(&app)
+        .await
+        .into_iter()
+        .map(|event| (event.0, event.1))
+        .collect();
+    assert_eq!(
+        logged,
+        [(200, "Monitor".to_owned()), (102, "computers".to_owned())]
+    );
 }
 
 #[tokio::test]
@@ -922,27 +1202,32 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
     app.sql("DELETE FROM glpi_rulecriterias; DELETE FROM glpi_ruleactions; DELETE FROM glpi_rules")
         .await;
 
-    // Unicity of fields, also on the infocoms when they are written.
+    // Unicity of the infocoms written along.
     app.sql(
         "INSERT INTO glpi_fieldunicities (name, itemtype, entities_id, fields, is_active, action_refuse) \
-         VALUES ('Serial', 'Computer', 0, 'serial', 1, 1)",
-    )
-    .await;
-    let response = app
-        .patch(
-            "/api/v2/assets/computers/102",
-            &manager,
-            json!({ "serial": "z" }),
-        )
-        .await;
-    refused(&response, "field_unicity");
-    app.sql(
-        "UPDATE glpi_fieldunicities SET itemtype = 'Infocom'; \
+         VALUES ('Dates', 'Infocom', 0, 'buy_date', 1, 1); \
          INSERT INTO glpi_configs (context, name, value) VALUES ('core', 'auto_create_infocoms', '1')",
     )
     .await;
     let response = app
         .post("/api/v2/assets/computers", &manager, Some(create.clone()))
+        .await;
+    refused(&response, "field_unicity");
+    app.sql("DELETE FROM glpi_fieldunicities; DELETE FROM glpi_configs WHERE name = 'auto_create_infocoms'")
+        .await;
+
+    // A unicity criterion on a field the form does not have.
+    app.sql(
+        "INSERT INTO glpi_fieldunicities (name, itemtype, entities_id, is_recursive, fields, is_active, action_refuse) \
+         VALUES ('Size', 'Monitor', 0, 1, 'size', 1, 1)",
+    )
+    .await;
+    let response = app
+        .patch(
+            "/api/v2/assets/monitors/200",
+            &manager,
+            json!({ "name": "x" }),
+        )
         .await;
     refused(&response, "field_unicity");
     app.sql("DELETE FROM glpi_fieldunicities").await;
@@ -976,7 +1261,11 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
     assert_eq!(response.status, StatusCode::OK);
     app.sql("UPDATE glpi_plugins SET state = 4").await;
 
-    // Sharing an item with linked items (here an installed software).
+    // Sharing an item whose linked items are in another entity.
+    app.sql(
+        "INSERT INTO glpi_networkports (itemtype, items_id, entities_id, is_recursive) VALUES ('Computer', 102, 2, 0)",
+    )
+    .await;
     let response = app
         .patch(
             "/api/v2/assets/computers/102",
@@ -985,23 +1274,6 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
         )
         .await;
     refused(&response, "linked_items");
-    // Shared items cannot be unshared here.
-    let response = app
-        .patch(
-            "/api/v2/assets/computers/107",
-            &manager,
-            json!({ "is_recursive": true }),
-        )
-        .await;
-    assert_eq!(response.status, StatusCode::OK);
-    let response = app
-        .patch(
-            "/api/v2/assets/computers/107",
-            &manager,
-            json!({ "is_recursive": false }),
-        )
-        .await;
-    refused(&response, "unrecursive");
 
     // Refusals write nothing.
     assert_eq!(history(&app, "Computer", 102).await, []);

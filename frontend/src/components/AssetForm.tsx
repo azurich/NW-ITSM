@@ -15,7 +15,6 @@ export function AssetFormView({
   entityId,
   entityField,
   initial,
-  recursiveLocked,
   submitLabel,
   pending,
   error,
@@ -29,8 +28,6 @@ export function AssetFormView({
   /** Entity choice of a creation. */
   entityField?: ReactNode
   initial: AssetForm
-  /** Already shared with the sub-entities: only the classic interface unshares. */
-  recursiveLocked?: boolean
   submitLabel: string
   pending: boolean
   error: unknown
@@ -108,12 +105,10 @@ export function AssetFormView({
               <input
                 type="checkbox"
                 checked={form.is_recursive}
-                disabled={recursiveLocked}
                 onChange={(event) => setForm({ ...form, is_recursive: event.target.checked })}
               />
               {t('asset.fields.is_recursive')}
             </label>
-            {recursiveLocked && <p className="mt-1 text-xs text-slate-500">{t('asset.form.recursiveLocked')}</p>}
           </div>
         </fieldset>
       </div>
@@ -154,13 +149,46 @@ const LEGACY_REASONS = [
   'business_rules',
   'field_unicity',
   'linked_items',
+  'notifications',
   'plugins',
-  'unrecursive',
 ] as const
+
+/** Form fields by column, to name the fields of a unicity criterion. */
+const FIELD_OF_COLUMN: Record<string, string> = {
+  name: 'name',
+  serial: 'serial',
+  otherserial: 'inventory_number',
+  uuid: 'uuid',
+  brand: 'brand',
+  number_line: 'number_line',
+  contact: 'contact',
+  contact_num: 'contact_number',
+  locations_id: 'location',
+  states_id: 'state',
+  manufacturers_id: 'manufacturer',
+  networks_id: 'network',
+  autoupdatesystems_id: 'update_source',
+  users_id: 'user',
+  groups_id: 'group',
+  users_id_tech: 'tech_user',
+  groups_id_tech: 'tech_group',
+}
+
+/** Name of a column: the label of its form field when there is one. */
+export function useColumnLabel() {
+  const { t } = useTranslation()
+  return (column: string) => {
+    const field =
+      FIELD_OF_COLUMN[column] ??
+      (column.endsWith('types_id') ? 'type' : column.endsWith('models_id') ? 'model' : undefined)
+    return field ? t(`asset.fields.${field}` as 'asset.fields.name') : column
+  }
+}
 
 /** Why a write failed; a link to the classic interface when it must be made there. */
 export function WriteError({ error, legacyPath }: { error: unknown; legacyPath: string }) {
   const { t } = useTranslation()
+  const columnLabel = useColumnLabel()
   let message = t('asset.errors.generic')
   let legacy = false
   if (error instanceof ApiError) {
@@ -168,6 +196,10 @@ export function WriteError({ error, legacyPath }: { error: unknown; legacyPath: 
       const reason = LEGACY_REASONS.find((known) => error.details.includes(known))
       message = `${t('asset.errors.legacy')} : ${reason ? t(`asset.errors.legacy_required.${reason}`) : ''}`
       legacy = true
+    } else if (error.code === 'duplicate') {
+      message = t('asset.errors.duplicate', { fields: error.details.map(columnLabel).join(', ') })
+    } else if (error.code === 'sharing_in_use') {
+      message = t('asset.errors.sharing_in_use')
     } else if (error.status === 403) {
       message = t('asset.errors.forbidden')
     } else if (error.status === 404) {

@@ -5,7 +5,7 @@
 //! Each function runs in one transaction. Rights, entities and the checks
 //! for PHP features not ported yet are the caller's job.
 
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 
 use nw_domain::{
     asset::{
@@ -57,6 +57,9 @@ pub struct UpdateEffects<'a> {
     /// Values set by the business rules on the connected items of each
     /// type, run on the copied fields.
     pub connected_rules: &'a HashMap<AssetKind, Vec<(Field, Value)>>,
+    /// Connected items whose update is refused by a unicity criterion:
+    /// they do not follow.
+    pub refused_items: &'a HashSet<(AssetKind, i32)>,
     pub infocoms: &'a InfocomSettings,
 }
 
@@ -156,6 +159,9 @@ pub async fn update(
                     continue;
                 };
                 if item.is_global {
+                    continue;
+                }
+                if effects.refused_items.contains(&(item_kind, item_id)) {
                     continue;
                 }
                 let mut item_values: Vec<(Field, Value)> = to_items
@@ -270,6 +276,7 @@ async fn after_update(
     };
     if changed.contains(&"is_recursive") {
         infocoms::forward_entity(conn, owner).await?;
+        forward_sharing(conn, kind, current.id, owner.is_recursive).await?;
     }
     if changed.contains(&"states_id") {
         let states_id = value_of("states_id").map_or(0, Value::id);
@@ -519,59 +526,183 @@ pub async fn references_exist(
     Ok(missing)
 }
 
-/// Types of the non-global items connected to a computer: those that follow
-/// its changes (and run their own business rules).
-pub async fn connected_kinds(
+/// A non-global item connected to a computer: it follows its changes.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct ConnectedItem {
+    pub kind: AssetKind,
+    pub id: i32,
+    pub entities_id: i32,
+}
+
+/// The items following the changes of a computer.
+pub async fn connected(
     pool: &MySqlPool,
     computer_id: i32,
-) -> Result<Vec<AssetKind>, sqlx::Error> {
+) -> Result<Vec<ConnectedItem>, sqlx::Error> {
     let mut conn = pool.acquire().await?;
-    let mut kinds = Vec::new();
+    let mut items = Vec::new();
     for (kind, id) in connected_items(&mut conn, computer_id).await? {
-        if kinds.contains(&kind) {
-            continue;
-        }
         let is_global = if kind.can_be_global() {
             "is_global"
         } else {
             "0"
         };
-        let global: Option<i64> = sqlx::query_scalar(&format!(
-            "SELECT CAST({is_global} AS SIGNED) FROM {} WHERE id = ?",
+        let row: Option<(i64, i32)> = sqlx::query_as(&format!(
+            "SELECT CAST({is_global} AS SIGNED), entities_id FROM {} WHERE id = ?",
             kind.table()
         ))
         .bind(id)
         .fetch_optional(&mut *conn)
         .await?;
-        if global == Some(0) {
-            kinds.push(kind);
+        if let Some((0, entities_id)) = row {
+            items.push(ConnectedItem {
+                kind,
+                id,
+                entities_id,
+            });
         }
     }
-    Ok(kinds)
+    Ok(items)
 }
 
-/// Tables of the items that follow the entity and sharing of an asset
-/// (`$forward_entity_to`), infocoms excepted, holding rows of this asset.
-pub async fn forwarded_items(
+/// Tables following the entity and sharing of an asset
+/// (`$forward_entity_to`) whose rows of this asset are in another entity:
+/// copying the entity to them is not ported.
+pub async fn entity_mismatches(
     pool: &MySqlPool,
     kind: AssetKind,
     id: i32,
+    entity: i32,
 ) -> Result<Vec<&'static str>, sqlx::Error> {
     let mut found = Vec::new();
-    for &table in kind.forward_entity_tables() {
-        let condition = if table == "glpi_computervirtualmachines" {
+    for &table in kind
+        .forward_entity_tables()
+        .iter()
+        .chain(&["glpi_infocoms"])
+    {
+        let owner = if table == "glpi_computervirtualmachines" {
             "computers_id = ?"
         } else {
             "itemtype = ? AND items_id = ?"
         };
-        let sql = format!("SELECT COUNT(*) FROM {table} WHERE {condition}");
+        let sql = format!("SELECT COUNT(*) FROM {table} WHERE {owner} AND entities_id <> ?");
         let mut query = sqlx::query_scalar::<_, i64>(&sql);
         if table != "glpi_computervirtualmachines" {
             query = query.bind(kind.itemtype());
         }
-        if query.bind(id).fetch_one(pool).await? > 0 {
+        if query.bind(id).bind(entity).fetch_one(pool).await? > 0 {
             found.push(table);
         }
     }
     Ok(found)
+}
+
+/// Linked items of entities that would no longer see a shared asset
+/// (`CommonDBTM::canUnrecurs`, `Printer::canUnrecurs`,
+/// `NetworkEquipment::canUnrecurs`); `entities` are the entity of the
+/// asset and its parents.
+pub async fn unshare_blockers(
+    pool: &MySqlPool,
+    kind: AssetKind,
+    id: i32,
+    entities: &[i32],
+) -> Result<Vec<&'static str>, sqlx::Error> {
+    let not_in = |column: &str| {
+        let list = vec!["?"; entities.len()].join(", ");
+        format!("{column} NOT IN ({list})")
+    };
+    let mut found = Vec::new();
+    if kind == AssetKind::Computer {
+        let checks = [
+            (
+                "glpi_items_softwareversions",
+                format!(
+                    "SELECT COUNT(*) FROM glpi_items_softwareversions \
+                     WHERE itemtype = 'Computer' AND items_id = ? AND {}",
+                    not_in("entities_id")
+                ),
+            ),
+            (
+                "glpi_computervirtualmachines",
+                format!(
+                    "SELECT COUNT(*) FROM glpi_computervirtualmachines WHERE computers_id = ? AND {}",
+                    not_in("entities_id")
+                ),
+            ),
+        ];
+        for (table, sql) in checks {
+            let mut query = sqlx::query_scalar::<_, i64>(&sql).bind(id);
+            for entity in entities {
+                query = query.bind(*entity);
+            }
+            if query.fetch_one(pool).await? > 0 {
+                found.push(table);
+            }
+        }
+    }
+    if matches!(kind, AssetKind::Printer | AssetKind::NetworkEquipment) {
+        // Ports wired to the ports of items of other entities.
+        let wired: Vec<(String, i32)> = sqlx::query_as(
+            "SELECT other.itemtype, other.items_id FROM glpi_networkports mine \
+             INNER JOIN glpi_networkports_networkports wire \
+               ON wire.networkports_id_1 = mine.id OR wire.networkports_id_2 = mine.id \
+             INNER JOIN glpi_networkports other ON other.id = \
+               IF(wire.networkports_id_1 = mine.id, wire.networkports_id_2, wire.networkports_id_1) \
+             WHERE mine.itemtype = ? AND mine.items_id = ?",
+        )
+        .bind(kind.itemtype())
+        .bind(id)
+        .fetch_all(pool)
+        .await?;
+        for (itemtype, items_id) in wired {
+            let Some(other) = AssetKind::from_itemtype(&itemtype) else {
+                continue;
+            };
+            let entity: Option<i32> = sqlx::query_scalar(&format!(
+                "SELECT entities_id FROM {} WHERE id = ?",
+                other.table()
+            ))
+            .bind(items_id)
+            .fetch_optional(pool)
+            .await?;
+            if entity.is_some_and(|entity| !entities.contains(&entity)) {
+                found.push("glpi_networkports_networkports");
+                break;
+            }
+        }
+    }
+    Ok(found)
+}
+
+/// Copies the sharing of an asset to the linked items having the flag
+/// (`forwardEntityInformations`: no history, a new `date_mod` where the
+/// table has one). The entity of the rows is the asset's (checked before).
+async fn forward_sharing(
+    conn: &mut MySqlConnection,
+    kind: AssetKind,
+    id: i32,
+    is_recursive: bool,
+) -> Result<(), sqlx::Error> {
+    for (table, has_date_mod) in [
+        ("glpi_networkports", true),
+        ("glpi_reservationitems", false),
+        ("glpi_items_operatingsystems", true),
+    ] {
+        let date_mod = if has_date_mod {
+            ", date_mod = NOW()"
+        } else {
+            ""
+        };
+        sqlx::query(&format!(
+            "UPDATE {table} SET is_recursive = ?{date_mod} \
+             WHERE itemtype = ? AND items_id = ? AND is_recursive <> ?"
+        ))
+        .bind(is_recursive)
+        .bind(kind.itemtype())
+        .bind(id)
+        .bind(is_recursive)
+        .execute(&mut *conn)
+        .await?;
+    }
+    Ok(())
 }

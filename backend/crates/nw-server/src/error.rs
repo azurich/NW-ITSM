@@ -40,6 +40,16 @@ pub enum ApiError {
     /// must be done in the classic interface. The reason is a stable code.
     #[error("this change must be made in the classic interface ({0})")]
     LegacyRequired(&'static str),
+    /// A unicity criterion refuses the values: another item has them. The
+    /// fields are the columns of the criterion.
+    #[error("{message}")]
+    Duplicate {
+        fields: Vec<String>,
+        message: String,
+    },
+    /// Unsharing an item that items of other entities use.
+    #[error("items of other entities use this shared item ({0})")]
+    SharingInUse(String),
     #[error("access denied")]
     Forbidden,
     #[error("not found")]
@@ -67,9 +77,10 @@ pub struct ErrorDetail {
     /// (`too_short`, `missing_digit`, `missing_lowercase`,
     /// `missing_uppercase`, `missing_symbol`) or the reason of
     /// `legacy_required` (`business_rules`, `field_unicity`,
-    /// `linked_items`, `plugins`, `unrecursive`).
+    /// `linked_items`, `notifications`, `plugins`), or the fields of a
+    /// `duplicate`.
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub details: Vec<&'static str>,
+    pub details: Vec<String>,
 }
 
 impl ApiError {
@@ -88,6 +99,8 @@ impl ApiError {
             Self::WeakPassword(_) => (StatusCode::BAD_REQUEST, "weak_password"),
             Self::BridgeDisabled => (StatusCode::NOT_FOUND, "bridge_disabled"),
             Self::LegacyRequired(_) => (StatusCode::CONFLICT, "legacy_required"),
+            Self::Duplicate { .. } => (StatusCode::CONFLICT, "duplicate"),
+            Self::SharingInUse(_) => (StatusCode::CONFLICT, "sharing_in_use"),
             Self::Forbidden => (StatusCode::FORBIDDEN, "forbidden"),
             Self::NotFound => (StatusCode::NOT_FOUND, "not_found"),
             Self::BadRequest(_) => (StatusCode::BAD_REQUEST, "bad_request"),
@@ -117,8 +130,9 @@ impl IntoResponse for ApiError {
             _ => None,
         };
         let details = match self {
-            Self::WeakPassword(details) => details,
-            Self::LegacyRequired(reason) => vec![reason],
+            Self::WeakPassword(details) => details.into_iter().map(str::to_owned).collect(),
+            Self::LegacyRequired(reason) => vec![reason.to_owned()],
+            Self::Duplicate { fields, .. } => fields,
             _ => Vec::new(),
         };
         let mut response = (
