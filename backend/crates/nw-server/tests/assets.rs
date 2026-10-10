@@ -967,6 +967,63 @@ async fn unsharing_checks_the_items_of_other_entities() {
 }
 
 #[tokio::test]
+async fn events_are_in_the_language_of_the_session() {
+    let app = test_app!();
+    app.sql(
+        "UPDATE glpi_users SET language = 'fr_FR', is_ids_visible = 1 WHERE name = 'manager'; \
+         INSERT INTO glpi_fieldunicities (name, itemtype, entities_id, is_recursive, fields, is_active, action_refuse) \
+         VALUES ('Serial', 'Computer', 0, 1, 'serial,contact', 1, 1); \
+         UPDATE glpi_computers SET serial = 'SN-FR', contact = 'ops' WHERE id IN (102, 105); \
+         UPDATE glpi_computers SET name = 'Poste é' WHERE id = 102; \
+         UPDATE glpi_computers SET name = '' WHERE id = 105",
+    )
+    .await;
+    let manager = app.login("manager").await;
+
+    let refused = app
+        .post(
+            "/api/v2/assets/computers",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "NEW", "serial": "SN-FR", "contact": "ops" })),
+        )
+        .await;
+    assert_eq!(refused.status, StatusCode::CONFLICT, "{}", refused.body);
+    let created = app
+        .post(
+            "/api/v2/assets/computers",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "Poste <FR>", "serial": "SN-FR2" })),
+        )
+        .await;
+    assert_eq!(created.status, StatusCode::CREATED, "{}", created.body);
+    let uri = format!("/api/v2/assets/computers/{}", created.body["id"]);
+    app.patch(&uri, &manager, json!({ "contact": "x" })).await;
+    app.post(&format!("{uri}/trash"), &manager, None).await;
+    app.post(&format!("{uri}/restore"), &manager, None).await;
+
+    let messages: Vec<String> = events(&app)
+        .await
+        .into_iter()
+        .map(|event| event.4)
+        .collect();
+    assert_eq!(
+        messages,
+        [
+            "manager essaie d'ajouter un élément qui existe déjà : Enregistrement impossible pour \
+             Numéro de série = SN-FR&nbsp;&amp;&nbsp;Usager = ops<br>Un autre élément existe\
+             <br>[<a  href='/front/computer.form.php?id=102'  title=\"Poste &eacute;\">Poste é (102)</a> \
+             - ID : 102 - Numéro de série : SN-FR - Entité : Root &gt; Paris]\
+             <br>[<a  href='/front/computer.form.php?id=105' >N/A (105)</a> \
+             - ID : 105 - Numéro de série : SN-FR - Entité : Root &gt; Paris - Objet à la corbeille]",
+            "manager ajoute l'élément Poste &lt;FR&gt;",
+            "manager met à jour un élément",
+            "manager supprime un élément",
+            "manager restaure un élément",
+        ]
+    );
+}
+
+#[tokio::test]
 async fn field_unicity_like_php() {
     let app = test_app!();
     let manager = app.login("manager").await;

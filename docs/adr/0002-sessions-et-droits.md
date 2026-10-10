@@ -90,5 +90,6 @@ entités actives.
   ailleurs avant son expiration (sauf changement de mot de passe).
 - Le rechargement à chaque requête coûte quelques petites requêtes SQL. Un
   cache court pourra être ajouté si les mesures le justifient.
-- Les messages de `glpi_events` écrits par l'API sont en anglais (texte
-  source des traductions), ceux du PHP dans la langue de la session.
+- Les messages de `glpi_events` écrits par l'API sont traduits comme ceux
+  du PHP : langue du navigateur pour les connexions, langue de la session
+  ensuite (voir [ADR 0004](0004-ecritures-du-parc.md#messages-du-journal-des-événements)).

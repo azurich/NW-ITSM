@@ -16,13 +16,17 @@ use nw_db::{
     MySqlPool, config, events,
     users::{self, User},
 };
-use nw_domain::password::{self, Expiration, PasswordPolicy};
+use nw_domain::{
+    i18n::{self, text},
+    password::{self, Expiration, PasswordPolicy},
+    text::to_stored,
+};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 
 use crate::{
     bridge::{NONCE_COOKIE, nonce_cookie, nonce_removal_cookie},
-    client::ClientAddress,
+    client::{AcceptLanguage, ClientAddress},
     error::{ApiError, ApiResult, ErrorBody},
     routes::session::SessionInfo,
     session::{ProfileChoice, Session, removal_cookie},
@@ -66,16 +70,18 @@ pub struct LoginRequest {
 pub async fn login(
     State(state): State<AppState>,
     ClientAddress(address): ClientAddress,
+    AcceptLanguage(accept): AcceptLanguage,
     jar: CookieJar,
     payload: Result<Json<LoginRequest>, JsonRejection>,
 ) -> ApiResult<(CookieJar, Json<SessionInfo>)> {
     let Json(request) = payload.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
     let login = parse_login(&request.login)?;
-    let user = authenticate(&state, &login, &address, &request.password).await?;
+    let client = LoginClient::new(&state, address, accept.as_deref()).await;
+    let user = authenticate(&state, &login, &client, &request.password).await?;
     check_password_policy(&state.pool, &user).await?;
 
     let session = Session::open(&state.pool, user, ProfileChoice::Default, None).await?;
-    finish_login(&state, &session, &address).await?;
+    finish_login(&state, &session, &client, &login).await?;
     let cookie = state.keys.cookie(&session, state.cookie_secure)?;
     Ok((
         jar.add(cookie),
@@ -121,12 +127,14 @@ pub struct ExpiredPasswordChange {
 pub async fn change_expired_password(
     State(state): State<AppState>,
     ClientAddress(address): ClientAddress,
+    AcceptLanguage(accept): AcceptLanguage,
     jar: CookieJar,
     payload: Result<Json<ExpiredPasswordChange>, JsonRejection>,
 ) -> ApiResult<(CookieJar, Json<SessionInfo>)> {
     let Json(request) = payload.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
     let login = parse_login(&request.login)?;
-    let user = authenticate(&state, &login, &address, &request.current_password).await?;
+    let client = LoginClient::new(&state, address, accept.as_deref()).await;
+    let user = authenticate(&state, &login, &client, &request.current_password).await?;
     match check_password_policy(&state.pool, &user).await {
         Err(ApiError::PasswordExpired) => {}
         Ok(()) => return Err(ApiError::PasswordNotExpired),
@@ -144,7 +152,7 @@ pub async fn change_expired_password(
         .await?
         .ok_or(ApiError::InvalidCredentials)?;
     let session = Session::open(&state.pool, user, ProfileChoice::Default, None).await?;
-    finish_login(&state, &session, &address).await?;
+    finish_login(&state, &session, &client, &login).await?;
     let cookie = state.keys.cookie(&session, state.cookie_secure)?;
     Ok((
         jar.add(cookie),
@@ -173,14 +181,16 @@ pub struct BridgeParams {
 pub async fn bridge_from_legacy(
     State(state): State<AppState>,
     ClientAddress(address): ClientAddress,
+    AcceptLanguage(accept): AcceptLanguage,
     jar: CookieJar,
     Query(params): Query<BridgeParams>,
 ) -> Response {
+    let client = LoginClient::new(&state, address, accept.as_deref()).await;
     let nonce = jar
         .get(NONCE_COOKIE)
         .map(|cookie| cookie.value().to_owned());
     let jar = jar.add(nonce_removal_cookie(state.cookie_secure));
-    match open_bridged_session(&state, &address, &params.token, nonce.as_deref()).await {
+    match open_bridged_session(&state, &client, &params.token, nonce.as_deref()).await {
         Ok(session) => match state.keys.cookie(&session, state.cookie_secure) {
             Ok(cookie) => {
                 let target = safe_app_path(params.redirect.as_deref());
@@ -197,7 +207,7 @@ pub async fn bridge_from_legacy(
 
 async fn open_bridged_session(
     state: &AppState,
-    address: &str,
+    client: &LoginClient,
     token: &str,
     nonce: Option<&str>,
 ) -> ApiResult<Session> {
@@ -216,7 +226,8 @@ async fn open_bridged_session(
         Some(claims.selection()),
     )
     .await?;
-    finish_login(state, &session, address).await?;
+    let login = session.user.name.clone().unwrap_or_default();
+    finish_login(state, &session, client, &login).await?;
     Ok(session)
 }
 
@@ -289,9 +300,10 @@ pub async fn verify_password(
 async fn authenticate(
     state: &AppState,
     login: &str,
-    address: &str,
+    client: &LoginClient,
     password: &str,
 ) -> ApiResult<User> {
+    let address = client.address.as_str();
     let now = Instant::now();
     state
         .password_guard
@@ -302,13 +314,13 @@ async fn authenticate(
         let candidate = password.to_owned();
         blocking(move || password::equalize_timing(&candidate)).await?;
         state.password_guard.failure(login, address, now);
-        log_failed_login(state, login, address).await;
+        log_failed_login(state, login, client).await;
         return Err(ApiError::InvalidCredentials);
     };
     match verify_password(state, login, address, &user, password).await {
         Ok(()) => Ok(user),
         Err(ApiError::WrongPassword) => {
-            log_failed_login(state, login, address).await;
+            log_failed_login(state, login, client).await;
             Err(ApiError::InvalidCredentials)
         }
         Err(other) => Err(other),
@@ -396,11 +408,41 @@ async fn password_policy(pool: &MySqlPool) -> ApiResult<PasswordPolicy> {
     })
 }
 
-/// Records a successful login like the legacy `Auth::login`.
-async fn finish_login(state: &AppState, session: &Session, address: &str) -> ApiResult<()> {
+/// A client logging in: its address, and the language of its requests
+/// before the login, in which the PHP code writes the login events
+/// (`Auth::login` logs them before `Session::init`).
+pub struct LoginClient {
+    pub address: String,
+    pub language: String,
+}
+
+impl LoginClient {
+    pub async fn new(state: &AppState, address: String, accept_language: Option<&str>) -> Self {
+        let default = config::core_values(&state.pool, &["language"])
+            .await
+            .ok()
+            .and_then(|values| values.get("language").cloned())
+            .filter(|language| !language.is_empty())
+            .unwrap_or_else(|| "en_GB".to_owned());
+        Self {
+            address,
+            language: i18n::preferred_language(accept_language, &default),
+        }
+    }
+}
+
+/// Records a successful login like the legacy `Auth::login`; `typed` is
+/// the login as the user typed it, which the PHP code logs.
+async fn finish_login(
+    state: &AppState,
+    session: &Session,
+    client: &LoginClient,
+    typed: &str,
+) -> ApiResult<()> {
     let login = session.user.name.clone().unwrap_or_default();
-    state.password_guard.success(&login, address);
+    state.password_guard.success(&login, &client.address);
     users::record_login(&state.pool, session.user.id).await?;
+    let format = i18n::tr(&client.language, text::LOGIN);
     log_event(
         state,
         &events::Event {
@@ -408,7 +450,7 @@ async fn finish_login(state: &AppState, session: &Session, address: &str) -> Api
             kind: "system",
             service: "login",
             level: 3,
-            message: &format!("{login} log in from IP {address}"),
+            message: &i18n::sprintf(&format, &[&to_stored(typed), &client.address]),
         },
     )
     .await;
@@ -416,8 +458,9 @@ async fn finish_login(state: &AppState, session: &Session, address: &str) -> Api
     Ok(())
 }
 
-async fn log_failed_login(state: &AppState, login: &str, address: &str) {
-    tracing::info!(%login, %address, "login failed");
+async fn log_failed_login(state: &AppState, login: &str, client: &LoginClient) {
+    tracing::info!(%login, address = %client.address, "login failed");
+    let format = i18n::tr(&client.language, text::FAILED_LOGIN);
     log_event(
         state,
         &events::Event {
@@ -425,7 +468,7 @@ async fn log_failed_login(state: &AppState, login: &str, address: &str) {
             kind: "system",
             service: "login",
             level: 3,
-            message: &format!("Failed login for {login} from IP {address}"),
+            message: &i18n::sprintf(&format, &[&to_stored(login), &client.address]),
         },
     )
     .await;

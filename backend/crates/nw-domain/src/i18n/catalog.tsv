@@ -1,0 +1,2013 @@
+ar_SA.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
+ar_SA.mo	Failed login for %1$s from IP %2$s	تعذر تسجيل دخول  %1$s من الأيبي %2$s
+ar_SA.mo	%1$s adds the item %2$s	%1$s قام بإضافة %2$s
+ar_SA.mo	%s updates an item	%s قام بتعديل عنصر
+ar_SA.mo	%s deletes an item	%s قام بحذف عنصر
+ar_SA.mo	%s restores an item	%s قام بإسترجاع عنصر
+ar_SA.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+ar_SA.mo	Impossible record for %s	Impossible record for %s
+ar_SA.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
+ar_SA.mo	Other item exist	Other item exist
+ar_SA.mo	Item in the trashbin	Item in the trashbin
+ar_SA.mo	%1$s = %2$s	%1$s = %2$s
+ar_SA.mo	%1$s: %2$s	%1$s: %2$s
+ar_SA.mo	%1$s - %2$s	%1$s - %2$s
+ar_SA.mo	%1$s (%2$s)	%1$s (%2$s)
+ar_SA.mo	ID	رقم التعريف
+ar_SA.mo	Entity	كيانات
+ar_SA.mo	Name	Name
+ar_SA.mo	Serial number	الرقم المتسلسل
+ar_SA.mo	Inventory number	رقم المخزون
+ar_SA.mo	Alternate username	اسم المستخدم البديل
+ar_SA.mo	Alternate username number	رقم إسم المستخدم البديل
+ar_SA.mo	UUID	UUID
+ar_SA.mo	Brand	Brand
+ar_SA.mo	Number of lines	Number of lines
+ar_SA.mo	User	مستخدم
+ar_SA.mo	Manufacturer	Manufacturers
+ar_SA.mo	Type	Types
+ar_SA.mo	Model	Models
+ar_SA.mo	Network	Networks
+ar_SA.mo	Update Source	Update Sources
+ar_SA.mo	Location comments	Location comments
+ar_SA.mo	Child entities	كيانات فرعية
+be_BY.mo	%1$s log in from IP %2$s	%1$s зайшоў у сістэму з IP %2$s
+be_BY.mo	Failed login for %1$s from IP %2$s	Няўдалы ўваход у сістэму для  %1$s з IP %2$s
+be_BY.mo	%1$s adds the item %2$s	%1$s дадае элемент %2$s
+be_BY.mo	%s updates an item	%s змяняе элемент
+be_BY.mo	%s deletes an item	%s выдаляе элемент
+be_BY.mo	%s restores an item	%s аднаўляе элемент
+be_BY.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+be_BY.mo	Impossible record for %s	Impossible record for %s
+be_BY.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
+be_BY.mo	Other item exist	Other item exist
+be_BY.mo	Item in the trashbin	Item in the trashbin
+be_BY.mo	%1$s = %2$s	%1$s = %2$s
+be_BY.mo	%1$s: %2$s	%1$s: %2$s
+be_BY.mo	%1$s - %2$s	%1$s - %2$s
+be_BY.mo	%1$s (%2$s)	%1$s (%2$s)
+be_BY.mo	ID	ID
+be_BY.mo	Entity	Entity
+be_BY.mo	Name	Name
+be_BY.mo	Serial number	Серыйны нумар
+be_BY.mo	Inventory number	Інвентарны нумар
+be_BY.mo	Alternate username	Альтернатыўнае імя карыстальніка
+be_BY.mo	Alternate username number	Alternate username number
+be_BY.mo	UUID	Ўнікальны нумар (UUID)
+be_BY.mo	Brand	Brand
+be_BY.mo	Number of lines	Number of lines
+be_BY.mo	User	User
+be_BY.mo	Manufacturer	Manufacturer
+be_BY.mo	Type	Type
+be_BY.mo	Model	Model
+be_BY.mo	Network	Network
+be_BY.mo	Update Source	Update Source
+be_BY.mo	Location comments	Location comments
+be_BY.mo	Child entities	Даччыныя сутнасці
+bg_BG.mo	%1$s log in from IP %2$s	%1$s влиза от IP %2$s
+bg_BG.mo	Failed login for %1$s from IP %2$s	Неуспешен вход за %1$s от IP %2$s
+bg_BG.mo	%1$s adds the item %2$s	%1$s добави елемента %2$s
+bg_BG.mo	%s updates an item	%s обновяване на елемента
+bg_BG.mo	%s deletes an item	%s изтриване на елемента
+bg_BG.mo	%s restores an item	%s възстановяване на елемента
+bg_BG.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+bg_BG.mo	Impossible record for %s	Impossible record for %s
+bg_BG.mo	Item successfully added but duplicate record on %s	Елементът е добавен успешно, но дублиран запис на %s
+bg_BG.mo	Other item exist	Друг елемент съществува
+bg_BG.mo	Item in the trashbin	Елемент в кошчето
+bg_BG.mo	%1$s = %2$s	%1$s = %2$s
+bg_BG.mo	%1$s: %2$s	%1$s: %2$s
+bg_BG.mo	%1$s - %2$s	%1$s - %2$s
+bg_BG.mo	%1$s (%2$s)	%1$s (%2$s)
+bg_BG.mo	ID	Идентификатор
+bg_BG.mo	Entity	Организация
+bg_BG.mo	Name	Name
+bg_BG.mo	Serial number	Сериен номер
+bg_BG.mo	Inventory number	Инвентарен номер
+bg_BG.mo	Alternate username	Алтернативно потребителско име
+bg_BG.mo	Alternate username number	Алтернативно потребителско име-номер
+bg_BG.mo	UUID	UUID
+bg_BG.mo	Brand	Тип
+bg_BG.mo	Number of lines	Брой линии
+bg_BG.mo	User	Потребител
+bg_BG.mo	Manufacturer	Производител
+bg_BG.mo	Type	Тип
+bg_BG.mo	Model	Модел
+bg_BG.mo	Network	Мрежа
+bg_BG.mo	Update Source	Update Source
+bg_BG.mo	Location comments	Местоположение коментари
+bg_BG.mo	Child entities	Подорганизации
+ca_ES.mo	%1$s log in from IP %2$s	%1$s ha entrat des de la IP %2$s
+ca_ES.mo	Failed login for %1$s from IP %2$s	Ha fallat l'inici de sessió per %1$s des de la IP %2$s
+ca_ES.mo	%1$s adds the item %2$s	%1$s afegeix l'element %2$s
+ca_ES.mo	%s updates an item	%s actualitza un element
+ca_ES.mo	%s deletes an item	%s suprimeix un element
+ca_ES.mo	%s restores an item	%s restaura un element
+ca_ES.mo	%1$s trying to add an item that already exists: %2$s	%1$s intenta afegir un element que ja existeix: %2$s
+ca_ES.mo	Impossible record for %s	Registre impossible per a %s
+ca_ES.mo	Item successfully added but duplicate record on %s	Element afegit amb èxit, però hi ha un registre duplicat en %s
+ca_ES.mo	Other item exist	Altre element existeix
+ca_ES.mo	Item in the trashbin	Objecte a la paperera
+ca_ES.mo	%1$s = %2$s	%1$s = %2$s
+ca_ES.mo	%1$s: %2$s	%1$s: %2$s
+ca_ES.mo	%1$s - %2$s	%1$s - %2$s
+ca_ES.mo	%1$s (%2$s)	%1$s (%2$s)
+ca_ES.mo	ID	ID
+ca_ES.mo	Entity	Entitat
+ca_ES.mo	Name	Name
+ca_ES.mo	Serial number	Número de sèrie
+ca_ES.mo	Inventory number	Número d'inventari
+ca_ES.mo	Alternate username	Contacte
+ca_ES.mo	Alternate username number	Número de contacte
+ca_ES.mo	UUID	UUID
+ca_ES.mo	Brand	Marca
+ca_ES.mo	Number of lines	Quantitat de línies
+ca_ES.mo	User	Usuari
+ca_ES.mo	Manufacturer	Fabricant
+ca_ES.mo	Type	Tipus
+ca_ES.mo	Model	Model
+ca_ES.mo	Network	Xarxa
+ca_ES.mo	Update Source	Font de l'actualització
+ca_ES.mo	Location comments	Comentaris d'ubicació
+ca_ES.mo	Child entities	Sots-entitats
+cs_CZ.mo	%1$s log in from IP %2$s	Uživatel %1$s se přihlásil z IP adresy %2$s
+cs_CZ.mo	Failed login for %1$s from IP %2$s	Neúspěšné přihlášení uživatele %1$s z IP adresy %2$s
+cs_CZ.mo	%1$s adds the item %2$s	%1$s přidal položku %2$s
+cs_CZ.mo	%s updates an item	%s  změnil položku
+cs_CZ.mo	%s deletes an item	%s smazal položku
+cs_CZ.mo	%s restores an item	%s obnovil položku
+cs_CZ.mo	%1$s trying to add an item that already exists: %2$s	%1$s se pokusil přidat položku, která už existuje: %2$s
+cs_CZ.mo	Impossible record for %s	Není možné zaznamenat pro %s
+cs_CZ.mo	Item successfully added but duplicate record on %s	Položka úspěšně přidána, ale duplicitní záznam na %s
+cs_CZ.mo	Other item exist	Existuje další položka
+cs_CZ.mo	Item in the trashbin	Položka v koši
+cs_CZ.mo	%1$s = %2$s	%1$s = %2$s
+cs_CZ.mo	%1$s: %2$s	%1$s: %2$s
+cs_CZ.mo	%1$s - %2$s	%1$s ‒ %2$s
+cs_CZ.mo	%1$s (%2$s)	%1$s (%2$s) 
+cs_CZ.mo	ID	Identifikátor
+cs_CZ.mo	Entity	Entita
+cs_CZ.mo	Name	Name
+cs_CZ.mo	Serial number	Sériové číslo
+cs_CZ.mo	Inventory number	Inventární číslo
+cs_CZ.mo	Alternate username	Alternativní uživatelské jméno
+cs_CZ.mo	Alternate username number	Alternativní číslo uživatelského jména
+cs_CZ.mo	UUID	nikde se neopak. identifikátor
+cs_CZ.mo	Brand	Značka
+cs_CZ.mo	Number of lines	Počet linek
+cs_CZ.mo	User	Uživatel
+cs_CZ.mo	Manufacturer	Výrobce
+cs_CZ.mo	Type	Typ
+cs_CZ.mo	Model	Model
+cs_CZ.mo	Network	Síť
+cs_CZ.mo	Update Source	Zdroj aktualizací
+cs_CZ.mo	Location comments	Poznámky k umístění
+cs_CZ.mo	Child entities	Podřízené entity
+da_DK.mo	%1$s log in from IP %2$s	%1$s log ind fra IP %2$s
+da_DK.mo	Failed login for %1$s from IP %2$s	Mislykket login for %1$s fra IP %2$s
+da_DK.mo	%1$s adds the item %2$s	%1$s tilføjer emnet %2$s
+da_DK.mo	%s updates an item	%s opdaterer et emne
+da_DK.mo	%s deletes an item	%s sletter et emne
+da_DK.mo	%s restores an item	%s gendanner et emne
+da_DK.mo	%1$s trying to add an item that already exists: %2$s	%1$s prøver at tilføje et emne der allerede eksisterer: %2$s
+da_DK.mo	Impossible record for %s	Umulig post for %s
+da_DK.mo	Item successfully added but duplicate record on %s	Emne korrekt tilføjet, men duplikeret post på %s
+da_DK.mo	Other item exist	Andet emne eksisterer
+da_DK.mo	Item in the trashbin	Item in the trashbin
+da_DK.mo	%1$s = %2$s	%1$s = %2$s
+da_DK.mo	%1$s: %2$s	%1$s: %2$s
+da_DK.mo	%1$s - %2$s	%1$s - %2$s
+da_DK.mo	%1$s (%2$s)	%1$s (%2$s)
+da_DK.mo	ID	ID
+da_DK.mo	Entity	Entitet
+da_DK.mo	Name	Name
+da_DK.mo	Serial number	Serienummer
+da_DK.mo	Inventory number	Aktivnummer
+da_DK.mo	Alternate username	Alternativt brugernavn
+da_DK.mo	Alternate username number	Alternativt brugernavns-nummer
+da_DK.mo	UUID	UUID
+da_DK.mo	Brand	Mærke
+da_DK.mo	Number of lines	Antal linier
+da_DK.mo	User	User
+da_DK.mo	Manufacturer	Manufacturer
+da_DK.mo	Type	Type
+da_DK.mo	Model	Model
+da_DK.mo	Network	Network
+da_DK.mo	Update Source	Update Source
+da_DK.mo	Location comments	Lokations kommentarer
+da_DK.mo	Child entities	Under-entiteter
+de_DE.mo	%1$s log in from IP %2$s	%1$s loggt sich mit der IP %2$s ein
+de_DE.mo	Failed login for %1$s from IP %2$s	Anmeldung des Benutzers %1$s von IP %2$s fehlgeschlagen
+de_DE.mo	%1$s adds the item %2$s	%1$s fügt das Element %2$s hinzu
+de_DE.mo	%s updates an item	%s aktualisiert ein Element
+de_DE.mo	%s deletes an item	%s löscht ein Element
+de_DE.mo	%s restores an item	%s stellt ein Element wieder her
+de_DE.mo	%1$s trying to add an item that already exists: %2$s	%1$s hinzuzufügendes Element existiert bereits: %2$s
+de_DE.mo	Impossible record for %s	Speichern nicht möglich für %s
+de_DE.mo	Item successfully added but duplicate record on %s	Speichern erfolgreich aber Duplikat auf %s
+de_DE.mo	Other item exist	Es existieren weitere Elemente
+de_DE.mo	Item in the trashbin	Element im Papierkorb
+de_DE.mo	%1$s = %2$s	%1$s = %2$s
+de_DE.mo	%1$s: %2$s	%1$s: %2$s
+de_DE.mo	%1$s - %2$s	%1$s - %2$s
+de_DE.mo	%1$s (%2$s)	%1$s (%2$s)
+de_DE.mo	ID	ID
+de_DE.mo	Entity	Einheit
+de_DE.mo	Name	Name
+de_DE.mo	Serial number	Seriennummer
+de_DE.mo	Inventory number	Inventarnummer
+de_DE.mo	Alternate username	Kontakt
+de_DE.mo	Alternate username number	Kontakt-Nummer
+de_DE.mo	UUID	UUID
+de_DE.mo	Brand	Marke
+de_DE.mo	Number of lines	Anzahl Leitungen
+de_DE.mo	User	Benutzer
+de_DE.mo	Manufacturer	Hersteller
+de_DE.mo	Type	Typ
+de_DE.mo	Model	Modell
+de_DE.mo	Network	Netzwerk
+de_DE.mo	Update Source	Aktualisierungsmethode
+de_DE.mo	Location comments	Beschreibung Standort
+de_DE.mo	Child entities	Untereinheiten
+el_GR.mo	%1$s log in from IP %2$s	%1$s συνδέεται από την IP %2$s
+el_GR.mo	Failed login for %1$s from IP %2$s	Εσφαλμένη σύνδεση για %1$s από την IP %2$s
+el_GR.mo	%1$s adds the item %2$s	%1$s προσθέτει το στοιχείο %2$s
+el_GR.mo	%s updates an item	%s ενημερώνει το αντικείμενο
+el_GR.mo	%s deletes an item	%s διαγράφει το αντικείμενο
+el_GR.mo	%s restores an item	%s επαναφέρει το αντικείμενο
+el_GR.mo	%1$s trying to add an item that already exists: %2$s	%1$s προσπαθεί να προσθέσει ένα στοιχείο που ήδη υπάρχει: %2$s
+el_GR.mo	Impossible record for %s	Αδύνατη εγγραφή για %s
+el_GR.mo	Item successfully added but duplicate record on %s	Επιτυχής προσθήκη αντικειμένου αλλά διπλότυπη εγγραφή σε %s
+el_GR.mo	Other item exist	Υπάρχει άλλο αντικείμενο
+el_GR.mo	Item in the trashbin	Item in the trashbin
+el_GR.mo	%1$s = %2$s	%1$s = %2$s
+el_GR.mo	%1$s: %2$s	%1$s: %2$s
+el_GR.mo	%1$s - %2$s	%1$s - %2$s
+el_GR.mo	%1$s (%2$s)	%1$s (%2$s)
+el_GR.mo	ID	ΑΑ
+el_GR.mo	Entity	Οντότητες
+el_GR.mo	Name	Name
+el_GR.mo	Serial number	Σειριακός αριθμός
+el_GR.mo	Inventory number	Αριθμός Απογραφής
+el_GR.mo	Alternate username	Εναλλακτικό όνομα χρήστη
+el_GR.mo	Alternate username number	Αριθμός εναλλακτικού ονόματος χρήστη
+el_GR.mo	UUID	UUID
+el_GR.mo	Brand	Μάρκα
+el_GR.mo	Number of lines	Αριθμός γραμμών
+el_GR.mo	User	Χρήστης
+el_GR.mo	Manufacturer	Κατασκευαστής
+el_GR.mo	Type	Type
+el_GR.mo	Model	Μοντέλο
+el_GR.mo	Network	Δίκτυο
+el_GR.mo	Update Source	Update Source
+el_GR.mo	Location comments	Σχόλια τοποθεσίας
+el_GR.mo	Child entities	Υποσύνολο οντοτήτων
+en_GB.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
+en_GB.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
+en_GB.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
+en_GB.mo	%s updates an item	%s updates an item
+en_GB.mo	%s deletes an item	%s deletes an item
+en_GB.mo	%s restores an item	%s restores an item
+en_GB.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+en_GB.mo	Impossible record for %s	Impossible record for %s
+en_GB.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
+en_GB.mo	Other item exist	Other item exist
+en_GB.mo	Item in the trashbin	Item in the trashbin
+en_GB.mo	%1$s = %2$s	%1$s = %2$s
+en_GB.mo	%1$s: %2$s	%1$s: %2$s
+en_GB.mo	%1$s - %2$s	%1$s - %2$s
+en_GB.mo	%1$s (%2$s)	%1$s (%2$s)
+en_GB.mo	ID	ID
+en_GB.mo	Entity	Entity
+en_GB.mo	Name	Name
+en_GB.mo	Serial number	Serial number
+en_GB.mo	Inventory number	Inventory number
+en_GB.mo	Alternate username	Alternate username
+en_GB.mo	Alternate username number	Alternate username number
+en_GB.mo	UUID	UUID
+en_GB.mo	Brand	Brand
+en_GB.mo	Number of lines	Number of lines
+en_GB.mo	User	User
+en_GB.mo	Manufacturer	Manufacturer
+en_GB.mo	Type	Type
+en_GB.mo	Model	Model
+en_GB.mo	Network	Network
+en_GB.mo	Update Source	Update Source
+en_GB.mo	Location comments	Location comments
+en_GB.mo	Child entities	Child entities
+en_US.mo	%1$s log in from IP %2$s	%1$s login from IP %2$s
+en_US.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
+en_US.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
+en_US.mo	%s updates an item	%s Updates an Item
+en_US.mo	%s deletes an item	%s Deletes an Item
+en_US.mo	%s restores an item	%s Restores an Item
+en_US.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+en_US.mo	Impossible record for %s	Impossible record for %s
+en_US.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
+en_US.mo	Other item exist	Other item exist
+en_US.mo	Item in the trashbin	Item in the Trash
+en_US.mo	%1$s = %2$s	%1$s = %2$s
+en_US.mo	%1$s: %2$s	%1$s: %2$s
+en_US.mo	%1$s - %2$s	%1$s - %2$s
+en_US.mo	%1$s (%2$s)	%1$s (%2$s)
+en_US.mo	ID	ID
+en_US.mo	Entity	Entity
+en_US.mo	Name	Name
+en_US.mo	Serial number	Serial Number
+en_US.mo	Inventory number	Inventory/Asset Number
+en_US.mo	Alternate username	Alternate Username
+en_US.mo	Alternate username number	Alternate Username Number
+en_US.mo	UUID	UUID
+en_US.mo	Brand	Brand
+en_US.mo	Number of lines	Number of Lines
+en_US.mo	User	User
+en_US.mo	Manufacturer	Manufacturer
+en_US.mo	Type	Type
+en_US.mo	Model	Model
+en_US.mo	Network	Network
+en_US.mo	Update Source	Update Source
+en_US.mo	Location comments	Location Comments
+en_US.mo	Child entities	Sub-entities
+eo.mo	%1$s log in from IP %2$s	%1$s вошел в систему с IP %2$s
+eo.mo	Failed login for %1$s from IP %2$s	Неудачная попытка входа пользователя %1$s с IP %2$s
+eo.mo	%1$s adds the item %2$s	%1$s aldonis objekto %2$s
+eo.mo	%s updates an item	%s ĝisdatigas eron
+eo.mo	%s deletes an item	%s forviŝis la celon
+eo.mo	%s restores an item	%s restarigas eron
+eo.mo	%1$s trying to add an item that already exists: %2$s	%1$s попытался добавить существующий элемент : %2$s
+eo.mo	Impossible record for %s	Невозможная запись для %s
+eo.mo	Item successfully added but duplicate record on %s	Объект успешно добавлен, но дублирует запись %s
+eo.mo	Other item exist	Существует другой элемент
+eo.mo	Item in the trashbin	Item in the trashbin
+eo.mo	%1$s = %2$s	%1$s = %2$s
+eo.mo	%1$s: %2$s	%1$s: %2$s
+eo.mo	%1$s - %2$s	%1$s - %2$s
+eo.mo	%1$s (%2$s)	%1$s (%2$s)
+eo.mo	ID	ID
+eo.mo	Entity	Entity
+eo.mo	Name	Name
+eo.mo	Serial number	Серийный номер
+eo.mo	Inventory number	Инвентарный номер
+eo.mo	Alternate username	Контактное лицо
+eo.mo	Alternate username number	Телефон контактного лица
+eo.mo	UUID	Уникальный номер (UUID)
+eo.mo	Brand	Торговая марка
+eo.mo	Number of lines	Число линий
+eo.mo	User	User
+eo.mo	Manufacturer	Manufacturer
+eo.mo	Type	Type
+eo.mo	Model	Model
+eo.mo	Network	Network
+eo.mo	Update Source	Update Source
+eo.mo	Location comments	Примечания местоположения
+eo.mo	Child entities	Organizoj subordigitaj
+es_419.mo	%1$s log in from IP %2$s	%1$s inicia sesión desde la IP %2$s
+es_419.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
+es_419.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
+es_419.mo	%s updates an item	%s actualiza el elemento
+es_419.mo	%s deletes an item	%s elimina el elemento
+es_419.mo	%s restores an item	%s restaura el elemento
+es_419.mo	%1$s trying to add an item that already exists: %2$s	%1$s intenta agregar un elemento que ya existe: %2$s
+es_419.mo	Impossible record for %s	Registro imposible para %s
+es_419.mo	Item successfully added but duplicate record on %s	Elemento agregado exitosamente pero hay un registro duplicado en %s
+es_419.mo	Other item exist	Otro elemento existe
+es_419.mo	Item in the trashbin	Artículo en el basurero
+es_419.mo	%1$s = %2$s	%1$s = %2$s
+es_419.mo	%1$s: %2$s	%1$s: %2$s
+es_419.mo	%1$s - %2$s	%1$s - %2$s
+es_419.mo	%1$s (%2$s)	%1$s (%2$s)
+es_419.mo	ID	ID
+es_419.mo	Entity	Entidad
+es_419.mo	Name	Name
+es_419.mo	Serial number	Número de serial
+es_419.mo	Inventory number	Número de inventario
+es_419.mo	Alternate username	Nombre de usuario alternativo
+es_419.mo	Alternate username number	Número de nombre de usuario alterno
+es_419.mo	UUID	UUID
+es_419.mo	Brand	Marca
+es_419.mo	Number of lines	Cantidad de líneas
+es_419.mo	User	Usuario
+es_419.mo	Manufacturer	Fabricante
+es_419.mo	Type	Type
+es_419.mo	Model	Modelo
+es_419.mo	Network	Red
+es_419.mo	Update Source	Actualizar fuente
+es_419.mo	Location comments	Comentarios sobre locación
+es_419.mo	Child entities	Subentidades
+es_AR.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
+es_AR.mo	Failed login for %1$s from IP %2$s	Login fallido de %1$s desde IP %2$s
+es_AR.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
+es_AR.mo	%s updates an item	%s actualiza un elemento
+es_AR.mo	%s deletes an item	%s elimina un elemento
+es_AR.mo	%s restores an item	%s restaura un elemento
+es_AR.mo	%1$s trying to add an item that already exists: %2$s	%1$s intentando agregar un elemento que ya existe: %2$s
+es_AR.mo	Impossible record for %s	Imposible registrar %s
+es_AR.mo	Item successfully added but duplicate record on %s	Elemento agregado exitosamente pero se encontró registro duplicado en %s
+es_AR.mo	Other item exist	Otro elemento existe
+es_AR.mo	Item in the trashbin	Artículo en el basurero
+es_AR.mo	%1$s = %2$s	%1$s = %2$s
+es_AR.mo	%1$s: %2$s	%1$s: %2$s
+es_AR.mo	%1$s - %2$s	%1$s - %2$s
+es_AR.mo	%1$s (%2$s)	%1$s (%2$s)
+es_AR.mo	ID	ID
+es_AR.mo	Entity	Entidad
+es_AR.mo	Name	Name
+es_AR.mo	Serial number	Número de serie
+es_AR.mo	Inventory number	Número de inventario
+es_AR.mo	Alternate username	Nombre de usuario alternativo
+es_AR.mo	Alternate username number	Número de usuario alternativo
+es_AR.mo	UUID	UUID
+es_AR.mo	Brand	Fabricante
+es_AR.mo	Number of lines	Cantidad de líneas
+es_AR.mo	User	Usuario
+es_AR.mo	Manufacturer	Fabricante
+es_AR.mo	Type	Type
+es_AR.mo	Model	Modelo
+es_AR.mo	Network	Red
+es_AR.mo	Update Source	Origen de actualizaciones
+es_AR.mo	Location comments	Comentarios
+es_AR.mo	Child entities	Subentidades
+es_CL.mo	%1$s log in from IP %2$s	%1$s inicia sesión desde la IP %2$s
+es_CL.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
+es_CL.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
+es_CL.mo	%s updates an item	%s actualiza el elemento
+es_CL.mo	%s deletes an item	%s elimina el elemento
+es_CL.mo	%s restores an item	%s restaura el elemento
+es_CL.mo	%1$s trying to add an item that already exists: %2$s	%1$s intenta agregar un elemento que ya existe: %2$s
+es_CL.mo	Impossible record for %s	Registro imposible para %s
+es_CL.mo	Item successfully added but duplicate record on %s	Elemento agregado exitosamente pero hay un registro duplicado en %s
+es_CL.mo	Other item exist	Otro elemento existe
+es_CL.mo	Item in the trashbin	Item in the trashbin
+es_CL.mo	%1$s = %2$s	%1$s = %2$s
+es_CL.mo	%1$s: %2$s	%1$s: %2$s
+es_CL.mo	%1$s - %2$s	%1$s - %2$s
+es_CL.mo	%1$s (%2$s)	%1$s (%2$s)
+es_CL.mo	ID	ID
+es_CL.mo	Entity	Entidad
+es_CL.mo	Name	Name
+es_CL.mo	Serial number	Número de serial
+es_CL.mo	Inventory number	Número de inventario
+es_CL.mo	Alternate username	Nombre de usuario alternativo
+es_CL.mo	Alternate username number	Número de nombre de usuario alterno
+es_CL.mo	UUID	UUID
+es_CL.mo	Brand	Marca
+es_CL.mo	Number of lines	Cantidad de líneas
+es_CL.mo	User	Usuario
+es_CL.mo	Manufacturer	Manufacturer
+es_CL.mo	Type	Type
+es_CL.mo	Model	Model
+es_CL.mo	Network	Network
+es_CL.mo	Update Source	Update Source
+es_CL.mo	Location comments	Comentarios sobre locación
+es_CL.mo	Child entities	Subentidades
+es_CO.mo	%1$s log in from IP %2$s	%1$s inicio de sesión desde la IP %2$s
+es_CO.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
+es_CO.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
+es_CO.mo	%s updates an item	%s actualiza un elemento
+es_CO.mo	%s deletes an item	%s borra un elemento
+es_CO.mo	%s restores an item	%s restaura un elemento
+es_CO.mo	%1$s trying to add an item that already exists: %2$s	%1$s intentando aagregar un elemento ya existente: %2$s
+es_CO.mo	Impossible record for %s	Registro imposible para %s
+es_CO.mo	Item successfully added but duplicate record on %s	Artículo agregado con éxito, pero registro duplicado en %s
+es_CO.mo	Other item exist	Otro elemento existente
+es_CO.mo	Item in the trashbin	Elemento en la papelera
+es_CO.mo	%1$s = %2$s	%1$s = %2$s
+es_CO.mo	%1$s: %2$s	%1$s: %2$s
+es_CO.mo	%1$s - %2$s	%1$s - %2$s
+es_CO.mo	%1$s (%2$s)	%1$s (%2$s)
+es_CO.mo	ID	ID
+es_CO.mo	Entity	Entidad
+es_CO.mo	Name	Name
+es_CO.mo	Serial number	Número de serie
+es_CO.mo	Inventory number	Número de inventario
+es_CO.mo	Alternate username	Nombre de usuario alternativo
+es_CO.mo	Alternate username number	Número de contacto
+es_CO.mo	UUID	UUID
+es_CO.mo	Brand	Marca
+es_CO.mo	Number of lines	Cantidad de líneas
+es_CO.mo	User	Usuario
+es_CO.mo	Manufacturer	Fabricante
+es_CO.mo	Type	Tipo
+es_CO.mo	Model	Modelo
+es_CO.mo	Network	Red
+es_CO.mo	Update Source	Fuente de actualización
+es_CO.mo	Location comments	Comentarios de ubicación
+es_CO.mo	Child entities	Subentidades
+es_ES.mo	%1$s log in from IP %2$s	%1$s inició la sesión desde la IP %2$s
+es_ES.mo	Failed login for %1$s from IP %2$s	Fallo en el inicio de sesión de %1$s desde la IP %2$s
+es_ES.mo	%1$s adds the item %2$s	%1$s añade el elemento %2$s
+es_ES.mo	%s updates an item	%s actualiza un elemento
+es_ES.mo	%s deletes an item	%s suprime un elemento
+es_ES.mo	%s restores an item	%s restablece un elemento
+es_ES.mo	%1$s trying to add an item that already exists: %2$s	%1$s intenta añadir un elemento que ya existe: %2$s
+es_ES.mo	Impossible record for %s	Registro imposible para %s
+es_ES.mo	Item successfully added but duplicate record on %s	Elemento añadido correctamente pero registro duplicado en %s
+es_ES.mo	Other item exist	Existe otro elemento
+es_ES.mo	Item in the trashbin	Elementos en la papelera
+es_ES.mo	%1$s = %2$s	%1$s = %2$s
+es_ES.mo	%1$s: %2$s	%1$s: %2$s
+es_ES.mo	%1$s - %2$s	%1$s - %2$s
+es_ES.mo	%1$s (%2$s)	%1$s (%2$s)
+es_ES.mo	ID	ID
+es_ES.mo	Entity	Entidad
+es_ES.mo	Name	Nombre
+es_ES.mo	Serial number	Número de serie
+es_ES.mo	Inventory number	Número de inventario
+es_ES.mo	Alternate username	Nombre de usuario alternativo
+es_ES.mo	Alternate username number	Número de nombre de usuario alternativo
+es_ES.mo	UUID	UUID
+es_ES.mo	Brand	Marca
+es_ES.mo	Number of lines	Número de líneas
+es_ES.mo	User	Usuario
+es_ES.mo	Manufacturer	Fabricante
+es_ES.mo	Type	Tipo
+es_ES.mo	Model	Modelo
+es_ES.mo	Network	Red
+es_ES.mo	Update Source	Fuente de actualización
+es_ES.mo	Location comments	Comentarios de ubicación
+es_ES.mo	Child entities	Entidades hijas
+es_MX.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
+es_MX.mo	Failed login for %1$s from IP %2$s	Error de acceso para %1$s de la IP %2$s
+es_MX.mo	%1$s adds the item %2$s	%1$s añade un elemento %2$s
+es_MX.mo	%s updates an item	%s actualiza un elemento
+es_MX.mo	%s deletes an item	%s elimina un elemento
+es_MX.mo	%s restores an item	%s restablece un elemento
+es_MX.mo	%1$s trying to add an item that already exists: %2$s	%1$s intentando aagregar un elemento ya existente: %2$s
+es_MX.mo	Impossible record for %s	Registro imposible para %s
+es_MX.mo	Item successfully added but duplicate record on %s	Elemento añadido correctamente pero registro duplicado en %s
+es_MX.mo	Other item exist	Existe otro elemento
+es_MX.mo	Item in the trashbin	Elemento en la papelera
+es_MX.mo	%1$s = %2$s	%1$s = %2$s
+es_MX.mo	%1$s: %2$s	%1$s: %2$s
+es_MX.mo	%1$s - %2$s	%1$s - %2$s
+es_MX.mo	%1$s (%2$s)	%1$s (%2$s)
+es_MX.mo	ID	ID
+es_MX.mo	Entity	Entidad
+es_MX.mo	Name	Name
+es_MX.mo	Serial number	Número de serie
+es_MX.mo	Inventory number	Número de inventario
+es_MX.mo	Alternate username	Cambiar usuario
+es_MX.mo	Alternate username number	Usuario de dominio
+es_MX.mo	UUID	UUID
+es_MX.mo	Brand	Marca
+es_MX.mo	Number of lines	Cantidad de líneas
+es_MX.mo	User	Usuario
+es_MX.mo	Manufacturer	Fabricante
+es_MX.mo	Type	Tipo
+es_MX.mo	Model	Modelo
+es_MX.mo	Network	Red
+es_MX.mo	Update Source	Fuente de actualización
+es_MX.mo	Location comments	Comentarios sobre la ubicación
+es_MX.mo	Child entities	Subentidades
+es_VE.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
+es_VE.mo	Failed login for %1$s from IP %2$s	Login fallido de %1$s desde IP %2$s
+es_VE.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
+es_VE.mo	%s updates an item	%s actualiza un elemento
+es_VE.mo	%s deletes an item	%s elimina un elemento
+es_VE.mo	%s restores an item	%s restaura un elemento
+es_VE.mo	%1$s trying to add an item that already exists: %2$s	%1$s intentando agregar un elemento que ya existe: %2$s
+es_VE.mo	Impossible record for %s	Imposible registrar %s
+es_VE.mo	Item successfully added but duplicate record on %s	Elemento agregado exitosamente pero se encontró registro duplicado en %s
+es_VE.mo	Other item exist	Otro elemento existe
+es_VE.mo	Item in the trashbin	Item in the trashbin
+es_VE.mo	%1$s = %2$s	%1$s = %2$s
+es_VE.mo	%1$s: %2$s	%1$s: %2$s
+es_VE.mo	%1$s - %2$s	%1$s - %2$s
+es_VE.mo	%1$s (%2$s)	%1$s (%2$s)
+es_VE.mo	ID	ID
+es_VE.mo	Entity	Entidad
+es_VE.mo	Name	Name
+es_VE.mo	Serial number	Número de serie
+es_VE.mo	Inventory number	Número de inventario
+es_VE.mo	Alternate username	Nombre de usuario alternativo
+es_VE.mo	Alternate username number	Número de usuario alternativo
+es_VE.mo	UUID	UUID
+es_VE.mo	Brand	Fabricante
+es_VE.mo	Number of lines	Cantidad de líneas
+es_VE.mo	User	Usuario
+es_VE.mo	Manufacturer	Fabricante
+es_VE.mo	Type	Type
+es_VE.mo	Model	Modelo
+es_VE.mo	Network	Red
+es_VE.mo	Update Source	Origen de actualizaciones
+es_VE.mo	Location comments	Comentarios
+es_VE.mo	Child entities	Subentidades
+et_EE.mo	%1$s log in from IP %2$s	%1$s logis sisse aadresilt %2$s
+et_EE.mo	Failed login for %1$s from IP %2$s	Ebaõnnestunud sisselogimine kasutajalt %1$s IP-aadressilt %2$s
+et_EE.mo	%1$s adds the item %2$s	%1$s lisas asja %2$s
+et_EE.mo	%s updates an item	%s muutis asja
+et_EE.mo	%s deletes an item	%s kustutas asja
+et_EE.mo	%s restores an item	%s taastas asja
+et_EE.mo	%1$s trying to add an item that already exists: %2$s	%1$s püüab sisestada üksust, mis juba eksisteerib: %2$s
+et_EE.mo	Impossible record for %s	Võimatu salvestada %s
+et_EE.mo	Item successfully added but duplicate record on %s	Üksus on edukalt lisatud aga duplikeerib kirjet %s
+et_EE.mo	Other item exist	Teine üksus eksisteerib
+et_EE.mo	Item in the trashbin	Üksus prügikastis
+et_EE.mo	%1$s = %2$s	%1$s = %2$s
+et_EE.mo	%1$s: %2$s	%1$s: %2$s
+et_EE.mo	%1$s - %2$s	%1$s - %2$s
+et_EE.mo	%1$s (%2$s)	%1$s (%2$s)
+et_EE.mo	ID	ID
+et_EE.mo	Entity	Üksus
+et_EE.mo	Name	Name
+et_EE.mo	Serial number	Seerianumber
+et_EE.mo	Inventory number	Inventarinumber
+et_EE.mo	Alternate username	Alternatiivne kasutajanimi
+et_EE.mo	Alternate username number	Alternatiivse kasutajanime number
+et_EE.mo	UUID	UUID
+et_EE.mo	Brand	Tootemark
+et_EE.mo	Number of lines	Ekraaniridu
+et_EE.mo	User	Kasutaja
+et_EE.mo	Manufacturer	Tootja
+et_EE.mo	Type	Tüüp
+et_EE.mo	Model	Mudel
+et_EE.mo	Network	Võrk
+et_EE.mo	Update Source	Uuenduse allikas
+et_EE.mo	Location comments	Asukoha seletus
+et_EE.mo	Child entities	Alamüksused
+eu_ES.mo	%1$s log in from IP %2$s	%1$s %2$s IP helbidetik sesioa hasi du
+eu_ES.mo	Failed login for %1$s from IP %2$s	%1$s %2$s IP helbidetik sesioa hasteko arazoa
+eu_ES.mo	%1$s adds the item %2$s	%1$s-k %2$s elementua gehitzen du
+eu_ES.mo	%s updates an item	%s elementu bat eguneratzen du
+eu_ES.mo	%s deletes an item	%s elementu bat ezabatzen du
+eu_ES.mo	%s restores an item	%s elementu bat berrezartzen du
+eu_ES.mo	%1$s trying to add an item that already exists: %2$s	%1$s existitzen den elementu bat berriz gehitzen saiatzen ari da: %2$s
+eu_ES.mo	Impossible record for %s	Ezinezko erregistroa %s-(r)entzako
+eu_ES.mo	Item successfully added but duplicate record on %s	Elementua ondo gehitu da, baina %s erregistroan duplikatua dago
+eu_ES.mo	Other item exist	Beste elementu bat existitzen da
+eu_ES.mo	Item in the trashbin	 Elementua zakarrontzian
+eu_ES.mo	%1$s = %2$s	%1$s = %2$s
+eu_ES.mo	%1$s: %2$s	%1$s: %2$s
+eu_ES.mo	%1$s - %2$s	%1$s - %2$s
+eu_ES.mo	%1$s (%2$s)	%1$s (%2$s)
+eu_ES.mo	ID	ID
+eu_ES.mo	Entity	Entitatea
+eu_ES.mo	Name	Name
+eu_ES.mo	Serial number	Serie zenbakia
+eu_ES.mo	Inventory number	Inbentario zenbakia
+eu_ES.mo	Alternate username	Kontaktua
+eu_ES.mo	Alternate username number	Erabiltzaile zenbaki alternatiboa
+eu_ES.mo	UUID	UUID
+eu_ES.mo	Brand	Marka
+eu_ES.mo	Number of lines	Lerro kopurua
+eu_ES.mo	User	Erabiltzailea
+eu_ES.mo	Manufacturer	Fabrikatzailea
+eu_ES.mo	Type	Mota
+eu_ES.mo	Model	Modeloa
+eu_ES.mo	Network	Sarea
+eu_ES.mo	Update Source	Eguneraketa jatorria
+eu_ES.mo	Location comments	Ubikazioaren komentarioak
+eu_ES.mo	Child entities	Azpi-entitatea
+fa_IR.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
+fa_IR.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
+fa_IR.mo	%1$s adds the item %2$s	%1$s قلم به آيتم  %2$s شد.
+fa_IR.mo	%s updates an item	%s updates an item
+fa_IR.mo	%s deletes an item	%s قلم از آيتم حذف شد.
+fa_IR.mo	%s restores an item	%s restores an item
+fa_IR.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+fa_IR.mo	Impossible record for %s	ضبط غیرممکن است برای %s
+fa_IR.mo	Item successfully added but duplicate record on %s	مورد با موفقیت اضافه شده، اما در سابقه تکراری است %s
+fa_IR.mo	Other item exist	Other item exist
+fa_IR.mo	Item in the trashbin	Item in the trashbin
+fa_IR.mo	%1$s = %2$s	%1$s = %2$s
+fa_IR.mo	%1$s: %2$s	%1$s: %2$s
+fa_IR.mo	%1$s - %2$s	%1$s - %2$s
+fa_IR.mo	%1$s (%2$s)	%1$s (%2$s)
+fa_IR.mo	ID	شناسه
+fa_IR.mo	Entity	Entity
+fa_IR.mo	Name	Name
+fa_IR.mo	Serial number	شماره سریال
+fa_IR.mo	Inventory number	شماره فهرست اموال
+fa_IR.mo	Alternate username	نام کاربری تعویضی
+fa_IR.mo	Alternate username number	تعداد نام کاربری تعویضی
+fa_IR.mo	UUID	UUID
+fa_IR.mo	Brand	عنوان تجاری
+fa_IR.mo	Number of lines	تعداد خطوط
+fa_IR.mo	User	کاربران
+fa_IR.mo	Manufacturer	Manufacturer
+fa_IR.mo	Type	Type
+fa_IR.mo	Model	Model
+fa_IR.mo	Network	شبکه ها
+fa_IR.mo	Update Source	Update Source
+fa_IR.mo	Location comments	Location comments
+fa_IR.mo	Child entities	هویت فرزندان
+fi_FI.mo	%1$s log in from IP %2$s	%1$s kirjautuu IP-osoitteesta %2$s
+fi_FI.mo	Failed login for %1$s from IP %2$s	Epäonnistunut kirjautuminen käyttäjälle %1$s IP-osoitteesta %2$s
+fi_FI.mo	%1$s adds the item %2$s	%1$s lisää kohteen %2$s
+fi_FI.mo	%s updates an item	%s päivittää kohteen
+fi_FI.mo	%s deletes an item	%s poistaa kohteen
+fi_FI.mo	%s restores an item	%s palauttaa kohteen
+fi_FI.mo	%1$s trying to add an item that already exists: %2$s	%1$s yrittää lisätä kohdetta, joka on jo olemassa: %2$s
+fi_FI.mo	Impossible record for %s	Mahdoton tietue kohteelle %s
+fi_FI.mo	Item successfully added but duplicate record on %s	Kohteen lisäys onnistui mutta kaksoistietue kohdassa %s
+fi_FI.mo	Other item exist	Toinen kohde olemassa
+fi_FI.mo	Item in the trashbin	Kohde roskakorissa
+fi_FI.mo	%1$s = %2$s	%1$s = %2$s
+fi_FI.mo	%1$s: %2$s	%1$s: %2$s
+fi_FI.mo	%1$s - %2$s	%1$s - %2$s
+fi_FI.mo	%1$s (%2$s)	%1$s (%2$s)
+fi_FI.mo	ID	Tunnus
+fi_FI.mo	Entity	Yksikkö
+fi_FI.mo	Name	Name
+fi_FI.mo	Serial number	Sarjanumero
+fi_FI.mo	Inventory number	Inventointinumero
+fi_FI.mo	Alternate username	Vaihtoehtoinen käyttäjätunnus
+fi_FI.mo	Alternate username number	Vaihtoehtoisen käyttäjätunnuksen numero
+fi_FI.mo	UUID	UUID
+fi_FI.mo	Brand	Tuotemerkki
+fi_FI.mo	Number of lines	Linjojen lukumäärä
+fi_FI.mo	User	Käyttäjä
+fi_FI.mo	Manufacturer	Valmistaja
+fi_FI.mo	Type	Type
+fi_FI.mo	Model	Malli
+fi_FI.mo	Network	Lähiverkko
+fi_FI.mo	Update Source	Päivityslähde
+fi_FI.mo	Location comments	Sijainnin lisätiedot
+fi_FI.mo	Child entities	Alayksiköt
+fr_BE.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
+fr_BE.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
+fr_BE.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
+fr_BE.mo	%s updates an item	%s met à jour un élément
+fr_BE.mo	%s deletes an item	%s supprime un élément
+fr_BE.mo	%s restores an item	%s restaure un élément
+fr_BE.mo	%1$s trying to add an item that already exists: %2$s	%1$s essaie d'ajouter un élément qui existe déjà : %2$s
+fr_BE.mo	Impossible record for %s	Enregistrement impossible pour  %s
+fr_BE.mo	Item successfully added but duplicate record on %s	Enregistrement effectué mais doublon sur %s
+fr_BE.mo	Other item exist	Un autre élément existe
+fr_BE.mo	Item in the trashbin	Objet à la corbeille
+fr_BE.mo	%1$s = %2$s	%1$s = %2$s
+fr_BE.mo	%1$s: %2$s	%1$s : %2$s
+fr_BE.mo	%1$s - %2$s	%1$s - %2$s
+fr_BE.mo	%1$s (%2$s)	%1$s (%2$s)
+fr_BE.mo	ID	ID
+fr_BE.mo	Entity	Entity
+fr_BE.mo	Name	Name
+fr_BE.mo	Serial number	Numéro de série
+fr_BE.mo	Inventory number	Numéro d'inventaire
+fr_BE.mo	Alternate username	Usager
+fr_BE.mo	Alternate username number	Usager numéro
+fr_BE.mo	UUID	UUID
+fr_BE.mo	Brand	Marque
+fr_BE.mo	Number of lines	Nombre de lignes
+fr_BE.mo	User	User
+fr_BE.mo	Manufacturer	Manufacturer
+fr_BE.mo	Type	Type
+fr_BE.mo	Model	Model
+fr_BE.mo	Network	Network
+fr_BE.mo	Update Source	Update Source
+fr_BE.mo	Location comments	Commentaires du lieu
+fr_BE.mo	Child entities	Sous-entités
+fr_CA.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
+fr_CA.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
+fr_CA.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
+fr_CA.mo	%s updates an item	%s met à jour un élément
+fr_CA.mo	%s deletes an item	%s supprime un élément
+fr_CA.mo	%s restores an item	%s restaure un élément
+fr_CA.mo	%1$s trying to add an item that already exists: %2$s	%1$s essaie d'ajouter un élément qui existe déjà : %2$s
+fr_CA.mo	Impossible record for %s	Enregistrement impossible pour %s
+fr_CA.mo	Item successfully added but duplicate record on %s	Enregistrement effectué mais en créant un doublon sur %s
+fr_CA.mo	Other item exist	Un autre élément existe
+fr_CA.mo	Item in the trashbin	Élément dans la corbeille
+fr_CA.mo	%1$s = %2$s	%1$s = %2$s
+fr_CA.mo	%1$s: %2$s	%1$s : %2$s
+fr_CA.mo	%1$s - %2$s	%1$s - %2$s
+fr_CA.mo	%1$s (%2$s)	%1$s (%2$s)
+fr_CA.mo	ID	ID
+fr_CA.mo	Entity	Entité
+fr_CA.mo	Name	Nom
+fr_CA.mo	Serial number	Numéro de série
+fr_CA.mo	Inventory number	Numéro d'inventaire
+fr_CA.mo	Alternate username	Nom d'utilisateur alternatif
+fr_CA.mo	Alternate username number	Numéro d'utilisateur alternatif
+fr_CA.mo	UUID	UUID
+fr_CA.mo	Brand	Marque
+fr_CA.mo	Number of lines	Nombre de lignes
+fr_CA.mo	User	Utilisateur
+fr_CA.mo	Manufacturer	Fabricant
+fr_CA.mo	Type	Type
+fr_CA.mo	Model	Modèle
+fr_CA.mo	Network	Réseau
+fr_CA.mo	Update Source	Source de mise à jour
+fr_CA.mo	Location comments	Commentaires du lieu
+fr_CA.mo	Child entities	Sous-entités
+fr_FR.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
+fr_FR.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
+fr_FR.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
+fr_FR.mo	%s updates an item	%s met à jour un élément
+fr_FR.mo	%s deletes an item	%s supprime un élément
+fr_FR.mo	%s restores an item	%s restaure un élément
+fr_FR.mo	%1$s trying to add an item that already exists: %2$s	%1$s essaie d'ajouter un élément qui existe déjà : %2$s
+fr_FR.mo	Impossible record for %s	Enregistrement impossible pour %s
+fr_FR.mo	Item successfully added but duplicate record on %s	Enregistrement effectué mais doublon sur %s
+fr_FR.mo	Other item exist	Un autre élément existe
+fr_FR.mo	Item in the trashbin	Objet à la corbeille
+fr_FR.mo	%1$s = %2$s	%1$s = %2$s
+fr_FR.mo	%1$s: %2$s	%1$s : %2$s
+fr_FR.mo	%1$s - %2$s	%1$s - %2$s
+fr_FR.mo	%1$s (%2$s)	%1$s (%2$s)
+fr_FR.mo	ID	ID
+fr_FR.mo	Entity	Entité
+fr_FR.mo	Name	Nom
+fr_FR.mo	Serial number	Numéro de série
+fr_FR.mo	Inventory number	Numéro d'inventaire
+fr_FR.mo	Alternate username	Usager
+fr_FR.mo	Alternate username number	Usager numéro
+fr_FR.mo	UUID	UUID
+fr_FR.mo	Brand	Marque
+fr_FR.mo	Number of lines	Nombre de lignes
+fr_FR.mo	User	Utilisateur
+fr_FR.mo	Manufacturer	Fabricant
+fr_FR.mo	Type	Type
+fr_FR.mo	Model	Modèle
+fr_FR.mo	Network	Réseau
+fr_FR.mo	Update Source	Source de mise à jour
+fr_FR.mo	Location comments	Commentaires du lieu
+fr_FR.mo	Child entities	Sous-entités
+gl_ES.mo	%1$s log in from IP %2$s	%1$s logueouse dende a IP %2$s
+gl_ES.mo	Failed login for %1$s from IP %2$s	Erro en conexión %1$s dende IP %2$s
+gl_ES.mo	%1$s adds the item %2$s	%1$s engade o elemento %2$s
+gl_ES.mo	%s updates an item	%s actualiza un elemento
+gl_ES.mo	%s deletes an item	%s elimina o elemento
+gl_ES.mo	%s restores an item	%s recupera un elemento
+gl_ES.mo	%1$s trying to add an item that already exists: %2$s	%1$s tenta engadir un elemento que xa existe: %2$s
+gl_ES.mo	Impossible record for %s	Rexistro imposible para %s
+gl_ES.mo	Item successfully added but duplicate record on %s	Artigo engadido con éxito, pero rexistro duplicado en %s
+gl_ES.mo	Other item exist	Existe outro elemento
+gl_ES.mo	Item in the trashbin	Item in the trashbin
+gl_ES.mo	%1$s = %2$s	%1$s = %2$s
+gl_ES.mo	%1$s: %2$s	%1$s: %2$s
+gl_ES.mo	%1$s - %2$s	%1$s - %2$s
+gl_ES.mo	%1$s (%2$s)	%1$s (%2$s)
+gl_ES.mo	ID	ID
+gl_ES.mo	Entity	Entidade
+gl_ES.mo	Name	Name
+gl_ES.mo	Serial number	Número de serie
+gl_ES.mo	Inventory number	Número de inventario
+gl_ES.mo	Alternate username	Contacto adicional
+gl_ES.mo	Alternate username number	Número de contacto adicional
+gl_ES.mo	UUID	UUID
+gl_ES.mo	Brand	Marca
+gl_ES.mo	Number of lines	Cantidade de liñas
+gl_ES.mo	User	Usuario
+gl_ES.mo	Manufacturer	Fabricante
+gl_ES.mo	Type	Tipo
+gl_ES.mo	Model	Modelo
+gl_ES.mo	Network	Rede
+gl_ES.mo	Update Source	Orixe de actualización
+gl_ES.mo	Location comments	Comentarios á localización
+gl_ES.mo	Child entities	Entidades fillas
+he_IL.mo	%1$s log in from IP %2$s	%1$sחיבור מכתובת IP %2$s
+he_IL.mo	Failed login for %1$s from IP %2$s	חיבור נכשל עבור %1$s מכתובת IP %2$s
+he_IL.mo	%1$s adds the item %2$s	%1$sהוסיף את הפריט %2$s
+he_IL.mo	%s updates an item	%s עדכן פריט
+he_IL.mo	%s deletes an item	%s מחק פריט
+he_IL.mo	%s restores an item	%s שחזר פריט
+he_IL.mo	%1$s trying to add an item that already exists: %2$s	%1$sמנסה להוסיף פריט שכבר קיים: %2$s
+he_IL.mo	Impossible record for %s	Impossible record for %s
+he_IL.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
+he_IL.mo	Other item exist	פריט אחר קיים
+he_IL.mo	Item in the trashbin	פריט בסל המחזור
+he_IL.mo	%1$s = %2$s	%1$s = %2$s
+he_IL.mo	%1$s: %2$s	%1$s : %2$s
+he_IL.mo	%1$s - %2$s	%1$s - %2$s
+he_IL.mo	%1$s (%2$s)	%1$s (%2$s)
+he_IL.mo	ID	מזהה
+he_IL.mo	Entity	Entity
+he_IL.mo	Name	Name
+he_IL.mo	Serial number	מספר סידורי
+he_IL.mo	Inventory number	מספר טבוע
+he_IL.mo	Alternate username	שם משתמש חלופי
+he_IL.mo	Alternate username number	מספר שם משתמש חלופי
+he_IL.mo	UUID	UUID
+he_IL.mo	Brand	מותג
+he_IL.mo	Number of lines	מספר קווים
+he_IL.mo	User	משתמש
+he_IL.mo	Manufacturer	יצרן
+he_IL.mo	Type	Type
+he_IL.mo	Model	דגם
+he_IL.mo	Network	רשת
+he_IL.mo	Update Source	Update Source
+he_IL.mo	Location comments	Location comments
+he_IL.mo	Child entities	יחידות משנה
+hi_IN.mo	%1$s log in from IP %2$s	IP %2$s से %1$s लॉग इन करें
+hi_IN.mo	Failed login for %1$s from IP %2$s	आईपी ​​%2$s से %1$s के लिए लॉगिन विफल
+hi_IN.mo	%1$s adds the item %2$s	1%1$sआइटम 2%2$sजोड़ता है
+hi_IN.mo	%s updates an item	%sएक आइटम अद्यतन करता है
+hi_IN.mo	%s deletes an item	%s एक आइटम हटा देता है
+hi_IN.mo	%s restores an item	%sएक आइटम बहाल करता है
+hi_IN.mo	%1$s trying to add an item that already exists: %2$s	%1$s एक आइटम जोड़ने की कोशिश कर रहा है जो पहले से मौजूद है: %2$s
+hi_IN.mo	Impossible record for %s	%s के लिए असंभव रिकॉर्ड
+hi_IN.mo	Item successfully added but duplicate record on %s	आइटम सफलतापूर्वक जोड़ा गया लेकिन %s पर डुप्लिकेट रिकॉर्ड
+hi_IN.mo	Other item exist	अन्य वस्तु मौजूद है
+hi_IN.mo	Item in the trashbin	Item in the trashbin
+hi_IN.mo	%1$s = %2$s	%1$s = %2$s
+hi_IN.mo	%1$s: %2$s	%1$s: %2$s
+hi_IN.mo	%1$s - %2$s	%1$s - %2$s
+hi_IN.mo	%1$s (%2$s)	%1$s (%2$s)
+hi_IN.mo	ID	ID
+hi_IN.mo	Entity	संस्थाओं
+hi_IN.mo	Name	Name
+hi_IN.mo	Serial number	सीरियल नंबर
+hi_IN.mo	Inventory number	सूची संख्या
+hi_IN.mo	Alternate username	वैकल्पिक उपयोगकर्ता नाम
+hi_IN.mo	Alternate username number	वैकल्पिक उपयोगकर्ता नाम संख्या
+hi_IN.mo	UUID	UUID
+hi_IN.mo	Brand	ब्रांड
+hi_IN.mo	Number of lines	लाइनों की संख्या
+hi_IN.mo	User	उपयोगकर्ता 
+hi_IN.mo	Manufacturer	निर्माता
+hi_IN.mo	Type	Type
+hi_IN.mo	Model	मॉडल
+hi_IN.mo	Network	नेटवर्क
+hi_IN.mo	Update Source	अद्यतन स्रोत
+hi_IN.mo	Location comments	स्थान टिप्पणियां
+hi_IN.mo	Child entities	अस्तित्व
+hr_HR.mo	%1$s log in from IP %2$s	%1$s prijava s IP adrese %2$s
+hr_HR.mo	Failed login for %1$s from IP %2$s	Neusjela prijava za %1$s sa IP adrese %2$s
+hr_HR.mo	%1$s adds the item %2$s	%1$s dodaje predmet. %2$s
+hr_HR.mo	%s updates an item	%s aktualizira predmet
+hr_HR.mo	%s deletes an item	%s briše predmet
+hr_HR.mo	%s restores an item	%s vraća predmet
+hr_HR.mo	%1$s trying to add an item that already exists: %2$s	%1$s pokušava dodati predmet koji već postoji: %2$s
+hr_HR.mo	Impossible record for %s	Nemoguć zapis za %s
+hr_HR.mo	Item successfully added but duplicate record on %s	Predmet usješno dodan, ali postoji dvostruki zapis na %s
+hr_HR.mo	Other item exist	Postoji drugi predmet
+hr_HR.mo	Item in the trashbin	Predmet u smeću
+hr_HR.mo	%1$s = %2$s	%1$s = %2$s
+hr_HR.mo	%1$s: %2$s	%1$s: %2$s
+hr_HR.mo	%1$s - %2$s	%1$s – %2$s
+hr_HR.mo	%1$s (%2$s)	%1$s (%2$s)
+hr_HR.mo	ID	ID
+hr_HR.mo	Entity	Entitet
+hr_HR.mo	Name	Name
+hr_HR.mo	Serial number	Serijski broj
+hr_HR.mo	Inventory number	Inventarni broj
+hr_HR.mo	Alternate username	Alternativno korisničko ime
+hr_HR.mo	Alternate username number	Alternativni korisnički broj
+hr_HR.mo	UUID	UUID
+hr_HR.mo	Brand	Brend
+hr_HR.mo	Number of lines	Broj redaka
+hr_HR.mo	User	Korisnik
+hr_HR.mo	Manufacturer	Proizvođač
+hr_HR.mo	Type	Vrsta
+hr_HR.mo	Model	Model
+hr_HR.mo	Network	Mreža
+hr_HR.mo	Update Source	Izvor aktualiziranja
+hr_HR.mo	Location comments	Komentari za lokaciju
+hr_HR.mo	Child entities	Podređeni entiteti
+hu_HU.mo	%1$s log in from IP %2$s	%1$s bejelentkezett a következő IP-ről: %2$s
+hu_HU.mo	Failed login for %1$s from IP %2$s	Sikertelen bejelentkezés %1$s a %2$s IP-ről.
+hu_HU.mo	%1$s adds the item %2$s	%1$s hozzáadta a %2$s elemet
+hu_HU.mo	%s updates an item	%s frissít egy elemet
+hu_HU.mo	%s deletes an item	%s töröl egy elemet
+hu_HU.mo	%s restores an item	%s visszaállít egy elemet
+hu_HU.mo	%1$s trying to add an item that already exists: %2$s	%1$s elemet próbált hozzáadni már létezőhöz: %2$s
+hu_HU.mo	Impossible record for %s	Érvénytelen rekord a következőhöz %s
+hu_HU.mo	Item successfully added but duplicate record on %s	Elem sikeresen hozzáadva, de duplikált %s
+hu_HU.mo	Other item exist	Egyéb elem létezik
+hu_HU.mo	Item in the trashbin	Item in the trashbin
+hu_HU.mo	%1$s = %2$s	%1$s = %2$s
+hu_HU.mo	%1$s: %2$s	%1$s: %2$s
+hu_HU.mo	%1$s - %2$s	%1$s - %2$s
+hu_HU.mo	%1$s (%2$s)	%1$s (%2$s)
+hu_HU.mo	ID	ID
+hu_HU.mo	Entity	Cég
+hu_HU.mo	Name	Name
+hu_HU.mo	Serial number	Sorozatszám
+hu_HU.mo	Inventory number	Leltári szám
+hu_HU.mo	Alternate username	Kapcsolattartó
+hu_HU.mo	Alternate username number	Kapcsolattartó száma
+hu_HU.mo	UUID	UUID
+hu_HU.mo	Brand	Márka
+hu_HU.mo	Number of lines	Sorok száma
+hu_HU.mo	User	Felhasználó
+hu_HU.mo	Manufacturer	Gyártó
+hu_HU.mo	Type	Típusok
+hu_HU.mo	Model	Modell
+hu_HU.mo	Network	Hálózat
+hu_HU.mo	Update Source	Forrás frissítése
+hu_HU.mo	Location comments	Helyek megjegyzései
+hu_HU.mo	Child entities	Alegységek
+id_ID.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
+id_ID.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
+id_ID.mo	%1$s adds the item %2$s	%1$s menambahkan item %2$s
+id_ID.mo	%s updates an item	1%s memperbarui item
+id_ID.mo	%s deletes an item	%s menghapus item
+id_ID.mo	%s restores an item	%s mengembalikan item
+id_ID.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+id_ID.mo	Impossible record for %s	Impossible record for %s
+id_ID.mo	Item successfully added but duplicate record on %s	Barang berhasil ditambahkan namun terjadi duplikasi pada %s
+id_ID.mo	Other item exist	Other item exist
+id_ID.mo	Item in the trashbin	Item in the trashbin
+id_ID.mo	%1$s = %2$s	%1$s = %2$s
+id_ID.mo	%1$s: %2$s	%1$s: %2$s
+id_ID.mo	%1$s - %2$s	%1$s - %2$s
+id_ID.mo	%1$s (%2$s)	%1$s = %2$s
+id_ID.mo	ID	ID
+id_ID.mo	Entity	Entitas
+id_ID.mo	Name	Name
+id_ID.mo	Serial number	Nomor Seri
+id_ID.mo	Inventory number	Nomor inventory
+id_ID.mo	Alternate username	Username alternatif
+id_ID.mo	Alternate username number	Alternate username number
+id_ID.mo	UUID	UUID
+id_ID.mo	Brand	Brand
+id_ID.mo	Number of lines	Number of lines
+id_ID.mo	User	Pengguna
+id_ID.mo	Manufacturer	Manufaktur
+id_ID.mo	Type	Tipe
+id_ID.mo	Model	Model
+id_ID.mo	Network	Network
+id_ID.mo	Update Source	Update Source
+id_ID.mo	Location comments	Location comments
+id_ID.mo	Child entities	Entitas anak
+is_IS.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
+is_IS.mo	Failed login for %1$s from IP %2$s	Misheppnaðar innskráningar fyrir %1$s frá IP %2$s 
+is_IS.mo	%1$s adds the item %2$s	%1$s bætir við %2$s 
+is_IS.mo	%s updates an item	%s uppfærir hlut
+is_IS.mo	%s deletes an item	%s eyðir hlut
+is_IS.mo	%s restores an item	%s endurheimtir hlut
+is_IS.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+is_IS.mo	Impossible record for %s	Impossible record for %s
+is_IS.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
+is_IS.mo	Other item exist	Other item exist
+is_IS.mo	Item in the trashbin	Item in the trashbin
+is_IS.mo	%1$s = %2$s	%1$s = %2$s
+is_IS.mo	%1$s: %2$s	%1$s: %2$s
+is_IS.mo	%1$s - %2$s	%1$s - %2$s
+is_IS.mo	%1$s (%2$s)	%1$s (%2$s)
+is_IS.mo	ID	KENNI
+is_IS.mo	Entity	Entity
+is_IS.mo	Name	Name
+is_IS.mo	Serial number	Raðnúmer
+is_IS.mo	Inventory number	Vörunúmer
+is_IS.mo	Alternate username	Alternate username
+is_IS.mo	Alternate username number	Alternate username number
+is_IS.mo	UUID	UUID
+is_IS.mo	Brand	Brand
+is_IS.mo	Number of lines	Number of lines
+is_IS.mo	User	User
+is_IS.mo	Manufacturer	Manufacturer
+is_IS.mo	Type	Type
+is_IS.mo	Model	Model
+is_IS.mo	Network	Network
+is_IS.mo	Update Source	Update Source
+is_IS.mo	Location comments	Athugasemdir vegna staðsetningar
+is_IS.mo	Child entities	Dótturfélög
+it_IT.mo	%1$s log in from IP %2$s	Accesso di %1$s dall'IP %2$s
+it_IT.mo	Failed login for %1$s from IP %2$s	Accesso non riuscito per %1$s dall'IP %2$s
+it_IT.mo	%1$s adds the item %2$s	%1$s aggiunge l'elemento %2$s
+it_IT.mo	%s updates an item	%s aggiorna un elemento
+it_IT.mo	%s deletes an item	%s elimina un elemento
+it_IT.mo	%s restores an item	%s ripristina un elemento
+it_IT.mo	%1$s trying to add an item that already exists: %2$s	%1$s tenta di aggiungere un elemento che esiste già: %2$s
+it_IT.mo	Impossible record for %s	Record impossibile per %s
+it_IT.mo	Item successfully added but duplicate record on %s	Elemento aggiunto con successo ma record duplicato su %s
+it_IT.mo	Other item exist	Esiste un altro elemento
+it_IT.mo	Item in the trashbin	Elementi nel cestino
+it_IT.mo	%1$s = %2$s	%1$s = %2$s
+it_IT.mo	%1$s: %2$s	%1$s: %2$s
+it_IT.mo	%1$s - %2$s	%1$s - %2$s
+it_IT.mo	%1$s (%2$s)	%1$s (%2$s)
+it_IT.mo	ID	ID
+it_IT.mo	Entity	Entità
+it_IT.mo	Name	Name
+it_IT.mo	Serial number	Numero di serie (S/N)
+it_IT.mo	Inventory number	Numero di inventario
+it_IT.mo	Alternate username	Nome utente alternativo
+it_IT.mo	Alternate username number	Telefono
+it_IT.mo	UUID	UUID
+it_IT.mo	Brand	Marca
+it_IT.mo	Number of lines	Numero di linee
+it_IT.mo	User	Utente
+it_IT.mo	Manufacturer	Produttore
+it_IT.mo	Type	Tipo
+it_IT.mo	Model	Modello
+it_IT.mo	Network	Rete
+it_IT.mo	Update Source	Aggiorna sorgente
+it_IT.mo	Location comments	Commenti sulla posizione
+it_IT.mo	Child entities	Entità figlio
+ja_JP.mo	%1$s log in from IP %2$s	%1$s は IP: %2$s からログインしました
+ja_JP.mo	Failed login for %1$s from IP %2$s	%1$s は IP: %2$s からのログインに失敗しました
+ja_JP.mo	%1$s adds the item %2$s	%1$s がアイテム %2$s を追加
+ja_JP.mo	%s updates an item	%s がアイテムを更新
+ja_JP.mo	%s deletes an item	%s がアイテムを削除
+ja_JP.mo	%s restores an item	%s がアイテムを復元
+ja_JP.mo	%1$s trying to add an item that already exists: %2$s	%1$s が既存のアイテムを追加しようとした: %2$s
+ja_JP.mo	Impossible record for %s	%s の記録ができません
+ja_JP.mo	Item successfully added but duplicate record on %s	アイテムを追加しましたが、重複レコードが %s にあります
+ja_JP.mo	Other item exist	他のアイテムが存在します
+ja_JP.mo	Item in the trashbin	ゴミ箱の中
+ja_JP.mo	%1$s = %2$s	%1$s = %2$s
+ja_JP.mo	%1$s: %2$s	%1$s: %2$s
+ja_JP.mo	%1$s - %2$s	%1$s - %2$s
+ja_JP.mo	%1$s (%2$s)	%1$s (%2$s)
+ja_JP.mo	ID	ID
+ja_JP.mo	Entity	エンティティ
+ja_JP.mo	Name	Name
+ja_JP.mo	Serial number	シリアル番号
+ja_JP.mo	Inventory number	情報資産番号
+ja_JP.mo	Alternate username	代替ユーザー名
+ja_JP.mo	Alternate username number	代替ユーザー番号
+ja_JP.mo	UUID	UUID
+ja_JP.mo	Brand	ブランド
+ja_JP.mo	Number of lines	回線数
+ja_JP.mo	User	ユーザー
+ja_JP.mo	Manufacturer	メーカー
+ja_JP.mo	Type	種類
+ja_JP.mo	Model	モデル
+ja_JP.mo	Network	ネットワーク
+ja_JP.mo	Update Source	更新元
+ja_JP.mo	Location comments	場所のコメント
+ja_JP.mo	Child entities	下位エンティティ
+kn.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
+kn.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
+kn.mo	%1$s adds the item %2$s	%1$sಐಟಂ ಸೇರಿಸುತ್ತದೆ %2$s 
+kn.mo	%s updates an item	%sಐಟಂ ನವೀಕರಿಸುತ್ತದೆ 
+kn.mo	%s deletes an item	%sಐಟಂ ಅನ್ನು ಅಳಿಸಲಾಗುತ್ತದೆ 
+kn.mo	%s restores an item	%sಐಟಂ ಮರುಸ್ಥಾಪನೆ 
+kn.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+kn.mo	Impossible record for %s	ಇಂಪಾಸಿಬಲ್ ರೆಕಾರ್ಡ್ಗಾಗಿ %s
+kn.mo	Item successfully added but duplicate record on %s	ಐಟಂ ಯಶಸ್ವಿಯಾಗಿ ಸೇರಿಸಲಾಗಿದೆ ಆದರೆ ರೆಕಾರ್ಡ್ ನಕಲು%s
+kn.mo	Other item exist	ಇತರ ಐಟಂ ಅಸ್ತಿತ್ವದಲ್ಲಿದೆ
+kn.mo	Item in the trashbin	Item in the trashbin
+kn.mo	%1$s = %2$s	%1$s = %2$s
+kn.mo	%1$s: %2$s	%1$s : %2$s
+kn.mo	%1$s - %2$s	%1$s -%2$s
+kn.mo	%1$s (%2$s)	%1$s (%2$s)
+kn.mo	ID	ID
+kn.mo	Entity	ಘಟಕಗಳು
+kn.mo	Name	Name
+kn.mo	Serial number	ಕ್ರಮ ಸಂಖ್ಯೆ
+kn.mo	Inventory number	ಇನ್ವೆಂಟರಿ ಸಂಖ್ಯೆ
+kn.mo	Alternate username	ಪರ್ಯಾಯ ಬಳಕೆದಾರಹೆಸರು
+kn.mo	Alternate username number	ಪರ್ಯಾಯ ಬಳಕೆದಾರಹೆಸರು ಸಂಖ್ಯೆ
+kn.mo	UUID	UUID
+kn.mo	Brand	Brand
+kn.mo	Number of lines	ಸಾಲುಗಳ ಸಂಖ್ಯೆ
+kn.mo	User	User
+kn.mo	Manufacturer	Manufacturer
+kn.mo	Type	Type
+kn.mo	Model	Model
+kn.mo	Network	Network
+kn.mo	Update Source	Update Source
+kn.mo	Location comments	Location comments
+kn.mo	Child entities	ಮಕ್ಕಳ ಅಸ್ತಿತ್ವಗಳು
+ko_KR.mo	%1$s log in from IP %2$s	IP %2$s에서 %1$s로 로그인
+ko_KR.mo	Failed login for %1$s from IP %2$s	IP %2$s에서 %1$s로 로그인 실패
+ko_KR.mo	%1$s adds the item %2$s	%1$s 는 %2$s 아이템을 추가합니다.
+ko_KR.mo	%s updates an item	%s는 아이템을 업데이트합니다.
+ko_KR.mo	%s deletes an item	%s는 아이템을 삭제합니다.
+ko_KR.mo	%s restores an item	%s는 아이템을 복구합니다.
+ko_KR.mo	%1$s trying to add an item that already exists: %2$s	%1$s가 이미 존재하는 품목을 추가하려고 합니다: %2$s
+ko_KR.mo	Impossible record for %s	%s에 기록 불가
+ko_KR.mo	Item successfully added but duplicate record on %s	품목이 추가되었지만 %s에 사본이 기록되었습니다
+ko_KR.mo	Other item exist	다른 품목 존재
+ko_KR.mo	Item in the trashbin	휴지통의 항목
+ko_KR.mo	%1$s = %2$s	%1$s = %2$s
+ko_KR.mo	%1$s: %2$s	%1$s: %2$s
+ko_KR.mo	%1$s - %2$s	%1$s - %2$s
+ko_KR.mo	%1$s (%2$s)	%1$s (%2$s)
+ko_KR.mo	ID	ID
+ko_KR.mo	Entity	엔티티
+ko_KR.mo	Name	Name
+ko_KR.mo	Serial number	시리얼 번호
+ko_KR.mo	Inventory number	재고 번호
+ko_KR.mo	Alternate username	대체 사용자이름
+ko_KR.mo	Alternate username number	그 외 사용자명 수
+ko_KR.mo	UUID	UUID
+ko_KR.mo	Brand	상표
+ko_KR.mo	Number of lines	줄 번호
+ko_KR.mo	User	사용자
+ko_KR.mo	Manufacturer	생산자
+ko_KR.mo	Type	유형
+ko_KR.mo	Model	모델
+ko_KR.mo	Network	네트워크
+ko_KR.mo	Update Source	소스 갱신
+ko_KR.mo	Location comments	위치 주석
+ko_KR.mo	Child entities	자식 객체
+lt_LT.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
+lt_LT.mo	Failed login for %1$s from IP %2$s	Nepavyko %1$s prisijungimas iš IP %2$s
+lt_LT.mo	%1$s adds the item %2$s	%1$s pridėjo elementą %2$s
+lt_LT.mo	%s updates an item	%s atnaujina daiktą
+lt_LT.mo	%s deletes an item	%s ištrina elementą
+lt_LT.mo	%s restores an item	%s  atkuria daiktą
+lt_LT.mo	%1$s trying to add an item that already exists: %2$s	%1$s bandymas pridėti elementą, kuris jau egzistuoja: %2$s
+lt_LT.mo	Impossible record for %s	Neįmanomas įrašas %s
+lt_LT.mo	Item successfully added but duplicate record on %s	Elementas sėkmingai pridėtas, tačiau egzistuoja du egzemplioriai %s
+lt_LT.mo	Other item exist	Egzistuoja kitas elementas
+lt_LT.mo	Item in the trashbin	Item in the trashbin
+lt_LT.mo	%1$s = %2$s	%1$s = %2$s
+lt_LT.mo	%1$s: %2$s	%1$s: %2$s
+lt_LT.mo	%1$s - %2$s	%1$s - %2$s
+lt_LT.mo	%1$s (%2$s)	%1$s (%2$s)
+lt_LT.mo	ID	ID
+lt_LT.mo	Entity	Padalinys
+lt_LT.mo	Name	Name
+lt_LT.mo	Serial number	Serijinis Nr
+lt_LT.mo	Inventory number	Inventorinis Nr
+lt_LT.mo	Alternate username	Alternatyvus vartotojo vardas
+lt_LT.mo	Alternate username number	Alternatyvaus vartotojo vardo numeris
+lt_LT.mo	UUID	UUID
+lt_LT.mo	Brand	Prekinis ženklas
+lt_LT.mo	Number of lines	Eilučių skaičius
+lt_LT.mo	User	Vartotojas
+lt_LT.mo	Manufacturer	Gamintojas
+lt_LT.mo	Type	Type
+lt_LT.mo	Model	Modelis
+lt_LT.mo	Network	Tinklas
+lt_LT.mo	Update Source	Update Source
+lt_LT.mo	Location comments	Location comments
+lt_LT.mo	Child entities	Pavaldūs padaliniai
+lv_LV.mo	%1$s log in from IP %2$s	%1$s pieteicās no IP %2$s
+lv_LV.mo	Failed login for %1$s from IP %2$s	Neveiksmīgs meiģinājums pieteikties lietotājam %1$s no IP %2$s
+lv_LV.mo	%1$s adds the item %2$s	%1$s pievieno ierakstu %2$s
+lv_LV.mo	%s updates an item	%s atjaunoja ierakstu
+lv_LV.mo	%s deletes an item	%s dzēsa ierakstu
+lv_LV.mo	%s restores an item	%s atjaunoja ierakstu
+lv_LV.mo	%1$s trying to add an item that already exists: %2$s	%1$s mēģināja pievienot jau esošu ierakstu: %2$s
+lv_LV.mo	Impossible record for %s	Neiespējami ierakstīt %s
+lv_LV.mo	Item successfully added but duplicate record on %s	Vienība ir veiksmīgi pievienota, bet ir dublējošs ieraksts %s
+lv_LV.mo	Other item exist	Ir citi ieraksti
+lv_LV.mo	Item in the trashbin	Ieraksti atkritnē
+lv_LV.mo	%1$s = %2$s	%1$s = %2$s
+lv_LV.mo	%1$s: %2$s	%1$s: %2$s
+lv_LV.mo	%1$s - %2$s	%1$s - %2$s
+lv_LV.mo	%1$s (%2$s)	%1$s (%2$s)
+lv_LV.mo	ID	ID
+lv_LV.mo	Entity	Nodaļas
+lv_LV.mo	Name	Name
+lv_LV.mo	Serial number	Sērijas numurs
+lv_LV.mo	Inventory number	Inventāra Nr.
+lv_LV.mo	Alternate username	Alternatīvs lietotājvārds
+lv_LV.mo	Alternate username number	Alternatīvā lietotājvārda numurs
+lv_LV.mo	UUID	UUID
+lv_LV.mo	Brand	Ražotājs
+lv_LV.mo	Number of lines	Līniju skaits
+lv_LV.mo	User	Lietotāji
+lv_LV.mo	Manufacturer	Ražotāji
+lv_LV.mo	Type	Type
+lv_LV.mo	Model	Modelis
+lv_LV.mo	Network	Tīkli
+lv_LV.mo	Update Source	Atjaunināšanas avoti
+lv_LV.mo	Location comments	Komentāru atrašanās vieta
+lv_LV.mo	Child entities	Apakšnodaļas
+mn_MN.mo	%1$s log in from IP %2$s	%1$sнь IP %2$s-ээр нэвтрэв
+mn_MN.mo	Failed login for %1$s from IP %2$s	%1$s-с IP %2$s-д нэвтрэх явц амжилтгүй боллоо
+mn_MN.mo	%1$s adds the item %2$s	%1$sтөхөөрөмжийг нэмэх%2$s
+mn_MN.mo	%s updates an item	%sтөхөөрөмжийг шинэчлэх
+mn_MN.mo	%s deletes an item	%sтөхөөрөмжийг устгах
+mn_MN.mo	%s restores an item	%sтөхөөрөмжийг дахин сэргээх
+mn_MN.mo	%1$s trying to add an item that already exists: %2$s	%1$s өмнө нь байсан зүйлийг нэмэх гэж оролдож байна: %2$s
+mn_MN.mo	Impossible record for %s	%s-ийн хувьд боломжгүй бичлэг
+mn_MN.mo	Item successfully added but duplicate record on %s	Зүйлийг амжилттай нэмсэн боловч %s дээрх бичлэгийг хуулбарласан болно
+mn_MN.mo	Other item exist	Бусад зүйл байна
+mn_MN.mo	Item in the trashbin	Хогийн саванд байгаа зүйлс
+mn_MN.mo	%1$s = %2$s	%1$s = %2$s
+mn_MN.mo	%1$s: %2$s	%1$s:%2$s
+mn_MN.mo	%1$s - %2$s	%1$s - %2$s
+mn_MN.mo	%1$s (%2$s)	%1$s(%2$s)
+mn_MN.mo	ID	ID
+mn_MN.mo	Entity	Газар нэгж
+mn_MN.mo	Name	Name
+mn_MN.mo	Serial number	Сериал дугаар
+mn_MN.mo	Inventory number	Хөрөнгийн код
+mn_MN.mo	Alternate username	Хэрэглэгчийн өөр нэр
+mn_MN.mo	Alternate username number	Хэрэглэгчийн өөр дугаар
+mn_MN.mo	UUID	UUID
+mn_MN.mo	Brand	Брэнд
+mn_MN.mo	Number of lines	Шугамын тоо
+mn_MN.mo	User	Хэрэглэгч
+mn_MN.mo	Manufacturer	Үйлдвэрлэгч
+mn_MN.mo	Type	Төрөл
+mn_MN.mo	Model	Загвар
+mn_MN.mo	Network	Сүлжээ
+mn_MN.mo	Update Source	Эх үүсвэрийг шинэчлэх
+mn_MN.mo	Location comments	Байршлын тайлбарууд
+mn_MN.mo	Child entities	Дэд газар нэгж
+ms_MY.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
+ms_MY.mo	Failed login for %1$s from IP %2$s	Gagal masuk bagi %1$s dari IP %2$s
+ms_MY.mo	%1$s adds the item %2$s	%1$s menambah kepada item %2$s
+ms_MY.mo	%s updates an item	%s updates an item
+ms_MY.mo	%s deletes an item	%s deletes an item
+ms_MY.mo	%s restores an item	%s restores an item
+ms_MY.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+ms_MY.mo	Impossible record for %s	Impossible record for %s
+ms_MY.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
+ms_MY.mo	Other item exist	Other item exist
+ms_MY.mo	Item in the trashbin	Item in the trashbin
+ms_MY.mo	%1$s = %2$s	%1$s = %2$s
+ms_MY.mo	%1$s: %2$s	%1$s: %2$s
+ms_MY.mo	%1$s - %2$s	%1$s  - %2$s
+ms_MY.mo	%1$s (%2$s)	%1$s (%2$s)
+ms_MY.mo	ID	ID
+ms_MY.mo	Entity	Entiti-entiti
+ms_MY.mo	Name	Name
+ms_MY.mo	Serial number	Nombor siri
+ms_MY.mo	Inventory number	Nombor inventori
+ms_MY.mo	Alternate username	Kata nama lain
+ms_MY.mo	Alternate username number	Alternate username number
+ms_MY.mo	UUID	UUID
+ms_MY.mo	Brand	Brand
+ms_MY.mo	Number of lines	Number of lines
+ms_MY.mo	User	pengguna pengguna
+ms_MY.mo	Manufacturer	Pengeluar
+ms_MY.mo	Type	Type
+ms_MY.mo	Model	Model
+ms_MY.mo	Network	rangkaian-rangkaian
+ms_MY.mo	Update Source	Kemaskini sumber
+ms_MY.mo	Location comments	Location comments
+ms_MY.mo	Child entities	Entiti bawahan
+nb_NO.mo	%1$s log in from IP %2$s	%1$s innlogget fra IP %2$s
+nb_NO.mo	Failed login for %1$s from IP %2$s	Innlogging feilet for %1$s fra IP %2$s
+nb_NO.mo	%1$s adds the item %2$s	%1$s legger til elementet %2$s
+nb_NO.mo	%s updates an item	%s oppdaterer et element
+nb_NO.mo	%s deletes an item	%s sletter et element
+nb_NO.mo	%s restores an item	%s gjenoppretter et element
+nb_NO.mo	%1$s trying to add an item that already exists: %2$s	%1$s prøver å legge til et objekt som allerede eksisterer: %2$s
+nb_NO.mo	Impossible record for %s	Ugyldig oppføring for %s
+nb_NO.mo	Item successfully added but duplicate record on %s	Element vellykket lagt til, men registrert duplikat på %s
+nb_NO.mo	Other item exist	Andre objekter eksisterer
+nb_NO.mo	Item in the trashbin	Item in the trashbin
+nb_NO.mo	%1$s = %2$s	%1$s = %2$s
+nb_NO.mo	%1$s: %2$s	%1$s: %2$s
+nb_NO.mo	%1$s - %2$s	%1$s - %2$s
+nb_NO.mo	%1$s (%2$s)	%1$s (%2$s)
+nb_NO.mo	ID	ID
+nb_NO.mo	Entity	Enhet
+nb_NO.mo	Name	Name
+nb_NO.mo	Serial number	Serienummer
+nb_NO.mo	Inventory number	Inventarnummer
+nb_NO.mo	Alternate username	Alternativt brukernavn
+nb_NO.mo	Alternate username number	Alternativt brukernummer
+nb_NO.mo	UUID	UUID
+nb_NO.mo	Brand	Merke
+nb_NO.mo	Number of lines	Antal linjer
+nb_NO.mo	User	Bruker
+nb_NO.mo	Manufacturer	Produsent
+nb_NO.mo	Type	Type
+nb_NO.mo	Model	Modell
+nb_NO.mo	Network	Nettverk
+nb_NO.mo	Update Source	Oppdaterings Kilde
+nb_NO.mo	Location comments	Kommentarer om sted
+nb_NO.mo	Child entities	Underenheter
+nl_BE.mo	%1$s log in from IP %2$s	%1$s log in van IP %2$s
+nl_BE.mo	Failed login for %1$s from IP %2$s	Mislukt login voor %1$s van IP %2$s
+nl_BE.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
+nl_BE.mo	%s updates an item	%s actualiseert een item
+nl_BE.mo	%s deletes an item	%s verwijdert een item
+nl_BE.mo	%s restores an item	%s zet een item terug
+nl_BE.mo	%1$s trying to add an item that already exists: %2$s	%1$s probeert een item toe te voegen dat al bestaat: %2$s
+nl_BE.mo	Impossible record for %s	Onmogelijk record voor %s
+nl_BE.mo	Item successfully added but duplicate record on %s	Item succesvol toegevoegd maar er is een duplicaat record op %s
+nl_BE.mo	Other item exist	Ander item bestaat
+nl_BE.mo	Item in the trashbin	Item in de prullenbak
+nl_BE.mo	%1$s = %2$s	%1$s = %2$s
+nl_BE.mo	%1$s: %2$s	%1$s: %2$s
+nl_BE.mo	%1$s - %2$s	%1$s - %2$s
+nl_BE.mo	%1$s (%2$s)	%1$s (%2$s)
+nl_BE.mo	ID	ID
+nl_BE.mo	Entity	Entiteit
+nl_BE.mo	Name	Naam
+nl_BE.mo	Serial number	Serienummer
+nl_BE.mo	Inventory number	Inventarisnummer
+nl_BE.mo	Alternate username	Alternatieve gebruikersnaam
+nl_BE.mo	Alternate username number	Alternatieve gebruikersnaam nummer
+nl_BE.mo	UUID	UUID
+nl_BE.mo	Brand	Merk
+nl_BE.mo	Number of lines	Aantal lijnen
+nl_BE.mo	User	Gebruiker
+nl_BE.mo	Manufacturer	Fabrikant
+nl_BE.mo	Type	Type
+nl_BE.mo	Model	Model
+nl_BE.mo	Network	Netwerk
+nl_BE.mo	Update Source	Update Source
+nl_BE.mo	Location comments	Locatie opmerkingen
+nl_BE.mo	Child entities	Sub-entiteiten
+nl_NL.mo	%1$s log in from IP %2$s	%1$s log in van IP %2$s
+nl_NL.mo	Failed login for %1$s from IP %2$s	Mislukt login voor %1$s van IP %2$s
+nl_NL.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
+nl_NL.mo	%s updates an item	%s actualiseert een item
+nl_NL.mo	%s deletes an item	%s verwijdert een item
+nl_NL.mo	%s restores an item	%s zet een item terug
+nl_NL.mo	%1$s trying to add an item that already exists: %2$s	%1$s probeert een item toe te voegen dat al bestaat: %2$s
+nl_NL.mo	Impossible record for %s	Onmogelijk record voor %s
+nl_NL.mo	Item successfully added but duplicate record on %s	Item succesvol toegevoegd maar er is een duplicaat record op %s
+nl_NL.mo	Other item exist	Ander item bestaat
+nl_NL.mo	Item in the trashbin	Item in de prullenbak
+nl_NL.mo	%1$s = %2$s	%1$s = %2$s
+nl_NL.mo	%1$s: %2$s	%1$s: %2$s
+nl_NL.mo	%1$s - %2$s	%1$s - %2$s
+nl_NL.mo	%1$s (%2$s)	%1$s (%2$s)
+nl_NL.mo	ID	ID
+nl_NL.mo	Entity	Entiteit
+nl_NL.mo	Name	Name
+nl_NL.mo	Serial number	Serienummer
+nl_NL.mo	Inventory number	Inventarisnummer
+nl_NL.mo	Alternate username	Alternatieve gebruikersnaam
+nl_NL.mo	Alternate username number	Alternatieve gebruikersnaam nummer
+nl_NL.mo	UUID	UUID
+nl_NL.mo	Brand	Merk
+nl_NL.mo	Number of lines	Aantal lijnen
+nl_NL.mo	User	Gebruiker
+nl_NL.mo	Manufacturer	Fabrikant
+nl_NL.mo	Type	Type
+nl_NL.mo	Model	Model
+nl_NL.mo	Network	Network
+nl_NL.mo	Update Source	Update Source
+nl_NL.mo	Location comments	Locatie opmerkingen
+nl_NL.mo	Child entities	Sub-entiteiten
+nn_NO.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
+nn_NO.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
+nn_NO.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
+nn_NO.mo	%s updates an item	%s updates an item
+nn_NO.mo	%s deletes an item	%s deletes an item
+nn_NO.mo	%s restores an item	%s restores an item
+nn_NO.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+nn_NO.mo	Impossible record for %s	Impossible record for %s
+nn_NO.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
+nn_NO.mo	Other item exist	Other item exist
+nn_NO.mo	Item in the trashbin	Item in the trashbin
+nn_NO.mo	%1$s = %2$s	%1$s = %2$s
+nn_NO.mo	%1$s: %2$s	%1$s: %2$s
+nn_NO.mo	%1$s - %2$s	%1$s - %2$s
+nn_NO.mo	%1$s (%2$s)	%1$s (%2$s)
+nn_NO.mo	ID	ID
+nn_NO.mo	Entity	Entity
+nn_NO.mo	Name	Name
+nn_NO.mo	Serial number	Serie Nummer
+nn_NO.mo	Inventory number	Inventar nummer
+nn_NO.mo	Alternate username	Alternate username
+nn_NO.mo	Alternate username number	Alternate username number
+nn_NO.mo	UUID	UUID
+nn_NO.mo	Brand	Merke
+nn_NO.mo	Number of lines	Antal linjer
+nn_NO.mo	User	User
+nn_NO.mo	Manufacturer	Manufacturer
+nn_NO.mo	Type	Type
+nn_NO.mo	Model	Model
+nn_NO.mo	Network	Network
+nn_NO.mo	Update Source	Update Source
+nn_NO.mo	Location comments	Location comments
+nn_NO.mo	Child entities	Barneservice enheter
+pl_PL.mo	%1$s log in from IP %2$s	%1$s zalogował się z IP %2$s
+pl_PL.mo	Failed login for %1$s from IP %2$s	Nieudane logowanie %1$s z IP %2$s
+pl_PL.mo	%1$s adds the item %2$s	%1$s dodał element %2$s
+pl_PL.mo	%s updates an item	%s zaktualizował element
+pl_PL.mo	%s deletes an item	%s usunął element
+pl_PL.mo	%s restores an item	%s przywrócił element
+pl_PL.mo	%1$s trying to add an item that already exists: %2$s	%1$s próbuje dodać element, który już istnieje: %2$s
+pl_PL.mo	Impossible record for %s	Niemożliwy rekord dla %s
+pl_PL.mo	Item successfully added but duplicate record on %s	Element poprawnie dodany ale znaleziono duplikat %s
+pl_PL.mo	Other item exist	Inny element istnieje
+pl_PL.mo	Item in the trashbin	Pozycje w koszu
+pl_PL.mo	%1$s = %2$s	%1$s = %2$s
+pl_PL.mo	%1$s: %2$s	%1$s: %2$s
+pl_PL.mo	%1$s - %2$s	%1$s - %2$s
+pl_PL.mo	%1$s (%2$s)	%1$s (%2$s)
+pl_PL.mo	ID	ID
+pl_PL.mo	Entity	Jednostka
+pl_PL.mo	Name	Name
+pl_PL.mo	Serial number	Numer seryjny
+pl_PL.mo	Inventory number	Numer inwentarzowy
+pl_PL.mo	Alternate username	Alternatywna nazwa użytkownika
+pl_PL.mo	Alternate username number	Alternatywny numer użytkownika
+pl_PL.mo	UUID	UUID
+pl_PL.mo	Brand	Marka
+pl_PL.mo	Number of lines	Ilość linii
+pl_PL.mo	User	Użytkownik
+pl_PL.mo	Manufacturer	Producent
+pl_PL.mo	Type	Typ
+pl_PL.mo	Model	Model
+pl_PL.mo	Network	Sieć
+pl_PL.mo	Update Source	Aktualizuj źródło
+pl_PL.mo	Location comments	Komentarz dla lokalizacji
+pl_PL.mo	Child entities	Podrzędne jednostki
+pt_BR.mo	%1$s log in from IP %2$s	%1$s fez login no IP %2$s
+pt_BR.mo	Failed login for %1$s from IP %2$s	Login falhou para %1$s no IP %2$s
+pt_BR.mo	%1$s adds the item %2$s	%1$s adicionou o item %2$s
+pt_BR.mo	%s updates an item	%s atualizou um item
+pt_BR.mo	%s deletes an item	%s excluiu um item
+pt_BR.mo	%s restores an item	%s restaurou um item
+pt_BR.mo	%1$s trying to add an item that already exists: %2$s	%1$s está tentando adicionar um item que já existe: %2$s
+pt_BR.mo	Impossible record for %s	Registro impossível para %s
+pt_BR.mo	Item successfully added but duplicate record on %s	Item adicionado com sucesso, mas registro duplicado em %s
+pt_BR.mo	Other item exist	Outro item existe
+pt_BR.mo	Item in the trashbin	Item na lixeira
+pt_BR.mo	%1$s = %2$s	%1$s = %2$s
+pt_BR.mo	%1$s: %2$s	%1$s: %2$s
+pt_BR.mo	%1$s - %2$s	%1$s - %2$s
+pt_BR.mo	%1$s (%2$s)	%1$s (%2$s)
+pt_BR.mo	ID	ID
+pt_BR.mo	Entity	Entidade
+pt_BR.mo	Name	Nome
+pt_BR.mo	Serial number	Número de série
+pt_BR.mo	Inventory number	Número de inventário
+pt_BR.mo	Alternate username	Nome alternativo do usuário
+pt_BR.mo	Alternate username number	Número alternativo do usuário
+pt_BR.mo	UUID	UUID
+pt_BR.mo	Brand	Marca
+pt_BR.mo	Number of lines	Número de linhas
+pt_BR.mo	User	Usuário
+pt_BR.mo	Manufacturer	Fabricante
+pt_BR.mo	Type	Tipo
+pt_BR.mo	Model	Modelo
+pt_BR.mo	Network	Rede
+pt_BR.mo	Update Source	Fonte de atualização
+pt_BR.mo	Location comments	Comentários da localização
+pt_BR.mo	Child entities	Entidades filhas
+pt_PT.mo	%1$s log in from IP %2$s	%1$s ligou-se do IP %2$s
+pt_PT.mo	Failed login for %1$s from IP %2$s	Falhou login para %1$s do IP %2$s
+pt_PT.mo	%1$s adds the item %2$s	%1$s adiciona o item %2$s
+pt_PT.mo	%s updates an item	%s atualizou um item
+pt_PT.mo	%s deletes an item	%s eliminou um item
+pt_PT.mo	%s restores an item	%s restaurou um item
+pt_PT.mo	%1$s trying to add an item that already exists: %2$s	%1$s tenta adicionar um item que já existe: %2$s
+pt_PT.mo	Impossible record for %s	Registo impossível para %s
+pt_PT.mo	Item successfully added but duplicate record on %s	Item adicionado com sucesso mas registo duplicado em %s
+pt_PT.mo	Other item exist	Existe outro item
+pt_PT.mo	Item in the trashbin	Item na reciclagem
+pt_PT.mo	%1$s = %2$s	%1$s = %2$s
+pt_PT.mo	%1$s: %2$s	%1$s: %2$s
+pt_PT.mo	%1$s - %2$s	%1$s - %2$s
+pt_PT.mo	%1$s (%2$s)	%1$s (%2$s)
+pt_PT.mo	ID	ID
+pt_PT.mo	Entity	Entidade
+pt_PT.mo	Name	Nome
+pt_PT.mo	Serial number	Número de série
+pt_PT.mo	Inventory number	Número de inventário
+pt_PT.mo	Alternate username	Nome de utilizador alternativo
+pt_PT.mo	Alternate username number	Número de utilizador alternativo
+pt_PT.mo	UUID	UUID
+pt_PT.mo	Brand	Marca
+pt_PT.mo	Number of lines	Numero de linhas
+pt_PT.mo	User	Utilizador
+pt_PT.mo	Manufacturer	Fabricante
+pt_PT.mo	Type	Tipo
+pt_PT.mo	Model	Modelo
+pt_PT.mo	Network	Rede
+pt_PT.mo	Update Source	Atualizar fonte
+pt_PT.mo	Location comments	Comentários para a localização
+pt_PT.mo	Child entities	Entidades descendentes
+ro_RO.mo	%1$s log in from IP %2$s	%1$s s-a conectat de la IP -ul  %2$s
+ro_RO.mo	Failed login for %1$s from IP %2$s	Conexiune eşuată pentru %1$s de la IP %2$s
+ro_RO.mo	%1$s adds the item %2$s	%1$sadaugă elementzl %2$s
+ro_RO.mo	%s updates an item	%s actualizează  un element
+ro_RO.mo	%s deletes an item	%s şterge un element
+ro_RO.mo	%s restores an item	%s restaurează un element
+ro_RO.mo	%1$s trying to add an item that already exists: %2$s	%1$s încearca să adauge un element care deja există: %2$s
+ro_RO.mo	Impossible record for %s	Înregistrare imposibilă pentru %s
+ro_RO.mo	Item successfully added but duplicate record on %s	Înregistrare efectuată dar dubluri pe %s
+ro_RO.mo	Other item exist	Un alt element există
+ro_RO.mo	Item in the trashbin	Item in the trashbin
+ro_RO.mo	%1$s = %2$s	%1$s = %2$s
+ro_RO.mo	%1$s: %2$s	%1$s: %2$s
+ro_RO.mo	%1$s - %2$s	%1$s - %2$s
+ro_RO.mo	%1$s (%2$s)	%1$s (%2$s)
+ro_RO.mo	ID	ID
+ro_RO.mo	Entity	Entitate: 
+ro_RO.mo	Name	Name
+ro_RO.mo	Serial number	Numar de serie
+ro_RO.mo	Inventory number	Numar de inventar
+ro_RO.mo	Alternate username	Nume utilizator alternativ
+ro_RO.mo	Alternate username number	Număr nume utilizator alternativ
+ro_RO.mo	UUID	UUID
+ro_RO.mo	Brand	Firma
+ro_RO.mo	Number of lines	Numarul de linii
+ro_RO.mo	User	Utilizator
+ro_RO.mo	Manufacturer	Producător
+ro_RO.mo	Type	Tip
+ro_RO.mo	Model	Model
+ro_RO.mo	Network	Retea
+ro_RO.mo	Update Source	Actualizează  sursa
+ro_RO.mo	Location comments	Comentarii locaţie
+ro_RO.mo	Child entities	Subentitate
+ru_RU.mo	%1$s log in from IP %2$s	%1$s вошел в систему с IP %2$s
+ru_RU.mo	Failed login for %1$s from IP %2$s	Неудачная попытка входа пользователя %1$s с IP %2$s
+ru_RU.mo	%1$s adds the item %2$s	%1$s добавил объект %2$s
+ru_RU.mo	%s updates an item	%s обновил объект
+ru_RU.mo	%s deletes an item	%s удалил объект
+ru_RU.mo	%s restores an item	%s восстановил объект
+ru_RU.mo	%1$s trying to add an item that already exists: %2$s	%1$s попытался добавить существующий элемент : %2$s
+ru_RU.mo	Impossible record for %s	Невозможная запись для %s
+ru_RU.mo	Item successfully added but duplicate record on %s	Объект успешно добавлен, но дублирует запись %s
+ru_RU.mo	Other item exist	Существует другой элемент
+ru_RU.mo	Item in the trashbin	Элемент в корзине
+ru_RU.mo	%1$s = %2$s	%1$s = %2$s
+ru_RU.mo	%1$s: %2$s	%1$s: %2$s
+ru_RU.mo	%1$s - %2$s	%1$s - %2$s
+ru_RU.mo	%1$s (%2$s)	%1$s (%2$s)
+ru_RU.mo	ID	ID
+ru_RU.mo	Entity	Организация
+ru_RU.mo	Name	Name
+ru_RU.mo	Serial number	Серийный номер
+ru_RU.mo	Inventory number	Инвентарный номер
+ru_RU.mo	Alternate username	Контактное лицо
+ru_RU.mo	Alternate username number	Телефон контактного лица
+ru_RU.mo	UUID	Уникальный номер (UUID)
+ru_RU.mo	Brand	Торговая марка
+ru_RU.mo	Number of lines	Число линий
+ru_RU.mo	User	Пользователь
+ru_RU.mo	Manufacturer	Производитель
+ru_RU.mo	Type	Тип
+ru_RU.mo	Model	Модель
+ru_RU.mo	Network	Сеть
+ru_RU.mo	Update Source	Источник обновлений
+ru_RU.mo	Location comments	Примечания местоположения
+ru_RU.mo	Child entities	Подчинённые организации
+sk_SK.mo	%1$s log in from IP %2$s	%1$s sa prihlásil z IP %2$s
+sk_SK.mo	Failed login for %1$s from IP %2$s	Neúspešné prihlásenie %1$s z IP %2$s
+sk_SK.mo	%1$s adds the item %2$s	%1$s pridal položku %2$s
+sk_SK.mo	%s updates an item	%s aktualizoval položku
+sk_SK.mo	%s deletes an item	%s zmazal položku
+sk_SK.mo	%s restores an item	%s obnovil položku
+sk_SK.mo	%1$s trying to add an item that already exists: %2$s	%1$s sa snaží pridať položku, ktorá už existuje: %2$s
+sk_SK.mo	Impossible record for %s	Nemožný zápis pre %s
+sk_SK.mo	Item successfully added but duplicate record on %s	Položka úspešne pridaná ale je to duplicitný záznam %s
+sk_SK.mo	Other item exist	Iná položka existuje
+sk_SK.mo	Item in the trashbin	Položka v koši
+sk_SK.mo	%1$s = %2$s	%1$s = %2$s
+sk_SK.mo	%1$s: %2$s	%1$s: %2$s
+sk_SK.mo	%1$s - %2$s	%1$s - %2$s
+sk_SK.mo	%1$s (%2$s)	%1$s (%2$s)
+sk_SK.mo	ID	ID
+sk_SK.mo	Entity	Entita
+sk_SK.mo	Name	Name
+sk_SK.mo	Serial number	Sériové číslo
+sk_SK.mo	Inventory number	Inventárne číslo
+sk_SK.mo	Alternate username	Alternatívne používateľské meno
+sk_SK.mo	Alternate username number	Číslo alternatívneho používateľského mena
+sk_SK.mo	UUID	UUID
+sk_SK.mo	Brand	Značka
+sk_SK.mo	Number of lines	Počet liniek
+sk_SK.mo	User	Používateľ
+sk_SK.mo	Manufacturer	Výrobca
+sk_SK.mo	Type	Typ
+sk_SK.mo	Model	Model
+sk_SK.mo	Network	Sieť
+sk_SK.mo	Update Source	Zdroj aktualizácií
+sk_SK.mo	Location comments	Komentáre umiestnenia
+sk_SK.mo	Child entities	Podriadené entity
+sl_SI.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
+sl_SI.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
+sl_SI.mo	%1$s adds the item %2$s	%1$s doda predmet %2$s
+sl_SI.mo	%s updates an item	%s posodobi predmet
+sl_SI.mo	%s deletes an item	%s izbriše predmet
+sl_SI.mo	%s restores an item	%s obnavlja predmet
+sl_SI.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+sl_SI.mo	Impossible record for %s	Impossible record for %s
+sl_SI.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
+sl_SI.mo	Other item exist	Other item exist
+sl_SI.mo	Item in the trashbin	Item in the trashbin
+sl_SI.mo	%1$s = %2$s	%1$s = %2$s
+sl_SI.mo	%1$s: %2$s	%1$s: %2$s
+sl_SI.mo	%1$s - %2$s	%1$s - %2$s
+sl_SI.mo	%1$s (%2$s)	%1$s (%2$s)
+sl_SI.mo	ID	ID
+sl_SI.mo	Entity	Entity
+sl_SI.mo	Name	Name
+sl_SI.mo	Serial number	Serijska številka
+sl_SI.mo	Inventory number	Inventarna številka
+sl_SI.mo	Alternate username	Drugo uporabniško ime
+sl_SI.mo	Alternate username number	Alternate username number
+sl_SI.mo	UUID	UUID
+sl_SI.mo	Brand	Znamka
+sl_SI.mo	Number of lines	Šetvilo vrstic
+sl_SI.mo	User	User
+sl_SI.mo	Manufacturer	Manufacturer
+sl_SI.mo	Type	Type
+sl_SI.mo	Model	Model
+sl_SI.mo	Network	Network
+sl_SI.mo	Update Source	Update Source
+sl_SI.mo	Location comments	Location comments
+sl_SI.mo	Child entities	Podrejene entitete
+sr_RS.mo	%1$s log in from IP %2$s	%1$s loguj se sa IP %2$s
+sr_RS.mo	Failed login for %1$s from IP %2$s	Neuspelo logovanje za %1$s sa IP %2$s
+sr_RS.mo	%1$s adds the item %2$s	%1$s dodavanje stavke %2$s
+sr_RS.mo	%s updates an item	%s ažurira stavku
+sr_RS.mo	%s deletes an item	%s briše stavke
+sr_RS.mo	%s restores an item	%s povraća stavku
+sr_RS.mo	%1$s trying to add an item that already exists: %2$s	%1$s pokušaj dodavanja stavke koja već postoji: %2$s
+sr_RS.mo	Impossible record for %s	Nemoguće izvršiti zapis za %s
+sr_RS.mo	Item successfully added but duplicate record on %s	Stavka uspešno dodata ali duplikat zapusan u %s
+sr_RS.mo	Other item exist	Postoji druga stavka
+sr_RS.mo	Item in the trashbin	Item in the trashbin
+sr_RS.mo	%1$s = %2$s	%1$s = %2$s
+sr_RS.mo	%1$s: %2$s	%1$s: %2$s
+sr_RS.mo	%1$s - %2$s	%1$s - %2$s
+sr_RS.mo	%1$s (%2$s)	%1$s (%2$s)
+sr_RS.mo	ID	ID
+sr_RS.mo	Entity	Entity
+sr_RS.mo	Name	Name
+sr_RS.mo	Serial number	Serijski broj
+sr_RS.mo	Inventory number	Inventarski broj
+sr_RS.mo	Alternate username	Alternativno korisničko ime
+sr_RS.mo	Alternate username number	Alternativni broj korisničkog imena
+sr_RS.mo	UUID	UUID
+sr_RS.mo	Brand	Marka
+sr_RS.mo	Number of lines	Broj linija
+sr_RS.mo	User	User
+sr_RS.mo	Manufacturer	Manufacturer
+sr_RS.mo	Type	Type
+sr_RS.mo	Model	Model
+sr_RS.mo	Network	Network
+sr_RS.mo	Update Source	Update Source
+sr_RS.mo	Location comments	Komentar za lokaciju
+sr_RS.mo	Child entities	Naslednik entiteta
+sv_SE.mo	%1$s log in from IP %2$s	%1$s är inloggad från ip %2$s
+sv_SE.mo	Failed login for %1$s from IP %2$s	%1$s misslyckades att logga in från IP %2$s
+sv_SE.mo	%1$s adds the item %2$s	%1$s lägger till objektet %2$s
+sv_SE.mo	%s updates an item	%s uppdaterar ett objekt
+sv_SE.mo	%s deletes an item	%s tar bort ett objekt
+sv_SE.mo	%s restores an item	%s återställer ett objekt
+sv_SE.mo	%1$s trying to add an item that already exists: %2$s	%1$s försöker lägga till ett objekt som redan finns: %2$s
+sv_SE.mo	Impossible record for %s	Impossible record for %s
+sv_SE.mo	Item successfully added but duplicate record on %s	Objekt tillagt men dubbel registrering på %s
+sv_SE.mo	Other item exist	Annat objekt finns
+sv_SE.mo	Item in the trashbin	Item in the trashbin
+sv_SE.mo	%1$s = %2$s	%1$s = %2$s
+sv_SE.mo	%1$s: %2$s	%1$s: %2$s
+sv_SE.mo	%1$s - %2$s	%1$s - %2$s
+sv_SE.mo	%1$s (%2$s)	%1$s (%2$s)
+sv_SE.mo	ID	ID
+sv_SE.mo	Entity	Enhet
+sv_SE.mo	Name	Name
+sv_SE.mo	Serial number	Serienummer
+sv_SE.mo	Inventory number	Inventarienummer
+sv_SE.mo	Alternate username	Alternativt användarnamn
+sv_SE.mo	Alternate username number	Alternativt användarnummer
+sv_SE.mo	UUID	UUID
+sv_SE.mo	Brand	Fabrikat
+sv_SE.mo	Number of lines	Antal linjer
+sv_SE.mo	User	Användare
+sv_SE.mo	Manufacturer	Tillverkare
+sv_SE.mo	Type	Type
+sv_SE.mo	Model	Modell
+sv_SE.mo	Network	Nätverk
+sv_SE.mo	Update Source	Uppdateringskälla
+sv_SE.mo	Location comments	Location comments
+sv_SE.mo	Child entities	Dotterenheter
+ta.mo	%1$s log in from IP %2$s	IP %2$s இலிருந்து %1$s உள்நுழைக
+ta.mo	Failed login for %1$s from IP %2$s	ஐபி %2$s இலிருந்து %1$s க்கான உள்நுழைவு தோல்வியுற்றது
+ta.mo	%1$s adds the item %2$s	%1$s உருப்படி %2$s ஐ சேர்க்கிறது
+ta.mo	%s updates an item	%s ஒரு பொருளைப் புதுப்பிக்கிறது
+ta.mo	%s deletes an item	%s ஒரு பொருளை நீக்குகிறது
+ta.mo	%s restores an item	%s ஒரு பொருளை மீட்டமைக்கிறது
+ta.mo	%1$s trying to add an item that already exists: %2$s	%1$s ஏற்கனவே இருக்கும் ஒரு பொருளைச் சேர்க்க முயற்சிக்கின்றன: %2$s
+ta.mo	Impossible record for %s	%s க்கு சாத்தியமற்ற பதிவு
+ta.mo	Item successfully added but duplicate record on %s	உருப்படி வெற்றிகரமாகச் சேர்த்தது, ஆனால் %s இல் நகல் பதிவு
+ta.mo	Other item exist	பிற உருப்படி உள்ளன
+ta.mo	Item in the trashbin	டிராச்பினில் உள்ள உருப்படி
+ta.mo	%1$s = %2$s	%1$s = %2$s
+ta.mo	%1$s: %2$s	%1$s: %2$s
+ta.mo	%1$s - %2$s	%1$s - %2$s
+ta.mo	%1$s (%2$s)	%1$s (%2$s)
+ta.mo	ID	ஐடி
+ta.mo	Entity	உருபொருள்
+ta.mo	Name	பெயர்
+ta.mo	Serial number	வரிசை எண்
+ta.mo	Inventory number	சரக்கு எண்
+ta.mo	Alternate username	மாற்று பயனர்பெயர்
+ta.mo	Alternate username number	மாற்று பயனர்பெயர் எண்
+ta.mo	UUID	Uuid
+ta.mo	Brand	சூட்டுக்குறி
+ta.mo	Number of lines	வரிகளின் எண்ணிக்கை
+ta.mo	User	பயனர்
+ta.mo	Manufacturer	உற்பத்தியாளர்
+ta.mo	Type	வகை
+ta.mo	Model	மாதிரியுரு
+ta.mo	Network	பிணையம்
+ta.mo	Update Source	மூலத்தைப் புதுப்பிக்கவும்
+ta.mo	Location comments	இருப்பிட கருத்துகள்
+ta.mo	Child entities	குழந்தை நிறுவனங்கள்
+th_TH.mo	%1$s log in from IP %2$s	%1$s เข้าสู่ระบบจาก IP %2$s
+th_TH.mo	Failed login for %1$s from IP %2$s	เข้าสู่ระบบไม่ผ่าน %1$s จาก IP %2$s
+th_TH.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
+th_TH.mo	%s updates an item	%s อัพเดทรายการ
+th_TH.mo	%s deletes an item	%s ลบรายการ
+th_TH.mo	%s restores an item	%s กู้คืนรายการ
+th_TH.mo	%1$s trying to add an item that already exists: %2$s	%1$s พยายามที่จะเพิ่มรายการที่มีอยู่แล้ว: %2$s
+th_TH.mo	Impossible record for %s	เป็นไปไม่ได้สำหรับการบันทึก %s
+th_TH.mo	Item successfully added but duplicate record on %s	รายการที่ประสบความสำเร็จในการเพิ่ม แต่บันทึกที่ซ้ำกันใน %s
+th_TH.mo	Other item exist	รายการอื่น ๆ ที่มีอยู่
+th_TH.mo	Item in the trashbin	รายการในถังขยะ
+th_TH.mo	%1$s = %2$s	%1$s = %2$s
+th_TH.mo	%1$s: %2$s	%1$s: %2$s
+th_TH.mo	%1$s - %2$s	%1$s - %2$s
+th_TH.mo	%1$s (%2$s)	%1$s (%2$s)
+th_TH.mo	ID	ID
+th_TH.mo	Entity	เอ็นทิตี้
+th_TH.mo	Name	Name
+th_TH.mo	Serial number	Serial No.
+th_TH.mo	Inventory number	รหัสทรัพย์สิน
+th_TH.mo	Alternate username	ชื่อผู้ใช้งาน
+th_TH.mo	Alternate username number	หมายเลขติดต่อผู้ใช้งาน
+th_TH.mo	UUID	UUID
+th_TH.mo	Brand	ยี่ห้อ
+th_TH.mo	Number of lines	จำนวนบันทัด
+th_TH.mo	User	ผู้ใช้
+th_TH.mo	Manufacturer	ผู้ผลิต
+th_TH.mo	Type	ประเภท
+th_TH.mo	Model	รุ่น
+th_TH.mo	Network	เน็ตเวร์ค
+th_TH.mo	Update Source	อัพเดทแหล่งที่มา
+th_TH.mo	Location comments	รายละเอียดเพิ่มเติม
+th_TH.mo	Child entities	เอ็นทิตี้ย่อย
+tr_TR.mo	%1$s log in from IP %2$s	%1$s, %2$s IP adresinden oturum açtı
+tr_TR.mo	Failed login for %1$s from IP %2$s	%1$s, %2$s IP adresinden oturum açamadı
+tr_TR.mo	%1$s adds the item %2$s	%1$s %2$s ögesini ekledi
+tr_TR.mo	%s updates an item	%s bir ögeyi güncelledi
+tr_TR.mo	%s deletes an item	%s bir ögeyi sildi
+tr_TR.mo	%s restores an item	%s bir ögeyi geri yükledi
+tr_TR.mo	%1$s trying to add an item that already exists: %2$s	%1$s zaten var olan bir ögeyi eklemeye çalışıyor: %2$s
+tr_TR.mo	Impossible record for %s	%s için olanaksız kayıt
+tr_TR.mo	Item successfully added but duplicate record on %s	Öge eklendi, ancak %s üzerinde çift kayıt
+tr_TR.mo	Other item exist	Başka bir öge var
+tr_TR.mo	Item in the trashbin	Çöp kutusundaki öge
+tr_TR.mo	%1$s = %2$s	%1$s = %2$s
+tr_TR.mo	%1$s: %2$s	%1$s: %2$s
+tr_TR.mo	%1$s - %2$s	%1$s - %2$s
+tr_TR.mo	%1$s (%2$s)	%1$s (%2$s)
+tr_TR.mo	ID	Kod
+tr_TR.mo	Entity	Birim
+tr_TR.mo	Name	Name
+tr_TR.mo	Serial number	Seri numarası
+tr_TR.mo	Inventory number	Stok numarası
+tr_TR.mo	Alternate username	Diğer kullanıcı adı
+tr_TR.mo	Alternate username number	Diğer kullanıcı adı numarası
+tr_TR.mo	UUID	UUID
+tr_TR.mo	Brand	Marka
+tr_TR.mo	Number of lines	Hat sayısı
+tr_TR.mo	User	Kullanıcı
+tr_TR.mo	Manufacturer	Üretici
+tr_TR.mo	Type	Tür
+tr_TR.mo	Model	Model
+tr_TR.mo	Network	Ağ
+tr_TR.mo	Update Source	Güncelleme Kaynağı
+tr_TR.mo	Location comments	Konum notları
+tr_TR.mo	Child entities	Alt birimler
+uk_UA.mo	%1$s log in from IP %2$s	%1$s зайшов з IP %2$s
+uk_UA.mo	Failed login for %1$s from IP %2$s	Невдала реєстрація %1$s з IP %2$s
+uk_UA.mo	%1$s adds the item %2$s	%1$s додав елемент %2$s
+uk_UA.mo	%s updates an item	%s змінив елемент
+uk_UA.mo	%s deletes an item	%s видалив елемент
+uk_UA.mo	%s restores an item	%s відновив елемент
+uk_UA.mo	%1$s trying to add an item that already exists: %2$s	%1$s намагався додати елемент, який вже існує: %2$s
+uk_UA.mo	Impossible record for %s	Неможливий запис для %s
+uk_UA.mo	Item successfully added but duplicate record on %s	Елемент успішно додано, але запис однаковий з %s
+uk_UA.mo	Other item exist	Існує інший елемент
+uk_UA.mo	Item in the trashbin	Елемент у кошику
+uk_UA.mo	%1$s = %2$s	%1$s = %2$s
+uk_UA.mo	%1$s: %2$s	%1$s: %2$s
+uk_UA.mo	%1$s - %2$s	%1$s - %2$s
+uk_UA.mo	%1$s (%2$s)	%1$s (%2$s)
+uk_UA.mo	ID	ID
+uk_UA.mo	Entity	Організація
+uk_UA.mo	Name	Name
+uk_UA.mo	Serial number	Серійний номер
+uk_UA.mo	Inventory number	Інвентарний номер
+uk_UA.mo	Alternate username	Контакт
+uk_UA.mo	Alternate username number	Контактний номер
+uk_UA.mo	UUID	UUID
+uk_UA.mo	Brand	Бренд
+uk_UA.mo	Number of lines	Число ліній
+uk_UA.mo	User	Користувач
+uk_UA.mo	Manufacturer	Виробник
+uk_UA.mo	Type	Тип
+uk_UA.mo	Model	Модель
+uk_UA.mo	Network	Мережа
+uk_UA.mo	Update Source	Джерело оновлення
+uk_UA.mo	Location comments	Примітки до приміщення
+uk_UA.mo	Child entities	Підпорядковані підрозділи
+vi_VN.mo	%1$s log in from IP %2$s	%1$s đăng nhập từ IP %2$s
+vi_VN.mo	Failed login for %1$s from IP %2$s	Đăng nhập thất bại cho %1$s từ IP %2$s
+vi_VN.mo	%1$s adds the item %2$s	%1$s thêm mục %2$s
+vi_VN.mo	%s updates an item	%s cập nhật một mục
+vi_VN.mo	%s deletes an item	%s xóa một mục
+vi_VN.mo	%s restores an item	%s phục hồi một mục
+vi_VN.mo	%1$s trying to add an item that already exists: %2$s	%1$s đang cố thêm một mục đang tồn tại: %2$s
+vi_VN.mo	Impossible record for %s	Không thể lưu cho %s
+vi_VN.mo	Item successfully added but duplicate record on %s	Đã thêm mục thành công, nhưng lặp lại bản lưu trên %s
+vi_VN.mo	Other item exist	Tồn tại mục khác
+vi_VN.mo	Item in the trashbin	Item in the trashbin
+vi_VN.mo	%1$s = %2$s	%1$s = %2$s
+vi_VN.mo	%1$s: %2$s	%1$s: %2$s
+vi_VN.mo	%1$s - %2$s	%1$s - %2$s
+vi_VN.mo	%1$s (%2$s)	%1$s (%2$s)
+vi_VN.mo	ID	ID
+vi_VN.mo	Entity	Các đối tượng
+vi_VN.mo	Name	Name
+vi_VN.mo	Serial number	Số sê-ri
+vi_VN.mo	Inventory number	Số hàng tồn kho
+vi_VN.mo	Alternate username	Tên người dùng thay thế
+vi_VN.mo	Alternate username number	Tên người dùng thay thế số
+vi_VN.mo	UUID	UUID
+vi_VN.mo	Brand	Nhãn hiệu
+vi_VN.mo	Number of lines	Số lượng các dòng
+vi_VN.mo	User	Các người dùng
+vi_VN.mo	Manufacturer	Nhà sản xuất
+vi_VN.mo	Type	Type
+vi_VN.mo	Model	Mô-đen
+vi_VN.mo	Network	Các mạng
+vi_VN.mo	Update Source	Các nguồn cập nhật
+vi_VN.mo	Location comments	Các bình luận địa điểm
+vi_VN.mo	Child entities	Các đối tượng con
+zh_CN.mo	%1$s log in from IP %2$s	%1$s 登陆来自 IP %2$s
+zh_CN.mo	Failed login for %1$s from IP %2$s	 %1$s 从 IP %2$s登陆失败
+zh_CN.mo	%1$s adds the item %2$s	%1$s 添加项目 %2$s
+zh_CN.mo	%s updates an item	%s 更新一个项目
+zh_CN.mo	%s deletes an item	%s 删除一个项目
+zh_CN.mo	%s restores an item	%s 恢复一个项目
+zh_CN.mo	%1$s trying to add an item that already exists: %2$s	%1$s 尝试添加已经存在的项目: %2$s
+zh_CN.mo	Impossible record for %s	不能记录 %s
+zh_CN.mo	Item successfully added but duplicate record on %s	项目添加成功，但是与记录 %s重复
+zh_CN.mo	Other item exist	其它存在的项目
+zh_CN.mo	Item in the trashbin	垃圾桶中的项
+zh_CN.mo	%1$s = %2$s	%1$s = %2$s
+zh_CN.mo	%1$s: %2$s	%1$s: %2$s
+zh_CN.mo	%1$s - %2$s	%1$s - %2$s
+zh_CN.mo	%1$s (%2$s)	%1$s (%2$s)
+zh_CN.mo	ID	ID
+zh_CN.mo	Entity	组织
+zh_CN.mo	Name	Name
+zh_CN.mo	Serial number	序列号
+zh_CN.mo	Inventory number	资产编号
+zh_CN.mo	Alternate username	使用者
+zh_CN.mo	Alternate username number	用户编号
+zh_CN.mo	UUID	UUID
+zh_CN.mo	Brand	品牌
+zh_CN.mo	Number of lines	行数
+zh_CN.mo	User	用户
+zh_CN.mo	Manufacturer	制造商
+zh_CN.mo	Type	类型
+zh_CN.mo	Model	型号
+zh_CN.mo	Network	网络
+zh_CN.mo	Update Source	更新来源
+zh_CN.mo	Location comments	地点注解
+zh_CN.mo	Child entities	从属组织
+zh_HK.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
+zh_HK.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
+zh_HK.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
+zh_HK.mo	%s updates an item	%s updates an item
+zh_HK.mo	%s deletes an item	%s deletes an item
+zh_HK.mo	%s restores an item	%s restores an item
+zh_HK.mo	%1$s trying to add an item that already exists: %2$s	%1$s trying to add an item that already exists: %2$s
+zh_HK.mo	Impossible record for %s	Impossible record for %s
+zh_HK.mo	Item successfully added but duplicate record on %s	Item successfully added but duplicate record on %s
+zh_HK.mo	Other item exist	Other item exist
+zh_HK.mo	Item in the trashbin	Item in the trashbin
+zh_HK.mo	%1$s = %2$s	%1$s = %2$s
+zh_HK.mo	%1$s: %2$s	%1$s: %2$s
+zh_HK.mo	%1$s - %2$s	%1$s - %2$s
+zh_HK.mo	%1$s (%2$s)	%1$s (%2$s)
+zh_HK.mo	ID	ID
+zh_HK.mo	Entity	Entity
+zh_HK.mo	Name	Name
+zh_HK.mo	Serial number	Serial number
+zh_HK.mo	Inventory number	Inventory number
+zh_HK.mo	Alternate username	Alternate username
+zh_HK.mo	Alternate username number	Alternate username number
+zh_HK.mo	UUID	UUID
+zh_HK.mo	Brand	Brand
+zh_HK.mo	Number of lines	Number of lines
+zh_HK.mo	User	User
+zh_HK.mo	Manufacturer	Manufacturer
+zh_HK.mo	Type	Type
+zh_HK.mo	Model	Model
+zh_HK.mo	Network	Network
+zh_HK.mo	Update Source	Update Source
+zh_HK.mo	Location comments	Location comments
+zh_HK.mo	Child entities	Child entities
+zh_TW.mo	%1$s log in from IP %2$s	%1$s 登錄從 IP %2$s
+zh_TW.mo	Failed login for %1$s from IP %2$s	從IP %2$s的%1$s 的登錄失敗
+zh_TW.mo	%1$s adds the item %2$s	%1$s 新增項目 %2$s
+zh_TW.mo	%s updates an item	%s 更新項目
+zh_TW.mo	%s deletes an item	%s 刪除項目
+zh_TW.mo	%s restores an item	%s 還原項目
+zh_TW.mo	%1$s trying to add an item that already exists: %2$s	%1$s 嘗試去新增一個已存在項目: %2$s
+zh_TW.mo	Impossible record for %s	不可能紀錄 %s
+zh_TW.mo	Item successfully added but duplicate record on %s	項目成功添加，但重複的記錄在 %s
+zh_TW.mo	Other item exist	其它項目已存在
+zh_TW.mo	Item in the trashbin	垃圾桶裡的項目
+zh_TW.mo	%1$s = %2$s	%1$s = %2$s
+zh_TW.mo	%1$s: %2$s	%1$s: %2$s
+zh_TW.mo	%1$s - %2$s	%1$s - %2$s
+zh_TW.mo	%1$s (%2$s)	%1$s (%2$s)
+zh_TW.mo	ID	ID
+zh_TW.mo	Entity	實體
+zh_TW.mo	Name	Name
+zh_TW.mo	Serial number	序號
+zh_TW.mo	Inventory number	財產編號
+zh_TW.mo	Alternate username	聯絡人
+zh_TW.mo	Alternate username number	聯絡電話
+zh_TW.mo	UUID	UUID
+zh_TW.mo	Brand	品牌
+zh_TW.mo	Number of lines	行數
+zh_TW.mo	User	使用者
+zh_TW.mo	Manufacturer	製造商
+zh_TW.mo	Type	Type
+zh_TW.mo	Model	型號
+zh_TW.mo	Network	網路設備
+zh_TW.mo	Update Source	更新來源
+zh_TW.mo	Location comments	位置註釋
+zh_TW.mo	Child entities	從屬實體

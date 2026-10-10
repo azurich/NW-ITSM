@@ -145,6 +145,21 @@ cd ../frontend && npm run generate:api
 Committez `backend/openapi.json` et `frontend/src/api/schema.ts` avec la
 modification : la CI échoue s'ils ne correspondent pas au code.
 
+## Textes traduits écrits en base
+
+Les textes que l'API écrit traduits en base, comme le PHP (messages du
+journal des événements), viennent des fichiers `locales/*.mo` de
+l'application, extraits dans `backend/crates/nw-domain/src/i18n/catalog.tsv`.
+Après l'ajout d'un texte dans `nw_domain::i18n::text` ou une mise à jour des
+traductions :
+
+```sh
+cd backend && UPDATE_TRANSLATIONS=1 cargo test -p nw-domain --test translations
+```
+
+Committez le catalogue : la CI échoue s'il ne correspond pas aux fichiers
+`.mo`.
+
 ## Ajouter un domaine
 
 1. `nw-domain` : règles propres au domaine, sans accès à la base, avec des

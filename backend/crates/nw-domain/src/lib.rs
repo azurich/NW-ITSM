@@ -9,6 +9,7 @@ pub mod crypto;
 pub mod entity;
 pub mod fk;
 pub mod history;
+pub mod i18n;
 pub mod infocom;
 pub mod languages;
 pub mod naming;

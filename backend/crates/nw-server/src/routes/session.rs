@@ -11,7 +11,9 @@ use axum_extra::extract::cookie::CookieJar;
 use nw_db::{entities, events, users};
 use nw_domain::{
     entity::{EntitySelection, selectable_entities},
-    history, languages,
+    history,
+    i18n::{self, text},
+    languages,
     rights::Interface,
 };
 use serde::{Deserialize, Deserializer, Serialize};
@@ -385,6 +387,8 @@ pub async fn change_password(
         &request.new_password,
     )
     .await?;
+    // Like the preferences form of the classic interface.
+    log_user_update(&state, &session).await;
 
     let user = users::find_by_id(&state.pool, session.user.id)
         .await?
@@ -439,18 +443,7 @@ pub async fn update_preferences(
     let changed =
         users::change_language(&state.pool, session.user.id, language.as_deref(), &actor).await?;
     if changed {
-        let login = session.user.name.clone().unwrap_or_default();
-        auth::log_event(
-            &state,
-            &events::Event {
-                items_id: session.user.id,
-                kind: "users",
-                service: "setup",
-                level: 5,
-                message: &format!("{login} updates an item"),
-            },
-        )
-        .await;
+        log_user_update(&state, &session).await;
     }
 
     let user = users::find_by_id(&state.pool, session.user.id)
@@ -459,6 +452,25 @@ pub async fn update_preferences(
     let profile = ProfileChoice::Exact(session.profile.id);
     let updated = Session::open(&state.pool, user, profile, Some(session.selection)).await?;
     Ok(Json(SessionInfo::build(&state, &updated).await?))
+}
+
+/// Event of `front/preference.php`, in the language of the session before
+/// the update: the PHP code changes the language of the session without
+/// reloading its translations.
+async fn log_user_update(state: &AppState, session: &Session) {
+    let login = session.user.name.clone().unwrap_or_default();
+    let format = i18n::tr(&session.preferences.language, text::UPDATES_ITEM);
+    auth::log_event(
+        state,
+        &events::Event {
+            items_id: session.user.id,
+            kind: "users",
+            service: "setup",
+            level: 5,
+            message: &i18n::sprintf(&format, &[&login]),
+        },
+    )
+    .await;
 }
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -480,7 +492,10 @@ pub async fn list_languages(_session: Session) -> Json<Vec<Language>> {
     Json(
         languages::LANGUAGES
             .iter()
-            .map(|&(code, name)| Language { code, name })
+            .map(|language| Language {
+                code: language.code,
+                name: language.name,
+            })
             .collect(),
     )
 }

@@ -52,15 +52,17 @@ async fn repeated_failures_block_the_login_for_a_while() {
 #[tokio::test]
 async fn logins_are_written_to_the_event_log() {
     let app = test_app!();
-    app.login_response("nobody", "secret").await;
+    app.login_response("<nobody>", "secret").await;
     app.login_response("admin", "wrong").await;
-    app.login("admin").await;
+    // The login as typed, like the PHP code.
+    let response = app.login_response("Admin", "secret").await;
+    assert_eq!(response.status, StatusCode::OK);
     assert_eq!(
         events(&app).await,
         [
-            "Failed login for nobody from IP unknown",
+            "Failed login for &lt;nobody&gt; from IP unknown",
             "Failed login for admin from IP unknown",
-            "admin log in from IP unknown",
+            "Admin log in from IP unknown",
         ]
     );
     let last_login: Option<chrono::DateTime<chrono::Utc>> =
@@ -69,6 +71,44 @@ async fn logins_are_written_to_the_event_log() {
             .await
             .unwrap();
     assert!(last_login.is_some());
+}
+
+#[tokio::test]
+async fn login_events_are_in_the_language_of_the_browser() {
+    let app = test_app!();
+    app.sql(
+        "INSERT INTO glpi_configs (context, name, value) VALUES ('core', 'language', 'fr_FR') \
+         ON DUPLICATE KEY UPDATE value = 'fr_FR'; \
+         UPDATE glpi_users SET language = 'de_DE' WHERE name = 'admin'",
+    )
+    .await;
+    let login = |password: &str, accept_language: Option<&str>| {
+        let mut request = axum::http::Request::builder()
+            .method(Method::POST)
+            .uri("/api/v2/auth/login")
+            .header(header::CONTENT_TYPE, "application/json");
+        if let Some(accept_language) = accept_language {
+            request = request.header(header::ACCEPT_LANGUAGE, accept_language);
+        }
+        let body = json!({ "login": "admin", "password": password }).to_string();
+        let request = request.body(axum::body::Body::from(body)).unwrap();
+        let app = &app;
+        async move { app.request(request).await }
+    };
+
+    // Logged before the session exists: the language of the browser, else
+    // the default one, never the user's own language.
+    login("wrong", None).await;
+    login("secret", Some("es-ES,es;q=0.9")).await;
+    login("secret", Some("tlh, en-US;q=0.5")).await;
+    assert_eq!(
+        events(&app).await,
+        [
+            "Connexion échouée de admin depuis l'IP unknown",
+            "admin inició la sesión desde la IP unknown",
+            "admin login from IP unknown",
+        ]
+    );
 }
 
 #[tokio::test]
@@ -253,6 +293,10 @@ async fn changing_the_password_ends_other_sessions() {
         app.login_response("admin", "N3w-password").await.status,
         StatusCode::OK
     );
+    // Like the preferences form of the classic interface.
+    let events = events(&app).await;
+    let updates: Vec<&String> = events.iter().filter(|e| e.contains("updates")).collect();
+    assert_eq!(updates, ["admin updates an item"]);
 }
 
 #[tokio::test]
@@ -377,13 +421,15 @@ async fn language_preference_is_saved_with_history() {
             ),
         ]
     );
+    // In the language of the session before the change, like the PHP code.
     let events = events(&app).await;
+    let updates: Vec<&String> = events
+        .iter()
+        .filter(|e| e.contains("updates an item") || e.contains("met à jour"))
+        .collect();
     assert_eq!(
-        events
-            .iter()
-            .filter(|e| *e == "admin updates an item")
-            .count(),
-        2
+        updates,
+        ["admin updates an item", "admin met à jour un élément"]
     );
 
     let languages = app.get("/api/v2/languages", Some(&cookie)).await.body;

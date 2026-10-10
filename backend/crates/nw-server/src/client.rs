@@ -1,4 +1,5 @@
-//! Address of the client, for the login limits and the event log.
+//! Address and languages of the client, for the login limits and the
+//! event log.
 
 use std::{
     convert::Infallible,
@@ -7,7 +8,7 @@ use std::{
 
 use axum::{
     extract::{ConnectInfo, FromRequestParts},
-    http::request::Parts,
+    http::{header, request::Parts},
 };
 
 use crate::state::AppState;
@@ -38,5 +39,23 @@ impl FromRequestParts<AppState> for ClientAddress {
             .map(|ConnectInfo(address)| address.ip().to_string())
             .unwrap_or_else(|| "unknown".to_owned());
         Ok(Self(address))
+    }
+}
+
+/// `Accept-Language` of the request.
+#[derive(Debug, Clone)]
+pub struct AcceptLanguage(pub Option<String>);
+
+impl<S: Send + Sync> FromRequestParts<S> for AcceptLanguage {
+    type Rejection = Infallible;
+
+    async fn from_request_parts(parts: &mut Parts, _state: &S) -> Result<Self, Infallible> {
+        Ok(Self(
+            parts
+                .headers
+                .get(header::ACCEPT_LANGUAGE)
+                .and_then(|value| value.to_str().ok())
+                .map(str::to_owned),
+        ))
     }
 }

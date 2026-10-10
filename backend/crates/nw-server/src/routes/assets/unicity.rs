@@ -3,7 +3,14 @@
 use std::collections::HashMap;
 
 use nw_db::{events, unicity as db};
-use nw_domain::{asset::AssetKind, history, rights::READ, unicity::is_checked};
+use nw_domain::{
+    asset::AssetKind,
+    history,
+    i18n::{self, Source, text},
+    php,
+    rights::READ,
+    unicity::is_checked,
+};
 use serde::Serialize;
 use utoipa::ToSchema;
 
@@ -158,15 +165,17 @@ pub async fn check(
     }
 
     let login = session.user.name.clone().unwrap_or_default();
+    let language = session.preferences.language.as_str();
     let mut checked = Checked {
         refused: None,
         notices: Vec::new(),
         events: Vec::new(),
     };
     for found in found {
-        let text = message(kind, session, &found);
-        checked.events.push(format!(
-            "{login} trying to add an item that already exists: {text}"
+        let message = message(kind, session, &found);
+        checked.events.push(i18n::sprintf(
+            &i18n::tr(language, text::DUPLICATE_EVENT),
+            &[&login, &message],
         ));
         if found.refuse {
             let summary = found
@@ -197,76 +206,116 @@ pub async fn check(
     Ok(checked)
 }
 
-/// `getUnicityErrorMessage`, with the English texts.
+/// `getUnicityErrorMessage`, in the language of the session.
 fn message(kind: AssetKind, session: &Session, found: &Found) -> String {
+    let language = session.preferences.language.as_str();
+    let tr = |source: Source| i18n::tr(language, source);
     let fields: Vec<String> = found
         .fields
         .iter()
         .zip(&found.values)
-        .map(|(field, value)| format!("{} = {value}", label(field)))
+        .map(|(field, value)| {
+            let label = label(field).map(tr).unwrap_or_default();
+            i18n::sprintf(&tr(text::EQUALS), &[&label, value])
+        })
         .collect();
-    let mut text = if found.refuse {
-        format!("Impossible record for {}", fields.join("&nbsp;&amp;&nbsp;"))
+    let format = if found.refuse {
+        text::IMPOSSIBLE_RECORD
     } else {
-        format!(
-            "Item successfully added but duplicate record on {}",
-            fields.join("&nbsp;&amp;&nbsp;")
-        )
+        text::DUPLICATE_RECORD
     };
-    text.push_str("<br>Other item exist");
+    let mut message = i18n::sprintf(&tr(format), &[&fields.join("&nbsp;&amp;&nbsp;")]);
+    message.push_str("<br>");
+    message.push_str(&tr(text::OTHER_ITEM_EXIST));
+    let dash = tr(text::DASH);
+    let colon = tr(text::COLON);
     for double in &found.doubles {
         let visible = session.rights.has(kind.right(), READ)
             && session
                 .scope
                 .can_see(double.entities_id, double.is_recursive);
-        let name = double.name.clone().unwrap_or_default();
         let mut parts = Vec::new();
         if visible {
-            parts.push(format!(
-                "<a  href='/front/{}.form.php?id={}'  title=\"{name}\">{name}</a>",
-                kind.itemtype().to_lowercase(),
-                double.id
-            ));
+            parts.push(link(kind, session, double));
         }
-        parts.push(format!("ID: {}", double.id));
-        parts.push(format!(
-            "Serial number: {}",
-            double.serial.clone().unwrap_or_default()
-        ));
+        let serial = double.serial.clone().unwrap_or_default();
         let entity = double
             .entity
             .as_deref()
             .map(history::tree_name)
             .unwrap_or_else(|| "&nbsp;".to_owned());
-        parts.push(format!("Entity: {entity}"));
-        if double.is_deleted {
-            parts.push("Item in the trashbin".to_owned());
+        parts.push(i18n::sprintf(
+            &colon,
+            &[&tr(text::ID), &double.id.to_string()],
+        ));
+        // A value equal to `NOT_AVAILABLE` is skipped.
+        if serial != NOT_AVAILABLE {
+            parts.push(i18n::sprintf(&colon, &[&tr(text::SERIAL), &serial]));
         }
-        text.push_str(&format!("<br>[{}]", parts.join(" - ")));
+        parts.push(i18n::sprintf(&colon, &[&tr(text::ENTITY), &entity]));
+        if double.is_deleted {
+            parts.push(tr(text::IN_TRASHBIN));
+        }
+        let double_text = parts
+            .into_iter()
+            .reduce(|text, part| i18n::sprintf(&dash, &[&text, &part]))
+            .unwrap_or_default();
+        message.push_str(&format!("<br>[{double_text}]"));
     }
-    text
+    message
+}
+
+/// `NOT_AVAILABLE` of the PHP code, the name of an item without name.
+const NOT_AVAILABLE: &str = "N/A";
+
+/// `CommonDBTM::getLink` of an item the user can see.
+fn link(kind: AssetKind, session: &Session, double: &db::Double) -> String {
+    let name = double
+        .name
+        .clone()
+        .filter(|name| !name.is_empty())
+        .unwrap_or_else(|| NOT_AVAILABLE.to_owned());
+    // `getNameID`.
+    let label = if session.preferences.names.show_ids {
+        let format = i18n::tr(&session.preferences.language, text::NAME_ID);
+        i18n::sprintf(&format, &[&name, &double.id.to_string()])
+    } else {
+        name.clone()
+    };
+    let title = if name == NOT_AVAILABLE {
+        String::new()
+    } else {
+        format!(" title=\"{}\"", php::htmlentities(&name))
+    };
+    format!(
+        "<a  href='/front/{}.form.php?id={}' {title}>{label}</a>",
+        kind.itemtype().to_lowercase(),
+        double.id
+    )
 }
 
 /// Name of the search option the PHP code finds for a field: for a foreign
 /// key, the first option showing the `name` of its table (none for the
-/// trees, shown by their full name).
-fn label(field: &str) -> &str {
-    match field {
-        "name" => "Name",
-        "serial" => "Serial number",
-        "otherserial" => "Inventory number",
-        "contact" => "Alternate username",
-        "contact_num" => "Alternate username number",
-        "uuid" => "UUID",
-        "brand" => "Brand",
-        "number_line" => "Number of lines",
-        "users_id" | "users_id_tech" => "User",
-        "manufacturers_id" => "Manufacturer",
-        "networks_id" => "Network",
-        "autoupdatesystems_id" => "Update Source",
-        "locations_id" | "states_id" | "groups_id" | "groups_id_tech" => "",
-        other if other.ends_with("types_id") => "Type",
-        other if other.ends_with("models_id") => "Model",
-        other => other,
-    }
+/// trees and the entity, shown by their full name), else the first option
+/// on a column of that name, whatever its table.
+fn label(field: &str) -> Option<Source> {
+    Some(match field {
+        "name" => text::NAME,
+        "serial" => text::SERIAL,
+        "otherserial" => text::INVENTORY_NUMBER,
+        "contact" => text::CONTACT,
+        "contact_num" => text::CONTACT_NUMBER,
+        "uuid" => text::UUID,
+        "brand" => text::BRAND,
+        "number_line" => text::NUMBER_LINE,
+        "comment" => text::LOCATION_COMMENTS,
+        "is_recursive" => text::CHILD_ENTITIES,
+        "users_id" | "users_id_tech" => text::USER,
+        "manufacturers_id" => text::MANUFACTURER,
+        "networks_id" => text::NETWORK,
+        "autoupdatesystems_id" => text::UPDATE_SOURCE,
+        other if other.ends_with("types_id") => text::TYPE,
+        other if other.ends_with("models_id") => text::MODEL,
+        _ => return None,
+    })
 }

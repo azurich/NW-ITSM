@@ -152,8 +152,8 @@ référence :
 - Doublon refusé : `409 duplicate` avec les champs du critère. Doublon
   seulement signalé : l'écriture a lieu et la réponse liste les doublons
   (`duplicates`), affichés sur la fiche. Dans les deux cas, l'événement du
-  PHP est journalisé (type de l'objet, `trying to add an item that already
-  exists`, avec les doublons).
+  PHP est journalisé (type de l'objet, « essaie d'ajouter un élément qui
+  existe déjà », avec les doublons).
 - Les notifications ne sont pas portées : un doublon d'un critère qui en
   envoie, quand elles sont actives, renvoie vers l'interface classique.
 
@@ -177,6 +177,42 @@ Vérification : doublon refusé à la création, doublon signalé à la
 modification, partage puis retrait avec informations financières, port
 réseau (et son nom réseau), réservation, système d'exploitation et logiciel
 liés : mêmes écritures et même historique que le PHP.
+
+### Messages du journal des événements
+
+Le PHP écrit les messages de `glpi_events` traduits, dans la langue de la
+session. L'API fait de même :
+
+- Les traductions viennent des fichiers `locales/*.mo` de l'application,
+  extraits dans un catalogue compilé avec l'API (les textes utilisés, dans
+  les 61 langues) selon les règles de Laminas et des fonctions `__`, `_n`,
+  `_x` : forme plurielle de chaque langue, contexte, repli sur l'anglais.
+  Une langue dont le fichier manque (`es_CL`, `ta`) s'écrit en anglais,
+  comme en PHP. Un test vérifie que le catalogue correspond aux fichiers.
+- Connexion réussie ou échouée : la langue du navigateur
+  (`Accept-Language`, au sens de `Session::getPreferredLanguage`), sinon la
+  langue par défaut, jamais celle de l'utilisateur (le PHP journalise avant
+  d'ouvrir la session). L'identifiant journalisé est celui saisi, encodé
+  comme le PHP (`<` en `&lt;`).
+- Autres événements : la langue de la session (celle de l'utilisateur, sinon
+  la langue par défaut). Un changement de langue dans les préférences est
+  journalisé dans l'ancienne langue, le PHP ne rechargeant pas ses
+  traductions avant d'écrire l'événement.
+- Le message de doublon reprend `getUnicityErrorMessage` : libellés des
+  options de recherche (`comment` donne « Commentaires du lieu »,
+  `is_recursive` « Sous-entités », les arbres et l'entité un libellé vide,
+  comme en PHP), lien vers l'élément avec l'ID si les ID sont affichés,
+  `N/A` sans nom, titre encodé par `htmlentities`.
+- Le changement de mot de passe dans les préférences, qui n'était pas
+  journalisé, l'est désormais comme dans le formulaire PHP.
+- Les surcharges locales de traductions (`files/_locales/core*`) ne sont
+  pas lues : les messages restent ceux des fichiers de l'application.
+
+Vérification : connexions avec plusieurs `Accept-Language`, création
+refusée pour doublon, création, modification, corbeille et restauration en
+français, doublon signalé en allemand sans les ID, changements de langue :
+mêmes messages que le PHP, au caractère près (hors adresse IP, que le
+serveur PHP de test ne fournit pas).
 
 ### Ce qui renvoie vers l'interface classique
 
@@ -210,9 +246,9 @@ Une modification qui ne change rien, ou une mise à la corbeille d'un
 - Une installation avec des plugins actifs continue d'écrire par
   l'interface classique, sans perte silencieuse ; chaque fonction portée
   plus tard retire un motif de refus.
-- Les messages du journal des événements sont écrits en anglais, alors que
-  le PHP les écrit dans la langue de l'utilisateur : à aligner quand les
-  traductions de l'application seront reprises.
+- Les messages du journal des événements sont écrits dans la même langue
+  que le PHP ; un texte ajouté au journal doit l'être aussi au catalogue
+  de traductions.
 - Le motif `plugins` disparaîtra avec la phase 2 (modèle d'extension
   natif) : en attendant, désactiver un plugin inutile ouvre les écritures
   natives.

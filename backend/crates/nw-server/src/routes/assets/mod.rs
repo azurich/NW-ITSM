@@ -26,6 +26,7 @@ use nw_domain::{
     asset::{AssetKind, Field, FieldKind, Value},
     fk::fk,
     history,
+    i18n::{self, Source, text},
     rights::{CREATE, DELETE, READ, UPDATE},
     text::{from_stored, to_stored},
 };
@@ -487,7 +488,7 @@ pub async fn create(
         .as_deref()
         .map(to_stored)
         .unwrap_or_default();
-    log_asset_event(&state, &session, kind, id, &format!("adds the item {name}")).await;
+    log_asset_event(&state, &session, kind, id, text::ADDS_ITEM, &[&name]).await;
     let mut created = detail(&state, &session, kind, id).await?;
     created.duplicates = notices;
     Ok((StatusCode::CREATED, Json(created)))
@@ -627,7 +628,7 @@ pub async fn update(
     assets::update(&state.pool, kind, id, &values, &actor, effects)
         .await?
         .ok_or(ApiError::NotFound)?;
-    log_asset_event(&state, &session, kind, id, "updates an item").await;
+    log_asset_event(&state, &session, kind, id, text::UPDATES_ITEM, &[]).await;
     let mut updated = detail(&state, &session, kind, id).await?;
     updated.duplicates = notices;
     Ok(Json(updated))
@@ -700,11 +701,11 @@ async fn set_trashed(
         .ok_or(ApiError::NotFound)?;
     if changed {
         let action = if trashed {
-            "deletes an item"
+            text::DELETES_ITEM
         } else {
-            "restores an item"
+            text::RESTORES_ITEM
         };
-        log_asset_event(&state, &session, kind, id, action).await;
+        log_asset_event(&state, &session, kind, id, action, &[]).await;
     }
     Ok(Json(detail(&state, &session, kind, id).await?))
 }
@@ -830,15 +831,20 @@ async fn check_references(state: &AppState, values: &[(Field, Value)]) -> ApiRes
     }
 }
 
-/// Event of the legacy asset forms: `<login> <action>`.
+/// Event of the legacy asset forms, in the language of the session: the
+/// login, then `args`.
 async fn log_asset_event(
     state: &AppState,
     session: &Session,
     kind: AssetKind,
     id: i32,
-    action: &str,
+    action: Source,
+    args: &[&str],
 ) {
     let login = session.user.name.clone().unwrap_or_default();
+    let mut values = vec![login.as_str()];
+    values.extend_from_slice(args);
+    let format = i18n::tr(&session.preferences.language, action);
     log_event(
         state,
         &events::Event {
@@ -846,7 +852,7 @@ async fn log_asset_event(
             kind: kind.event_type(),
             service: "inventory",
             level: 4,
-            message: &format!("{login} {action}"),
+            message: &i18n::sprintf(&format, &values),
         },
     )
     .await;

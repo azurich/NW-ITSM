@@ -50,7 +50,7 @@ Chaque lot suit la même « définition de terminé » :
       (y compris expiré) avec la politique de mots de passe ; fermeture des
       autres sessions
 - [x] Écriture de l'historique (`glpi_logs`) au format du PHP, vérifiée contre une écriture PHP
-- [x] Préférences utilisateur : langue (les 57 langues de l'application), format des noms
+- [x] Préférences utilisateur : langue (les 61 langues de l'application), format des noms
 - [x] Compatibilité avec les données chiffrées (`glpicrypt.key`, XChaCha20-Poly1305) :
       module prêt, branché au premier besoin (LDAP, SMTP)
 - Déplacé : authentification native LDAP, OIDC, CAS et IMAP. Ces comptes
@@ -75,8 +75,9 @@ Chaque lot suit la même « définition de terminé » :
       statut), vérifiées contre le PHP
 - [x] Unicité des champs (refus, signalement, liste noire, événements) et
       partage recopié vers les objets liés, retrait du partage vérifié
-- [ ] Messages du journal des événements dans la langue de l'utilisateur,
-      comme le PHP (traductions `.po`)
+- [x] Messages du journal des événements dans la langue du PHP
+      (navigateur à la connexion, session ensuite), traduits depuis les
+      fichiers `.mo` de l'application, vérifiés contre le PHP
 - [ ] Corriger des deux côtés le bug des règles du parc qui ignorent la
       condition « Ajout / Mise à jour » (reproduit pour l'instant)
 - [ ] Champs propres à chaque type, gabarits, suppression définitive
