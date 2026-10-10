@@ -83,12 +83,18 @@ mesurée sur la base de référence :
   collection est construite sur l'entité 0), par rang. Une règle sans
   critère ne s'exécute jamais. Chaque règle lit l'entrée d'origine ; les
   actions des règles qui correspondent s'accumulent, la dernière l'emporte.
-- **Bug du PHP conservé** : `assetBusinessRules` passe la condition
-  « Ajout / Mise à jour » dans le mauvais argument de `processAllRules` ;
-  elle n'est donc jamais appliquée et toutes les règles s'exécutent à la
-  création comme à la modification. Le Rust fait de même pour que les deux
-  interfaces donnent le même résultat. La correction devra être faite des
-  deux côtés à la fois.
+- **Condition « Ajout / Mise à jour » respectée** : une création n'exécute
+  que les règles d'ajout, une modification (et les éléments connectés qui
+  la suivent) que celles de mise à jour ; une règle sans condition (possible
+  seulement hors formulaire) ne s'exécute jamais, comme dans la requête PHP
+  (`condition & opération`). ITSM-NG ignorait cette condition :
+  `assetBusinessRules` la passait dans le mauvais argument de
+  `processAllRules`, et toutes les règles s'exécutaient à la création comme
+  à la modification. Corrigé des deux côtés dans ce fork, avec un second
+  défaut du PHP qui faisait le même effet : le cache des règles
+  (`getCollectionDatas`) gardait celles d'une autre condition quand aucune
+  règle ne correspondait à la nouvelle. Les tests atoum, qui validaient le
+  comportement erroné, sont corrigés et complétés.
 - Les règles lisent **le formulaire complet**, comme le poste l'interface
   classique : tous les champs (valeurs enregistrées et modifications), l'entité,
   `_itemtype` et `_auto` = 0. Elles s'appliquent donc aussi quand un autre
@@ -114,7 +120,10 @@ Vérification : règles avec expression régulière et utilisateur retrouvé,
 condition « sous », règle sur les moniteurs, règle de création, appliquées
 par le PHP (avec le formulaire complet) et par l'API à des jumeaux, avec
 recopie vers un moniteur connecté et création d'un moniteur : historique,
-valeurs et informations financières identiques.
+valeurs et informations financières identiques. Après la correction, règles
+d'ajout, de mise à jour, des deux et sans condition, à la création et à la
+modification d'un ordinateur avec un moniteur connecté : mêmes valeurs et
+même historique que le PHP corrigé.
 
 ### Informations financières (`glpi_infocoms`)
 

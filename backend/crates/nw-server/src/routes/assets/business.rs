@@ -6,7 +6,7 @@ use std::collections::HashMap;
 use nw_db::{MySqlPool, rules as db};
 use nw_domain::{
     asset::{AssetKind, Field, FieldKind, Value},
-    rules::{self, AssetRule, RuleInput, Step},
+    rules::{self, AssetRule, Operation, RuleInput, Step},
 };
 
 use crate::{
@@ -69,21 +69,21 @@ fn as_posted(value: &Value) -> String {
     }
 }
 
-/// Runs the rules on an input; returns the values they set on an item of
-/// this type, in the order they were set. Every rule runs on creations and
-/// updates alike, as in the PHP code (see `nw_domain::rules`).
+/// Runs the rules of the operation on an input; returns the values they
+/// set on an item of this type, in the order they were set.
 pub async fn run(
     pool: &MySqlPool,
     session: &Session,
     rules: &[AssetRule],
+    operation: Operation,
     kind: AssetKind,
     form: &FormInput,
 ) -> ApiResult<Vec<(Field, Value)>> {
-    if rules.is_empty() {
+    if !rules.iter().any(|rule| rule.runs_on(operation)) {
         return Ok(Vec::new());
     }
     let input = rule_input(pool, session, kind, form).await?;
-    let steps = rules::process(rules, &input).map_err(|unsupported| {
+    let steps = rules::process(rules, &input, operation).map_err(|unsupported| {
         tracing::info!(rule = unsupported.rule_id, reason = %unsupported.reason, "business rule left to the classic interface");
         ApiError::LegacyRequired("business_rules")
     })?;

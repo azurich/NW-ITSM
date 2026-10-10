@@ -8,11 +8,10 @@
 //! criteria and actions, some regular expressions) is reported as
 //! [`Unsupported`], so that the write is left to the classic interface.
 //!
-//! Legacy bug kept on purpose: `assetBusinessRules` passes the add/update
-//! condition as the `$params` of `processAllRules` instead of its
-//! `$options`, so the condition is never applied and every active rule
-//! runs on both creations and updates. Both interfaces must give the same
-//! result: it is reproduced here (measured against the PHP code).
+//! Only the rules meant for the operation run (`Add`, `Update` or both).
+//! The PHP code of ITSM-NG used to ignore that condition (passed as the
+//! `$params` of `processAllRules` instead of its `$options`) and ran every
+//! rule on both: fixed in this fork, on both sides.
 
 pub mod pcre;
 
@@ -55,17 +54,41 @@ pub struct Action {
     pub value: String,
 }
 
+/// Operation a rule runs on (`RuleAsset::ONADD`, `RuleAsset::ONUPDATE`).
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum Operation {
+    Add,
+    Update,
+}
+
+impl Operation {
+    /// Bit of the operation in the `condition` of a rule.
+    pub const fn bit(self) -> i32 {
+        match self {
+            Self::Add => 1,
+            Self::Update => 2,
+        }
+    }
+}
+
 /// An active rule, with its criteria and actions in their stored order.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct AssetRule {
     pub id: i32,
     /// `AND` matching: every criterion must match (else `OR`).
     pub match_all: bool,
-    /// Operations the rule is meant for (`RuleAsset::ONADD` 1, `ONUPDATE`
-    /// 2): ignored by the PHP code, see the module documentation.
+    /// Operations the rule is meant for: [`Operation::bit`]s.
     pub condition: i32,
     pub criteria: Vec<Criterion>,
     pub actions: Vec<Action>,
+}
+
+impl AssetRule {
+    /// The rule is meant for the operation (`getRuleListCriteria`:
+    /// `condition & <operation>`, so a rule without condition never runs).
+    pub fn runs_on(&self, operation: Operation) -> bool {
+        self.condition & operation.bit() != 0
+    }
 }
 
 /// How a criterion value is read (`RuleAsset::getCriterias`).
@@ -147,10 +170,18 @@ pub struct Unsupported {
     pub reason: String,
 }
 
-/// Runs the rules in their order; returns the steps of the matching rules.
-pub fn process(rules: &[AssetRule], input: &RuleInput) -> Result<Vec<Step>, Unsupported> {
+/// Runs the rules of the operation in their order; returns the steps of
+/// the matching rules.
+pub fn process(
+    rules: &[AssetRule],
+    input: &RuleInput,
+    operation: Operation,
+) -> Result<Vec<Step>, Unsupported> {
     let mut steps = Vec::new();
     for rule in rules {
+        if !rule.runs_on(operation) {
+            continue;
+        }
         // `Rule::validateCriterias`: a rule without criteria never runs.
         if rule.criteria.is_empty() {
             continue;
@@ -414,7 +445,10 @@ mod tests {
             ("_auto", "0"),
             ("contact", "jdoe@x"),
         ]);
-        assert_eq!(process(&default_rules(), &manual).unwrap(), []);
+        assert_eq!(
+            process(&default_rules(), &manual, Operation::Update).unwrap(),
+            []
+        );
     }
 
     #[test]
@@ -425,7 +459,7 @@ mod tests {
             ("contact", "jdoe@x"),
         ]);
         assert_eq!(
-            process(&default_rules(), &inventory).unwrap(),
+            process(&default_rules(), &inventory, Operation::Update).unwrap(),
             [
                 Step::UserByLogin(vec!["jdoe".to_owned()]),
                 // "/(.*),/" does not match. "/(.*)/" also matches the empty
@@ -436,28 +470,36 @@ mod tests {
     }
 
     #[test]
-    fn conditions_of_operations_are_ignored_like_php() {
-        // A rule meant for creations also runs on updates (legacy bug).
-        let add_only = AssetRule {
-            condition: 1,
-            ..rule(
-                1,
-                vec![criterion("contact", IS, "x")],
-                vec![assign("locations_id", "3")],
-            )
-        };
+    fn rules_run_on_their_operations() {
         let x = input(&[("contact", "X")]);
-        assert_eq!(
-            process(&[add_only], &x).unwrap(),
-            [set("locations_id", "3")]
-        );
+        let runs = |condition: i32, operation: Operation| {
+            let rule = AssetRule {
+                condition,
+                ..rule(
+                    1,
+                    vec![criterion("contact", IS, "x")],
+                    vec![assign("locations_id", "3")],
+                )
+            };
+            !process(&[rule], &x, operation).unwrap().is_empty()
+        };
+        assert!(runs(1, Operation::Add) && !runs(1, Operation::Update));
+        assert!(!runs(2, Operation::Add) && runs(2, Operation::Update));
+        assert!(runs(3, Operation::Add) && runs(3, Operation::Update));
+        // No condition: never (the form always sets one).
+        assert!(!runs(0, Operation::Add) && !runs(0, Operation::Update));
     }
 
     #[test]
     fn rules_without_criteria_and_matching() {
         let x = input(&[("contact", "X")]);
         assert_eq!(
-            process(&[rule(1, vec![], vec![assign("comment", "c")])], &x).unwrap(),
+            process(
+                &[rule(1, vec![], vec![assign("comment", "c")])],
+                &x,
+                Operation::Update
+            )
+            .unwrap(),
             []
         );
 
@@ -472,10 +514,13 @@ mod tests {
                 vec![assign("comment", "seen")],
             )
         };
-        assert_eq!(process(std::slice::from_ref(&either), &x).unwrap(), []);
+        assert_eq!(
+            process(std::slice::from_ref(&either), &x, Operation::Update).unwrap(),
+            []
+        );
         let commented = input(&[("contact", "X"), ("comment", "hello")]);
         assert_eq!(
-            process(&[either], &commented).unwrap(),
+            process(&[either], &commented, Operation::Update).unwrap(),
             [set("comment", "seen")]
         );
     }
@@ -507,7 +552,9 @@ mod tests {
                 vec![criterion(criteria, condition, pattern)],
                 vec![assign("comment", "hit")],
             );
-            !process(&[rule], &values).unwrap().is_empty()
+            !process(&[rule], &values, Operation::Update)
+                .unwrap()
+                .is_empty()
         };
         assert!(matches("contact", IS, "jean dupont"));
         assert!(matches("states_id", IS, "02"));
@@ -560,7 +607,7 @@ mod tests {
         );
         let found = input(&[("contact", "jean.dupont"), ("comment", "room 12")]);
         assert_eq!(
-            process(&[rule], &found).unwrap(),
+            process(&[rule], &found, Operation::Update).unwrap(),
             [
                 set("comment", "dupont jean in 12 "),
                 Step::UserByLogin(vec!["jean".to_owned()])
@@ -583,7 +630,7 @@ mod tests {
             ),
         ];
         assert_eq!(
-            process(&rules, &input(&[("contact", "a")])).unwrap(),
+            process(&rules, &input(&[("contact", "a")]), Operation::Update).unwrap(),
             [set("comment", "first")]
         );
     }
@@ -612,7 +659,7 @@ mod tests {
             (unknown_type, 6),
             (translated, 7),
         ] {
-            let error = process(&[rule], &RuleInput::default()).unwrap_err();
+            let error = process(&[rule], &RuleInput::default(), Operation::Update).unwrap_err();
             assert_eq!(error.rule_id, id, "{}", error.reason);
         }
     }

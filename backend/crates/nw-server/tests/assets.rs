@@ -590,6 +590,15 @@ async fn business_rules_change_the_written_values() {
     .await;
     app.sql("UPDATE glpi_rules SET entities_id = 1 WHERE id = 6")
         .await;
+    // Creations only: not run by the updates.
+    rule(
+        &app,
+        7,
+        1,
+        &[("_itemtype", 0, "Computer"), ("contact", 0, "JDUPONT")],
+        &[("assign", "states_id", "1")],
+    )
+    .await;
 
     let response = app
         .patch(
@@ -642,6 +651,19 @@ async fn business_rules_change_the_written_values() {
         )
         .await;
     assert_eq!(response.body["user"], Value::Null);
+
+    // A creation runs the rules of creations, not those of updates.
+    let response = app
+        .post(
+            "/api/v2/assets/computers",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "PC-NEW", "contact": "jdupont" })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    assert_eq!(response.body["state"]["id"], 1);
+    assert_eq!(response.body["location"], Value::Null);
+    assert_eq!(response.body["comment"], "");
 }
 
 #[tokio::test]
@@ -1233,11 +1255,11 @@ async fn unported_php_features_send_the_change_to_the_classic_interface() {
         )
         .await;
     refused(&response, "business_rules");
-    // A rule meant for updates also runs on creations, as in PHP.
+    // A rule meant for updates does not run on creations.
     let response = app
         .post("/api/v2/assets/computers", &manager, Some(create.clone()))
         .await;
-    refused(&response, "business_rules");
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
     app.sql("DELETE FROM glpi_rulecriterias; DELETE FROM glpi_ruleactions; DELETE FROM glpi_rules")
         .await;
     rule(

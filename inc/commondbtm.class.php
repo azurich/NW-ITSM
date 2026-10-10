@@ -5841,11 +5841,13 @@ class CommonDBTM extends CommonGLPI
             if (!isset($this->input['_auto'])) {
                 $input['_auto'] = 0;
             }
-            //Set the condition (add or update)
+            //Set the condition (add or update): an option of the collection,
+            //so that only the rules of this condition are processed (still
+            //given in the parameters, which the plugins receive)
             $params = [
                'condition' => $condition
             ];
-            $output = $ruleasset->processAllRules($input, [], $params);
+            $output = $ruleasset->processAllRules($input, [], $params, $params);
             //If at least one rule has matched
             if (isset($output['_rule_process'])) {
                 foreach ($output as $key => $value) {

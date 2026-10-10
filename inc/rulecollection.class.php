@@ -261,9 +261,12 @@ class RuleCollection extends CommonDBTM
             $criteria = $this->getRuleListCriteria(['condition' => $condition]);
             $iterator = $DB->request($criteria);
 
-            if (count($iterator)) {
-                $this->RuleList->list = [];
+            // The rules loaded before may be those of another condition:
+            // without rule for this one, none must be kept.
+            $this->RuleList->list = [];
+            $this->RuleList->load = 0;
 
+            if (count($iterator)) {
                 while ($rule = $iterator->next()) {
                     //For each rule, get a Rule object with all the criterias and actions
                     $tempRule = $this->getRuleClass();

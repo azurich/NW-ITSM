@@ -28,6 +28,7 @@ use nw_domain::{
     history,
     i18n::{self, Source, text},
     rights::{CREATE, DELETE, READ, UPDATE},
+    rules::Operation,
     text::{from_stored, to_stored},
 };
 use serde::{Deserialize, Deserializer, Serialize};
@@ -452,6 +453,7 @@ pub async fn create(
         &state.pool,
         &session,
         &rules,
+        Operation::Add,
         kind,
         &business::FormInput::form(&values, request.entity_id, None),
     )
@@ -535,6 +537,7 @@ pub async fn update(
         &state.pool,
         &session,
         &rules,
+        Operation::Update,
         kind,
         &business::FormInput::form(&form, current.entities_id, Some(id)),
     )
@@ -578,8 +581,15 @@ pub async fn update(
                 .collect();
             if let Entry::Vacant(entry) = connected_rules.entry(item.kind) {
                 let input = business::FormInput::fields(&item_values);
-                let rule_values =
-                    business::run(&state.pool, &session, &rules, item.kind, &input).await?;
+                let rule_values = business::run(
+                    &state.pool,
+                    &session,
+                    &rules,
+                    Operation::Update,
+                    item.kind,
+                    &input,
+                )
+                .await?;
                 entry.insert(rule_values);
             }
             business::merge(&mut item_values, connected_rules[&item.kind].clone());

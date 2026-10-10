@@ -78,8 +78,8 @@ Chaque lot suit la même « définition de terminé » :
 - [x] Messages du journal des événements dans la langue du PHP
       (navigateur à la connexion, session ensuite), traduits depuis les
       fichiers `.mo` de l'application, vérifiés contre le PHP
-- [ ] Corriger des deux côtés le bug des règles du parc qui ignorent la
-      condition « Ajout / Mise à jour » (reproduit pour l'instant)
+- [x] Règles du parc : condition « Ajout / Mise à jour » respectée,
+      corrigée des deux côtés (PHP et Rust, tests atoum compris)
 - [ ] Champs propres à chaque type, gabarits, suppression définitive
 - [ ] Baies et autres types (équipements passifs, PDU, enclos, clusters)
 - [ ] Logiciels, licences, versions installées
