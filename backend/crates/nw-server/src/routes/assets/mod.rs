@@ -1,9 +1,11 @@
 //! Assets: computers, monitors, printers, network equipment, peripherals
-//! and phones, under `/assets/{type}`.
+//! and phones, and the datacenter items (racks, enclosures, PDUs, passive
+//! equipment, clusters), under `/assets/{type}`.
 
 mod business;
 pub mod choices;
 mod guards;
+pub mod racks;
 pub mod templates;
 pub mod unicity;
 
@@ -28,8 +30,10 @@ use nw_domain::{
     fk::fk,
     history,
     i18n::{self, Source, text},
+    rack,
     rights::{CREATE, DELETE, PURGE, READ, UPDATE},
     rules::Operation,
+    template::ClonedLink,
     text::{from_stored, to_stored},
 };
 use serde::{Deserialize, Deserializer, Serialize};
@@ -73,6 +77,7 @@ pub fn routes() -> Router<AppState> {
         .route("/assets/{kind}/{id}/trash", post(trash))
         .route("/assets/{kind}/{id}/restore", post(restore))
         .route("/assets/{kind}/choices/{field}", get(choices::choices))
+        .route("/assets/racks/positions", get(racks::positions))
 }
 
 /// Type of asset, in the paths.
@@ -85,6 +90,11 @@ pub enum AssetType {
     NetworkEquipments,
     Peripherals,
     Phones,
+    Racks,
+    Enclosures,
+    Pdus,
+    PassiveDcEquipments,
+    Clusters,
 }
 
 impl From<AssetType> for AssetKind {
@@ -96,6 +106,11 @@ impl From<AssetType> for AssetKind {
             AssetType::NetworkEquipments => Self::NetworkEquipment,
             AssetType::Peripherals => Self::Peripheral,
             AssetType::Phones => Self::Phone,
+            AssetType::Racks => Self::Rack,
+            AssetType::Enclosures => Self::Enclosure,
+            AssetType::Pdus => Self::Pdu,
+            AssetType::PassiveDcEquipments => Self::PassiveDcEquipment,
+            AssetType::Clusters => Self::Cluster,
         }
     }
 }
@@ -109,6 +124,11 @@ impl From<AssetKind> for AssetType {
             AssetKind::NetworkEquipment => Self::NetworkEquipments,
             AssetKind::Peripheral => Self::Peripherals,
             AssetKind::Phone => Self::Phones,
+            AssetKind::Rack => Self::Racks,
+            AssetKind::Enclosure => Self::Enclosures,
+            AssetKind::Pdu => Self::Pdus,
+            AssetKind::PassiveDcEquipment => Self::PassiveDcEquipments,
+            AssetKind::Cluster => Self::Clusters,
         }
     }
 }
@@ -236,6 +256,9 @@ pub struct AssetDetail {
     /// Connectors and features of the type, `null` for the other types.
     #[serde(flatten)]
     pub features: Features,
+    /// Fields of the datacenter items, `null` for the other types.
+    #[serde(flatten)]
+    pub datacenter: DatacenterDetail,
     /// In the trash.
     pub is_deleted: bool,
     /// Updated by an inventory tool.
@@ -270,6 +293,110 @@ pub struct AssetDetail {
     /// a unicity criterion that does not refuse them.
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub duplicates: Vec<unicity::DuplicateNotice>,
+}
+
+/// Fields of the datacenter items.
+#[derive(Debug, Default, Serialize, ToSchema)]
+pub struct DatacenterDetail {
+    /// Racks: server room.
+    pub room: Option<Ref>,
+    /// Racks: place in the room, `"<column>,<row>"` (`"0"` or empty for
+    /// none).
+    pub position: Option<String>,
+    /// Racks: door orientation in the room, 1 north, 2 east, 3 south, 4 west
+    /// (0: never set).
+    pub room_orientation: Option<i32>,
+    /// Racks.
+    pub number_units: Option<i32>,
+    /// Racks.
+    pub width: Option<i32>,
+    /// Racks.
+    pub height: Option<i32>,
+    /// Racks.
+    pub depth: Option<i32>,
+    /// Racks: in watts.
+    pub max_power: Option<i32>,
+    /// Racks: in watts.
+    pub measured_power: Option<i32>,
+    /// Racks.
+    pub max_weight: Option<i32>,
+    /// Racks: `#RRGGBB`.
+    pub background_color: Option<String>,
+    /// Enclosures.
+    pub power_supplies: Option<i32>,
+    /// Clusters.
+    pub version: Option<String>,
+}
+
+impl DatacenterDetail {
+    fn read(specific: &assets::Specific) -> Self {
+        let number = |column: &str| specific.text(column).and_then(|value| value.parse().ok());
+        Self {
+            room: number("dcrooms_id").and_then(|id| Ref::optional(id, specific.room.clone())),
+            position: decode(specific.text("position")),
+            room_orientation: number("room_orientation"),
+            number_units: number("number_units"),
+            width: number("width"),
+            height: number("height"),
+            depth: number("depth"),
+            max_power: number("max_power"),
+            measured_power: number("mesured_power"),
+            max_weight: number("max_weight"),
+            background_color: specific.text("bgcolor"),
+            power_supplies: number("power_supplies"),
+            version: decode(specific.text("version")),
+        }
+    }
+}
+
+/// Fields of the datacenter items in a creation or an update.
+#[derive(Debug, Default, Deserialize, ToSchema)]
+pub struct DatacenterFields {
+    /// Racks: server room.
+    #[serde(default, deserialize_with = "nullable_id")]
+    #[schema(value_type = Option<i32>)]
+    pub room_id: Option<i32>,
+    /// Racks: place in the room, `"<column>,<row>"` as offered by
+    /// `/assets/racks/positions`, `"0"` for none.
+    #[serde(default, deserialize_with = "nullable_text")]
+    #[schema(value_type = Option<String>)]
+    pub position: Option<String>,
+    /// Racks: door orientation, 1 north, 2 east, 3 south, 4 west.
+    pub room_orientation: Option<i32>,
+    /// Racks: 1 to 100.
+    pub number_units: Option<i32>,
+    /// Racks; `null` empties it (stored as 0, like the classic form).
+    #[serde(default, deserialize_with = "nullable_number")]
+    #[schema(value_type = Option<i32>)]
+    pub width: Option<Option<i32>>,
+    /// Racks; `null` empties it.
+    #[serde(default, deserialize_with = "nullable_number")]
+    #[schema(value_type = Option<i32>)]
+    pub height: Option<Option<i32>>,
+    /// Racks; `null` empties it.
+    #[serde(default, deserialize_with = "nullable_number")]
+    #[schema(value_type = Option<i32>)]
+    pub depth: Option<Option<i32>>,
+    /// Racks: in watts; `null` empties it.
+    #[serde(default, deserialize_with = "nullable_number")]
+    #[schema(value_type = Option<i32>)]
+    pub max_power: Option<Option<i32>>,
+    /// Racks: in watts; `null` empties it.
+    #[serde(default, deserialize_with = "nullable_number")]
+    #[schema(value_type = Option<i32>)]
+    pub measured_power: Option<Option<i32>>,
+    /// Racks; `null` empties it.
+    #[serde(default, deserialize_with = "nullable_number")]
+    #[schema(value_type = Option<i32>)]
+    pub max_weight: Option<Option<i32>>,
+    /// Racks: `#RRGGBB`.
+    pub background_color: Option<String>,
+    /// Enclosures.
+    pub power_supplies: Option<i32>,
+    /// Clusters.
+    #[serde(default, deserialize_with = "nullable_text")]
+    #[schema(value_type = Option<String>)]
+    pub version: Option<String>,
 }
 
 /// Connectors and features of monitors, printers and phones (`have_*`).
@@ -449,6 +576,8 @@ pub struct AssetFields {
     pub is_global: Option<bool>,
     #[serde(flatten)]
     pub features: Features,
+    #[serde(flatten)]
+    pub datacenter: DatacenterFields,
 }
 
 #[derive(Debug, Deserialize, ToSchema)]
@@ -465,6 +594,13 @@ fn nullable_text<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Option<St
 
 fn nullable_id<'de, D: Deserializer<'de>>(deserializer: D) -> Result<Option<i32>, D::Error> {
     Option::<i32>::deserialize(deserializer).map(|id| Some(id.unwrap_or(0)))
+}
+
+/// A number that can be emptied: absent, `null` or a number.
+fn nullable_number<'de, D: Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Option<Option<i32>>, D::Error> {
+    Option::<i32>::deserialize(deserializer).map(Some)
 }
 
 /// Lists the assets of a type visible to the session (templates excluded).
@@ -611,14 +747,17 @@ async fn create_asset(
     // Infocom written: created with the item (not for a clone), dated by
     // its status (not for a template), cloned from the template.
     let (writes_infocom, clones_infocom) = match &creation {
+        _ if !kind.has_infocom() => (false, false),
         Creation::Item => (
             infocom_settings.auto_create || infocom_settings.any_status_date(),
             false,
         ),
         Creation::Template => (infocom_settings.auto_create, false),
+        // Only the inventory assets clone the infocom of their template.
         Creation::FromTemplate(template) => (
             infocom_settings.any_status_date(),
-            infocoms::exists(&state.pool, kind.itemtype(), template.id).await?,
+            kind.cloned_links().contains(&ClonedLink::Infocom)
+                && infocoms::exists(&state.pool, kind.itemtype(), template.id).await?,
         ),
     };
     guards::check_create(&state.pool, writes_infocom, clones_infocom).await?;
@@ -628,7 +767,8 @@ async fn create_asset(
 
     // Every field of the form is written as the classic interface posts
     // it: the given value, else the value of a new item (an empty text,
-    // not NULL) or of the template. The rules see them all.
+    // not NULL) or of the template as the form shows it. The rules see
+    // them all.
     let fields = match creation {
         Creation::Template => kind.template_fields(),
         Creation::Item | Creation::FromTemplate(_) => kind.fields(),
@@ -641,11 +781,10 @@ async fn create_asset(
                 .find(|(given, _)| given.column == field.column);
             let value = match (posted, &creation) {
                 (Some((_, value)), _) => value.clone(),
-                (None, Creation::FromTemplate(template)) => match template.value(field.column)? {
-                    Value::Text(None) => Value::Text(Some(String::new())),
-                    value => value.clone(),
-                },
-                (None, Creation::Item | Creation::Template) => field.form_default()?,
+                (None, Creation::FromTemplate(template)) => {
+                    kind.form_value(field, template.value(field.column)?)
+                }
+                (None, Creation::Item | Creation::Template) => kind.form_default(field)?,
             };
             Some((field, value))
         })
@@ -658,22 +797,28 @@ async fn create_asset(
             _ => None,
         })
         .unwrap_or_default();
-    let rules = nw_db::rules::asset_rules(&state.pool).await?;
-    let rule_values = business::run(
-        &state.pool,
-        session,
-        &rules,
-        Operation::Add,
-        kind,
-        &business::FormInput::form(&values, entity_id, None),
-    )
-    .await?;
-    business::merge(&mut values, rule_values);
+    // `prepareInputForAdd` of a rack, before the rules and the unicity.
+    check_rack_position(state, kind, &values, None).await?;
+    // Only the inventory assets have business rules.
+    if kind.is_inventory_asset() {
+        let rules = nw_db::rules::asset_rules(&state.pool).await?;
+        let rule_values = business::run(
+            &state.pool,
+            session,
+            &rules,
+            Operation::Add,
+            kind,
+            &business::FormInput::form(&values, entity_id, None),
+        )
+        .await?;
+        business::merge(&mut values, rule_values);
+    }
 
     // Unicity of the values the rules leave; not for a template.
     let posted = business::FormInput::form(&values, entity_id, None).by_field();
     let checked = match &creation {
         Creation::Template => None,
+        _ if !kind.has_unicity() => None,
         Creation::Item => Some(
             unicity::check(
                 state,
@@ -793,20 +938,33 @@ async fn update_asset(
     let current = writable(state, session, kind, id, template).await?;
     check_references(state, &values).await?;
 
-    // The rules see the whole form: the stored values and the changes.
-    let rules = nw_db::rules::asset_rules(&state.pool).await?;
+    // The legacy form posts the whole form: the stored values and the
+    // changes. `prepareInputForUpdate` of a rack checks its place first; a
+    // refused update still logs the event of the form.
     let mut form = current.values.clone();
     business::merge(&mut form, values.clone());
-    let rule_values = business::run(
-        &state.pool,
-        session,
-        &rules,
-        Operation::Update,
-        kind,
-        &business::FormInput::form(&form, current.entities_id, Some(id)),
-    )
-    .await?;
-    business::merge(&mut values, rule_values);
+    if let Err(error) = check_rack_position(state, kind, &form, Some(id)).await {
+        log_asset_event(state, session, kind, id, text::UPDATES_ITEM, &[]).await;
+        return Err(error);
+    }
+    // The rules see the whole form; only the inventory assets have some.
+    let rules = if kind.is_inventory_asset() {
+        nw_db::rules::asset_rules(&state.pool).await?
+    } else {
+        Vec::new()
+    };
+    if kind.is_inventory_asset() {
+        let rule_values = business::run(
+            &state.pool,
+            session,
+            &rules,
+            Operation::Update,
+            kind,
+            &business::FormInput::form(&form, current.entities_id, Some(id)),
+        )
+        .await?;
+        business::merge(&mut values, rule_values);
+    }
     // The changes, and their history, in the order of the legacy form.
     kind.sort_by_form(&mut values, template);
 
@@ -814,7 +972,7 @@ async fn update_asset(
     // for a template.
     business::merge(&mut form, values.clone());
     let posted = business::FormInput::form(&form, current.entities_id, Some(id)).by_field();
-    let checked = if template {
+    let checked = if template || !kind.has_unicity() {
         None
     } else {
         Some(
@@ -894,7 +1052,15 @@ async fn update_asset(
 
     // Events of the duplicates, as the PHP code logs them on the way.
     let notices = match checked {
-        Some(checked) => checked.log_and_enforce(state, kind, Some(id)).await?,
+        Some(checked) => match checked.log_and_enforce(state, kind, Some(id)).await {
+            Ok(notices) => notices,
+            Err(error) => {
+                // The legacy form logs its event even when the update is
+                // refused.
+                log_asset_event(state, session, kind, id, text::UPDATES_ITEM, &[]).await;
+                return Err(error);
+            }
+        },
         None => Vec::new(),
     };
     let mut refused_items = HashSet::new();
@@ -1110,8 +1276,9 @@ async fn detail(
 
 /// Stored values of the given fields, validated.
 fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, Value)>> {
-    let (type_column, _) = kind.type_dropdown();
-    let (model_column, _) = kind.model_dropdown();
+    // An empty column for a type without type or model: no such field.
+    let type_column = kind.type_dropdown().map_or("", |(column, _)| column);
+    let model_column = kind.model_dropdown().map_or("", |(column, _)| column);
     let texts = [
         ("name", "name", &fields.name),
         ("serial", "serial", &fields.serial),
@@ -1122,6 +1289,7 @@ fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, 
         ("contact", "contact", &fields.contact),
         ("contact_number", "contact_num", &fields.contact_number),
         ("comment", "comment", &fields.comment),
+        ("version", "version", &fields.datacenter.version),
     ];
     let ids = [
         ("location_id", "locations_id", fields.location_id),
@@ -1148,6 +1316,7 @@ fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, 
             "phonepowersupplies_id",
             fields.power_supply_id,
         ),
+        ("room_id", "dcrooms_id", fields.datacenter.room_id),
     ];
     let field = |name: &str, column: &str| {
         kind.field(column).ok_or_else(|| {
@@ -1236,7 +1405,114 @@ fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, 
         let Some(counter) = counter else { continue };
         values.push((field(name, column)?, Value::Text(Some(counter.to_string()))));
     }
+    datacenter_values(kind, &fields.datacenter, &mut values)?;
     Ok(values)
+}
+
+/// Fields of the racks and enclosures, validated: what the classic form
+/// offers (a door orientation, 1 to 100 units, a color), whole numbers.
+fn datacenter_values(
+    kind: AssetKind,
+    fields: &DatacenterFields,
+    values: &mut Vec<(Field, Value)>,
+) -> ApiResult<()> {
+    let field = |name: &str, column: &str| {
+        kind.field(column).ok_or_else(|| {
+            ApiError::BadRequest(format!("{name}: no such field for {}", kind.slug()))
+        })
+    };
+    let number = |value: i32| Value::Text(Some(value.to_string()));
+    if let Some(position) = &fields.position {
+        let stored = to_stored(position);
+        if stored.chars().count() > 50 {
+            return Err(ApiError::BadRequest("position: too long".to_owned()));
+        }
+        values.push((field("position", "position")?, Value::Text(Some(stored))));
+    }
+    let bounded = [
+        (
+            "room_orientation",
+            "room_orientation",
+            fields.room_orientation,
+            1,
+            4,
+        ),
+        ("number_units", "number_units", fields.number_units, 1, 100),
+        (
+            "power_supplies",
+            "power_supplies",
+            fields.power_supplies,
+            0,
+            i32::MAX,
+        ),
+    ];
+    for (name, column, value, min, max) in bounded {
+        let Some(value) = value else { continue };
+        if !(min..=max).contains(&value) {
+            return Err(ApiError::BadRequest(format!("{name}: out of range")));
+        }
+        values.push((field(name, column)?, number(value)));
+    }
+    let sizes = [
+        ("width", "width", fields.width),
+        ("height", "height", fields.height),
+        ("depth", "depth", fields.depth),
+        ("max_power", "max_power", fields.max_power),
+        ("measured_power", "mesured_power", fields.measured_power),
+        ("max_weight", "max_weight", fields.max_weight),
+    ];
+    for (name, column, value) in sizes {
+        let Some(value) = value else { continue };
+        let value = match value {
+            // Empty, as the form posts it: stored as 0.
+            None => Value::Text(Some(String::new())),
+            Some(value) if value < 0 => {
+                return Err(ApiError::BadRequest(format!("{name}: out of range")));
+            }
+            Some(value) => number(value),
+        };
+        values.push((field(name, column)?, value));
+    }
+    if let Some(color) = &fields.background_color {
+        let valid = color.len() == 7
+            && color.starts_with('#')
+            && color[1..].bytes().all(|byte| byte.is_ascii_hexdigit());
+        if !valid {
+            return Err(ApiError::BadRequest(
+                "background_color: #RRGGBB is required".to_owned(),
+            ));
+        }
+        values.push((
+            field("background_color", "bgcolor")?,
+            Value::Text(Some(color.to_lowercase())),
+        ));
+    }
+    Ok(())
+}
+
+/// `Rack::prepareInput`: another rack outside the trash at the same place
+/// of the room refuses the write (`form`: every field of the form).
+async fn check_rack_position(
+    state: &AppState,
+    kind: AssetKind,
+    form: &[(Field, Value)],
+    id: Option<i32>,
+) -> ApiResult<()> {
+    if kind != AssetKind::Rack {
+        return Ok(());
+    }
+    let value = |column: &str| form.iter().find(|(field, _)| field.column == column);
+    let room = value("dcrooms_id").map_or(0, |(_, value)| value.id());
+    let position = value("position")
+        .map(|(_, value)| value.raw())
+        .unwrap_or_default();
+    if !rack::position_is_checked(room, &position) {
+        return Ok(());
+    }
+    if assets::racks::position_taken(&state.pool, room, &position, id).await? {
+        return Err(ApiError::PositionUnavailable(from_stored(&position)));
+    }
+    Ok(())
 }
 
 /// A decimal number: digits, with `.` or `,` before the decimals.
@@ -1403,8 +1679,9 @@ impl AssetDetail {
                 .and_then(|id| id.parse().ok())
                 .and_then(|id| Ref::optional(id, specific.power_supply.clone())),
             features: Features::read(kind, specific),
+            datacenter: DatacenterDetail::read(specific),
             is_deleted: row.is_deleted,
-            is_dynamic: row.is_dynamic,
+            is_dynamic: row.is_dynamic != 0,
             is_recursive: row.is_recursive,
             is_global: row.is_global != 0,
             created_at: row.date_creation,
@@ -1440,8 +1717,8 @@ impl AssetDetail {
                 ),
             ),
             tech_group: Ref::optional(row.groups_id_tech, row.tech_group),
-            is_template: row.is_template,
-            template_name: if row.is_template {
+            is_template: row.is_template != 0,
+            template_name: if row.is_template != 0 {
                 decode(row.template_name)
             } else {
                 None

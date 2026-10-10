@@ -52,6 +52,10 @@ pub enum ApiError {
     SharingInUse(String),
     #[error("only an item in the trash can be purged")]
     NotInTrash,
+    /// Another rack outside the trash is at this place of the server room
+    /// (`Rack::prepareInput`).
+    #[error("position {0} is not available")]
+    PositionUnavailable(String),
     #[error("access denied")]
     Forbidden,
     #[error("not found")]
@@ -104,6 +108,7 @@ impl ApiError {
             Self::Duplicate { .. } => (StatusCode::CONFLICT, "duplicate"),
             Self::SharingInUse(_) => (StatusCode::CONFLICT, "sharing_in_use"),
             Self::NotInTrash => (StatusCode::CONFLICT, "not_in_trash"),
+            Self::PositionUnavailable(_) => (StatusCode::CONFLICT, "position_unavailable"),
             Self::Forbidden => (StatusCode::FORBIDDEN, "forbidden"),
             Self::NotFound => (StatusCode::NOT_FOUND, "not_found"),
             Self::BadRequest(_) => (StatusCode::BAD_REQUEST, "bad_request"),

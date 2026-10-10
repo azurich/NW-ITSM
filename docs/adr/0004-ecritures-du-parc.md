@@ -2,14 +2,17 @@
 
 - **Statut** : accepté (complété le 2026-10-10 : règles métier,
   informations financières, unicité des champs, partage, champs propres à
-  chaque type, suppression définitive et gabarits portés)
+  chaque type, suppression définitive, gabarits, baies, châssis, PDU,
+  équipements passifs et clusters portés)
 - **Date** : 2026-10-10
 
 ## Contexte
 
 Le lot 2 ouvre les premières écritures métier : création, modification,
 mise à la corbeille et restauration des ordinateurs, moniteurs,
-imprimantes, matériels réseau, périphériques et téléphones.
+imprimantes, matériels réseau, périphériques et téléphones, puis des
+éléments du centre de données (baies, châssis, PDU, équipements passifs)
+et des clusters.
 
 Côté PHP, une écriture (`CommonDBTM::add`, `update`, `delete`, `restore`)
 déclenche de nombreux effets de bord :
@@ -40,7 +43,8 @@ classique, sur le même élément. Rien n'est écrit en cas de refus.
 ### Ce qui est porté
 
 - Droits : `CREATE`, `UPDATE`, `DELETE` du profil sur le type (`computer`,
-  `monitor`, `printer`, `networking`, `peripheral`, `phone`). Comme
+  `monitor`, `printer`, `networking`, `peripheral`, `phone`, `datacenter`
+  pour les baies, châssis, PDU et équipements passifs, `cluster`). Comme
   `canCreateItem` / `canUpdateItem`, l'élément doit appartenir à une entité
   **active** : un élément partagé par une entité parente est visible mais
   en lecture seule. La corbeille et la restauration demandent `DELETE`,
@@ -358,6 +362,109 @@ gabarit, et création d'un moniteur depuis un gabarit, faites par les
 formulaires PHP postés comme par un navigateur puis par l'API : bases
 identiques, mêmes événements.
 
+### Baies, châssis, PDU, équipements passifs et clusters
+
+- Routes `/assets/racks`, `/assets/enclosures`, `/assets/pdus`,
+  `/assets/passive-dc-equipments` et `/assets/clusters`, avec les mêmes
+  écritures que les autres types (création, modification, corbeille,
+  purge, gabarits) et les événements de leurs formulaires PHP (types
+  `racks`, `enclosure`, `pdus`, `passivedcequipment`, `cluster`).
+- **Champs** : ni utilisateur, ni groupe, ni contact ; pas de type pour
+  les châssis. Les clusters n'ont ni lieu, ni numéros de série et
+  d'inventaire, ni fabricant, ni modèle, mais un UUID, une version et une
+  source de mise à jour. Baies : salle serveur, position dans la salle,
+  orientation de la porte, nombre d'unités (1 à 100), largeur, hauteur,
+  profondeur, puissances maximale et mesurée, poids maximal, couleur de
+  fond. Châssis : nombre d'alimentations.
+- **Historique** : seuls les champs ayant une option de recherche y
+  entrent, comme le PHP (salle 7, unités 8, UUID 5 des clusters...). N'y
+  entrent pas : dimensions, puissances, orientation, position et couleur
+  des baies, alimentations des châssis, version, type et source de mise à
+  jour des clusters, commentaire des PDU, commentaire et partage des
+  équipements passifs. Les modèles de ces types peuvent être NULL :
+  « aucun » s'écrit alors `&nbsp; ()`.
+- **Pas de règles métier** (ces types ne sont pas dans `asset_types`) ;
+  unicité des champs pour les baies, châssis, PDU et clusters (pas pour
+  les équipements passifs, que `FieldUnicity` ne propose pas).
+- **Nouvel élément** comme le formulaire PHP : 42 unités, porte au nord,
+  position « 0 », fond `#F5B7B1`, une alimentation ; une dimension vide est
+  enregistrée 0 (le PHP se connecte sans mode SQL strict).
+- **Position dans la salle** (`Rack::prepareInputForAdd` /
+  `prepareInputForUpdate`) : avec une salle et une position non nulle, une
+  autre baie hors corbeille (gabarits compris) déjà à cette place refuse
+  l'écriture (`409 position_unavailable`). Les places proposées
+  (`/assets/racks/positions`, comme `ajax/dcroom_size.php`) sont celles de
+  la grille visible de la salle que n'occupe aucune autre baie, la place
+  actuelle comprise, nommées par colonne en lettres (A, B... AA) et rangée.
+- **Événement d'une modification refusée** : le formulaire PHP écrit
+  « updates an item » même quand la position ou l'unicité des champs
+  refuse la modification ; l'API aussi, pour tous les types.
+- **Informations financières** (pas pour les clusters) : création
+  automatique et dates du statut comme les autres types, mais dans
+  l'entité racine, non partagée, avec l'alerte par défaut de l'entité de
+  l'élément : ces classes ne transmettent pas leur entité
+  (`$forward_entity_to` vide, `CommonDBChild::addNeededInfoToInput`). Pour
+  la même raison, changer le partage ne recopie rien.
+- **Purge** : supprimés avec l'élément, selon le type comme le PHP :
+  information financière (sauf clusters), liens vers les contrats (sauf
+  équipements passifs), les documents (clusters), les changements et les
+  problèmes. Renvoyé vers l'interface classique (`linked_data`) : tickets,
+  ports réseau (châssis, PDU, clusters), analyse d'impact (sauf
+  équipements passifs), composants (châssis), place dans une baie ou un
+  châssis, et contenu propre : éléments et PDU d'une baie, éléments d'un
+  châssis, prises et baies d'un PDU, éléments d'un cluster.
+- **Gabarits** : pour tous sauf les clusters (sans colonne de gabarit).
+  Baies et équipements passifs ne sont pas `Clonable` : un élément créé
+  depuis leur gabarit n'en recopie aucun lien (ni information financière,
+  ni contrat). Châssis et PDU recopieraient leurs éléments, prises,
+  composants et ports : renvoyés vers l'interface classique quand le
+  gabarit en a. Les champs non donnés reprennent les valeurs du gabarit
+  telles que le formulaire les affiche, donc les poste : modèle NULL
+  posté 0, orientation hors liste postée « nord », 0 unité postée 42, 0
+  alimentation postée 1.
+- **Corrections côté PHP** : le champ « numéro d'inventaire » des
+  formulaires PDU et équipement passif affichait le numéro de série ;
+  enregistrer le formulaire remplaçait donc le numéro d'inventaire par le
+  numéro de série (tests `tests/functional/PDU.php` et
+  `PassiveDCEquipment.php`).
+- Remarques :
+  - Une modification par l'API n'écrit que les champs donnés. Le
+    formulaire PHP, lui, renvoie ce qu'il affiche. Il réécrit donc, à chaque
+    enregistrement, les valeurs qu'il ne sait pas afficher, venues d'un
+    autre outil ou d'un import :
+    - modèle NULL écrit 0, avec une ligne d'historique ;
+    - 0 unité écrit 42 ;
+    - orientation inconnue écrite « nord ».
+
+    L'API ne reproduit pas cet effet de l'affichage.
+  - Les formulaires Twig d'ITSM-NG ignorent les conditions de leurs listes
+    déclarées sous la clé `conditions` (seule `condition` est lue par
+    `expandSelect`). La liste des statuts des baies, châssis et clusters,
+    comme celle de nombreux autres formulaires (ordinateurs, imprimantes,
+    téléphones, contrats...), n'est donc pas filtrée par type ; celle des
+    baies vise en plus la mauvaise colonne
+    (`is_visible_computer`), et celle des clusters `is_visible_line`. L'API
+    propose les statuts visibles pour le type, comme GLPI ; les valeurs
+    restent vérifiées en existence seulement, des deux côtés.
+
+Vérification : sur des copies identiques de la base de référence (une
+salle de 3 × 2, deux baies placées, un châssis, un PDU, un équipement
+passif, un cluster, un contrat lié), faites par les formulaires PHP postés
+comme par un navigateur puis par l'API, avec création automatique des
+informations financières et date d'achat au statut :
+- création d'une baie (salle, position, type, statut, largeur), d'un châssis,
+  d'un PDU, d'un équipement passif et d'un cluster ;
+- modification d'une baie (unités, modèle, couleur, statut), d'un
+  châssis, d'un PDU, d'un équipement passif (partage) et d'un cluster
+  (UUID, version, type) ;
+- refus d'une position prise et d'un doublon ;
+- purge d'une baie liée à un contrat, d'un cluster, d'un PDU et d'un
+  châssis ;
+- création, purge et utilisation de gabarits de baie, châssis, PDU et
+  équipement passif.
+
+Résultat : bases identiques, mêmes événements.
+
 ### Ce qui renvoie vers l'interface classique
 
 | Motif (`details`) | Situation |
@@ -366,7 +473,7 @@ identiques, mêmes événements.
 | `business_rules` | Une règle métier utilise un critère ou une action de plugin, une condition textuelle sur « inventaire automatique » (libellé traduit), ou une expression régulière que les deux moteurs ne lisent pas pareil |
 | `field_unicity` | Un critère d'unicité porte sur un champ que le formulaire n'a pas, ou pourrait s'appliquer aux informations financières (créées, datées ou recopiées d'un gabarit) ou aux cartes SIM écrites en même temps |
 | `notifications` | Un doublon relève d'un critère qui envoie des notifications, et elles sont actives |
-| `linked_data` | Une purge toucherait des données liées dont la suppression n'est pas portée (ports réseau, composants, logiciels, tickets, baies, cartouches, réservations en cours, impact, connexions avec nettoyage à la déconnexion), ou le gabarit d'une création a des liens dont la recopie n'est pas portée (système d'exploitation, composants, ports réseau, disques, logiciels, connexions, notes, base de connaissances, cartouches) |
+| `linked_data` | Une purge toucherait des données liées dont la suppression n'est pas portée (ports réseau, composants, logiciels, tickets, place ou contenu d'une baie, d'un châssis, d'un PDU ou d'un cluster, cartouches, réservations en cours, impact, connexions avec nettoyage à la déconnexion), ou le gabarit d'une création a des liens dont la recopie n'est pas portée (système d'exploitation, composants, ports réseau, disques, logiciels, connexions, notes, base de connaissances, cartouches, éléments d'un châssis, prises d'un PDU) |
 | `linked_items` | Partager l'élément changerait l'entité d'objets liés rangés dans une autre entité (données incohérentes : seule la recopie du partage est portée) |
 
 Une modification qui ne change rien, ou une mise à la corbeille d'un

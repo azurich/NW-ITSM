@@ -151,7 +151,7 @@ pub async fn check(
         } else {
             vec![config.entities_id]
         };
-        let doubles = db::doubles(&state.pool, kind.table(), &criteria, &entities, item).await?;
+        let doubles = db::doubles(&state.pool, kind, &criteria, &entities, item).await?;
         if !doubles.is_empty() {
             found.push(Found {
                 fields: criteria.iter().map(|(field, _)| field.clone()).collect(),
@@ -221,7 +221,7 @@ fn message(kind: AssetKind, session: &Session, found: &Found) -> String {
         .iter()
         .zip(&found.values)
         .map(|(field, value)| {
-            let label = label(field, &tr);
+            let label = label(kind, field, &tr);
             i18n::sprintf(&tr(text::EQUALS), &[&label, value])
         })
         .collect();
@@ -304,8 +304,23 @@ fn link(kind: AssetKind, session: &Session, double: &db::Double) -> String {
 /// key, the first option showing the `name` of its table (none for the
 /// trees and the entity, shown by their full name), else the first option
 /// on a column of that name, whatever its table.
-fn label(field: &str, tr: &impl Fn(Source) -> String) -> String {
+fn label(kind: AssetKind, field: &str, tr: &impl Fn(Source) -> String) -> String {
+    // The options of the datacenter items differ: no user nor location.
+    if !kind.is_inventory_asset() {
+        let source = match field {
+            "users_id_tech" => Some(text::TECH_USER),
+            "comment" if kind == AssetKind::Cluster => Some(text::COMMENTS),
+            "clustertypes_id" | "autoupdatesystems_id" => return String::new(),
+            "dcrooms_id" => Some(text::SERVER_ROOM),
+            "number_units" => Some(text::NUMBER_OF_UNITS),
+            _ => None,
+        };
+        if let Some(source) = source {
+            return tr(source);
+        }
+    }
     let source = match field {
+        "template_name" => text::TEMPLATE_NAME,
         "name" => text::NAME,
         "serial" => text::SERIAL,
         "otherserial" => text::INVENTORY_NUMBER,

@@ -47,7 +47,7 @@ pub async fn purge_blockers(
     autoclean: bool,
 ) -> Result<Vec<&'static str>, sqlx::Error> {
     let mut found = present(pool, kind, id, kind.purge_blockers()).await?;
-    if autoclean && kind != AssetKind::NetworkEquipment {
+    if autoclean && kind.is_inventory_asset() && kind != AssetKind::NetworkEquipment {
         let mut sql = QueryBuilder::new("SELECT 1 FROM glpi_computers_items WHERE ");
         push_owner(&mut sql, kind, id, Owner::Connection);
         if exists(pool, sql).await? {

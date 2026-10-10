@@ -1402,6 +1402,23 @@ async fn field_unicity_like_php() {
         )
         .await,
     );
+    // Refused, the update still logs the event of the legacy form, after
+    // the one of the duplicate.
+    let logged: Vec<(i32, String)> = events(&app)
+        .await
+        .into_iter()
+        .rev()
+        .take(2)
+        .map(|event| (event.0, event.4))
+        .collect();
+    assert_eq!(logged[0], (107, "manager updates an item".to_owned()));
+    assert!(
+        logged[1]
+            .1
+            .contains("Impossible record for Serial number = SN-P1"),
+        "{}",
+        logged[1].1
+    );
 
     // Reported only: written, with the duplicates in the answer.
     app.sql("UPDATE glpi_fieldunicities SET action_refuse = 0")
@@ -2200,5 +2217,326 @@ async fn items_are_created_from_templates_like_php() {
         .await
         .status,
         StatusCode::NOT_FOUND
+    );
+}
+
+#[tokio::test]
+async fn datacenter_items_like_php() {
+    let app = test_app!();
+    app.sql(
+        "INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES (4, 'datacenter', 31), (4, 'cluster', 31); \
+         INSERT INTO glpi_dcrooms (id, name, entities_id, is_recursive, vis_cols, vis_rows) \
+         VALUES (1, 'Room A', 1, 0, 2, 2), (2, 'Root room', 0, 1, 1, 1); \
+         INSERT INTO glpi_configs (context, name, value) VALUES ('core', 'auto_create_infocoms', '1')",
+    )
+    .await;
+    // Business rules are for the inventory assets only.
+    rule(&app, 9, 3, &[], &[("assign", "comment", "by rule")]).await;
+    let manager = app.login("manager").await;
+    let column = |sql: String| {
+        let app = &app;
+        async move { column(app, &sql).await }
+    };
+
+    // A rack as the classic form creates it: its defaults, an infocom, no
+    // rule, the event of the rack forms.
+    let response = app
+        .post(
+            "/api/v2/assets/racks",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "RACK-1" })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    let rack = response.body["id"].as_i64().unwrap() as i32;
+    assert_eq!(response.body["kind"], json!("racks"));
+    assert_eq!(response.body["number_units"], json!(42));
+    assert_eq!(response.body["contact"], Value::Null);
+    assert_eq!(
+        column(format!(
+            "SELECT CAST(CONCAT_WS('|', number_units, room_orientation, position, bgcolor, width, \
+             max_power, IFNULL(comment, '-')) AS CHAR) FROM glpi_racks WHERE id = {rack}"
+        ))
+        .await
+        .as_deref(),
+        Some("42|1|0|#F5B7B1|0|0|")
+    );
+    // Racks do not give their entity to their infocom: it is in the root
+    // entity, not shared.
+    assert_eq!(
+        column(format!(
+            "SELECT CAST(CONCAT_WS('|', entities_id, is_recursive) AS CHAR) FROM glpi_infocoms \
+             WHERE itemtype = 'Rack' AND items_id = {rack}"
+        ))
+        .await
+        .as_deref(),
+        Some("0|0")
+    );
+    assert_eq!(history(&app, "Rack", rack).await, [item_row(20)]);
+    assert_eq!(
+        events(&app).await.pop().unwrap(),
+        (
+            rack,
+            "racks".into(),
+            "inventory".into(),
+            4,
+            "manager adds the item RACK-1".into()
+        )
+    );
+
+    // In a room: a place another rack outside the trash takes is refused.
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/racks/{rack}"),
+            &manager,
+            json!({ "room_id": 1, "position": "1,1", "width": 600, "number_units": 48 }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["room"]["name"], json!("Room A"));
+    // The width is not in the history, the room and the units are.
+    assert_eq!(
+        history(&app, "Rack", rack).await[1..],
+        [row(7, "&nbsp; (0)", "Room A (1)"), row(8, "42", "48")]
+    );
+    let other = app
+        .post(
+            "/api/v2/assets/racks",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "RACK-2", "room_id": 1, "position": "1,1" })),
+        )
+        .await;
+    assert_eq!(other.error_code(), "position_unavailable", "{}", other.body);
+    let response = app
+        .get("/api/v2/assets/racks/positions?room_id=1", Some(&manager))
+        .await;
+    let free: Vec<&str> = response.body["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|item| item["position"].as_str().unwrap())
+        .collect();
+    assert_eq!(free, ["1,2", "2,1", "2,2"]);
+    assert_eq!(response.body["items"][1]["column"], json!("B"));
+    // The rooms offered: those of the entity of the rack, and the shared
+    // ones of its parents.
+    let response = app
+        .get(
+            "/api/v2/assets/racks/choices/room?entity_id=1",
+            Some(&manager),
+        )
+        .await;
+    assert_eq!(
+        response.body["items"],
+        json!([{ "id": 1, "label": "Room A" }, { "id": 2, "label": "Root room" }])
+    );
+    // Refused, the update still logs the event of the form.
+    let second = app
+        .post(
+            "/api/v2/assets/racks",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "RACK-2", "room_id": 1, "position": "2,2" })),
+        )
+        .await;
+    let second = second.body["id"].as_i64().unwrap() as i32;
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/racks/{second}"),
+            &manager,
+            json!({ "position": "1,1" }),
+        )
+        .await;
+    assert_eq!(response.error_code(), "position_unavailable");
+    assert_eq!(
+        events(&app).await.pop().unwrap().4,
+        "manager updates an item"
+    );
+    // A rack in the trash leaves its place.
+    app.post(
+        &format!("/api/v2/assets/racks/{rack}/trash"),
+        &manager,
+        None,
+    )
+    .await;
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/racks/{second}"),
+            &manager,
+            json!({ "position": "1,1" }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    // Validated like the form offers them.
+    for body in [
+        json!({ "room_orientation": 5 }),
+        json!({ "number_units": 0 }),
+        json!({ "background_color": "red" }),
+        json!({ "width": -1 }),
+        json!({ "power_supplies": 2 }),
+    ] {
+        let response = app
+            .patch(
+                &format!("/api/v2/assets/racks/{second}"),
+                &manager,
+                body.clone(),
+            )
+            .await;
+        assert_eq!(response.status, StatusCode::BAD_REQUEST, "{body}");
+    }
+    // Emptied, a number is stored as 0.
+    app.patch(
+        &format!("/api/v2/assets/racks/{second}"),
+        &manager,
+        json!({ "max_weight": 300 }),
+    )
+    .await;
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/racks/{second}"),
+            &manager,
+            json!({ "max_weight": null }),
+        )
+        .await;
+    assert_eq!(response.body["max_weight"], json!(0));
+
+    // A model left NULL: setting none is a change for PHP.
+    app.sql(&format!(
+        "UPDATE glpi_racks SET rackmodels_id = NULL WHERE id = {second}"
+    ))
+    .await;
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/racks/{second}"),
+            &manager,
+            json!({ "model_id": 0 }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(
+        history(&app, "Rack", second).await.pop().unwrap(),
+        row(40, "&nbsp; ()", "&nbsp; (0)")
+    );
+
+    // Enclosures: one power supply by default, no type.
+    let response = app
+        .post(
+            "/api/v2/assets/enclosures",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "ENC-1" })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    assert_eq!(response.body["power_supplies"], json!(1));
+    assert_eq!(
+        app.post(
+            "/api/v2/assets/enclosures",
+            &manager,
+            Some(json!({ "entity_id": 1, "type_id": 1 })),
+        )
+        .await
+        .status,
+        StatusCode::BAD_REQUEST
+    );
+
+    // PDUs and passive equipment: comments not in the history.
+    let response = app
+        .post(
+            "/api/v2/assets/pdus",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "PDU-1" })),
+        )
+        .await;
+    let pdu = response.body["id"].as_i64().unwrap() as i32;
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/pdus/{pdu}"),
+            &manager,
+            json!({ "comment": "c", "name": "PDU-2" }),
+        )
+        .await;
+    assert_eq!(response.body["comment"], json!("c"));
+    assert_eq!(
+        history(&app, "PDU", pdu).await[1..],
+        [row(1, "PDU-1", "PDU-2")]
+    );
+    assert_eq!(events(&app).await.pop().unwrap().1, "pdus".to_owned());
+
+    // Clusters: no template, no infocom, version and type not logged.
+    let response = app
+        .post(
+            "/api/v2/assets/clusters",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "CLU-1", "uuid": "u-1" })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    let cluster = response.body["id"].as_i64().unwrap() as i32;
+    assert_eq!(
+        count(
+            &app,
+            &format!("SELECT COUNT(*) FROM glpi_infocoms WHERE itemtype = 'Cluster' AND items_id = {cluster}")
+        )
+        .await,
+        0
+    );
+    app.patch(
+        &format!("/api/v2/assets/clusters/{cluster}"),
+        &manager,
+        json!({ "version": "2", "uuid": "u-2" }),
+    )
+    .await;
+    assert_eq!(
+        history(&app, "Cluster", cluster).await[1..],
+        [row(5, "u-1", "u-2")]
+    );
+    assert_eq!(
+        app.get("/api/v2/assets/clusters/templates", Some(&manager))
+            .await
+            .status,
+        StatusCode::NOT_FOUND
+    );
+    let response = app
+        .get("/api/v2/assets/clusters?search=u-2", Some(&manager))
+        .await;
+    assert_eq!(response.body["total"], json!(1), "{}", response.body);
+
+    // Purge: what the item holds leaves it to the classic interface.
+    app.sql(&format!(
+        "INSERT INTO glpi_items_racks (racks_id, itemtype, items_id, position) VALUES ({second}, 'Computer', 102, 1); \
+         INSERT INTO glpi_contracts_items (contracts_id, itemtype, items_id) VALUES (1, 'Rack', {rack}); \
+         UPDATE glpi_racks SET is_deleted = 1 WHERE id = {second}"
+    ))
+    .await;
+    app.sql("INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES (4, 'infocom', 31)")
+        .await;
+    let response = app
+        .send(
+            Method::DELETE,
+            &format!("/api/v2/assets/racks/{second}"),
+            Some(&manager),
+            None,
+        )
+        .await;
+    assert_eq!(response.error_code(), "legacy_required");
+    let response = app
+        .send(
+            Method::DELETE,
+            &format!("/api/v2/assets/racks/{rack}"),
+            Some(&manager),
+            None,
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::NO_CONTENT, "{}", response.body);
+    assert_eq!(
+        count(
+            &app,
+            &format!(
+                "SELECT (SELECT COUNT(*) FROM glpi_racks WHERE id = {rack}) \
+                 + (SELECT COUNT(*) FROM glpi_contracts_items WHERE itemtype = 'Rack') \
+                 + (SELECT COUNT(*) FROM glpi_infocoms WHERE itemtype = 'Rack' AND items_id = {rack})"
+            )
+        )
+        .await,
+        0
     );
 }

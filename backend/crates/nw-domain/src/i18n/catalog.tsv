@@ -54,6 +54,11 @@ ar_SA.mo	Current counter of pages	Current counter of pages
 ar_SA.mo	Power supply	Power supplies
 ar_SA.mo	Headset	Headset
 ar_SA.mo	Speaker	Speaker
+ar_SA.mo	Technician in charge of the hardware	المسؤول الفني للأجهزة
+ar_SA.mo	Comments	التعليقات
+ar_SA.mo	Template name	إسم النموذج
+ar_SA.mo	Number of units	Number of units
+ar_SA.mo	Server room	Server rooms
 be_BY.mo	%1$s log in from IP %2$s	%1$s зайшоў у сістэму з IP %2$s
 be_BY.mo	Failed login for %1$s from IP %2$s	Няўдалы ўваход у сістэму для  %1$s з IP %2$s
 be_BY.mo	%1$s adds the item %2$s	%1$s дадае элемент %2$s
@@ -110,6 +115,11 @@ be_BY.mo	Current counter of pages	Current counter of pages
 be_BY.mo	Power supply	Power supply
 be_BY.mo	Headset	Headset
 be_BY.mo	Speaker	Speaker
+be_BY.mo	Technician in charge of the hardware	Адказны спецыяліст
+be_BY.mo	Comments	Каментары
+be_BY.mo	Template name	Template name
+be_BY.mo	Number of units	Number of units
+be_BY.mo	Server room	Server room
 bg_BG.mo	%1$s log in from IP %2$s	%1$s влиза от IP %2$s
 bg_BG.mo	Failed login for %1$s from IP %2$s	Неуспешен вход за %1$s от IP %2$s
 bg_BG.mo	%1$s adds the item %2$s	%1$s добави елемента %2$s
@@ -166,6 +176,11 @@ bg_BG.mo	Current counter of pages	Текущ брояч на страници
 bg_BG.mo	Power supply	Захранващ блок
 bg_BG.mo	Headset	Гарнитура
 bg_BG.mo	Speaker	Високоговорител
+bg_BG.mo	Technician in charge of the hardware	Изпълнител, отговорен за хардуера
+bg_BG.mo	Comments	Забележки
+bg_BG.mo	Template name	Име на шаблона
+bg_BG.mo	Number of units	Брой единици
+bg_BG.mo	Server room	Сървърна стая
 ca_ES.mo	%1$s log in from IP %2$s	%1$s ha entrat des de la IP %2$s
 ca_ES.mo	Failed login for %1$s from IP %2$s	Ha fallat l'inici de sessió per %1$s des de la IP %2$s
 ca_ES.mo	%1$s adds the item %2$s	%1$s afegeix l'element %2$s
@@ -222,6 +237,11 @@ ca_ES.mo	Current counter of pages	Comptador de pàgines actual
 ca_ES.mo	Power supply	Font d'alimentació
 ca_ES.mo	Headset	Casc
 ca_ES.mo	Speaker	Altaveu
+ca_ES.mo	Technician in charge of the hardware	Responsable tècnic del maquinari
+ca_ES.mo	Comments	Comentaris
+ca_ES.mo	Template name	Nom de la plantilla
+ca_ES.mo	Number of units	Nombre d'unitats
+ca_ES.mo	Server room	Sala de servidor
 cs_CZ.mo	%1$s log in from IP %2$s	Uživatel %1$s se přihlásil z IP adresy %2$s
 cs_CZ.mo	Failed login for %1$s from IP %2$s	Neúspěšné přihlášení uživatele %1$s z IP adresy %2$s
 cs_CZ.mo	%1$s adds the item %2$s	%1$s přidal položku %2$s
@@ -278,6 +298,11 @@ cs_CZ.mo	Current counter of pages	Aktuální stav počítadla stránek
 cs_CZ.mo	Power supply	Napájecí zdroj
 cs_CZ.mo	Headset	Náhlavní souprava
 cs_CZ.mo	Speaker	Reproduktor
+cs_CZ.mo	Technician in charge of the hardware	Technik zodpovědný za hardware
+cs_CZ.mo	Comments	Komentáře
+cs_CZ.mo	Template name	Název šablony
+cs_CZ.mo	Number of units	Počet jednotek
+cs_CZ.mo	Server room	Serverovna
 da_DK.mo	%1$s log in from IP %2$s	%1$s log ind fra IP %2$s
 da_DK.mo	Failed login for %1$s from IP %2$s	Mislykket login for %1$s fra IP %2$s
 da_DK.mo	%1$s adds the item %2$s	%1$s tilføjer emnet %2$s
@@ -334,6 +359,11 @@ da_DK.mo	Current counter of pages	Nuværende aflæsning af sider
 da_DK.mo	Power supply	Power supply
 da_DK.mo	Headset	Hjelm telefoner
 da_DK.mo	Speaker	Højtaler
+da_DK.mo	Technician in charge of the hardware	Ansvarlig tekniker
+da_DK.mo	Comments	Kommentarer
+da_DK.mo	Template name	Skabelon navn
+da_DK.mo	Number of units	Number of units
+da_DK.mo	Server room	Server room
 de_DE.mo	%1$s log in from IP %2$s	%1$s loggt sich mit der IP %2$s ein
 de_DE.mo	Failed login for %1$s from IP %2$s	Anmeldung des Benutzers %1$s von IP %2$s fehlgeschlagen
 de_DE.mo	%1$s adds the item %2$s	%1$s fügt das Element %2$s hinzu
@@ -390,6 +420,11 @@ de_DE.mo	Current counter of pages	aktueller Stand des Seitenzählers
 de_DE.mo	Power supply	Netzteil
 de_DE.mo	Headset	Headset
 de_DE.mo	Speaker	Lautsprecher
+de_DE.mo	Technician in charge of the hardware	Verwaltende Person
+de_DE.mo	Comments	Kommentare
+de_DE.mo	Template name	Vorlage Name
+de_DE.mo	Number of units	Anzahl der Einheiten
+de_DE.mo	Server room	Serverraum
 el_GR.mo	%1$s log in from IP %2$s	%1$s συνδέεται από την IP %2$s
 el_GR.mo	Failed login for %1$s from IP %2$s	Εσφαλμένη σύνδεση για %1$s από την IP %2$s
 el_GR.mo	%1$s adds the item %2$s	%1$s προσθέτει το στοιχείο %2$s
@@ -446,6 +481,11 @@ el_GR.mo	Current counter of pages	Τρέχων μετρητής σελίδων
 el_GR.mo	Power supply	Power supply
 el_GR.mo	Headset	Βοηθητικό ακουστικό
 el_GR.mo	Speaker	Μεγάφωνο
+el_GR.mo	Technician in charge of the hardware	Εξουσιοδοτημένος τεχνικός
+el_GR.mo	Comments	Σχόλια
+el_GR.mo	Template name	Όνομα προτύπου
+el_GR.mo	Number of units	Number of units
+el_GR.mo	Server room	Server room
 en_GB.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 en_GB.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 en_GB.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -502,6 +542,11 @@ en_GB.mo	Current counter of pages	Current counter of pages
 en_GB.mo	Power supply	Power supply
 en_GB.mo	Headset	Headset
 en_GB.mo	Speaker	Speaker
+en_GB.mo	Technician in charge of the hardware	Technician in charge of the hardware
+en_GB.mo	Comments	Comments
+en_GB.mo	Template name	Template name
+en_GB.mo	Number of units	Number of units
+en_GB.mo	Server room	Server room
 en_US.mo	%1$s log in from IP %2$s	%1$s login from IP %2$s
 en_US.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 en_US.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -558,6 +603,11 @@ en_US.mo	Current counter of pages	Current Counter of Pages
 en_US.mo	Power supply	Power Supply
 en_US.mo	Headset	Headset
 en_US.mo	Speaker	Speaker
+en_US.mo	Technician in charge of the hardware	Technician in Charge of the Hardware
+en_US.mo	Comments	Comments
+en_US.mo	Template name	Template Name
+en_US.mo	Number of units	Number of units
+en_US.mo	Server room	Server room
 eo.mo	%1$s log in from IP %2$s	%1$s вошел в систему с IP %2$s
 eo.mo	Failed login for %1$s from IP %2$s	Неудачная попытка входа пользователя %1$s с IP %2$s
 eo.mo	%1$s adds the item %2$s	%1$s aldonis objekto %2$s
@@ -614,6 +664,11 @@ eo.mo	Current counter of pages	Текущий счетчик страниц
 eo.mo	Power supply	Power supply
 eo.mo	Headset	Гарнитура
 eo.mo	Speaker	Громкая связь
+eo.mo	Technician in charge of the hardware	Специалист ответственный за оборудование
+eo.mo	Comments	Komentoj
+eo.mo	Template name	Имя шаблона
+eo.mo	Number of units	Number of units
+eo.mo	Server room	Server room
 es_419.mo	%1$s log in from IP %2$s	%1$s inicia sesión desde la IP %2$s
 es_419.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_419.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -670,6 +725,11 @@ es_419.mo	Current counter of pages	Contador acutual de páginas
 es_419.mo	Power supply	Suministro eléctrico
 es_419.mo	Headset	Audífono
 es_419.mo	Speaker	Altavoz
+es_419.mo	Technician in charge of the hardware	Técnico responsable
+es_419.mo	Comments	Comentarios
+es_419.mo	Template name	Nombre de la plantilla
+es_419.mo	Number of units	Número de unidades
+es_419.mo	Server room	Cuarto de servidor
 es_AR.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_AR.mo	Failed login for %1$s from IP %2$s	Login fallido de %1$s desde IP %2$s
 es_AR.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -726,6 +786,11 @@ es_AR.mo	Current counter of pages	Contador actual de páginas
 es_AR.mo	Power supply	Fuente de alimentación
 es_AR.mo	Headset	Casco
 es_AR.mo	Speaker	Parlante
+es_AR.mo	Technician in charge of the hardware	Responsable técnico del hardware
+es_AR.mo	Comments	Comentarios
+es_AR.mo	Template name	Nombre de la plantilla
+es_AR.mo	Number of units	Número de unidades
+es_AR.mo	Server room	Sala de servidor
 es_CL.mo	%1$s log in from IP %2$s	%1$s inicia sesión desde la IP %2$s
 es_CL.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_CL.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -782,6 +847,11 @@ es_CL.mo	Current counter of pages	Contador acutual de páginas
 es_CL.mo	Power supply	Power supply
 es_CL.mo	Headset	Audífono
 es_CL.mo	Speaker	Altavoz
+es_CL.mo	Technician in charge of the hardware	Técnico responsable
+es_CL.mo	Comments	Comentarios
+es_CL.mo	Template name	Nombre de la plantilla
+es_CL.mo	Number of units	Number of units
+es_CL.mo	Server room	Sala de Servidor
 es_CO.mo	%1$s log in from IP %2$s	%1$s inicio de sesión desde la IP %2$s
 es_CO.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_CO.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -838,6 +908,11 @@ es_CO.mo	Current counter of pages	Contador actual de paginas
 es_CO.mo	Power supply	Suministro eléctrico
 es_CO.mo	Headset	Manos libres
 es_CO.mo	Speaker	Altavoz
+es_CO.mo	Technician in charge of the hardware	Técnico a cargo del hardware
+es_CO.mo	Comments	Comentarios
+es_CO.mo	Template name	Nombre de plantilla
+es_CO.mo	Number of units	Número de unidades
+es_CO.mo	Server room	Sala de servidor
 es_ES.mo	%1$s log in from IP %2$s	%1$s inició la sesión desde la IP %2$s
 es_ES.mo	Failed login for %1$s from IP %2$s	Fallo en el inicio de sesión de %1$s desde la IP %2$s
 es_ES.mo	%1$s adds the item %2$s	%1$s añade el elemento %2$s
@@ -894,6 +969,11 @@ es_ES.mo	Current counter of pages	Contador actual de páginas
 es_ES.mo	Power supply	Fuente de alimentación
 es_ES.mo	Headset	Auricular
 es_ES.mo	Speaker	Altavoz
+es_ES.mo	Technician in charge of the hardware	Técnico a cargo del hardware
+es_ES.mo	Comments	Comentarios
+es_ES.mo	Template name	Nombre de la plantilla
+es_ES.mo	Number of units	Número de unidades
+es_ES.mo	Server room	Sala del servidor
 es_MX.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_MX.mo	Failed login for %1$s from IP %2$s	Error de acceso para %1$s de la IP %2$s
 es_MX.mo	%1$s adds the item %2$s	%1$s añade un elemento %2$s
@@ -950,6 +1030,11 @@ es_MX.mo	Current counter of pages	Conteo actual de páginas
 es_MX.mo	Power supply	Fuente de alimentación
 es_MX.mo	Headset	Diadema
 es_MX.mo	Speaker	Altavoz
+es_MX.mo	Technician in charge of the hardware	Técnico a cargo del hardware
+es_MX.mo	Comments	Comentarios
+es_MX.mo	Template name	Nombre de la plantilla
+es_MX.mo	Number of units	Número de unidades
+es_MX.mo	Server room	Sala de servidores
 es_VE.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_VE.mo	Failed login for %1$s from IP %2$s	Login fallido de %1$s desde IP %2$s
 es_VE.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -1006,6 +1091,11 @@ es_VE.mo	Current counter of pages	Contador actual de páginas
 es_VE.mo	Power supply	Fuente de alimentación
 es_VE.mo	Headset	Casco
 es_VE.mo	Speaker	Parlante
+es_VE.mo	Technician in charge of the hardware	Responsable técnico del hardware
+es_VE.mo	Comments	Comentarios
+es_VE.mo	Template name	Nombre de la plantilla
+es_VE.mo	Number of units	Number of units
+es_VE.mo	Server room	Server room
 et_EE.mo	%1$s log in from IP %2$s	%1$s logis sisse aadresilt %2$s
 et_EE.mo	Failed login for %1$s from IP %2$s	Ebaõnnestunud sisselogimine kasutajalt %1$s IP-aadressilt %2$s
 et_EE.mo	%1$s adds the item %2$s	%1$s lisas asja %2$s
@@ -1062,6 +1152,11 @@ et_EE.mo	Current counter of pages	Praegune leheloendur
 et_EE.mo	Power supply	Toiteallikas
 et_EE.mo	Headset	Kõrvaklapid
 et_EE.mo	Speaker	Kõlar
+et_EE.mo	Technician in charge of the hardware	Riistvara eest vastutaja
+et_EE.mo	Comments	Kommentaarid
+et_EE.mo	Template name	Malli nimi
+et_EE.mo	Number of units	Unitite arv
+et_EE.mo	Server room	Serveriruum
 eu_ES.mo	%1$s log in from IP %2$s	%1$s %2$s IP helbidetik sesioa hasi du
 eu_ES.mo	Failed login for %1$s from IP %2$s	%1$s %2$s IP helbidetik sesioa hasteko arazoa
 eu_ES.mo	%1$s adds the item %2$s	%1$s-k %2$s elementua gehitzen du
@@ -1118,6 +1213,11 @@ eu_ES.mo	Current counter of pages	Oraingo orri kontadorea
 eu_ES.mo	Power supply	Energia iturria
 eu_ES.mo	Headset	Aurikularra
 eu_ES.mo	Speaker	Bozgorailua
+eu_ES.mo	Technician in charge of the hardware	Arduradun teknikoa
+eu_ES.mo	Comments	Iruzkinak
+eu_ES.mo	Template name	Eredu izena
+eu_ES.mo	Number of units	Number of units
+eu_ES.mo	Server room	Server room
 fa_IR.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 fa_IR.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 fa_IR.mo	%1$s adds the item %2$s	%1$s قلم به آيتم  %2$s شد.
@@ -1174,6 +1274,11 @@ fa_IR.mo	Current counter of pages	Current counter of pages
 fa_IR.mo	Power supply	منبع تغذیه
 fa_IR.mo	Headset	Headset
 fa_IR.mo	Speaker	بلندگو
+fa_IR.mo	Technician in charge of the hardware	کاردان فنی متصدی سخت‌افزار
+fa_IR.mo	Comments	توضیح
+fa_IR.mo	Template name	نام قالب
+fa_IR.mo	Number of units	Number of units
+fa_IR.mo	Server room	Server room
 fi_FI.mo	%1$s log in from IP %2$s	%1$s kirjautuu IP-osoitteesta %2$s
 fi_FI.mo	Failed login for %1$s from IP %2$s	Epäonnistunut kirjautuminen käyttäjälle %1$s IP-osoitteesta %2$s
 fi_FI.mo	%1$s adds the item %2$s	%1$s lisää kohteen %2$s
@@ -1230,6 +1335,11 @@ fi_FI.mo	Current counter of pages	Sivulaskurin nykyinen arvo
 fi_FI.mo	Power supply	Virtalähde
 fi_FI.mo	Headset	Kuulokkeet
 fi_FI.mo	Speaker	Kaiutin
+fi_FI.mo	Technician in charge of the hardware	Laitteistosta vastaava asentaja
+fi_FI.mo	Comments	Kommentit
+fi_FI.mo	Template name	Mallin nimi
+fi_FI.mo	Number of units	Laitemäärä
+fi_FI.mo	Server room	Palvelinhuone
 fr_BE.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_BE.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_BE.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -1286,6 +1396,11 @@ fr_BE.mo	Current counter of pages	Compteur de page actuel
 fr_BE.mo	Power supply	Power supply
 fr_BE.mo	Headset	Casque
 fr_BE.mo	Speaker	Haut parleur
+fr_BE.mo	Technician in charge of the hardware	Responsable technique
+fr_BE.mo	Comments	Commentaires
+fr_BE.mo	Template name	Nom du gabarit
+fr_BE.mo	Number of units	Nombre d'unités
+fr_BE.mo	Server room	Server room
 fr_CA.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_CA.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_CA.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -1342,6 +1457,11 @@ fr_CA.mo	Current counter of pages	Compteur de page actuel
 fr_CA.mo	Power supply	Bloc d'alimentation
 fr_CA.mo	Headset	Casque
 fr_CA.mo	Speaker	Haut parleur
+fr_CA.mo	Technician in charge of the hardware	Technicien responsable du matériel
+fr_CA.mo	Comments	Commentaires
+fr_CA.mo	Template name	Nom du gabarit
+fr_CA.mo	Number of units	Nombre d'unités
+fr_CA.mo	Server room	Salle serveurs
 fr_FR.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_FR.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_FR.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -1398,6 +1518,11 @@ fr_FR.mo	Current counter of pages	Compteur de page actuel
 fr_FR.mo	Power supply	Alimentation
 fr_FR.mo	Headset	Casque
 fr_FR.mo	Speaker	Haut parleur
+fr_FR.mo	Technician in charge of the hardware	Responsable technique
+fr_FR.mo	Comments	Commentaires
+fr_FR.mo	Template name	Nom du gabarit
+fr_FR.mo	Number of units	Nombre d'unités
+fr_FR.mo	Server room	Salle serveurs
 gl_ES.mo	%1$s log in from IP %2$s	%1$s logueouse dende a IP %2$s
 gl_ES.mo	Failed login for %1$s from IP %2$s	Erro en conexión %1$s dende IP %2$s
 gl_ES.mo	%1$s adds the item %2$s	%1$s engade o elemento %2$s
@@ -1454,6 +1579,11 @@ gl_ES.mo	Current counter of pages	Contador de impresións
 gl_ES.mo	Power supply	Alimentación
 gl_ES.mo	Headset	Casco
 gl_ES.mo	Speaker	Altofalante
+gl_ES.mo	Technician in charge of the hardware	Responsable técnico
+gl_ES.mo	Comments	Comentarios
+gl_ES.mo	Template name	Nome do persoal
+gl_ES.mo	Number of units	Number of units
+gl_ES.mo	Server room	Sala de servidores
 he_IL.mo	%1$s log in from IP %2$s	%1$sחיבור מכתובת IP %2$s
 he_IL.mo	Failed login for %1$s from IP %2$s	חיבור נכשל עבור %1$s מכתובת IP %2$s
 he_IL.mo	%1$s adds the item %2$s	%1$sהוסיף את הפריט %2$s
@@ -1510,6 +1640,11 @@ he_IL.mo	Current counter of pages	מונה נוכחי של דפים
 he_IL.mo	Power supply	ספק כח
 he_IL.mo	Headset	אוזניות
 he_IL.mo	Speaker	רמקול
+he_IL.mo	Technician in charge of the hardware	טכנאי אחראי על הפריט
+he_IL.mo	Comments	הערות
+he_IL.mo	Template name	שם תבנית
+he_IL.mo	Number of units	Number of units
+he_IL.mo	Server room	חדר שרתים
 hi_IN.mo	%1$s log in from IP %2$s	IP %2$s से %1$s लॉग इन करें
 hi_IN.mo	Failed login for %1$s from IP %2$s	आईपी ​​%2$s से %1$s के लिए लॉगिन विफल
 hi_IN.mo	%1$s adds the item %2$s	1%1$sआइटम 2%2$sजोड़ता है
@@ -1566,6 +1701,11 @@ hi_IN.mo	Current counter of pages	पृष्ठों का वर्तम�
 hi_IN.mo	Power supply	बिजली की आपूर्ति
 hi_IN.mo	Headset	हेडसेट
 hi_IN.mo	Speaker	वक्ता
+hi_IN.mo	Technician in charge of the hardware	हार्डवेयर के प्रभारी तकनीशियन
+hi_IN.mo	Comments	टिप्पणियाँ
+hi_IN.mo	Template name	टेम्पलेट नाम
+hi_IN.mo	Number of units	इकाइयों की संख्या
+hi_IN.mo	Server room	सर्वर कमरे
 hr_HR.mo	%1$s log in from IP %2$s	%1$s prijava s IP adrese %2$s
 hr_HR.mo	Failed login for %1$s from IP %2$s	Neusjela prijava za %1$s sa IP adrese %2$s
 hr_HR.mo	%1$s adds the item %2$s	%1$s dodaje predmet. %2$s
@@ -1622,6 +1762,11 @@ hr_HR.mo	Current counter of pages	Trenutačni brojač stranica
 hr_HR.mo	Power supply	Izvor napajanja
 hr_HR.mo	Headset	Slušalice
 hr_HR.mo	Speaker	Zvučnik
+hr_HR.mo	Technician in charge of the hardware	Tehničar zadužen za uređaje
+hr_HR.mo	Comments	Komentari
+hr_HR.mo	Template name	Ime predloška
+hr_HR.mo	Number of units	Broj jedinica
+hr_HR.mo	Server room	Soba s poslužiteljem
 hu_HU.mo	%1$s log in from IP %2$s	%1$s bejelentkezett a következő IP-ről: %2$s
 hu_HU.mo	Failed login for %1$s from IP %2$s	Sikertelen bejelentkezés %1$s a %2$s IP-ről.
 hu_HU.mo	%1$s adds the item %2$s	%1$s hozzáadta a %2$s elemet
@@ -1678,6 +1823,11 @@ hu_HU.mo	Current counter of pages	Oldalszámláló állása
 hu_HU.mo	Power supply	Tápegysésg
 hu_HU.mo	Headset	Fejhallgatós telefon
 hu_HU.mo	Speaker	Hangszóró
+hu_HU.mo	Technician in charge of the hardware	Technikai felelős
+hu_HU.mo	Comments	Megjegyzések
+hu_HU.mo	Template name	Sablon neve
+hu_HU.mo	Number of units	Number of units
+hu_HU.mo	Server room	Server room
 id_ID.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 id_ID.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 id_ID.mo	%1$s adds the item %2$s	%1$s menambahkan item %2$s
@@ -1734,6 +1884,11 @@ id_ID.mo	Current counter of pages	Current counter of pages
 id_ID.mo	Power supply	Catu Daya
 id_ID.mo	Headset	Headset
 id_ID.mo	Speaker	Speaker
+id_ID.mo	Technician in charge of the hardware	Teknisi yang ditunjuk atas hardware
+id_ID.mo	Comments	Komentar
+id_ID.mo	Template name	Nama Kerangka
+id_ID.mo	Number of units	Number of units
+id_ID.mo	Server room	Server room
 is_IS.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 is_IS.mo	Failed login for %1$s from IP %2$s	Misheppnaðar innskráningar fyrir %1$s frá IP %2$s 
 is_IS.mo	%1$s adds the item %2$s	%1$s bætir við %2$s 
@@ -1790,6 +1945,11 @@ is_IS.mo	Current counter of pages	Current counter of pages
 is_IS.mo	Power supply	Power supply
 is_IS.mo	Headset	Heyrnatól
 is_IS.mo	Speaker	Hátalari
+is_IS.mo	Technician in charge of the hardware	Technician in charge of the hardware
+is_IS.mo	Comments	Athugasemdir
+is_IS.mo	Template name	Template name
+is_IS.mo	Number of units	Number of units
+is_IS.mo	Server room	Server room
 it_IT.mo	%1$s log in from IP %2$s	Accesso di %1$s dall'IP %2$s
 it_IT.mo	Failed login for %1$s from IP %2$s	Accesso non riuscito per %1$s dall'IP %2$s
 it_IT.mo	%1$s adds the item %2$s	%1$s aggiunge l'elemento %2$s
@@ -1846,6 +2006,11 @@ it_IT.mo	Current counter of pages	Conteggio attuale delle pagine
 it_IT.mo	Power supply	Alimentatore
 it_IT.mo	Headset	Cuffia
 it_IT.mo	Speaker	Vivavoce
+it_IT.mo	Technician in charge of the hardware	Responsabile tecnico
+it_IT.mo	Comments	Commenti
+it_IT.mo	Template name	Nome modello
+it_IT.mo	Number of units	Numero di unità
+it_IT.mo	Server room	Sala server
 ja_JP.mo	%1$s log in from IP %2$s	%1$s は IP: %2$s からログインしました
 ja_JP.mo	Failed login for %1$s from IP %2$s	%1$s は IP: %2$s からのログインに失敗しました
 ja_JP.mo	%1$s adds the item %2$s	%1$s がアイテム %2$s を追加
@@ -1902,6 +2067,11 @@ ja_JP.mo	Current counter of pages	現在のページカウンタ
 ja_JP.mo	Power supply	電源ユニット
 ja_JP.mo	Headset	ヘッドフォン
 ja_JP.mo	Speaker	スピーカー
+ja_JP.mo	Technician in charge of the hardware	ハードウェア担当技術者
+ja_JP.mo	Comments	備考
+ja_JP.mo	Template name	テンプレート名
+ja_JP.mo	Number of units	ユニット数
+ja_JP.mo	Server room	サーバールーム
 kn.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 kn.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 kn.mo	%1$s adds the item %2$s	%1$sಐಟಂ ಸೇರಿಸುತ್ತದೆ %2$s 
@@ -1958,6 +2128,11 @@ kn.mo	Current counter of pages	Current counter of pages
 kn.mo	Power supply	Power supply
 kn.mo	Headset	Headset
 kn.mo	Speaker	Speaker
+kn.mo	Technician in charge of the hardware	ಯಂತ್ರಾಂಶದ ಉಸ್ತುವಾರಿ ವಹಿಸುವ ತಂತ್ರಜ್ಞ
+kn.mo	Comments	ಪ್ರತಿಕ್ರಿಯೆಗಳು
+kn.mo	Template name	ಟೆಂಪ್ಲೇಟು ಹೆಸರು
+kn.mo	Number of units	Number of units
+kn.mo	Server room	Server room
 ko_KR.mo	%1$s log in from IP %2$s	IP %2$s에서 %1$s로 로그인
 ko_KR.mo	Failed login for %1$s from IP %2$s	IP %2$s에서 %1$s로 로그인 실패
 ko_KR.mo	%1$s adds the item %2$s	%1$s 는 %2$s 아이템을 추가합니다.
@@ -2014,6 +2189,11 @@ ko_KR.mo	Current counter of pages	현재 페이지 수
 ko_KR.mo	Power supply	전원 장치
 ko_KR.mo	Headset	헤드셋
 ko_KR.mo	Speaker	스피커
+ko_KR.mo	Technician in charge of the hardware	하드웨어 책임 기술자
+ko_KR.mo	Comments	논평
+ko_KR.mo	Template name	템플릿 이름
+ko_KR.mo	Number of units	단위 수
+ko_KR.mo	Server room	서버실
 lt_LT.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 lt_LT.mo	Failed login for %1$s from IP %2$s	Nepavyko %1$s prisijungimas iš IP %2$s
 lt_LT.mo	%1$s adds the item %2$s	%1$s pridėjo elementą %2$s
@@ -2070,6 +2250,11 @@ lt_LT.mo	Current counter of pages	Dabartiniai skaitliuko parodymai
 lt_LT.mo	Power supply	Power supply
 lt_LT.mo	Headset	Ausinės
 lt_LT.mo	Speaker	Garsiakalbis
+lt_LT.mo	Technician in charge of the hardware	Aptarnaujantis darbuotojas
+lt_LT.mo	Comments	Komentarai
+lt_LT.mo	Template name	Formos vardas
+lt_LT.mo	Number of units	Number of units
+lt_LT.mo	Server room	Server room
 lv_LV.mo	%1$s log in from IP %2$s	%1$s pieteicās no IP %2$s
 lv_LV.mo	Failed login for %1$s from IP %2$s	Neveiksmīgs meiģinājums pieteikties lietotājam %1$s no IP %2$s
 lv_LV.mo	%1$s adds the item %2$s	%1$s pievieno ierakstu %2$s
@@ -2126,6 +2311,11 @@ lv_LV.mo	Current counter of pages	Pašreizējais lapu skaits
 lv_LV.mo	Power supply	Barošanas bloki
 lv_LV.mo	Headset	Klausule
 lv_LV.mo	Speaker	Skaļrunis
+lv_LV.mo	Technician in charge of the hardware	Atbildīgais tehniķis
+lv_LV.mo	Comments	Piezīmes
+lv_LV.mo	Template name	Veidnes nosaukums
+lv_LV.mo	Number of units	Vienību skaits
+lv_LV.mo	Server room	Serveru telpas
 mn_MN.mo	%1$s log in from IP %2$s	%1$sнь IP %2$s-ээр нэвтрэв
 mn_MN.mo	Failed login for %1$s from IP %2$s	%1$s-с IP %2$s-д нэвтрэх явц амжилтгүй боллоо
 mn_MN.mo	%1$s adds the item %2$s	%1$sтөхөөрөмжийг нэмэх%2$s
@@ -2182,6 +2372,11 @@ mn_MN.mo	Current counter of pages	Хуудасны одоогийн тоолуу
 mn_MN.mo	Power supply	Эрчим хүчний хангамж
 mn_MN.mo	Headset	Чихэвч
 mn_MN.mo	Speaker	Спеакер
+mn_MN.mo	Technician in charge of the hardware	Тоног төхөөрөмж хариуцсан техникч
+mn_MN.mo	Comments	Тайлбар
+mn_MN.mo	Template name	Загварын нэр
+mn_MN.mo	Number of units	Нэгжийн тоо
+mn_MN.mo	Server room	Серверийн өрөө
 ms_MY.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 ms_MY.mo	Failed login for %1$s from IP %2$s	Gagal masuk bagi %1$s dari IP %2$s
 ms_MY.mo	%1$s adds the item %2$s	%1$s menambah kepada item %2$s
@@ -2238,6 +2433,11 @@ ms_MY.mo	Current counter of pages	Current counter of pages
 ms_MY.mo	Power supply	Power supply
 ms_MY.mo	Headset	Headset
 ms_MY.mo	Speaker	Speaker
+ms_MY.mo	Technician in charge of the hardware	Juruteknik ditugaskan menjaga perkakasan
+ms_MY.mo	Comments	komen
+ms_MY.mo	Template name	Template name
+ms_MY.mo	Number of units	Number of units
+ms_MY.mo	Server room	Server room
 nb_NO.mo	%1$s log in from IP %2$s	%1$s innlogget fra IP %2$s
 nb_NO.mo	Failed login for %1$s from IP %2$s	Innlogging feilet for %1$s fra IP %2$s
 nb_NO.mo	%1$s adds the item %2$s	%1$s legger til elementet %2$s
@@ -2294,6 +2494,11 @@ nb_NO.mo	Current counter of pages	Current counter of pages
 nb_NO.mo	Power supply	Strømforsyning
 nb_NO.mo	Headset	Hodetelefoner
 nb_NO.mo	Speaker	Høytaler
+nb_NO.mo	Technician in charge of the hardware	Ansvarlig tekniker
+nb_NO.mo	Comments	Kommentarer
+nb_NO.mo	Template name	Mal navn
+nb_NO.mo	Number of units	Number of units
+nb_NO.mo	Server room	Server room
 nl_BE.mo	%1$s log in from IP %2$s	%1$s log in van IP %2$s
 nl_BE.mo	Failed login for %1$s from IP %2$s	Mislukt login voor %1$s van IP %2$s
 nl_BE.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
@@ -2350,6 +2555,11 @@ nl_BE.mo	Current counter of pages	Huidige teller van pagina's
 nl_BE.mo	Power supply	Power supply
 nl_BE.mo	Headset	Koptelefoons
 nl_BE.mo	Speaker	Luidspreker
+nl_BE.mo	Technician in charge of the hardware	Hardware beheerder
+nl_BE.mo	Comments	Opmerkingen
+nl_BE.mo	Template name	Sjabloonnaam
+nl_BE.mo	Number of units	Aantal eenheden
+nl_BE.mo	Server room	Server room
 nl_NL.mo	%1$s log in from IP %2$s	%1$s log in van IP %2$s
 nl_NL.mo	Failed login for %1$s from IP %2$s	Mislukt login voor %1$s van IP %2$s
 nl_NL.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
@@ -2406,6 +2616,11 @@ nl_NL.mo	Current counter of pages	Huidige teller van pagina's
 nl_NL.mo	Power supply	Power supply
 nl_NL.mo	Headset	Koptelefoons
 nl_NL.mo	Speaker	Luidspreker
+nl_NL.mo	Technician in charge of the hardware	Hardware beheerder
+nl_NL.mo	Comments	Opmerkingen
+nl_NL.mo	Template name	Sjabloonnaam
+nl_NL.mo	Number of units	Aantal eenheden
+nl_NL.mo	Server room	Server room
 nn_NO.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 nn_NO.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 nn_NO.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -2462,6 +2677,11 @@ nn_NO.mo	Current counter of pages	Current counter of pages
 nn_NO.mo	Power supply	Power supply
 nn_NO.mo	Headset	Hodetelefoner
 nn_NO.mo	Speaker	Høytaler
+nn_NO.mo	Technician in charge of the hardware	Ansvarleg teknikar
+nn_NO.mo	Comments	Merknad
+nn_NO.mo	Template name	Mal navn
+nn_NO.mo	Number of units	Number of units
+nn_NO.mo	Server room	Server room
 pl_PL.mo	%1$s log in from IP %2$s	%1$s zalogował się z IP %2$s
 pl_PL.mo	Failed login for %1$s from IP %2$s	Nieudane logowanie %1$s z IP %2$s
 pl_PL.mo	%1$s adds the item %2$s	%1$s dodał element %2$s
@@ -2518,6 +2738,11 @@ pl_PL.mo	Current counter of pages	Aktualny licznik stron
 pl_PL.mo	Power supply	Zasilacz
 pl_PL.mo	Headset	Słuchawki z mikrofonem
 pl_PL.mo	Speaker	Głośnik
+pl_PL.mo	Technician in charge of the hardware	Technik odpowiedzialny za sprzęt
+pl_PL.mo	Comments	Komentarz
+pl_PL.mo	Template name	Nazwa Szablonu
+pl_PL.mo	Number of units	Wysokość w jednostkach
+pl_PL.mo	Server room	Serwerownia
 pt_BR.mo	%1$s log in from IP %2$s	%1$s fez login no IP %2$s
 pt_BR.mo	Failed login for %1$s from IP %2$s	Login falhou para %1$s no IP %2$s
 pt_BR.mo	%1$s adds the item %2$s	%1$s adicionou o item %2$s
@@ -2574,6 +2799,11 @@ pt_BR.mo	Current counter of pages	Contagem atual de páginas
 pt_BR.mo	Power supply	Fonte de alimentação
 pt_BR.mo	Headset	Fone de ouvido
 pt_BR.mo	Speaker	Viva Voz
+pt_BR.mo	Technician in charge of the hardware	Técnico encarregado do hardware
+pt_BR.mo	Comments	Comentários
+pt_BR.mo	Template name	Nome do modelo
+pt_BR.mo	Number of units	Número de unidades
+pt_BR.mo	Server room	Sala de servidor
 pt_PT.mo	%1$s log in from IP %2$s	%1$s ligou-se do IP %2$s
 pt_PT.mo	Failed login for %1$s from IP %2$s	Falhou login para %1$s do IP %2$s
 pt_PT.mo	%1$s adds the item %2$s	%1$s adiciona o item %2$s
@@ -2630,6 +2860,11 @@ pt_PT.mo	Current counter of pages	Contador de paginas actual
 pt_PT.mo	Power supply	Fonte de alimentação
 pt_PT.mo	Headset	Auscultadores
 pt_PT.mo	Speaker	Altifalantes
+pt_PT.mo	Technician in charge of the hardware	Técnico responsável pelo hardware
+pt_PT.mo	Comments	Comentários
+pt_PT.mo	Template name	Nome do modelo
+pt_PT.mo	Number of units	Número de unidades
+pt_PT.mo	Server room	Sala de servidor
 ro_RO.mo	%1$s log in from IP %2$s	%1$s s-a conectat de la IP -ul  %2$s
 ro_RO.mo	Failed login for %1$s from IP %2$s	Conexiune eşuată pentru %1$s de la IP %2$s
 ro_RO.mo	%1$s adds the item %2$s	%1$sadaugă elementzl %2$s
@@ -2686,6 +2921,11 @@ ro_RO.mo	Current counter of pages	Număr pagină curentă
 ro_RO.mo	Power supply	Sursa alimentare
 ro_RO.mo	Headset	Casti
 ro_RO.mo	Speaker	Difuzor
+ro_RO.mo	Technician in charge of the hardware	Responsabil tehnic
+ro_RO.mo	Comments	Observaţii
+ro_RO.mo	Template name	Numele template-ului
+ro_RO.mo	Number of units	Număr de unităţi
+ro_RO.mo	Server room	Server room
 ru_RU.mo	%1$s log in from IP %2$s	%1$s вошел в систему с IP %2$s
 ru_RU.mo	Failed login for %1$s from IP %2$s	Неудачная попытка входа пользователя %1$s с IP %2$s
 ru_RU.mo	%1$s adds the item %2$s	%1$s добавил объект %2$s
@@ -2742,6 +2982,11 @@ ru_RU.mo	Current counter of pages	Текущий счетчик страниц
 ru_RU.mo	Power supply	Источник питания
 ru_RU.mo	Headset	Гарнитура
 ru_RU.mo	Speaker	Громкая связь
+ru_RU.mo	Technician in charge of the hardware	Специалист ответственный за оборудование
+ru_RU.mo	Comments	Комментарии
+ru_RU.mo	Template name	Имя шаблона
+ru_RU.mo	Number of units	Количество юнитов
+ru_RU.mo	Server room	Серверная
 sk_SK.mo	%1$s log in from IP %2$s	%1$s sa prihlásil z IP %2$s
 sk_SK.mo	Failed login for %1$s from IP %2$s	Neúspešné prihlásenie %1$s z IP %2$s
 sk_SK.mo	%1$s adds the item %2$s	%1$s pridal položku %2$s
@@ -2798,6 +3043,11 @@ sk_SK.mo	Current counter of pages	Aktuálny stav počítadla stránok
 sk_SK.mo	Power supply	Zdroj napájania
 sk_SK.mo	Headset	Sluchátka
 sk_SK.mo	Speaker	Reproduktor
+sk_SK.mo	Technician in charge of the hardware	Technik zodpovedný za hardvér
+sk_SK.mo	Comments	Komentáre
+sk_SK.mo	Template name	Názov šablony
+sk_SK.mo	Number of units	Počet jednotiek
+sk_SK.mo	Server room	Serverovňa
 sl_SI.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 sl_SI.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 sl_SI.mo	%1$s adds the item %2$s	%1$s doda predmet %2$s
@@ -2854,6 +3104,11 @@ sl_SI.mo	Current counter of pages	Current counter of pages
 sl_SI.mo	Power supply	Power supply
 sl_SI.mo	Headset	Slušalke
 sl_SI.mo	Speaker	Zvočnik
+sl_SI.mo	Technician in charge of the hardware	Tehnik odgovoren za strojno opremo
+sl_SI.mo	Comments	Komentarji
+sl_SI.mo	Template name	Ime predloge
+sl_SI.mo	Number of units	Number of units
+sl_SI.mo	Server room	Server room
 sr_RS.mo	%1$s log in from IP %2$s	%1$s loguj se sa IP %2$s
 sr_RS.mo	Failed login for %1$s from IP %2$s	Neuspelo logovanje za %1$s sa IP %2$s
 sr_RS.mo	%1$s adds the item %2$s	%1$s dodavanje stavke %2$s
@@ -2910,6 +3165,11 @@ sr_RS.mo	Current counter of pages	Trenutni brojač stranica
 sr_RS.mo	Power supply	Power supply
 sr_RS.mo	Headset	Slušalice
 sr_RS.mo	Speaker	Zvučnik
+sr_RS.mo	Technician in charge of the hardware	Tehničar zadužen za hardver
+sr_RS.mo	Comments	Komentari
+sr_RS.mo	Template name	Ime obrasca
+sr_RS.mo	Number of units	Number of units
+sr_RS.mo	Server room	Server room
 sv_SE.mo	%1$s log in from IP %2$s	%1$s är inloggad från ip %2$s
 sv_SE.mo	Failed login for %1$s from IP %2$s	%1$s misslyckades att logga in från IP %2$s
 sv_SE.mo	%1$s adds the item %2$s	%1$s lägger till objektet %2$s
@@ -2966,6 +3226,11 @@ sv_SE.mo	Current counter of pages	Aktuell sid-mätning
 sv_SE.mo	Power supply	Nätaggregat
 sv_SE.mo	Headset	Headset
 sv_SE.mo	Speaker	Högtalare
+sv_SE.mo	Technician in charge of the hardware	Tekniskt ansvarig
+sv_SE.mo	Comments	Kommentarer
+sv_SE.mo	Template name	Mallnamn
+sv_SE.mo	Number of units	Number of units
+sv_SE.mo	Server room	Server room
 ta.mo	%1$s log in from IP %2$s	IP %2$s இலிருந்து %1$s உள்நுழைக
 ta.mo	Failed login for %1$s from IP %2$s	ஐபி %2$s இலிருந்து %1$s க்கான உள்நுழைவு தோல்வியுற்றது
 ta.mo	%1$s adds the item %2$s	%1$s உருப்படி %2$s ஐ சேர்க்கிறது
@@ -3022,6 +3287,11 @@ ta.mo	Current counter of pages	பக்கங்களின் தற்போ
 ta.mo	Power supply	மின் வழங்கி
 ta.mo	Headset	எட்செட்
 ta.mo	Speaker	ஒலிபெருக்கி, ஒலிபரப்பி
+ta.mo	Technician in charge of the hardware	வன்பொருளின் பொறுப்பான தொழில்நுட்ப வல்லுநர்
+ta.mo	Comments	கருத்துகள்
+ta.mo	Template name	வார்ப்புரு பெயர்
+ta.mo	Number of units	அலகுகளின் எண்ணிக்கை
+ta.mo	Server room	சேவையக அறை
 th_TH.mo	%1$s log in from IP %2$s	%1$s เข้าสู่ระบบจาก IP %2$s
 th_TH.mo	Failed login for %1$s from IP %2$s	เข้าสู่ระบบไม่ผ่าน %1$s จาก IP %2$s
 th_TH.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -3078,6 +3348,11 @@ th_TH.mo	Current counter of pages	นับหน้าปัจจบัน
 th_TH.mo	Power supply	พาวเวอร์ซัพพลาย
 th_TH.mo	Headset	หูฟัง
 th_TH.mo	Speaker	ลำโพง
+th_TH.mo	Technician in charge of the hardware	ผู้ที่เปลี่ยนฮาร์ดแวร์
+th_TH.mo	Comments	ความคิดเห็น
+th_TH.mo	Template name	ชื่อแม่แบบ
+th_TH.mo	Number of units	Number of units
+th_TH.mo	Server room	Server room
 tr_TR.mo	%1$s log in from IP %2$s	%1$s, %2$s IP adresinden oturum açtı
 tr_TR.mo	Failed login for %1$s from IP %2$s	%1$s, %2$s IP adresinden oturum açamadı
 tr_TR.mo	%1$s adds the item %2$s	%1$s %2$s ögesini ekledi
@@ -3134,6 +3409,11 @@ tr_TR.mo	Current counter of pages	Güncel sayfa sayacı
 tr_TR.mo	Power supply	Güç kaynağı
 tr_TR.mo	Headset	Kulaklık
 tr_TR.mo	Speaker	Hoparlör
+tr_TR.mo	Technician in charge of the hardware	Donanımdan sorumlu teknisyen
+tr_TR.mo	Comments	Notlar
+tr_TR.mo	Template name	Kalıp Adı
+tr_TR.mo	Number of units	Birim sayısı
+tr_TR.mo	Server room	Sunucu odası
 uk_UA.mo	%1$s log in from IP %2$s	%1$s зайшов з IP %2$s
 uk_UA.mo	Failed login for %1$s from IP %2$s	Невдала реєстрація %1$s з IP %2$s
 uk_UA.mo	%1$s adds the item %2$s	%1$s додав елемент %2$s
@@ -3190,6 +3470,11 @@ uk_UA.mo	Current counter of pages	Поточний лічильник сторі
 uk_UA.mo	Power supply	Блок живлення
 uk_UA.mo	Headset	Гарнітура
 uk_UA.mo	Speaker	Гучний динамік
+uk_UA.mo	Technician in charge of the hardware	Інженер, відповідальний за обладнання
+uk_UA.mo	Comments	Примітка
+uk_UA.mo	Template name	Назва шаблону
+uk_UA.mo	Number of units	Кількість юнітів
+uk_UA.mo	Server room	Серверне приміщення
 vi_VN.mo	%1$s log in from IP %2$s	%1$s đăng nhập từ IP %2$s
 vi_VN.mo	Failed login for %1$s from IP %2$s	Đăng nhập thất bại cho %1$s từ IP %2$s
 vi_VN.mo	%1$s adds the item %2$s	%1$s thêm mục %2$s
@@ -3246,6 +3531,11 @@ vi_VN.mo	Current counter of pages	Bộ đếm hiện tại của các trang
 vi_VN.mo	Power supply	Các bộ nguồn
 vi_VN.mo	Headset	Tai nghe không dây
 vi_VN.mo	Speaker	Loa
+vi_VN.mo	Technician in charge of the hardware	Kỹ thuật viên phụ trách phần cứng
+vi_VN.mo	Comments	Các bình luận
+vi_VN.mo	Template name	Tên biểu mẫu
+vi_VN.mo	Number of units	Number of units
+vi_VN.mo	Server room	Server room
 zh_CN.mo	%1$s log in from IP %2$s	%1$s 登陆来自 IP %2$s
 zh_CN.mo	Failed login for %1$s from IP %2$s	 %1$s 从 IP %2$s登陆失败
 zh_CN.mo	%1$s adds the item %2$s	%1$s 添加项目 %2$s
@@ -3302,6 +3592,11 @@ zh_CN.mo	Current counter of pages	页面当前计数
 zh_CN.mo	Power supply	电源
 zh_CN.mo	Headset	耳机
 zh_CN.mo	Speaker	扬声器
+zh_CN.mo	Technician in charge of the hardware	硬件技术负责人
+zh_CN.mo	Comments	备注
+zh_CN.mo	Template name	模板名称
+zh_CN.mo	Number of units	单位数量
+zh_CN.mo	Server room	服务器房间
 zh_HK.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 zh_HK.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 zh_HK.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -3358,6 +3653,11 @@ zh_HK.mo	Current counter of pages	Current counter of pages
 zh_HK.mo	Power supply	Power supply
 zh_HK.mo	Headset	Headset
 zh_HK.mo	Speaker	Speaker
+zh_HK.mo	Technician in charge of the hardware	Technician in charge of the hardware
+zh_HK.mo	Comments	Comments
+zh_HK.mo	Template name	Template name
+zh_HK.mo	Number of units	Number of units
+zh_HK.mo	Server room	Server room
 zh_TW.mo	%1$s log in from IP %2$s	%1$s 登錄從 IP %2$s
 zh_TW.mo	Failed login for %1$s from IP %2$s	從IP %2$s的%1$s 的登錄失敗
 zh_TW.mo	%1$s adds the item %2$s	%1$s 新增項目 %2$s
@@ -3414,3 +3714,8 @@ zh_TW.mo	Current counter of pages	現在表的頁數
 zh_TW.mo	Power supply	電源供應器
 zh_TW.mo	Headset	耳機
 zh_TW.mo	Speaker	揚聲器
+zh_TW.mo	Technician in charge of the hardware	硬體技術負責範圍
+zh_TW.mo	Comments	備註
+zh_TW.mo	Template name	樣板名稱
+zh_TW.mo	Number of units	Number of units
+zh_TW.mo	Server room	Server room

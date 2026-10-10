@@ -135,9 +135,9 @@ pub async fn create(
         Origin::Form | Origin::Template => "VALUES (",
     });
     sql.push_bind(entity_id);
-    for (_, value) in values {
+    for (field, value) in values {
         sql.push(", ");
-        push_value(&mut sql, value);
+        push_value(&mut sql, *field, value);
     }
     for column in &copied {
         sql.push(format_args!(", t.`{column}`"));
@@ -179,13 +179,17 @@ pub async fn create(
         id,
         entities_id: entity_id,
         is_recursive: value_of("is_recursive") == Some(&Value::Bool(true)),
+        forwards_entity: kind.forwards_to_infocom(),
     };
     // Not for a clone.
-    if infocom_settings.auto_create && !matches!(origin, Origin::FromTemplate { .. }) {
+    if kind.has_infocom()
+        && infocom_settings.auto_create
+        && !matches!(origin, Origin::FromTemplate { .. })
+    {
         infocoms::create_for_new_item(&mut tx, infocom_settings, owner, actor).await?;
     }
     // The form always posts a status, even none; not for a template.
-    if origin != Origin::Template {
+    if kind.has_infocom() && origin != Origin::Template {
         let states_id = value_of("states_id").map_or(0, Value::id);
         infocoms::fill_status_dates(&mut tx, infocom_settings, owner, states_id, actor).await?;
     }
@@ -374,12 +378,14 @@ async fn after_update(
         id: current.id,
         entities_id: current.entities_id,
         is_recursive: value_of("is_recursive") == Some(&Value::Bool(true)),
+        forwards_entity: kind.forwards_to_infocom(),
     };
-    if changed.contains(&"is_recursive") {
+    // Only the classes forwarding their entity (`$forward_entity_to`).
+    if changed.contains(&"is_recursive") && kind.forwards_to_infocom() {
         infocoms::forward_entity(conn, owner).await?;
         forward_sharing(conn, kind, current.id, owner.is_recursive).await?;
     }
-    if changed.contains(&"states_id") {
+    if changed.contains(&"states_id") && kind.has_infocom() {
         let states_id = value_of("states_id").map_or(0, Value::id);
         infocoms::fill_status_dates(conn, infocom_settings, owner, states_id, actor).await?;
     }
@@ -442,12 +448,27 @@ async fn lock(
     kind: AssetKind,
     id: i32,
 ) -> Result<Option<Current>, sqlx::Error> {
-    let fields = kind.template_fields();
+    let fields = if kind.has_templates() {
+        kind.template_fields()
+    } else {
+        kind.fields()
+    };
     let columns: Vec<String> = fields.iter().map(|field| select_column(*field)).collect();
     let row = sqlx::query(&format!(
-        "SELECT id, entities_id, is_deleted, is_dynamic, is_template, {} FROM {} WHERE id = ? FOR UPDATE",
+        "SELECT id, entities_id, is_deleted, {is_dynamic} AS is_dynamic, \
+         {is_template} AS is_template, {} FROM {} WHERE id = ? FOR UPDATE",
         columns.join(", "),
-        kind.table()
+        kind.table(),
+        is_dynamic = if kind.has_column("is_dynamic") {
+            "is_dynamic"
+        } else {
+            "0"
+        },
+        is_template = if kind.has_templates() {
+            "is_template"
+        } else {
+            "0"
+        },
     ))
     .bind(id)
     .fetch_optional(conn)
@@ -455,7 +476,7 @@ async fn lock(
     let Some(row) = row else {
         return Ok(None);
     };
-    let is_template: bool = row.try_get("is_template")?;
+    let is_template = row.try_get::<i64, _>("is_template")? != 0;
     let values: Vec<(Field, Value)> = fields
         .into_iter()
         .filter(|field| is_template || field.column != "template_name")
@@ -469,7 +490,7 @@ async fn lock(
         id: row.try_get("id")?,
         entities_id: row.try_get("entities_id")?,
         is_deleted: row.try_get("is_deleted")?,
-        is_dynamic: row.try_get("is_dynamic")?,
+        is_dynamic: row.try_get::<i64, _>("is_dynamic")? != 0,
         is_global,
         is_template,
         values,
@@ -479,7 +500,7 @@ async fn lock(
 /// A column in a `SELECT`: numbers as text, compared as stored.
 fn select_column(field: Field) -> String {
     match field.kind {
-        FieldKind::Integer | FieldKind::Decimal => {
+        FieldKind::Integer | FieldKind::Decimal | FieldKind::Number => {
             format!("CAST({0} AS CHAR) AS {0}", field.column)
         }
         _ => field.column.to_owned(),
@@ -500,18 +521,29 @@ pub async fn current(
 
 fn read_value(row: &MySqlRow, field: Field) -> Result<Value, sqlx::Error> {
     Ok(match field.kind {
-        FieldKind::Text | FieldKind::Integer | FieldKind::Decimal => {
+        FieldKind::Text | FieldKind::Integer | FieldKind::Decimal | FieldKind::Number => {
             Value::Text(row.try_get(field.column)?)
         }
-        FieldKind::Dropdown { .. } | FieldKind::User => Value::Id(row.try_get(field.column)?),
+        FieldKind::Dropdown { .. } | FieldKind::User => row
+            .try_get::<Option<i32>, _>(field.column)?
+            .map_or(Value::NoId, Value::Id),
         FieldKind::Bool => Value::Bool(row.try_get(field.column)?),
     })
 }
 
-fn push_value(sql: &mut QueryBuilder<'_, MySql>, value: &Value) {
+/// A value as written in its column: an empty number is `0`, as the PHP
+/// connection (without strict SQL mode) stores it.
+fn push_value(sql: &mut QueryBuilder<'_, MySql>, field: Field, value: &Value) {
     match value {
+        Value::Text(text)
+            if field.kind == FieldKind::Number
+                && text.as_deref().unwrap_or_default().is_empty() =>
+        {
+            sql.push_bind(0)
+        }
         Value::Text(text) => sql.push_bind(text.clone()),
         Value::Id(id) => sql.push_bind(*id),
+        Value::NoId => sql.push_bind(None::<i32>),
         Value::Bool(flag) => sql.push_bind(*flag),
     };
 }
@@ -539,14 +571,14 @@ async fn apply_changes(
     let mut sql = QueryBuilder::<MySql>::new(format!("UPDATE {} SET ", kind.table()));
     for (field, new, _) in &changes {
         sql.push(format_args!("{} = ", field.column));
-        push_value(&mut sql, new);
+        push_value(&mut sql, *field, new);
         sql.push(", ");
     }
     sql.push("date_mod = NOW() WHERE id = ");
     sql.push_bind(current.id);
     sql.build().execute(&mut *conn).await?;
 
-    for (field, new, old) in &changes {
+    for (field, new, old) in changes.iter().filter(|(field, _, _)| field.is_logged()) {
         let change = Change::new(
             field.search_option,
             &history_label(conn, field.kind, old).await?,
@@ -567,9 +599,18 @@ async fn history_label(
     value: &Value,
 ) -> Result<String, sqlx::Error> {
     let id = match (kind, value) {
-        (FieldKind::Text | FieldKind::Bool | FieldKind::Integer | FieldKind::Decimal, value) => {
+        (
+            FieldKind::Text
+            | FieldKind::Bool
+            | FieldKind::Integer
+            | FieldKind::Decimal
+            | FieldKind::Number,
+            value,
+        ) => {
             return Ok(value.raw());
         }
+        // `getDropdownName` of NULL, and the NULL id printed empty.
+        (_, Value::NoId) => return Ok(format!("{} ()", history::NO_VALUE)),
         (_, value) => value.id(),
     };
     let name = if id == 0 {
@@ -579,7 +620,11 @@ async fn history_label(
             FieldKind::User => ("glpi_users", "name"),
             FieldKind::Dropdown { table, tree: true } => (table, "completename"),
             FieldKind::Dropdown { table, tree: false } => (table, "name"),
-            FieldKind::Text | FieldKind::Bool | FieldKind::Integer | FieldKind::Decimal => {
+            FieldKind::Text
+            | FieldKind::Bool
+            | FieldKind::Integer
+            | FieldKind::Decimal
+            | FieldKind::Number => {
                 unreachable!("handled above")
             }
         };
@@ -627,7 +672,11 @@ pub async fn references_exist(
         let table = match field.kind {
             FieldKind::User => "glpi_users",
             FieldKind::Dropdown { table, .. } => table,
-            FieldKind::Text | FieldKind::Bool | FieldKind::Integer | FieldKind::Decimal => continue,
+            FieldKind::Text
+            | FieldKind::Bool
+            | FieldKind::Integer
+            | FieldKind::Decimal
+            | FieldKind::Number => continue,
         };
         let id = value.id();
         if id == 0 {
@@ -694,11 +743,12 @@ pub async fn entity_mismatches(
     entity: i32,
 ) -> Result<Vec<&'static str>, sqlx::Error> {
     let mut found = Vec::new();
-    for &table in kind
-        .forward_entity_tables()
-        .iter()
-        .chain(&["glpi_infocoms"])
-    {
+    let infocom: &[&str] = if kind.forwards_to_infocom() {
+        &["glpi_infocoms"]
+    } else {
+        &[]
+    };
+    for &table in kind.forward_entity_tables().iter().chain(infocom) {
         let owner = if table == "glpi_computervirtualmachines" {
             "computers_id = ?"
         } else {

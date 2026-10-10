@@ -46,6 +46,7 @@ use crate::{
         assets::templates::purge,
         assets::templates::create_item,
         assets::choices::choices,
+        assets::racks::positions,
     ),
     components(schemas(ErrorBody, ErrorDetail, assets::AssetType, assets::choices::ChoiceField)),
     modifiers(&SessionSecurity),

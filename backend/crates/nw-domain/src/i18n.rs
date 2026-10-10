@@ -93,9 +93,14 @@ pub mod text {
     pub const POWER_SUPPLY: Source = One("Power supply", "Power supplies");
     pub const HEADSET: Source = Text("Headset");
     pub const SPEAKER: Source = Text("Speaker");
+    pub const TECH_USER: Source = Text("Technician in charge of the hardware");
+    pub const COMMENTS: Source = Text("Comments");
+    pub const TEMPLATE_NAME: Source = Text("Template name");
+    pub const NUMBER_OF_UNITS: Source = Text("Number of units");
+    pub const SERVER_ROOM: Source = One("Server room", "Server rooms");
 
     /// Every text, for the catalog.
-    pub const ALL: [Source; 56] = [
+    pub const ALL: [Source; 61] = [
         LOGIN,
         FAILED_LOGIN,
         ADDS_ITEM,
@@ -152,6 +157,11 @@ pub mod text {
         POWER_SUPPLY,
         HEADSET,
         SPEAKER,
+        TECH_USER,
+        COMMENTS,
+        TEMPLATE_NAME,
+        NUMBER_OF_UNITS,
+        SERVER_ROOM,
     ];
 }
 

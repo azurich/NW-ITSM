@@ -10,6 +10,7 @@ export type AssetFields = Schemas['AssetFields']
 export type ChoiceField = Schemas['ChoiceField']
 export type Choice = Schemas['Choice']
 export type DuplicateNotice = Schemas['DuplicateNotice']
+export type RoomPosition = Schemas['RoomPosition']
 export type TemplateList = Schemas['TemplateList']
 export type TemplateSummary = Schemas['TemplateSummary']
 /** Fields of a template: those of its items, and its own name. */
@@ -20,6 +21,19 @@ export type Feature = keyof Schemas['Features']
 type ListQuery = NonNullable<paths['/api/v2/assets/{kind}']['get']['parameters']['query']>
 export type AssetSort = NonNullable<ListQuery['sort']>
 export type SortOrder = NonNullable<ListQuery['order']>
+
+/** Common fields some types do not have. */
+export type OptionalField =
+  | 'type'
+  | 'manufacturer'
+  | 'model'
+  | 'serial'
+  | 'inventory_number'
+  | 'location'
+  | 'user'
+  | 'group'
+  | 'contact'
+  | 'contact_number'
 
 /** What differs between the asset types. */
 export interface AssetTypeInfo {
@@ -43,7 +57,20 @@ export interface AssetTypeInfo {
   powerSupply?: boolean
   /** Connectors and features, in the order of the classic interface. */
   features?: readonly Feature[]
+  /** Common fields the type does not have. */
+  without?: readonly OptionalField[]
+  /** No templates (clusters). */
+  noTemplates?: boolean
+  /** Server room, place, door, units, size and color of the racks. */
+  rack?: boolean
+  /** Number of power supplies (enclosures). */
+  powerSupplies?: boolean
+  /** Version (clusters). */
+  version?: boolean
 }
+
+/** The datacenter items have no user, group nor contact. */
+const NO_USER = ['user', 'group', 'contact', 'contact_number'] as const
 
 export const ASSET_TYPES: Record<AssetType, AssetTypeInfo> = {
   computers: { right: 'computer', legacy: 'computer', uuid: true, network: true, updateSource: true },
@@ -82,6 +109,19 @@ export const ASSET_TYPES: Record<AssetType, AssetTypeInfo> = {
     global: true,
     powerSupply: true,
     features: ['has_headset', 'has_speaker'],
+  },
+  racks: { right: 'datacenter', legacy: 'rack', without: NO_USER, rack: true },
+  enclosures: { right: 'datacenter', legacy: 'enclosure', without: [...NO_USER, 'type'], powerSupplies: true },
+  pdus: { right: 'datacenter', legacy: 'pdu', without: NO_USER },
+  'passive-dc-equipments': { right: 'datacenter', legacy: 'passivedcequipment', without: NO_USER },
+  clusters: {
+    right: 'cluster',
+    legacy: 'cluster',
+    uuid: true,
+    updateSource: true,
+    version: true,
+    noTemplates: true,
+    without: [...NO_USER, 'manufacturer', 'model', 'serial', 'inventory_number', 'location'],
   },
 }
 
@@ -145,6 +185,21 @@ export const choicesQuery = (kind: AssetType, field: ChoiceField, entityId: numb
       ).items,
     staleTime: 30_000,
     placeholderData: keepPreviousData,
+  })
+
+/**
+ * Places of a server room no other rack takes, like the classic form offers
+ * them; `current`, the place of the rack being edited, is offered too.
+ */
+export const roomPositionsQuery = (roomId: number, current?: string) =>
+  queryOptions({
+    queryKey: ['room-positions', roomId, current],
+    queryFn: async () =>
+      unwrap(
+        await api.GET('/api/v2/assets/racks/positions', {
+          params: { query: { room_id: roomId, current: current || undefined } },
+        }),
+      ).items,
   })
 
 export async function createAsset(kind: AssetType, entityId: number, fields: AssetFields): Promise<AssetDetail> {

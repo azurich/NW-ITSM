@@ -7,7 +7,9 @@ import { ASSET_TYPES, assetQuery, purgeAsset, setTrashed, type AssetType } from 
 import { WriteError, useColumnLabel } from '../components/AssetForm'
 import { LegacyLink } from '../components/LegacyLink'
 import { ErrorState, Loading } from '../components/States'
+import { hasField, type RefField, type TextField } from '../lib/assetForm'
 import { formatDateTime } from '../lib/format'
+import { ORIENTATIONS, parsePosition } from '../lib/rack'
 
 export function AssetPage() {
   const { t, i18n } = useTranslation()
@@ -56,7 +58,17 @@ export function AssetPage() {
   const legacyPath = `front/${info.legacy}.form.php?id=${asset.id}`
   const date = (value: string | null | undefined) => formatDateTime(value, i18n.language)
   const readOnly = !asset.permissions.update && !asset.permissions.trash
-  const hasFeatures = info.size || info.memory || info.pageCounters || info.powerSupply || info.global || info.features
+  const hasFeatures =
+    info.size || info.memory || info.pageCounters || info.powerSupply || info.powerSupplies || info.global || info.features
+  // The fields of the type only.
+  const text = (field: TextField) =>
+    hasField(kind, field) && <Field label={t(`asset.fields.${field}`)}>{asset[field]}</Field>
+  const ref = (field: RefField) =>
+    hasField(kind, field) && <Field label={t(`asset.fields.${field}`)}>{asset[field]?.name}</Field>
+  const place = parsePosition(asset.position)
+  const orientation = ORIENTATIONS[asset.room_orientation as keyof typeof ORIENTATIONS] as
+    | (typeof ORIENTATIONS)[keyof typeof ORIENTATIONS]
+    | undefined
 
   return (
     <article className="space-y-6">
@@ -159,32 +171,64 @@ export function AssetPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         <Section title={t('asset.sections.general')}>
           <Field label={t('asset.fields.entity')}>{asset.entity.name}</Field>
-          <Field label={t('asset.fields.type')}>{asset.type?.name}</Field>
-          <Field label={t('asset.fields.manufacturer')}>{asset.manufacturer?.name}</Field>
-          <Field label={t('asset.fields.model')}>{asset.model?.name}</Field>
-          <Field label={t('asset.fields.serial')}>{asset.serial}</Field>
-          <Field label={t('asset.fields.inventory_number')}>{asset.inventory_number}</Field>
-          {info.uuid && <Field label={t('asset.fields.uuid')}>{asset.uuid}</Field>}
-          {info.brand && <Field label={t('asset.fields.brand')}>{asset.brand}</Field>}
-          {info.numberLine && <Field label={t('asset.fields.number_line')}>{asset.number_line}</Field>}
-          {info.network && <Field label={t('asset.fields.network')}>{asset.network?.name}</Field>}
-          {info.updateSource && (
-            <Field label={t('asset.fields.update_source')}>{asset.update_source?.name}</Field>
-          )}
+          {ref('type')}
+          {ref('manufacturer')}
+          {ref('model')}
+          {text('serial')}
+          {text('inventory_number')}
+          {text('uuid')}
+          {text('brand')}
+          {text('number_line')}
+          {text('version')}
+          {ref('network')}
+          {ref('update_source')}
           <Field label={t('asset.fields.created_at')}>{date(asset.created_at)}</Field>
           <Field label={t('asset.fields.updated_at')}>{date(asset.updated_at)}</Field>
         </Section>
         <Section title={t('asset.sections.management')}>
-          <Field label={t('asset.fields.state')}>{asset.state?.name}</Field>
-          <Field label={t('asset.fields.location')}>{asset.location?.name}</Field>
-          <Field label={t('asset.fields.user')}>{asset.user?.name}</Field>
-          <Field label={t('asset.fields.group')}>{asset.group?.name}</Field>
-          <Field label={t('asset.fields.contact')}>{asset.contact}</Field>
-          <Field label={t('asset.fields.contact_number')}>{asset.contact_number}</Field>
-          <Field label={t('asset.fields.tech_user')}>{asset.tech_user?.name}</Field>
-          <Field label={t('asset.fields.tech_group')}>{asset.tech_group?.name}</Field>
+          {ref('state')}
+          {ref('location')}
+          {ref('user')}
+          {ref('group')}
+          {text('contact')}
+          {text('contact_number')}
+          {ref('tech_user')}
+          {ref('tech_group')}
         </Section>
       </div>
+
+      {info.rack && (
+        <Section title={t('asset.sections.rack')}>
+          {ref('room')}
+          <Field label={t('asset.fields.position')}>
+            {place ? t('asset.rack.position', place) : asset.position !== '0' && asset.position}
+          </Field>
+          <Field label={t('asset.fields.room_orientation')}>
+            {orientation && t(`asset.orientations.${orientation}`)}
+          </Field>
+          <Field label={t('asset.fields.number_units')}>
+            {asset.number_units != null && t('asset.rack.units', { count: asset.number_units })}
+          </Field>
+          <Field label={t('asset.fields.width')}>{asset.width}</Field>
+          <Field label={t('asset.fields.height')}>{asset.height}</Field>
+          <Field label={t('asset.fields.depth')}>{asset.depth}</Field>
+          <Field label={t('asset.fields.max_power')}>{asset.max_power}</Field>
+          <Field label={t('asset.fields.measured_power')}>{asset.measured_power}</Field>
+          <Field label={t('asset.fields.max_weight')}>{asset.max_weight}</Field>
+          <Field label={t('asset.fields.background_color')}>
+            {asset.background_color && (
+              <span className="inline-flex items-center gap-2">
+                <span
+                  aria-hidden="true"
+                  className="inline-block size-4 rounded border border-slate-300 dark:border-slate-700"
+                  style={{ backgroundColor: asset.background_color }}
+                />
+                {asset.background_color}
+              </span>
+            )}
+          </Field>
+        </Section>
+      )}
 
       {hasFeatures && (
         <Section title={t('asset.sections.features')}>
@@ -201,6 +245,7 @@ export function AssetPage() {
             </>
           )}
           {info.powerSupply && <Field label={t('asset.fields.power_supply')}>{asset.power_supply?.name}</Field>}
+          {info.powerSupplies && <Field label={t('asset.fields.power_supplies')}>{asset.power_supplies}</Field>}
           {info.global && (
             <Field label={t('asset.fields.is_global')}>
               {asset.is_global ? t('asset.management.global') : t('asset.management.unit')}

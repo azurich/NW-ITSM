@@ -4,7 +4,7 @@
 use nw_domain::{
     asset::AssetKind,
     history::{self, Entry},
-    template::{CLONED_LINKS, ClonedLink},
+    template::ClonedLink,
 };
 use sqlx::{MySqlConnection, MySqlPool};
 
@@ -49,7 +49,7 @@ pub(super) async fn clone_links(
         id: owner.id,
         name,
     };
-    for link in CLONED_LINKS {
+    for link in kind.cloned_links().iter().copied() {
         match link {
             ClonedLink::Infocom => {
                 infocoms::clone_for_item(conn, settings, template_id, owner, actor).await?;

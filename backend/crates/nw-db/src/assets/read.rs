@@ -24,7 +24,19 @@ pub enum Sort {
 }
 
 impl Sort {
-    fn column(self) -> &'static str {
+    /// Sorted column; `NULL` when the type does not have it.
+    fn column(self, kind: AssetKind) -> &'static str {
+        let present = match self {
+            Self::Serial => kind.has_column("serial"),
+            Self::InventoryNumber => kind.has_column("otherserial"),
+            Self::Location => kind.has_column("locations_id"),
+            Self::Type => kind.type_dropdown().is_some(),
+            Self::Manufacturer => kind.has_column("manufacturers_id"),
+            Self::Name | Self::Entity | Self::State | Self::UpdatedAt => true,
+        };
+        if !present {
+            return "NULL";
+        }
         match self {
             Self::Name => "a.name",
             Self::Serial => "a.serial",
@@ -86,11 +98,11 @@ pub struct Detail {
     pub brand: Option<String>,
     pub number_line: Option<String>,
     pub is_deleted: bool,
-    pub is_dynamic: bool,
+    /// `0` or `1`, numbers as only some tables have them.
+    pub is_dynamic: i64,
     pub is_recursive: bool,
-    /// `0` or `1`: a number for every type, as only some tables have it.
     pub is_global: i64,
-    pub is_template: bool,
+    pub is_template: i64,
     pub template_name: Option<String>,
     pub date_creation: Option<DateTime<Utc>>,
     pub date_mod: Option<DateTime<Utc>>,
@@ -126,24 +138,58 @@ pub struct Detail {
 
 /// `a.<column>` when the type has the column, else a constant.
 fn optional_column(kind: AssetKind, column: &str, default: &str) -> String {
-    let present = kind.field(column).is_some() || (column == "is_global" && kind.can_be_global());
-    if present {
+    if kind.has_column(column) {
         format!("a.{column}")
     } else {
         default.to_owned()
     }
 }
 
+/// `<alias>.<column>` of a joined table, `NULL` when the type has no join.
+fn joined(present: bool, column: &str) -> &str {
+    if present { column } else { "NULL" }
+}
+
 fn joins(kind: AssetKind) -> String {
-    let (type_column, type_table) = kind.type_dropdown();
+    let mut sql = format!(
+        " FROM {} a LEFT JOIN glpi_entities e ON e.id = a.entities_id",
+        kind.table()
+    );
+    if kind.has_column("locations_id") {
+        sql.push_str(" LEFT JOIN glpi_locations l ON l.id = a.locations_id");
+    }
+    if let Some((type_column, type_table)) = kind.type_dropdown() {
+        sql.push_str(&format!(
+            " LEFT JOIN {type_table} t ON t.id = a.{type_column}"
+        ));
+    }
+    if kind.has_column("manufacturers_id") {
+        sql.push_str(" LEFT JOIN glpi_manufacturers m ON m.id = a.manufacturers_id");
+    }
+    sql.push_str(" LEFT JOIN glpi_states s ON s.id = a.states_id");
+    sql
+}
+
+/// Columns of a list or a detail shared by every type: `NULL` (or `0`)
+/// for those a type does not have.
+fn summary_columns(kind: AssetKind) -> String {
+    let type_id = kind
+        .type_dropdown()
+        .map_or("0".to_owned(), |(column, _)| format!("a.{column}"));
     format!(
-        " FROM {table} a \
-         LEFT JOIN glpi_entities e ON e.id = a.entities_id \
-         LEFT JOIN glpi_locations l ON l.id = a.locations_id \
-         LEFT JOIN {type_table} t ON t.id = a.{type_column} \
-         LEFT JOIN glpi_manufacturers m ON m.id = a.manufacturers_id \
-         LEFT JOIN glpi_states s ON s.id = a.states_id",
-        table = kind.table(),
+        "a.id, a.name, {serial} AS serial, {otherserial} AS otherserial, \
+         a.entities_id, e.completename AS entity, \
+         {locations_id} AS locations_id, {location} AS location, \
+         {type_id} AS types_id, {type_name} AS type_name, \
+         {manufacturers_id} AS manufacturers_id, {manufacturer} AS manufacturer, \
+         a.states_id, s.completename AS state",
+        serial = optional_column(kind, "serial", "NULL"),
+        otherserial = optional_column(kind, "otherserial", "NULL"),
+        locations_id = optional_column(kind, "locations_id", "0"),
+        location = joined(kind.has_column("locations_id"), "l.completename"),
+        type_name = joined(kind.type_dropdown().is_some(), "t.name"),
+        manufacturers_id = optional_column(kind, "manufacturers_id", "0"),
+        manufacturer = joined(kind.has_column("manufacturers_id"), "m.name"),
     )
 }
 
@@ -160,14 +206,18 @@ pub async fn list(
         .search
         .as_deref()
         .map(|search| like_pattern(&to_stored(search)));
-    let mut searched = vec!["a.name", "a.serial", "a.otherserial"];
-    if kind == AssetKind::Computer {
-        searched.push("a.uuid");
-    }
+    let searched: Vec<String> = ["name", "serial", "otherserial", "uuid"]
+        .into_iter()
+        .filter(|column| kind.has_column(column))
+        .map(|column| format!("a.{column}"))
+        .collect();
     let joins = joins(kind);
     let filter = |sql: &mut QueryBuilder<'_, MySql>| {
-        sql.push(" WHERE a.is_template = 0 AND a.is_deleted = ");
+        sql.push(" WHERE a.is_deleted = ");
         sql.push_bind(query.trash);
+        if kind.has_templates() {
+            sql.push(" AND a.is_template = 0");
+        }
         restrict_entities(sql, "a", scope);
         if let Some(pattern) = &pattern {
             sql.push(" AND (");
@@ -188,21 +238,14 @@ pub async fn list(
     filter(&mut count);
     let (total,): (i64,) = count.build_query_as().fetch_one(pool).await?;
 
-    let (type_column, _) = kind.type_dropdown();
-    let mut select = QueryBuilder::<MySql>::new(format!(
-        "SELECT a.id, a.name, a.serial, a.otherserial, \
-                a.entities_id, e.completename AS entity, \
-                a.locations_id, l.completename AS location, \
-                a.{type_column} AS types_id, t.name AS type_name, \
-                a.manufacturers_id, m.name AS manufacturer, \
-                a.states_id, s.completename AS state, a.date_mod"
-    ));
+    let mut select =
+        QueryBuilder::<MySql>::new(format!("SELECT {}, a.date_mod", summary_columns(kind)));
     select.push(&joins);
     filter(&mut select);
     let direction = if query.descending { "DESC" } else { "ASC" };
     select.push(format_args!(
         " ORDER BY {} {direction}, a.id {direction} LIMIT ",
-        query.sort.column()
+        query.sort.column(kind)
     ));
     select
         .push_bind(query.limit)
@@ -222,50 +265,61 @@ pub async fn get(
     id: i32,
     template: bool,
 ) -> Result<Option<Detail>, sqlx::Error> {
-    let (type_column, _) = kind.type_dropdown();
-    let (model_column, model_table) = kind.model_dropdown();
     let networks = optional_column(kind, "networks_id", "0");
     let update_sources = optional_column(kind, "autoupdatesystems_id", "0");
+    let users = optional_column(kind, "users_id", "0");
+    let groups = optional_column(kind, "groups_id", "0");
+    // The models of the datacenter items can be NULL.
+    let (models, model_join) = match kind.model_dropdown() {
+        Some((column, table)) => (
+            format!("IFNULL(a.{column}, 0)"),
+            format!(" LEFT JOIN {table} md ON md.id = a.{column}"),
+        ),
+        None => ("0".to_owned(), String::new()),
+    };
     let mut sql = QueryBuilder::<MySql>::new(format!(
-        "SELECT a.id, a.name, a.serial, a.otherserial, a.contact, a.contact_num, a.comment, \
+        "SELECT {summary}, {contact} AS contact, {contact_num} AS contact_num, a.comment, \
                 {uuid} AS uuid, {brand} AS brand, {number_line} AS number_line, \
-                a.is_deleted, a.is_dynamic, a.is_recursive, {is_global} AS is_global, \
-                a.is_template, a.template_name, \
+                a.is_deleted, CAST({is_dynamic} AS SIGNED) AS is_dynamic, a.is_recursive, \
+                CAST({is_global} AS SIGNED) AS is_global, \
+                CAST({is_template} AS SIGNED) AS is_template, {template_name} AS template_name, \
                 a.date_creation, a.date_mod, \
-                a.entities_id, e.completename AS entity, \
-                a.locations_id, l.completename AS location, \
-                a.{type_column} AS types_id, t.name AS type_name, \
-                a.{model_column} AS models_id, md.name AS model_name, \
-                a.manufacturers_id, m.name AS manufacturer, \
-                a.states_id, s.completename AS state, \
+                {models} AS models_id, {model_name} AS model_name, \
                 {networks} AS networks_id, n.name AS network, \
                 {update_sources} AS autoupdatesystems_id, au.name AS autoupdatesystem, \
-                a.users_id, u.name AS user_name, u.realname AS user_realname, u.firstname AS user_firstname, \
-                a.groups_id, g.completename AS `group`, \
+                {users} AS users_id, u.name AS user_name, u.realname AS user_realname, u.firstname AS user_firstname, \
+                {groups} AS groups_id, g.completename AS `group`, \
                 a.users_id_tech, ut.name AS tech_name, ut.realname AS tech_realname, ut.firstname AS tech_firstname, \
                 a.groups_id_tech, gt.completename AS tech_group",
+        summary = summary_columns(kind),
+        contact = optional_column(kind, "contact", "NULL"),
+        contact_num = optional_column(kind, "contact_num", "NULL"),
         uuid = optional_column(kind, "uuid", "NULL"),
         brand = optional_column(kind, "brand", "NULL"),
         number_line = optional_column(kind, "number_line", "NULL"),
-        is_global = if kind.can_be_global() {
-            "CAST(a.is_global AS SIGNED)"
-        } else {
-            "CAST(0 AS SIGNED)"
-        },
+        is_dynamic = optional_column(kind, "is_dynamic", "0"),
+        is_global = optional_column(kind, "is_global", "0"),
+        is_template = optional_column(kind, "is_template", "0"),
+        template_name = optional_column(kind, "template_name", "NULL"),
+        model_name = joined(kind.model_dropdown().is_some(), "md.name"),
     ));
     sql.push(joins(kind));
     sql.push(format_args!(
-        " LEFT JOIN {model_table} md ON md.id = a.{model_column} \
+        "{model_join} \
           LEFT JOIN glpi_networks n ON n.id = {networks} \
           LEFT JOIN glpi_autoupdatesystems au ON au.id = {update_sources} \
-          LEFT JOIN glpi_users u ON u.id = a.users_id \
-          LEFT JOIN glpi_groups g ON g.id = a.groups_id \
+          LEFT JOIN glpi_users u ON u.id = {users} \
+          LEFT JOIN glpi_groups g ON g.id = {groups} \
           LEFT JOIN glpi_users ut ON ut.id = a.users_id_tech \
           LEFT JOIN glpi_groups gt ON gt.id = a.groups_id_tech \
-          WHERE a.is_template = "
+          WHERE a.id = "
     ));
-    sql.push_bind(template).push(" AND a.id = ");
     sql.push_bind(id);
+    if kind.has_templates() {
+        sql.push(" AND a.is_template = ").push_bind(template);
+    } else if template {
+        return Ok(None);
+    }
     restrict_entities(&mut sql, "a", scope);
     sql.build_query_as().fetch_optional(pool).await
 }
@@ -291,6 +345,9 @@ pub async fn list_templates(
          FROM {} a LEFT JOIN glpi_entities e ON e.id = a.entities_id WHERE a.is_template = 1",
         kind.table()
     ));
+    if !kind.has_templates() {
+        return Ok(Vec::new());
+    }
     restrict_entities(&mut sql, "a", scope);
     sql.push(" ORDER BY a.template_name, a.id");
     sql.build_query_as().fetch_all(pool).await
@@ -302,6 +359,8 @@ pub async fn list_templates(
 pub struct Specific {
     pub values: HashMap<&'static str, Option<String>>,
     pub power_supply: Option<String>,
+    /// Server room of a rack.
+    pub room: Option<String>,
 }
 
 impl Specific {
@@ -331,6 +390,11 @@ pub async fn specific(pool: &MySqlPool, kind: AssetKind, id: i32) -> Result<Spec
         columns.push("ps.name AS power_supply".to_owned());
         joins.push_str(" LEFT JOIN glpi_phonepowersupplies ps ON ps.id = a.phonepowersupplies_id");
     }
+    let has_room = kind.field("dcrooms_id").is_some();
+    if has_room {
+        columns.push("r.name AS room".to_owned());
+        joins.push_str(" LEFT JOIN glpi_dcrooms r ON r.id = a.dcrooms_id");
+    }
     let row = sqlx::query(&format!(
         "SELECT {} FROM {} a{joins} WHERE a.id = ?",
         columns.join(", "),
@@ -350,6 +414,9 @@ pub async fn specific(pool: &MySqlPool, kind: AssetKind, id: i32) -> Result<Spec
     }
     if has_power_supply {
         specific.power_supply = row.try_get("power_supply")?;
+    }
+    if has_room {
+        specific.room = row.try_get("room")?;
     }
     Ok(specific)
 }

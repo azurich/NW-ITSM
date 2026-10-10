@@ -65,6 +65,7 @@ fn as_posted(value: &Value) -> String {
     match value {
         Value::Text(text) => text.clone().unwrap_or_default(),
         Value::Id(id) => id.to_string(),
+        Value::NoId => String::new(),
         Value::Bool(flag) => i32::from(*flag).to_string(),
     }
 }
@@ -116,7 +117,9 @@ pub async fn run(
             continue;
         };
         let value = match field.kind {
-            FieldKind::Text | FieldKind::Integer | FieldKind::Decimal => Value::Text(Some(value)),
+            FieldKind::Text | FieldKind::Integer | FieldKind::Decimal | FieldKind::Number => {
+                Value::Text(Some(value))
+            }
             FieldKind::Dropdown { .. } | FieldKind::User => Value::Id(
                 value
                     .parse()

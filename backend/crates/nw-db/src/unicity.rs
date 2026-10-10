@@ -3,6 +3,7 @@
 
 use std::collections::HashSet;
 
+use nw_domain::asset::AssetKind;
 use nw_domain::unicity::{UnicityConfig, applicable};
 use sqlx::{MySql, MySqlPool, QueryBuilder};
 
@@ -108,14 +109,27 @@ pub struct Double {
 /// templates excepted, trash included. `criteria` columns must exist.
 pub async fn doubles(
     pool: &MySqlPool,
-    table: &str,
+    kind: AssetKind,
     criteria: &[(String, String)],
     entities: &[i32],
     except: Option<i32>,
 ) -> Result<Vec<Double>, sqlx::Error> {
+    // `getField` of a column the type does not have: `NOT_AVAILABLE`.
+    let serial = if kind.has_column("serial") {
+        "a.serial"
+    } else {
+        "'N/A'"
+    };
+    let templates = if kind.has_templates() {
+        "a.is_template = 0"
+    } else {
+        "1"
+    };
     let mut sql = QueryBuilder::<MySql>::new(format!(
-        "SELECT a.id, a.name, a.serial, a.entities_id, a.is_recursive, e.completename AS entity, a.is_deleted \
-         FROM {table} a LEFT JOIN glpi_entities e ON e.id = a.entities_id WHERE a.is_template = 0"
+        "SELECT a.id, a.name, {serial} AS serial, a.entities_id, a.is_recursive, \
+         e.completename AS entity, a.is_deleted \
+         FROM {} a LEFT JOIN glpi_entities e ON e.id = a.entities_id WHERE {templates}",
+        kind.table()
     ));
     for (column, value) in criteria {
         sql.push(format_args!(" AND a.`{}` = ", column.replace('`', "")));

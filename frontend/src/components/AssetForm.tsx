@@ -13,6 +13,7 @@ import {
 import { ChoicePicker } from './ChoicePicker'
 import { LegacyLink } from './LegacyLink'
 import { inputClass } from './PasswordFields'
+import { RackFields } from './RackFields'
 
 const sectionClass = 'rounded-lg border border-slate-200 bg-white p-4 dark:border-slate-800 dark:bg-slate-900'
 
@@ -61,13 +62,14 @@ export function AssetFormView({
         />
       </label>
     )
-  const number = (field: NumberField) =>
+  const number = (field: NumberField, min?: number) =>
     hasField(kind, field) && (
       <label className="block text-sm font-medium">
         {t(`asset.fields.${field}`)}
         <input
           type="number"
           step={1}
+          min={min}
           value={form.numbers[field]}
           onChange={(event) =>
             setForm({ ...form, numbers: { ...form.numbers, [field]: event.target.value } })
@@ -86,7 +88,8 @@ export function AssetFormView({
       {t(`asset.features.${field}`)}
     </label>
   )
-  const hasFeatures = info.size || info.memory || info.pageCounters || info.powerSupply || flagFields(kind).length > 0
+  const hasFeatures =
+    info.size || info.memory || info.pageCounters || info.powerSupply || info.powerSupplies || flagFields(kind).length > 0
   const choice = (field: RefField) =>
     hasField(kind, field) && (
       <ChoicePicker
@@ -132,6 +135,7 @@ export function AssetFormView({
           {text('uuid')}
           {text('brand')}
           {text('number_line')}
+          {text('version')}
           {choice('network')}
           {choice('update_source')}
         </fieldset>
@@ -160,6 +164,15 @@ export function AssetFormView({
         </fieldset>
       </div>
 
+      {info.rack && (
+        <fieldset className={`${sectionClass} space-y-4`}>
+          <legend className="px-1 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            {t('asset.sections.rack')}
+          </legend>
+          <RackFields kind={kind} entityId={entityId} form={form} initial={initial} onChange={setForm} />
+        </fieldset>
+      )}
+
       {hasFeatures && (
         <fieldset className={`${sectionClass} space-y-4`}>
           <legend className="px-1 text-sm font-semibold uppercase tracking-wide text-slate-500">
@@ -174,6 +187,7 @@ export function AssetFormView({
             )}
             {number('initial_page_counter')}
             {number('page_counter')}
+            {number('power_supplies', 0)}
             {choice('power_supply')}
             {info.global && (
               <label className="block text-sm font-medium">
@@ -264,6 +278,19 @@ const FIELD_OF_COLUMN: Record<string, string> = {
   last_pages_counter: 'page_counter',
   phonepowersupplies_id: 'power_supply',
   is_global: 'is_global',
+  version: 'version',
+  dcrooms_id: 'room',
+  position: 'position',
+  room_orientation: 'room_orientation',
+  number_units: 'number_units',
+  width: 'width',
+  height: 'height',
+  depth: 'depth',
+  max_power: 'max_power',
+  mesured_power: 'measured_power',
+  max_weight: 'max_weight',
+  bgcolor: 'background_color',
+  power_supplies: 'power_supplies',
 }
 
 /** Features by column. */
@@ -317,6 +344,8 @@ export function WriteError({ error, legacyPath }: { error: unknown; legacyPath: 
       message = t('asset.errors.sharing_in_use')
     } else if (error.code === 'not_in_trash') {
       message = t('asset.errors.not_in_trash')
+    } else if (error.code === 'position_unavailable') {
+      message = t('asset.errors.position_unavailable')
     } else if (error.status === 403) {
       message = t('asset.errors.forbidden')
     } else if (error.status === 404) {

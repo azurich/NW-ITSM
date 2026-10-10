@@ -16,6 +16,7 @@ pub mod naming;
 pub mod password;
 pub mod php;
 pub mod purge;
+pub mod rack;
 pub mod rights;
 pub mod rules;
 pub mod template;

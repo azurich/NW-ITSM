@@ -153,8 +153,10 @@ pub async fn check_update(
             return Err(ApiError::LegacyRequired("linked_items"));
         }
     }
-    let infocom_writes = (changed.contains(&"states_id") && infocoms.any_status_date())
-        || changed.contains(&"is_recursive");
+    // Dates of the new status, sharing copied to the infocom.
+    let infocom_writes = kind.has_infocom()
+        && ((changed.contains(&"states_id") && infocoms.any_status_date())
+            || (changed.contains(&"is_recursive") && kind.forwards_to_infocom()));
     if infocom_writes {
         check_side_unicity(pool, "Infocom", Some(&INFOCOM_INPUT)).await?;
     }

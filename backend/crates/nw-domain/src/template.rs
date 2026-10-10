@@ -2,11 +2,13 @@
 //! (`CommonDBTM::clone`), then its linked rows (`Clonable::post_clone`, in
 //! the order of `getCloneRelations`).
 //!
-//! The infocom, the contracts and the documents are cloned here the same
-//! way. The other links of the template (operating system, components,
-//! disks, software, network ports, connections, notes, knowledge base,
-//! cartridges) leave the creation to the classic interface:
-//! see [`AssetKind::template_blockers`].
+//! The infocom, the contracts and the documents of the inventory assets are
+//! cloned here the same way. The other links of the template (operating
+//! system, components, disks, software, network ports, connections, notes,
+//! knowledge base, cartridges, items of an enclosure, plugs of a PDU) leave
+//! the creation to the classic interface: see
+//! [`AssetKind::template_blockers`]. Racks and passive equipment clone no
+//! link (their classes are not `Clonable`).
 
 use crate::{
     asset::{AssetKind, DEVICE_ITEMS},
@@ -24,15 +26,40 @@ pub enum ClonedLink {
     Document,
 }
 
-pub const CLONED_LINKS: [ClonedLink; 3] = [
-    ClonedLink::Infocom,
-    ClonedLink::Contract,
-    ClonedLink::Document,
-];
-
 impl AssetKind {
+    /// Rows of the template cloned for the new item, in this order.
+    pub fn cloned_links(self) -> &'static [ClonedLink] {
+        if self.is_inventory_asset() {
+            &[
+                ClonedLink::Infocom,
+                ClonedLink::Contract,
+                ClonedLink::Document,
+            ]
+        } else {
+            &[]
+        }
+    }
+
     /// Rows of a template whose cloning is not ported.
     pub fn template_blockers(self) -> Vec<Blocker> {
+        let devices = DEVICE_ITEMS.iter().map(|(_, table)| Blocker::Item(table));
+        match self {
+            // Not `Clonable`: nothing is cloned. No templates for clusters.
+            Self::Rack | Self::PassiveDcEquipment | Self::Cluster => return Vec::new(),
+            Self::Enclosure => {
+                let mut blockers = vec![Blocker::Column("glpi_items_enclosures", "enclosures_id")];
+                blockers.extend(devices);
+                blockers.push(Blocker::Item("glpi_networkports"));
+                return blockers;
+            }
+            Self::Pdu => {
+                let mut blockers = vec![Blocker::Column("glpi_pdus_plugs", "pdus_id")];
+                blockers.extend(devices);
+                blockers.push(Blocker::Item("glpi_networkports"));
+                return blockers;
+            }
+            _ => {}
+        }
         let mut blockers = vec![
             Blocker::Item("glpi_items_operatingsystems"),
             Blocker::Item("glpi_knowbaseitems_items"),
@@ -56,6 +83,9 @@ impl AssetKind {
             ]),
             Self::Monitor | Self::Peripheral | Self::Phone => {
                 blockers.push(Blocker::Item("glpi_computers_items"));
+            }
+            Self::Rack | Self::Enclosure | Self::Pdu | Self::PassiveDcEquipment | Self::Cluster => {
+                unreachable!("handled above")
             }
         }
         blockers
@@ -81,5 +111,13 @@ mod tests {
                 .template_blockers()
                 .contains(&Blocker::Item("glpi_computers_items"))
         );
+        assert!(AssetKind::Rack.template_blockers().is_empty());
+        assert!(AssetKind::Rack.cloned_links().is_empty());
+        assert!(
+            AssetKind::Pdu
+                .template_blockers()
+                .contains(&Blocker::Column("glpi_pdus_plugs", "pdus_id"))
+        );
+        assert_eq!(AssetKind::Monitor.cloned_links().len(), 3);
     }
 }

@@ -45,7 +45,8 @@ export function AssetCreatePage() {
   const { kind } = useParams({ from: '/authenticated/assets/$kind/new' })
   const { template } = useSearch({ from: '/authenticated/assets/$kind/new' })
   const { data: session } = useSuspenseQuery(sessionQuery)
-  const templates = useQuery({ ...templatesQuery(kind), enabled: template === undefined })
+  const withTemplates = !ASSET_TYPES[kind].noTemplates
+  const templates = useQuery({ ...templatesQuery(kind), enabled: withTemplates && template === undefined })
 
   const header = (
     <div className="space-y-2">
@@ -61,7 +62,7 @@ export function AssetCreatePage() {
       </div>
     )
   }
-  if (template === undefined) {
+  if (withTemplates && template === undefined) {
     if (templates.isPending) {
       return <Loading />
     }
@@ -187,7 +188,7 @@ function CreateBlank({ kind, header }: { kind: AssetType; header: ReactNode }) {
         kind={kind}
         entityId={entity.id}
         entityField={choice.field}
-        initial={emptyForm()}
+        initial={emptyForm(kind)}
         submitLabel={t('asset.form.create')}
         pending={mutation.isPending}
         error={mutation.error}
@@ -315,7 +316,7 @@ export function TemplateCreatePage() {
         kind={kind}
         entityId={entity.id}
         entityField={choice.field}
-        initial={{ ...emptyForm(), template_name: '' }}
+        initial={{ ...emptyForm(kind), template_name: '' }}
         submitLabel={t('asset.form.create')}
         pending={mutation.isPending}
         error={mutation.error}

@@ -68,6 +68,9 @@ impl AssetKind {
     /// Rows deleted with the asset. Its own history (`glpi_logs`) is
     /// deleted too.
     pub fn purged_links(self) -> Vec<Link> {
+        if !self.is_inventory_asset() {
+            return self.datacenter_purged_links();
+        }
         let mut links = vec![INFOCOM];
         // `cleanDBonPurge` of the class.
         if self == Self::Computer {
@@ -122,11 +125,38 @@ impl AssetKind {
         links
     }
 
+    /// Rows deleted with a datacenter item, by the branches of
+    /// `cleanRelationTable` its type is in.
+    fn datacenter_purged_links(self) -> Vec<Link> {
+        let mut links = Vec::new();
+        if self.has_infocom() {
+            links.push(INFOCOM);
+        }
+        // `contract_types`.
+        if self != Self::PassiveDcEquipment {
+            links.push(link("glpi_contracts_items", Owner::Item));
+        }
+        // `document_types`.
+        if self == Self::Cluster {
+            links.push(link("glpi_documents_items", Owner::Item));
+        }
+        // `ticket_types`: changes and problems.
+        links.extend([
+            link("glpi_changes_items", Owner::Item),
+            link("glpi_items_problems", Owner::Item),
+        ]);
+        links
+    }
+
     /// Linked rows whose purge does more than deleting them: network ports
     /// (names, addresses, links), components and installed software
     /// (history, licenses), tickets (updated, deleted when the item was
-    /// their only one), racks, cartridges, reservations, impact analysis.
+    /// their only one), racks, cartridges, reservations, impact analysis,
+    /// the items of a rack, an enclosure or a cluster, the plugs of a PDU.
     pub fn purge_blockers(self) -> Vec<Blocker> {
+        if !self.is_inventory_asset() {
+            return self.datacenter_purge_blockers();
+        }
         let mut blockers = vec![
             Blocker::Item("glpi_networkports"),
             Blocker::Item("glpi_items_tickets"),
@@ -151,6 +181,44 @@ impl AssetKind {
         }
         blockers
     }
+
+    fn datacenter_purge_blockers(self) -> Vec<Blocker> {
+        let mut blockers = vec![Blocker::Item("glpi_items_tickets")];
+        // `networkport_types`.
+        if matches!(self, Self::Enclosure | Self::Pdu | Self::Cluster) {
+            blockers.push(Blocker::Item("glpi_networkports"));
+        }
+        // `impact_asset_types`.
+        if self != Self::PassiveDcEquipment {
+            blockers.push(Blocker::Impact);
+        }
+        // `itemdevices_types`.
+        if self == Self::Enclosure {
+            blockers.extend(DEVICE_ITEMS.iter().map(|(_, table)| Blocker::Item(table)));
+        }
+        // `rackable_types`: its place in a rack or an enclosure.
+        if matches!(self, Self::Enclosure | Self::Pdu | Self::PassiveDcEquipment) {
+            blockers.extend([
+                Blocker::Item("glpi_items_racks"),
+                Blocker::Item("glpi_items_enclosures"),
+            ]);
+        }
+        // `cleanDBonPurge` of the class: what it holds.
+        blockers.extend(match self {
+            Self::Rack => vec![
+                Blocker::Column("glpi_items_racks", "racks_id"),
+                Blocker::Column("glpi_pdus_racks", "racks_id"),
+            ],
+            Self::Enclosure => vec![Blocker::Column("glpi_items_enclosures", "enclosures_id")],
+            Self::Pdu => vec![
+                Blocker::Column("glpi_pdus_plugs", "pdus_id"),
+                Blocker::Column("glpi_pdus_racks", "pdus_id"),
+            ],
+            Self::Cluster => vec![Blocker::Column("glpi_items_clusters", "clusters_id")],
+            _ => Vec::new(),
+        });
+        blockers
+    }
 }
 
 #[cfg(test)]
@@ -167,7 +235,10 @@ mod tests {
         assert!(!tables(AssetKind::NetworkEquipment).contains(&"glpi_computers_items"));
         assert!(!tables(AssetKind::Monitor).contains(&"glpi_certificates_items"));
         assert!(tables(AssetKind::NetworkEquipment).contains(&"glpi_items_clusters"));
-        for kind in AssetKind::ALL {
+        for kind in AssetKind::ALL
+            .into_iter()
+            .filter(|kind| kind.is_inventory_asset())
+        {
             assert_eq!(kind.purged_links()[0], INFOCOM);
             assert!(
                 kind.purge_blockers()
@@ -183,6 +254,21 @@ mod tests {
             !AssetKind::Printer
                 .purge_blockers()
                 .contains(&Blocker::Item("glpi_items_racks"))
+        );
+        // Datacenter items.
+        assert!(!tables(AssetKind::Cluster).contains(&"glpi_infocoms"));
+        assert!(tables(AssetKind::Cluster).contains(&"glpi_documents_items"));
+        assert!(!tables(AssetKind::Rack).contains(&"glpi_documents_items"));
+        assert!(!tables(AssetKind::PassiveDcEquipment).contains(&"glpi_contracts_items"));
+        assert!(
+            AssetKind::Rack
+                .purge_blockers()
+                .contains(&Blocker::Column("glpi_items_racks", "racks_id"))
+        );
+        assert!(
+            !AssetKind::PassiveDcEquipment
+                .purge_blockers()
+                .contains(&Blocker::Impact)
         );
     }
 }

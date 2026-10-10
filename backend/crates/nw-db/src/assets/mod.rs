@@ -2,6 +2,7 @@
 //! and phones (`nw_domain::asset`).
 
 mod purge;
+pub mod racks;
 mod read;
 mod template;
 mod write;

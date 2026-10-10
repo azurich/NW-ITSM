@@ -9,6 +9,88 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/v2/assets/racks/positions": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Places of a server room no rack outside the trash takes, like the\nclassic form offers them (`ajax/dcroom_size.php`).",
+        "operationId": "positions",
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "query",
+            "description": "Server room.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "current",
+            "in": "query",
+            "description": "Position of the rack being edited: offered although it is taken.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Free places",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomPositions"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create or update right on the racks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible room",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/assets/{kind}": {
       "get": {
         "tags": [
@@ -1666,6 +1748,10 @@
             "description": "Connectors and features of the type, `null` for the other types."
           },
           {
+            "$ref": "#/components/schemas/DatacenterDetail",
+            "description": "Fields of the datacenter items, `null` for the other types."
+          },
+          {
             "type": "object",
             "required": [
               "kind",
@@ -1958,6 +2044,9 @@
         "allOf": [
           {
             "$ref": "#/components/schemas/Features"
+          },
+          {
+            "$ref": "#/components/schemas/DatacenterFields"
           },
           {
             "type": "object",
@@ -2299,7 +2388,12 @@
           "printers",
           "network-equipments",
           "peripherals",
-          "phones"
+          "phones",
+          "racks",
+          "enclosures",
+          "pdus",
+          "passive-dc-equipments",
+          "clusters"
         ]
       },
       "BridgeToken": {
@@ -2345,7 +2439,8 @@
           "group",
           "tech_user",
           "tech_group",
-          "power_supply"
+          "power_supply",
+          "room"
         ]
       },
       "ChoiceList": {
@@ -2360,6 +2455,223 @@
               "$ref": "#/components/schemas/Choice"
             },
             "description": "At most 50 values, sorted by label."
+          }
+        }
+      },
+      "DatacenterDetail": {
+        "type": "object",
+        "description": "Fields of the datacenter items.",
+        "properties": {
+          "background_color": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Racks: `#RRGGBB`."
+          },
+          "depth": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks."
+          },
+          "height": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks."
+          },
+          "max_power": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: in watts."
+          },
+          "max_weight": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks."
+          },
+          "measured_power": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: in watts."
+          },
+          "number_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks."
+          },
+          "position": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Racks: place in the room, `\"<column>,<row>\"` (`\"0\"` or empty for\nnone)."
+          },
+          "power_supplies": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Enclosures."
+          },
+          "room": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref",
+                "description": "Racks: server room."
+              }
+            ]
+          },
+          "room_orientation": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: door orientation in the room, 1 north, 2 east, 3 south, 4 west\n(0: never set)."
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Clusters."
+          },
+          "width": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks."
+          }
+        }
+      },
+      "DatacenterFields": {
+        "type": "object",
+        "description": "Fields of the datacenter items in a creation or an update.",
+        "properties": {
+          "background_color": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Racks: `#RRGGBB`."
+          },
+          "depth": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks; `null` empties it."
+          },
+          "height": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks; `null` empties it."
+          },
+          "max_power": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: in watts; `null` empties it."
+          },
+          "max_weight": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks; `null` empties it."
+          },
+          "measured_power": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: in watts; `null` empties it."
+          },
+          "number_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: 1 to 100."
+          },
+          "position": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Racks: place in the room, `\"<column>,<row>\"` as offered by\n`/assets/racks/positions`, `\"0\"` for none."
+          },
+          "power_supplies": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Enclosures."
+          },
+          "room_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: server room."
+          },
+          "room_orientation": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: door orientation, 1 north, 2 east, 3 south, 4 west."
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Clusters."
+          },
+          "width": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks; `null` empties it (stored as 0, like the classic form)."
           }
         }
       },
@@ -2705,6 +3017,44 @@
               "null"
             ],
             "description": "`null` when the related row no longer exists."
+          }
+        }
+      },
+      "RoomPosition": {
+        "type": "object",
+        "description": "A free place of the room.",
+        "required": [
+          "position",
+          "column",
+          "row"
+        ],
+        "properties": {
+          "column": {
+            "type": "string",
+            "description": "Column in letters (A, B... AA)."
+          },
+          "position": {
+            "type": "string",
+            "description": "Stored value, `\"<column>,<row>\"`."
+          },
+          "row": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RoomPositions": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoomPosition"
+            },
+            "description": "By column, then row."
           }
         }
       },

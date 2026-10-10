@@ -92,7 +92,7 @@ pub async fn list(
     kind: Result<Path<AssetType>, PathRejection>,
 ) -> ApiResult<Json<TemplateList>> {
     let Path(kind) = kind.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
-    let kind = AssetKind::from(kind);
+    let kind = with_templates(AssetKind::from(kind))?;
     // To manage them, or to choose one for a new item.
     let can_create = session.rights.has(kind.right(), CREATE);
     if !can_create && !session.rights.has(kind.right(), READ) {
@@ -139,6 +139,7 @@ pub async fn get_one(
     path: Result<Path<(AssetType, i32)>, PathRejection>,
 ) -> ApiResult<Json<AssetDetail>> {
     let (kind, id) = parse_path(path)?;
+    let kind = with_templates(kind)?;
     session.require(kind.right(), READ)?;
     Ok(Json(detail(&state, &session, kind, id, true).await?))
 }
@@ -166,7 +167,7 @@ pub async fn create(
     payload: Result<Json<TemplateCreation>, JsonRejection>,
 ) -> ApiResult<(StatusCode, Json<AssetDetail>)> {
     let Path(kind) = kind.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
-    let kind = AssetKind::from(kind);
+    let kind = with_templates(AssetKind::from(kind))?;
     session.require(kind.right(), CREATE)?;
     let Json(request) = payload.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
     let mut requested = field_values(kind, &request.fields)?;
@@ -210,6 +211,7 @@ pub async fn update(
     payload: Result<Json<TemplateFields>, JsonRejection>,
 ) -> ApiResult<Json<AssetDetail>> {
     let (kind, id) = parse_path(path)?;
+    let kind = with_templates(kind)?;
     session.require(kind.right(), UPDATE)?;
     let Json(request) = payload.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
     let mut values = field_values(kind, &request.fields)?;
@@ -244,6 +246,7 @@ pub async fn purge(
     path: Result<Path<(AssetType, i32)>, PathRejection>,
 ) -> ApiResult<StatusCode> {
     let (kind, id) = parse_path(path)?;
+    let kind = with_templates(kind)?;
     purge_asset(&state, &session, kind, id, true).await?;
     Ok(StatusCode::NO_CONTENT)
 }
@@ -278,6 +281,7 @@ pub async fn create_item(
     payload: Result<Json<AssetFields>, JsonRejection>,
 ) -> ApiResult<(StatusCode, Json<AssetDetail>)> {
     let (kind, id) = parse_path(path)?;
+    let kind = with_templates(kind)?;
     session.require(kind.right(), CREATE)?;
     let Json(fields) = payload.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
     let visible = assets::get(&state.pool, kind, &session.scope, id, true)
@@ -297,6 +301,15 @@ pub async fn create_item(
     )
     .await?;
     Ok((StatusCode::CREATED, Json(created)))
+}
+
+/// A type having templates (not the clusters).
+fn with_templates(kind: AssetKind) -> ApiResult<AssetKind> {
+    if kind.has_templates() {
+        Ok(kind)
+    } else {
+        Err(ApiError::NotFound)
+    }
 }
 
 /// The name of a template, validated.

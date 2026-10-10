@@ -13,6 +13,7 @@ import {
 } from '../api/assets'
 import { CREATE, hasRight, sessionQuery } from '../api/session'
 import { ErrorState, Loading } from '../components/States'
+import { hasField } from '../lib/assetForm'
 import { formatDateTime } from '../lib/format'
 import { withDefaults, type AssetListSearch } from '../lib/search'
 
@@ -27,6 +28,18 @@ const COLUMNS: AssetSort[] = [
   'location',
   'updated_at',
 ]
+
+/** Columns of the fields some types do not have. */
+const OPTIONAL_COLUMNS = ['serial', 'inventory_number', 'type', 'manufacturer', 'location'] as const
+
+/** Columns of the list of a type: those of its fields. */
+function columnsOf(kind: AssetType): AssetSort[] {
+  return COLUMNS.filter(
+    (column) =>
+      !(OPTIONAL_COLUMNS as readonly AssetSort[]).includes(column) ||
+      hasField(kind, column as (typeof OPTIONAL_COLUMNS)[number]),
+  )
+}
 
 const SEARCH_DELAY_MS = 300
 
@@ -103,20 +116,28 @@ function AssetList({ kind }: { kind: AssetType }) {
             >
               {t('assets.new')}
             </Link>
-            <Link
-              to="/assets/$kind/templates"
-              params={{ kind }}
-              className="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
-            >
-              {t('templates.manage')}
-            </Link>
+            {!ASSET_TYPES[kind].noTemplates && (
+              <Link
+                to="/assets/$kind/templates"
+                params={{ kind }}
+                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
+              >
+                {t('templates.manage')}
+              </Link>
+            )}
           </>
         )}
         <input
           type="search"
           value={text}
           onChange={(event) => onSearch(event.target.value)}
-          placeholder={ASSET_TYPES[kind].uuid ? t('assets.searchWithUuid') : t('assets.search')}
+          placeholder={
+            !hasField(kind, 'serial')
+              ? t('assets.searchNameUuid')
+              : ASSET_TYPES[kind].uuid
+                ? t('assets.searchWithUuid')
+                : t('assets.search')
+          }
           aria-label={t('assets.search')}
           className="ml-auto w-full max-w-md rounded-md border border-slate-300 bg-white px-3 py-2 text-sm shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 dark:border-slate-700 dark:bg-slate-900"
         />
@@ -154,6 +175,8 @@ function Results({ kind, page, params, dimmed, onSort, onPage }: ResultsProps) {
   const from = page.total > 0 ? (page.page - 1) * page.per_page + 1 : 0
   const to = Math.min(page.page * page.per_page, page.total)
   const lastPage = Math.max(1, Math.ceil(page.total / page.per_page))
+  const columns = columnsOf(kind)
+  const shown = (column: AssetSort) => columns.includes(column)
 
   return (
     <>
@@ -161,7 +184,7 @@ function Results({ kind, page, params, dimmed, onSort, onPage }: ResultsProps) {
         <table className={`min-w-full text-left text-sm ${dimmed ? 'opacity-60' : ''}`}>
           <thead className="border-b border-slate-200 bg-slate-50 text-xs uppercase text-slate-500 dark:border-slate-800 dark:bg-slate-900/60">
             <tr>
-              {COLUMNS.map((column) => (
+              {columns.map((column) => (
                 <th
                   key={column}
                   scope="col"
@@ -181,7 +204,7 @@ function Results({ kind, page, params, dimmed, onSort, onPage }: ResultsProps) {
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {page.items.length === 0 ? (
               <tr>
-                <td colSpan={COLUMNS.length} className="px-3 py-8 text-center text-slate-500">
+                <td colSpan={columns.length} className="px-3 py-8 text-center text-slate-500">
                   {params.trash ? t('assets.emptyTrash') : t('assets.empty')}
                 </td>
               </tr>
@@ -198,12 +221,12 @@ function Results({ kind, page, params, dimmed, onSort, onPage }: ResultsProps) {
                     </Link>
                   </td>
                   <td className="px-3 py-2">{asset.entity.name}</td>
-                  <td className="px-3 py-2">{asset.serial}</td>
-                  <td className="px-3 py-2">{asset.inventory_number}</td>
-                  <td className="px-3 py-2">{asset.type?.name}</td>
-                  <td className="px-3 py-2">{asset.manufacturer?.name}</td>
+                  {shown('serial') && <td className="px-3 py-2">{asset.serial}</td>}
+                  {shown('inventory_number') && <td className="px-3 py-2">{asset.inventory_number}</td>}
+                  {shown('type') && <td className="px-3 py-2">{asset.type?.name}</td>}
+                  {shown('manufacturer') && <td className="px-3 py-2">{asset.manufacturer?.name}</td>}
                   <td className="px-3 py-2">{asset.state?.name}</td>
-                  <td className="px-3 py-2">{asset.location?.name}</td>
+                  {shown('location') && <td className="px-3 py-2">{asset.location?.name}</td>}
                   <td className="whitespace-nowrap px-3 py-2">
                     {formatDateTime(asset.updated_at, i18n.language)}
                   </td>

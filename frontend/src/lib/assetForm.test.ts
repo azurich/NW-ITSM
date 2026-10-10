@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { AssetDetail } from '../api/assets'
-import { changedFields, emptyForm, formFromDetail } from './assetForm'
+import { changedFields, emptyForm, formFromDetail, hasField } from './assetForm'
 
 const detail = {
   kind: 'monitors',
@@ -125,5 +125,69 @@ describe('templates', () => {
 
   it('sends the name of a new template, even empty', () => {
     expect(changedFields('computers', { ...emptyForm(), template_name: '' })).toEqual({ template_name: '' })
+  })
+})
+
+describe('datacenter items', () => {
+  const rack = {
+    ...detail,
+    kind: 'racks',
+    user: null,
+    room: { id: 9, name: 'Room A' },
+    position: '2,1',
+    room_orientation: 0,
+    number_units: 0,
+    width: 600,
+    height: null,
+    background_color: '#F5B7B1',
+  } as AssetDetail
+
+  it('has the fields of the type only', () => {
+    expect(hasField('racks', 'room')).toBe(true)
+    expect(hasField('racks', 'user')).toBe(false)
+    expect(hasField('racks', 'contact')).toBe(false)
+    expect(hasField('computers', 'room')).toBe(false)
+    expect(hasField('enclosures', 'type')).toBe(false)
+    expect(hasField('enclosures', 'power_supplies')).toBe(true)
+    expect(hasField('clusters', 'serial')).toBe(false)
+    expect(hasField('clusters', 'version')).toBe(true)
+    expect(hasField('clusters', 'uuid')).toBe(true)
+  })
+
+  it('shows what the classic form shows, and sends only the changes', () => {
+    const initial = formFromDetail(rack)
+    expect(initial.refs.room).toEqual({ id: 9, label: 'Room A' })
+    expect(initial.numbers).toMatchObject({ number_units: '42', room_orientation: '1', width: '600', height: '' })
+    expect(initial.text.background_color).toBe('#f5b7b1')
+    const form = formFromDetail(rack)
+    expect(changedFields('racks', form, initial)).toEqual({})
+    form.refs.room = null
+    form.text.position = '0'
+    form.numbers.width = ''
+    form.numbers.depth = '800'
+    form.numbers.room_orientation = '3'
+    expect(changedFields('racks', form, initial)).toEqual({
+      room_id: null,
+      position: '0',
+      width: null,
+      depth: 800,
+      room_orientation: 3,
+    })
+  })
+
+  it('creates with the defaults of the classic forms', () => {
+    const form = emptyForm('racks')
+    form.text.name = 'R1'
+    expect(changedFields('racks', form)).toEqual({
+      name: 'R1',
+      background_color: '#f5b7b1',
+      room_orientation: 1,
+      number_units: 42,
+    })
+    expect(changedFields('enclosures', emptyForm('enclosures'))).toEqual({ power_supplies: 1 })
+    const cluster = emptyForm('clusters')
+    cluster.text.version = '2.1'
+    cluster.text.serial = 'ignored'
+    expect(changedFields('clusters', cluster)).toEqual({ version: '2.1' })
   })
 })

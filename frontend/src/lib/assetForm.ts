@@ -4,6 +4,7 @@ import {
   type AssetType,
   type Choice,
   type Feature,
+  type OptionalField,
   type TemplateFields,
 } from '../api/assets'
 
@@ -19,6 +20,9 @@ export const TEXT_FIELDS = [
   'comment',
   'size',
   'memory',
+  'version',
+  'position',
+  'background_color',
 ] as const
 export type TextField = (typeof TEXT_FIELDS)[number]
 
@@ -36,12 +40,44 @@ export const REF_FIELDS = [
   'tech_user',
   'tech_group',
   'power_supply',
+  'room',
 ] as const
 export type RefField = (typeof REF_FIELDS)[number]
 
 /** Whole numbers, typed as text. */
-export const NUMBER_FIELDS = ['initial_page_counter', 'page_counter'] as const
+export const NUMBER_FIELDS = [
+  'initial_page_counter',
+  'page_counter',
+  'room_orientation',
+  'number_units',
+  'width',
+  'height',
+  'depth',
+  'max_power',
+  'measured_power',
+  'max_weight',
+  'power_supplies',
+] as const
 export type NumberField = (typeof NUMBER_FIELDS)[number]
+
+/** Sizes of a rack: empty is none; the other numbers are 0 when empty. */
+const CLEARABLE_NUMBERS: readonly NumberField[] = [
+  'width',
+  'height',
+  'depth',
+  'max_power',
+  'measured_power',
+  'max_weight',
+]
+
+const RACK_FIELDS: readonly (TextField | RefField | NumberField)[] = [
+  'room',
+  'position',
+  'room_orientation',
+  'number_units',
+  ...CLEARABLE_NUMBERS,
+  'background_color',
+]
 
 /** Switches: the management type and the features. */
 export type FlagField = Feature | 'is_global'
@@ -65,6 +101,12 @@ export function flagFields(kind: AssetType): FlagField[] {
 /** Whether the type has the field. */
 export function hasField(kind: AssetType, field: TextField | RefField | NumberField): boolean {
   const info = ASSET_TYPES[kind]
+  if (info.without?.includes(field as OptionalField)) {
+    return false
+  }
+  if (RACK_FIELDS.includes(field)) {
+    return !!info.rack
+  }
   switch (field) {
     case 'size':
       return !!info.size
@@ -85,19 +127,37 @@ export function hasField(kind: AssetType, field: TextField | RefField | NumberFi
       return !!info.network
     case 'update_source':
       return !!info.updateSource
+    case 'power_supplies':
+      return !!info.powerSupplies
+    case 'version':
+      return !!info.version
     default:
       return true
   }
 }
 
-export function emptyForm(): AssetForm {
-  return {
+/**
+ * Form of a new item or template: empty, but the defaults of the
+ * datacenter forms (42 units, a door to the north, a light red background,
+ * one power supply).
+ */
+export function emptyForm(kind?: AssetType): AssetForm {
+  const form: AssetForm = {
     text: Object.fromEntries(TEXT_FIELDS.map((field) => [field, ''])) as AssetForm['text'],
     refs: Object.fromEntries(REF_FIELDS.map((field) => [field, null])) as AssetForm['refs'],
-    numbers: { initial_page_counter: '', page_counter: '' },
+    numbers: Object.fromEntries(NUMBER_FIELDS.map((field) => [field, ''])) as AssetForm['numbers'],
     flags: {},
     is_recursive: false,
   }
+  if (kind && ASSET_TYPES[kind].rack) {
+    form.numbers.number_units = '42'
+    form.numbers.room_orientation = '1'
+    form.text.background_color = '#f5b7b1'
+  }
+  if (kind && ASSET_TYPES[kind].powerSupplies) {
+    form.numbers.power_supplies = '1'
+  }
+  return form
 }
 
 export function formFromDetail(asset: AssetDetail): AssetForm {
@@ -105,12 +165,25 @@ export function formFromDetail(asset: AssetDetail): AssetForm {
   for (const field of TEXT_FIELDS) {
     form.text[field] = asset[field] ?? ''
   }
+  // As the color input gives it.
+  form.text.background_color = form.text.background_color.toLowerCase()
   for (const field of REF_FIELDS) {
     const ref = asset[field]
     form.refs[field] = ref ? { id: ref.id, label: ref.name ?? `#${ref.id}` } : null
   }
   for (const field of NUMBER_FIELDS) {
     form.numbers[field] = String(asset[field] ?? '')
+  }
+  // What the classic forms show for values they do not offer.
+  const info = ASSET_TYPES[asset.kind]
+  if (info.rack) {
+    form.numbers.number_units = asset.number_units ? String(asset.number_units) : '42'
+    if (!['1', '2', '3', '4'].includes(form.numbers.room_orientation)) {
+      form.numbers.room_orientation = '1'
+    }
+  }
+  if (info.powerSupplies && !asset.power_supplies) {
+    form.numbers.power_supplies = '1'
   }
   for (const field of flagFields(asset.kind)) {
     form.flags[field] = asset[field] ?? false
@@ -145,7 +218,7 @@ export function changedFields(kind: AssetType, form: AssetForm, initial?: AssetF
     const value = form.numbers[field].trim()
     if (hasField(kind, field) && (initial ? value !== initial.numbers[field] : value !== '')) {
       // Like the classic interface, an empty counter is 0.
-      fields[field] = value === '' ? 0 : Number(value)
+      fields[field] = value !== '' ? Number(value) : CLEARABLE_NUMBERS.includes(field) ? null : 0
     }
   }
   for (const field of flagFields(kind)) {

@@ -4,6 +4,26 @@
  */
 
 export interface paths {
+    "/api/v2/assets/racks/positions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Places of a server room no rack outside the trash takes, like the
+         *     classic form offers them (`ajax/dcroom_size.php`).
+         */
+        get: operations["positions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/assets/{kind}": {
         parameters: {
             query?: never;
@@ -425,7 +445,7 @@ export interface components {
              */
             entity_id: number;
         };
-        AssetDetail: components["schemas"]["Features"] & {
+        AssetDetail: components["schemas"]["Features"] & components["schemas"]["DatacenterDetail"] & {
             /** @description Peripherals and phones only. */
             brand?: string | null;
             comment?: string | null;
@@ -495,7 +515,7 @@ export interface components {
          * @description Fields of a creation or an update. Absent fields are left unchanged;
          *     `null` clears a field (empty text, no related object).
          */
-        AssetFields: components["schemas"]["Features"] & {
+        AssetFields: components["schemas"]["Features"] & components["schemas"]["DatacenterFields"] & {
             /** @description Peripherals and phones only. */
             brand?: string | null;
             comment?: string | null;
@@ -604,7 +624,7 @@ export interface components {
          * @description Type of asset, in the paths.
          * @enum {string}
          */
-        AssetType: "computers" | "monitors" | "printers" | "network-equipments" | "peripherals" | "phones";
+        AssetType: "computers" | "monitors" | "printers" | "network-equipments" | "peripherals" | "phones" | "racks" | "enclosures" | "pdus" | "passive-dc-equipments" | "clusters";
         BridgeToken: {
             /**
              * @description To pass to `front/nw_bridge.php?token=...` within one minute, from
@@ -621,10 +641,131 @@ export interface components {
          * @description A field of the asset forms offering a list of values.
          * @enum {string}
          */
-        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group" | "power_supply";
+        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group" | "power_supply" | "room";
         ChoiceList: {
             /** @description At most 50 values, sorted by label. */
             items: components["schemas"]["Choice"][];
+        };
+        /** @description Fields of the datacenter items. */
+        DatacenterDetail: {
+            /** @description Racks: `#RRGGBB`. */
+            background_color?: string | null;
+            /**
+             * Format: int32
+             * @description Racks.
+             */
+            depth?: number | null;
+            /**
+             * Format: int32
+             * @description Racks.
+             */
+            height?: number | null;
+            /**
+             * Format: int32
+             * @description Racks: in watts.
+             */
+            max_power?: number | null;
+            /**
+             * Format: int32
+             * @description Racks.
+             */
+            max_weight?: number | null;
+            /**
+             * Format: int32
+             * @description Racks: in watts.
+             */
+            measured_power?: number | null;
+            /**
+             * Format: int32
+             * @description Racks.
+             */
+            number_units?: number | null;
+            /**
+             * @description Racks: place in the room, `"<column>,<row>"` (`"0"` or empty for
+             *     none).
+             */
+            position?: string | null;
+            /**
+             * Format: int32
+             * @description Enclosures.
+             */
+            power_supplies?: number | null;
+            room?: null | components["schemas"]["Ref"];
+            /**
+             * Format: int32
+             * @description Racks: door orientation in the room, 1 north, 2 east, 3 south, 4 west
+             *     (0: never set).
+             */
+            room_orientation?: number | null;
+            /** @description Clusters. */
+            version?: string | null;
+            /**
+             * Format: int32
+             * @description Racks.
+             */
+            width?: number | null;
+        };
+        /** @description Fields of the datacenter items in a creation or an update. */
+        DatacenterFields: {
+            /** @description Racks: `#RRGGBB`. */
+            background_color?: string | null;
+            /**
+             * Format: int32
+             * @description Racks; `null` empties it.
+             */
+            depth?: number | null;
+            /**
+             * Format: int32
+             * @description Racks; `null` empties it.
+             */
+            height?: number | null;
+            /**
+             * Format: int32
+             * @description Racks: in watts; `null` empties it.
+             */
+            max_power?: number | null;
+            /**
+             * Format: int32
+             * @description Racks; `null` empties it.
+             */
+            max_weight?: number | null;
+            /**
+             * Format: int32
+             * @description Racks: in watts; `null` empties it.
+             */
+            measured_power?: number | null;
+            /**
+             * Format: int32
+             * @description Racks: 1 to 100.
+             */
+            number_units?: number | null;
+            /**
+             * @description Racks: place in the room, `"<column>,<row>"` as offered by
+             *     `/assets/racks/positions`, `"0"` for none.
+             */
+            position?: string | null;
+            /**
+             * Format: int32
+             * @description Enclosures.
+             */
+            power_supplies?: number | null;
+            /**
+             * Format: int32
+             * @description Racks: server room.
+             */
+            room_id?: number | null;
+            /**
+             * Format: int32
+             * @description Racks: door orientation, 1 north, 2 east, 3 south, 4 west.
+             */
+            room_orientation?: number | null;
+            /** @description Clusters. */
+            version?: string | null;
+            /**
+             * Format: int32
+             * @description Racks; `null` empties it (stored as 0, like the classic form).
+             */
+            width?: number | null;
         };
         /** @description Items with the same values, reported but not refused. */
         DuplicateNotice: {
@@ -745,6 +886,19 @@ export interface components {
             /** @description `null` when the related row no longer exists. */
             name?: string | null;
         };
+        /** @description A free place of the room. */
+        RoomPosition: {
+            /** @description Column in letters (A, B... AA). */
+            column: string;
+            /** @description Stored value, `"<column>,<row>"`. */
+            position: string;
+            /** Format: int32 */
+            row: number;
+        };
+        RoomPositions: {
+            /** @description By column, then row. */
+            items: components["schemas"]["RoomPosition"][];
+        };
         SelectableEntities: {
             /** @description Ordered by full name. */
             items: components["schemas"]["SelectableEntity"][];
@@ -853,6 +1007,67 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    positions: {
+        parameters: {
+            query: {
+                /** @description Server room. */
+                room_id: number;
+                /** @description Position of the rack being edited: offered although it is taken. */
+                current?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Free places */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RoomPositions"];
+                };
+            };
+            /** @description Invalid parameters */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No create or update right on the racks */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible room */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
     list: {
         parameters: {
             query?: {

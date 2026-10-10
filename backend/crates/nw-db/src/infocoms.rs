@@ -116,6 +116,22 @@ pub struct Owner<'a> {
     pub id: i32,
     pub entities_id: i32,
     pub is_recursive: bool,
+    /// The item gives its entity and sharing to its infocom
+    /// (`$forward_entity_to`).
+    pub forwards_entity: bool,
+}
+
+impl Owner<'_> {
+    /// Entity and sharing of a new infocom: those of the item when it
+    /// forwards them, else the root entity, not shared
+    /// (`CommonDBChild::addNeededInfoToInput`).
+    fn infocom_entity(&self) -> (i32, bool) {
+        if self.forwards_entity {
+            (self.entities_id, self.is_recursive)
+        } else {
+            (0, false)
+        }
+    }
 }
 
 /// Creates the infocom of a new item (`auto_create_infocoms`).
@@ -246,8 +262,9 @@ async fn find(conn: &mut MySqlConnection, owner: Owner<'_>) -> Result<Option<i32
         .await
 }
 
-/// `Infocom::add`: entity and sharing of the item, default alert of the
-/// entity, and the creation in the history of the infocom.
+/// `Infocom::add`: entity and sharing of the item when it forwards them,
+/// default alert of the entity of the item, and the creation in the history
+/// of the infocom.
 async fn add(
     conn: &mut MySqlConnection,
     settings: &InfocomSettings,
@@ -269,11 +286,12 @@ async fn add(
         "INSERT INTO glpi_infocoms ({}, date_creation, date_mod) VALUES ({placeholders}, NOW(), NOW())",
         columns.join(", ")
     );
+    let (entities_id, is_recursive) = owner.infocom_entity();
     let mut query = sqlx::query(&sql)
         .bind(owner.itemtype)
         .bind(owner.id)
-        .bind(owner.entities_id)
-        .bind(owner.is_recursive)
+        .bind(entities_id)
+        .bind(is_recursive)
         .bind(settings.default_alert(owner.entities_id));
     for date in dates {
         query = query.bind(stored_value(*date, now));
@@ -294,7 +312,7 @@ fn stored_value(date: AutoDate, now: &str) -> &str {
 
 /// Clones the infocom of a template for an item created from it
 /// (`Infocom::clone`): its values, with the entity and the sharing of the
-/// item and the default alert of its entity, and the creation in its
+/// item when it forwards them and the default alert of its entity, and the creation in its
 /// history. Refused, like the PHP code, when the item already has one
 /// (filled by its status).
 pub async fn clone_for_item(
@@ -311,6 +329,7 @@ pub async fn clone_for_item(
     .bind(template_id)
     .fetch_all(&mut *conn)
     .await?;
+    let (entities_id, is_recursive) = owner.infocom_entity();
     for source in sources {
         if find(conn, owner).await?.is_some() {
             continue;
@@ -321,8 +340,8 @@ pub async fn clone_for_item(
             source,
             &[
                 ("items_id", owner.id),
-                ("entities_id", owner.entities_id),
-                ("is_recursive", i32::from(owner.is_recursive)),
+                ("entities_id", entities_id),
+                ("is_recursive", i32::from(is_recursive)),
                 ("alert", settings.default_alert(owner.entities_id)),
             ],
         )

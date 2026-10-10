@@ -1,6 +1,8 @@
 //! Assets of the inventory: computers, monitors, printers, network
-//! equipment, peripherals and phones. They share most of their columns, so
-//! one description drives the reads, the writes and the history of all.
+//! equipment, peripherals and phones, and the datacenter items (racks,
+//! enclosures, PDUs, passive equipment, clusters). They share most of their
+//! columns, so one description drives the reads, the writes and the history
+//! of all.
 
 use crate::php;
 
@@ -13,6 +15,11 @@ pub enum AssetKind {
     NetworkEquipment,
     Peripheral,
     Phone,
+    Rack,
+    Enclosure,
+    Pdu,
+    PassiveDcEquipment,
+    Cluster,
 }
 
 /// How a field is stored, which decides how it is validated and shown in
@@ -36,9 +43,18 @@ pub enum FieldKind {
     /// Decimal number (search option `decimal`): `floatval(cleanDecimal())`,
     /// compared as a number.
     Decimal,
+    /// Whole number of a column without search option: not filtered by the
+    /// legacy code, an empty value is stored as `0` (the PHP connection
+    /// runs without strict SQL mode). Compared as a number.
+    Number,
 }
 
-/// An editable column and the search option identifying it in the history.
+/// Search option of a column the PHP code has none for: its changes are
+/// not in the history (`Log::constructHistory` finds no option).
+pub const NOT_LOGGED: i32 = 0;
+
+/// An editable column and the search option identifying it in the history
+/// ([`NOT_LOGGED`] when it is not in the history).
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Field {
     pub column: &'static str,
@@ -91,18 +107,28 @@ const fn integer(column: &'static str, search_option: i32) -> Field {
     }
 }
 
+const fn number(column: &'static str) -> Field {
+    Field {
+        column,
+        search_option: NOT_LOGGED,
+        kind: FieldKind::Number,
+    }
+}
+
 impl Field {
     /// Whether a new value changes the stored one, as compared by
     /// `CommonDBTM::update`: text exactly (NULL and an empty text are the
     /// same), numbers with PHP's `!=`.
     pub fn changes(&self, stored: &Value, new: &Value) -> bool {
         match (self.kind, stored, new) {
-            (FieldKind::Integer | FieldKind::Decimal, Value::Text(old), Value::Text(new)) => {
-                !php::loose_eq(
-                    old.as_deref().unwrap_or_default(),
-                    new.as_deref().unwrap_or_default(),
-                )
-            }
+            (
+                FieldKind::Integer | FieldKind::Decimal | FieldKind::Number,
+                Value::Text(old),
+                Value::Text(new),
+            ) => !php::loose_eq(
+                old.as_deref().unwrap_or_default(),
+                new.as_deref().unwrap_or_default(),
+            ),
             _ => new.differs_from(stored),
         }
     }
@@ -119,8 +145,14 @@ impl Field {
             FieldKind::Integer => {
                 Value::Text(Some(if self.column == "ram" { "" } else { "0" }.to_owned()))
             }
+            FieldKind::Number => Value::Text(Some(String::new())),
             FieldKind::Decimal => return None,
         })
+    }
+
+    /// Whether its changes are in the history.
+    pub fn is_logged(&self) -> bool {
+        self.search_option != NOT_LOGGED
     }
 }
 
@@ -178,14 +210,59 @@ const NETWORK: Field = dropdown("networks_id", 32, "glpi_networks", false);
 const IS_GLOBAL: Field = flag("is_global", 82);
 
 impl AssetKind {
-    pub const ALL: [Self; 6] = [
+    pub const ALL: [Self; 11] = [
         Self::Computer,
         Self::Monitor,
         Self::Printer,
         Self::NetworkEquipment,
         Self::Peripheral,
         Self::Phone,
+        Self::Rack,
+        Self::Enclosure,
+        Self::Pdu,
+        Self::PassiveDcEquipment,
+        Self::Cluster,
     ];
+
+    /// One of the assets of the inventory (`$CFG_GLPI['asset_types']`):
+    /// business rules, contact and users, items updated by an inventory
+    /// tool (`is_dynamic`). The datacenter items are not.
+    pub fn is_inventory_asset(self) -> bool {
+        matches!(
+            self,
+            Self::Computer
+                | Self::Monitor
+                | Self::Printer
+                | Self::NetworkEquipment
+                | Self::Peripheral
+                | Self::Phone
+        )
+    }
+
+    /// Checked by the field unicity (`$CFG_GLPI['unicity_types']`).
+    pub fn has_unicity(self) -> bool {
+        self != Self::PassiveDcEquipment
+    }
+
+    /// Has financial information (`$CFG_GLPI['infocom_types']`).
+    pub fn has_infocom(self) -> bool {
+        self != Self::Cluster
+    }
+
+    /// Can have templates (`is_template` column).
+    pub fn has_templates(self) -> bool {
+        self != Self::Cluster
+    }
+
+    /// Columns of the table besides the fields of the form.
+    pub fn has_column(self, column: &str) -> bool {
+        match column {
+            "is_dynamic" => self.is_inventory_asset(),
+            "is_template" | "template_name" => self.has_templates(),
+            "is_global" => self.can_be_global(),
+            _ => self.field(column).is_some(),
+        }
+    }
 
     /// Name in the API paths (`/assets/computers`...).
     pub fn slug(self) -> &'static str {
@@ -196,6 +273,11 @@ impl AssetKind {
             Self::NetworkEquipment => "network-equipments",
             Self::Peripheral => "peripherals",
             Self::Phone => "phones",
+            Self::Rack => "racks",
+            Self::Enclosure => "enclosures",
+            Self::Pdu => "pdus",
+            Self::PassiveDcEquipment => "passive-dc-equipments",
+            Self::Cluster => "clusters",
         }
     }
 
@@ -212,6 +294,11 @@ impl AssetKind {
             Self::NetworkEquipment => "NetworkEquipment",
             Self::Peripheral => "Peripheral",
             Self::Phone => "Phone",
+            Self::Rack => "Rack",
+            Self::Enclosure => "Enclosure",
+            Self::Pdu => "PDU",
+            Self::PassiveDcEquipment => "PassiveDCEquipment",
+            Self::Cluster => "Cluster",
         }
     }
 
@@ -229,6 +316,11 @@ impl AssetKind {
             Self::NetworkEquipment => "glpi_networkequipments",
             Self::Peripheral => "glpi_peripherals",
             Self::Phone => "glpi_phones",
+            Self::Rack => "glpi_racks",
+            Self::Enclosure => "glpi_enclosures",
+            Self::Pdu => "glpi_pdus",
+            Self::PassiveDcEquipment => "glpi_passivedcequipments",
+            Self::Cluster => "glpi_clusters",
         }
     }
 
@@ -241,6 +333,8 @@ impl AssetKind {
             Self::NetworkEquipment => "networking",
             Self::Peripheral => "peripheral",
             Self::Phone => "phone",
+            Self::Rack | Self::Enclosure | Self::Pdu | Self::PassiveDcEquipment => "datacenter",
+            Self::Cluster => "cluster",
         }
     }
 
@@ -253,6 +347,11 @@ impl AssetKind {
             Self::NetworkEquipment => "networkequipment",
             Self::Peripheral => "peripherals",
             Self::Phone => "phones",
+            Self::Rack => "racks",
+            Self::Enclosure => "enclosure",
+            Self::Pdu => "pdus",
+            Self::PassiveDcEquipment => "passivedcequipment",
+            Self::Cluster => "cluster",
         }
     }
 
@@ -264,31 +363,52 @@ impl AssetKind {
             Self::NetworkEquipment => "networkequipment",
             Self::Peripheral => "peripheral",
             Self::Phone => "phone",
+            Self::Rack => "rack",
+            Self::Enclosure => "enclosure",
+            Self::Pdu => "pdu",
+            Self::PassiveDcEquipment => "passivedcequipment",
+            Self::Cluster => "cluster",
         }
     }
 
-    /// Type dropdown: `(column, table)`.
-    pub fn type_dropdown(self) -> (&'static str, &'static str) {
-        match self {
+    /// Type dropdown: `(column, table)`; enclosures have none.
+    pub fn type_dropdown(self) -> Option<(&'static str, &'static str)> {
+        Some(match self {
             Self::Computer => ("computertypes_id", "glpi_computertypes"),
             Self::Monitor => ("monitortypes_id", "glpi_monitortypes"),
             Self::Printer => ("printertypes_id", "glpi_printertypes"),
             Self::NetworkEquipment => ("networkequipmenttypes_id", "glpi_networkequipmenttypes"),
             Self::Peripheral => ("peripheraltypes_id", "glpi_peripheraltypes"),
             Self::Phone => ("phonetypes_id", "glpi_phonetypes"),
-        }
+            Self::Rack => ("racktypes_id", "glpi_racktypes"),
+            Self::Enclosure => return None,
+            Self::Pdu => ("pdutypes_id", "glpi_pdutypes"),
+            Self::PassiveDcEquipment => {
+                ("passivedcequipmenttypes_id", "glpi_passivedcequipmenttypes")
+            }
+            Self::Cluster => ("clustertypes_id", "glpi_clustertypes"),
+        })
     }
 
-    /// Model dropdown: `(column, table)`.
-    pub fn model_dropdown(self) -> (&'static str, &'static str) {
-        match self {
+    /// Model dropdown: `(column, table)`; clusters have none. The models of
+    /// the datacenter items can be NULL.
+    pub fn model_dropdown(self) -> Option<(&'static str, &'static str)> {
+        Some(match self {
             Self::Computer => ("computermodels_id", "glpi_computermodels"),
             Self::Monitor => ("monitormodels_id", "glpi_monitormodels"),
             Self::Printer => ("printermodels_id", "glpi_printermodels"),
             Self::NetworkEquipment => ("networkequipmentmodels_id", "glpi_networkequipmentmodels"),
             Self::Peripheral => ("peripheralmodels_id", "glpi_peripheralmodels"),
             Self::Phone => ("phonemodels_id", "glpi_phonemodels"),
-        }
+            Self::Rack => ("rackmodels_id", "glpi_rackmodels"),
+            Self::Enclosure => ("enclosuremodels_id", "glpi_enclosuremodels"),
+            Self::Pdu => ("pdumodels_id", "glpi_pdumodels"),
+            Self::PassiveDcEquipment => (
+                "passivedcequipmentmodels_id",
+                "glpi_passivedcequipmentmodels",
+            ),
+            Self::Cluster => return None,
+        })
     }
 
     /// Column of `glpi_states` telling whether a status is offered for this type.
@@ -299,7 +419,10 @@ impl AssetKind {
     /// Can be used by several computers at once (`is_global`): such items
     /// do not follow the changes of the computers they are connected to.
     pub fn can_be_global(self) -> bool {
-        !matches!(self, Self::Computer | Self::NetworkEquipment)
+        matches!(
+            self,
+            Self::Monitor | Self::Printer | Self::Peripheral | Self::Phone
+        )
     }
 
     /// Editable fields, in the order of the legacy form (its entity part
@@ -358,17 +481,67 @@ impl AssetKind {
                 "groups_id", "brand", "phonepowersupplies_id", "number_line", "comment",
                 "have_headset", "have_hp",
             ],
+            Self::Rack => &[
+                "is_recursive", "name", "states_id", "locations_id", "racktypes_id",
+                "users_id_tech", "manufacturers_id", "groups_id_tech", "rackmodels_id", "serial",
+                "otherserial", "dcrooms_id", "position", "room_orientation", "number_units",
+                "width", "height", "depth", "max_power", "mesured_power", "max_weight", "bgcolor",
+                "comment",
+            ],
+            Self::Enclosure => &[
+                "is_recursive", "name", "states_id", "power_supplies", "manufacturers_id",
+                "locations_id", "enclosuremodels_id", "users_id_tech", "groups_id_tech", "serial",
+                "otherserial", "comment",
+            ],
+            Self::Pdu => &[
+                "is_recursive", "name", "states_id", "locations_id", "pdutypes_id",
+                "users_id_tech", "manufacturers_id", "groups_id_tech", "pdumodels_id", "serial",
+                "otherserial", "comment",
+            ],
+            Self::PassiveDcEquipment => &[
+                "is_recursive", "name", "states_id", "locations_id", "passivedcequipmenttypes_id",
+                "users_id_tech", "manufacturers_id", "groups_id_tech",
+                "passivedcequipmentmodels_id", "serial", "otherserial", "comment",
+            ],
+            Self::Cluster => &[
+                "is_recursive", "name", "states_id", "uuid", "version", "clustertypes_id",
+                "autoupdatesystems_id", "users_id_tech", "groups_id_tech", "comment",
+            ],
         }
     }
 
     /// A field of this type, with its search option.
     fn definition(self, column: &str) -> Option<Field> {
-        let (type_column, type_table) = self.type_dropdown();
-        let (model_column, model_table) = self.model_dropdown();
-        if column == type_column {
+        // What differs from the other types first.
+        let changed: &[Field] = match self {
+            Self::Pdu => &[text("comment", NOT_LOGGED)],
+            Self::PassiveDcEquipment => &[
+                text("comment", NOT_LOGGED),
+                flag("is_recursive", NOT_LOGGED),
+            ],
+            Self::Cluster => &[
+                text("uuid", 5),
+                dropdown("clustertypes_id", NOT_LOGGED, "glpi_clustertypes", false),
+                dropdown(
+                    "autoupdatesystems_id",
+                    NOT_LOGGED,
+                    "glpi_autoupdatesystems",
+                    false,
+                ),
+            ],
+            _ => &[],
+        };
+        if let Some(field) = changed.iter().find(|field| field.column == column) {
+            return Some(*field);
+        }
+        if let Some((type_column, type_table)) = self.type_dropdown()
+            && column == type_column
+        {
             return Some(dropdown(type_column, 4, type_table, false));
         }
-        if column == model_column {
+        if let Some((model_column, model_table)) = self.model_dropdown()
+            && column == model_column
+        {
             return Some(dropdown(model_column, 40, model_table, false));
         }
         if let Some(field) = COMMON_FIELDS.iter().find(|field| field.column == column) {
@@ -423,11 +596,63 @@ impl AssetKind {
                 flag("have_hp", 44),
                 IS_GLOBAL,
             ],
+            Self::Rack => &[
+                dropdown("dcrooms_id", 7, "glpi_dcrooms", false),
+                text("position", NOT_LOGGED),
+                number("room_orientation"),
+                integer("number_units", 8),
+                number("width"),
+                number("height"),
+                number("depth"),
+                number("max_power"),
+                number("mesured_power"),
+                number("max_weight"),
+                text("bgcolor", NOT_LOGGED),
+            ],
+            Self::Enclosure => &[number("power_supplies")],
+            Self::Pdu | Self::PassiveDcEquipment => &[],
+            Self::Cluster => &[text("version", NOT_LOGGED)],
         };
         specific
             .iter()
             .find(|field| field.column == column)
             .copied()
+    }
+
+    /// What the legacy form of a new item posts for a field: its fields
+    /// are empty, except the defaults of the datacenter forms (42 units, a
+    /// door to the north, a light red background, one power supply).
+    pub fn form_default(self, field: Field) -> Option<Value> {
+        let default = match (self, field.column) {
+            (Self::Rack, "number_units") => "42",
+            (Self::Rack, "room_orientation") => "1",
+            (Self::Rack, "position") => "0",
+            (Self::Rack, "bgcolor") => "#F5B7B1",
+            (Self::Enclosure, "power_supplies") => "1",
+            _ => return field.form_default(),
+        };
+        Some(Value::Text(Some(default.to_owned())))
+    }
+
+    /// What the legacy form shows for a stored value, and so posts back
+    /// when it is left as is: a dropdown without value (NULL) its empty
+    /// choice, a door orientation outside the list the first one, and the
+    /// `?:` of the datacenter forms (42 units, one power supply).
+    pub fn form_value(self, field: Field, stored: &Value) -> Value {
+        let number = |value: &Value| php::numeric(&value.raw()).unwrap_or_default();
+        let shown = match (self, field.column, stored) {
+            (_, _, Value::NoId) => return Value::Id(0),
+            (_, _, Value::Text(None)) => return Value::Text(Some(String::new())),
+            (Self::Rack, "number_units", value) if number(value) == 0.0 => "42",
+            (Self::Rack, "room_orientation", Value::Text(Some(value)))
+                if !matches!(value.as_str(), "1" | "2" | "3" | "4") =>
+            {
+                "1"
+            }
+            (Self::Enclosure, "power_supplies", value) if number(value) == 0.0 => "1",
+            (_, _, value) => return value.clone(),
+        };
+        Value::Text(Some(shown.to_owned()))
     }
 
     /// `template_name`, a field of the templates only.
@@ -493,7 +718,17 @@ impl AssetKind {
                 "glpi_items_operatingsystems",
                 "glpi_items_disks",
             ],
+            // Their classes forward nothing, not even to the infocom.
+            Self::Rack | Self::Enclosure | Self::Pdu | Self::PassiveDcEquipment | Self::Cluster => {
+                &[]
+            }
         }
+    }
+
+    /// Whether the infocom follows the entity and sharing of the item (in
+    /// `$forward_entity_to`).
+    pub fn forwards_to_infocom(self) -> bool {
+        self.is_inventory_asset()
     }
 
     pub fn field(self, column: &str) -> Option<Field> {
@@ -510,6 +745,9 @@ pub enum Value {
     Text(Option<String>),
     /// Id of a dropdown row or user, `0` for none.
     Id(i32),
+    /// NULL in a dropdown column (models of the datacenter items): the
+    /// PHP code sees it differ from `0`.
+    NoId,
     Bool(bool),
 }
 
@@ -530,6 +768,7 @@ impl Value {
         match self {
             Self::Text(text) => text.clone().unwrap_or_default(),
             Self::Id(id) => id.to_string(),
+            Self::NoId => String::new(),
             Self::Bool(value) => i32::from(*value).to_string(),
         }
     }
@@ -703,6 +942,51 @@ mod tests {
         assert!(Value::Id(2).differs_from(&Value::Id(1)));
         assert_eq!(Value::Bool(true).raw(), "1");
         assert_eq!(null.raw(), "");
+    }
+
+    #[test]
+    fn the_form_posts_back_what_it_shows() {
+        let text = |value: &str| Value::Text(Some(value.to_owned()));
+        let rack = AssetKind::Rack;
+        let field = |kind: AssetKind, column| kind.field(column).unwrap();
+        assert_eq!(
+            rack.form_value(field(rack, "rackmodels_id"), &Value::NoId),
+            Value::Id(0)
+        );
+        assert_eq!(
+            rack.form_value(field(rack, "rackmodels_id"), &Value::Id(3)),
+            Value::Id(3)
+        );
+        assert_eq!(
+            rack.form_value(field(rack, "width"), &Value::Text(None)),
+            text("")
+        );
+        assert_eq!(
+            rack.form_value(field(rack, "number_units"), &text("0")),
+            text("42")
+        );
+        assert_eq!(
+            rack.form_value(field(rack, "number_units"), &text("47")),
+            text("47")
+        );
+        assert_eq!(
+            rack.form_value(field(rack, "room_orientation"), &text("0")),
+            text("1")
+        );
+        assert_eq!(
+            rack.form_value(field(rack, "room_orientation"), &text("3")),
+            text("3")
+        );
+        let enclosure = AssetKind::Enclosure;
+        assert_eq!(
+            enclosure.form_value(field(enclosure, "power_supplies"), &text("0")),
+            text("1")
+        );
+        let monitor = AssetKind::Monitor;
+        assert_eq!(
+            monitor.form_value(field(monitor, "size"), &text("0")),
+            text("0")
+        );
     }
 
     #[test]

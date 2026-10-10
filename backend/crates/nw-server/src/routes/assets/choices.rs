@@ -45,16 +45,19 @@ pub enum ChoiceField {
     TechGroup,
     /// Phones only.
     PowerSupply,
+    /// Racks only: server room.
+    Room,
 }
 
 impl ChoiceField {
-    fn column(self, kind: AssetKind) -> &'static str {
-        match self {
+    /// Column of the field; `None` when the type has neither type nor model.
+    fn column(self, kind: AssetKind) -> Option<&'static str> {
+        Some(match self {
             Self::Location => "locations_id",
             Self::State => "states_id",
             Self::Manufacturer => "manufacturers_id",
-            Self::Type => kind.type_dropdown().0,
-            Self::Model => kind.model_dropdown().0,
+            Self::Type => kind.type_dropdown()?.0,
+            Self::Model => kind.model_dropdown()?.0,
             Self::Network => "networks_id",
             Self::UpdateSource => "autoupdatesystems_id",
             Self::User => "users_id",
@@ -62,7 +65,8 @@ impl ChoiceField {
             Self::TechUser => "users_id_tech",
             Self::TechGroup => "groups_id_tech",
             Self::PowerSupply => "phonepowersupplies_id",
-        }
+            Self::Room => "dcrooms_id",
+        })
     }
 }
 
@@ -121,9 +125,9 @@ pub async fn choices(
     if !session.scope.active().contains(&params.entity_id) {
         return Err(ApiError::Forbidden);
     }
-    let column = field.column(kind);
-    let field_kind = kind
-        .field(column)
+    let field_kind = field
+        .column(kind)
+        .and_then(|column| kind.field(column))
         .ok_or_else(|| ApiError::BadRequest(format!("no such field for {}", kind.slug())))?
         .kind;
     let visibility = Visibility {
@@ -187,7 +191,11 @@ pub async fn choices(
             })
             .collect()
         }
-        FieldKind::Text | FieldKind::Bool | FieldKind::Integer | FieldKind::Decimal => {
+        FieldKind::Text
+        | FieldKind::Bool
+        | FieldKind::Integer
+        | FieldKind::Decimal
+        | FieldKind::Number => {
             return Err(ApiError::BadRequest("not a list field".to_owned()));
         }
     };
@@ -195,4 +203,9 @@ pub async fn choices(
 }
 
 /// Dropdown tables of the asset forms having an entity.
-const ENTITY_SCOPED: [&str; 3] = ["glpi_locations", "glpi_states", "glpi_groups"];
+const ENTITY_SCOPED: [&str; 4] = [
+    "glpi_locations",
+    "glpi_states",
+    "glpi_groups",
+    "glpi_dcrooms",
+];

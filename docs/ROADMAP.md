@@ -91,7 +91,11 @@ Chaque lot suit la même « définition de terminé » :
       d'un élément depuis un gabarit (informations financières, contrats et
       documents recopiés), vérifiés contre le PHP ; nom donné à l'élément
       conservé, corrigé côté PHP
-- [ ] Baies et autres types (équipements passifs, PDU, enclos, clusters)
+- [x] Baies, châssis, PDU, équipements passifs et clusters : champs propres
+      (salle, position libre, dimensions, alimentations, version), position
+      refusée si occupée, informations financières, purge et gabarits,
+      vérifiés contre le PHP ; numéro d'inventaire des PDU et équipements
+      passifs corrigé côté PHP
 - [ ] Logiciels, licences, versions installées
 - [ ] Liaisons entre objets (`itemtype` / `items_id`), composants, ports réseau
 - [ ] Gestion financière (`infocoms`), contrats, fournisseurs, documents
