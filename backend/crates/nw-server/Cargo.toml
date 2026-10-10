@@ -12,6 +12,10 @@ path = "src/main.rs"
 
 [dependencies]
 anyhow.workspace = true
+hex.workspace = true
+rand.workspace = true
+sha2.workspace = true
+subtle.workspace = true
 axum.workspace = true
 axum-extra.workspace = true
 chrono.workspace = true
@@ -29,7 +33,6 @@ tracing-subscriber.workspace = true
 utoipa.workspace = true
 
 [dev-dependencies]
-rand.workspace = true
 sqlx.workspace = true
 tower.workspace = true
 

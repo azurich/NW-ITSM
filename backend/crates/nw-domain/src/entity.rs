@@ -78,6 +78,102 @@ pub struct ProfileEntity {
     pub is_recursive: bool,
 }
 
+/// The entities a session works on, chosen by the user (legacy entity
+/// selector) or by default at login.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum EntitySelection {
+    /// Every entity the profile is granted on ("Show all").
+    All,
+    /// One entity, with or without its sub-entities.
+    Entity { id: i32, recursive: bool },
+}
+
+impl EntitySelection {
+    /// The selection made at login or when the profile changes, in the
+    /// same order as the legacy `Session::changeProfile`:
+    /// 1. the user's default entity, if the profile is granted on it;
+    /// 2. the default entity and its sons, if it is below a recursive grant;
+    /// 3. otherwise every entity the profile is granted on.
+    ///
+    /// Returns `None` when the profile has no entity, in which case the
+    /// legacy code does not activate the profile.
+    pub fn default_for(
+        tree: &EntityTree,
+        granted: &[ProfileEntity],
+        default_entity: i32,
+    ) -> Option<Self> {
+        let granted = merge_grants(granted);
+        if granted.is_empty() {
+            return None;
+        }
+        if let Some(grant) = granted.iter().find(|g| g.entity_id == default_entity) {
+            return Some(Self::Entity {
+                id: grant.entity_id,
+                recursive: grant.is_recursive,
+            });
+        }
+        let selection = Self::Entity {
+            id: default_entity,
+            recursive: true,
+        };
+        if selection.is_allowed(tree, &granted) {
+            Some(selection)
+        } else {
+            Some(Self::All)
+        }
+    }
+
+    /// Whether the profile grants allow this selection.
+    ///
+    /// Stricter than the legacy `Session::changeActiveEntities`, which also
+    /// accepts a sub-entity of a non-recursive grant: an entity is allowed
+    /// only when the profile actually sees it, and with its sub-entities
+    /// only below a recursive grant.
+    pub fn is_allowed(&self, tree: &EntityTree, granted: &[ProfileEntity]) -> bool {
+        match *self {
+            Self::All => !granted.is_empty(),
+            Self::Entity { id, recursive } => {
+                let ancestors = tree.ancestors_of(id);
+                granted.iter().any(|g| {
+                    let covers =
+                        g.entity_id == id || (g.is_recursive && ancestors.contains(&g.entity_id));
+                    covers && (!recursive || g.is_recursive)
+                })
+            }
+        }
+    }
+}
+
+/// An entity the profile can select.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub struct SelectableEntity {
+    pub id: i32,
+    /// It can be selected with its sub-entities.
+    pub recursive_allowed: bool,
+}
+
+/// Every entity the profile can select, by id.
+pub fn selectable_entities(tree: &EntityTree, granted: &[ProfileEntity]) -> Vec<SelectableEntity> {
+    let mut selectable = std::collections::BTreeMap::new();
+    for grant in merge_grants(granted) {
+        let entities = if grant.is_recursive {
+            tree.sons_of(grant.entity_id)
+        } else {
+            BTreeSet::from([grant.entity_id])
+        };
+        for id in entities {
+            *selectable.entry(id).or_insert(false) |= grant.is_recursive;
+        }
+    }
+    selectable
+        .into_iter()
+        .map(|(id, recursive_allowed)| SelectableEntity {
+            id,
+            recursive_allowed,
+        })
+        .collect()
+}
+
 /// Entities the current session can see.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EntityScope {
@@ -87,47 +183,36 @@ pub struct EntityScope {
 }
 
 impl EntityScope {
-    /// Computes the scope selected at login for a profile.
-    ///
-    /// Same order as the legacy `Session::changeProfile`:
-    /// 1. the user's default entity, if the profile is granted on it;
-    /// 2. the default entity and its sons, if it is below a recursive grant;
-    /// 3. otherwise every entity the profile is granted on.
-    ///
-    /// Returns `None` when the profile has no entity, in which case the
-    /// legacy code does not activate the profile.
-    pub fn for_profile(
+    /// The scope of a selection, or `None` when the grants do not allow it.
+    pub fn new(
         tree: &EntityTree,
         granted: &[ProfileEntity],
-        default_entity: i32,
+        selection: EntitySelection,
     ) -> Option<Self> {
         let granted = merge_grants(granted);
-        if granted.is_empty() {
+        if !selection.is_allowed(tree, &granted) {
             return None;
         }
-
-        let sons_if = |grant: &ProfileEntity| {
-            if grant.is_recursive {
-                tree.sons_of(grant.entity_id)
-            } else {
-                BTreeSet::from([grant.entity_id])
-            }
+        let active = match selection {
+            EntitySelection::All => granted
+                .iter()
+                .flat_map(|grant| {
+                    if grant.is_recursive {
+                        tree.sons_of(grant.entity_id)
+                    } else {
+                        BTreeSet::from([grant.entity_id])
+                    }
+                })
+                .collect(),
+            EntitySelection::Entity {
+                id,
+                recursive: true,
+            } => tree.sons_of(id),
+            EntitySelection::Entity {
+                id,
+                recursive: false,
+            } => BTreeSet::from([id]),
         };
-
-        if let Some(grant) = granted.iter().find(|g| g.entity_id == default_entity) {
-            return Some(Self::from_active(tree, sons_if(grant)));
-        }
-
-        let default_ancestors = tree.ancestors_of(default_entity);
-        let below_recursive_grant = granted.iter().any(|g| {
-            g.is_recursive
-                && (g.entity_id == default_entity || default_ancestors.contains(&g.entity_id))
-        });
-        if below_recursive_grant {
-            return Some(Self::from_active(tree, tree.sons_of(default_entity)));
-        }
-
-        let active = granted.iter().flat_map(sons_if).collect();
         Some(Self::from_active(tree, active))
     }
 
@@ -209,6 +294,74 @@ mod tests {
         }
     }
 
+    /// Scope selected at login.
+    fn login_scope(granted: &[ProfileEntity], default_entity: i32) -> Option<EntityScope> {
+        let selection = EntitySelection::default_for(&tree(), granted, default_entity)?;
+        EntityScope::new(&tree(), granted, selection)
+    }
+
+    fn entity(id: i32, recursive: bool) -> EntitySelection {
+        EntitySelection::Entity { id, recursive }
+    }
+
+    #[test]
+    fn default_selection_follows_the_legacy_order() {
+        let granted = [grant(1, true), grant(2, false)];
+        assert_eq!(
+            EntitySelection::default_for(&tree(), &granted, 2),
+            Some(entity(2, false))
+        );
+        assert_eq!(
+            EntitySelection::default_for(&tree(), &granted, 4),
+            Some(entity(4, true))
+        );
+        assert_eq!(
+            EntitySelection::default_for(&tree(), &granted, 0),
+            Some(EntitySelection::All)
+        );
+        assert_eq!(EntitySelection::default_for(&tree(), &[], 0), None);
+    }
+
+    #[test]
+    fn selection_must_be_covered_by_a_grant() {
+        let granted = [grant(1, true), grant(2, false)];
+        assert!(entity(1, true).is_allowed(&tree(), &granted));
+        assert!(entity(5, false).is_allowed(&tree(), &granted));
+        assert!(entity(4, true).is_allowed(&tree(), &granted));
+        assert!(entity(2, false).is_allowed(&tree(), &granted));
+        // Not recursive on Lyon, nothing at the root.
+        assert!(!entity(2, true).is_allowed(&tree(), &granted));
+        assert!(!entity(0, false).is_allowed(&tree(), &granted));
+        // Below a non-recursive grant: refused, unlike the legacy code.
+        let paris_only = [grant(1, false)];
+        assert!(!entity(3, false).is_allowed(&tree(), &paris_only));
+        assert!(EntityScope::new(&tree(), &paris_only, entity(3, false)).is_none());
+    }
+
+    #[test]
+    fn scope_of_a_selection() {
+        let granted = [grant(1, true), grant(2, false)];
+        let scope = EntityScope::new(&tree(), &granted, entity(4, false)).unwrap();
+        assert_eq!(scope.active(), &set(&[4]));
+        assert_eq!(scope.parents(), &set(&[0, 1]));
+        let all = EntityScope::new(&tree(), &granted, EntitySelection::All).unwrap();
+        assert_eq!(all.active(), &set(&[1, 2, 3, 4, 5]));
+    }
+
+    #[test]
+    fn selectable_entities_follow_recursion() {
+        let selectable =
+            selectable_entities(&tree(), &[grant(1, true), grant(2, false), grant(4, false)]);
+        let ids: Vec<_> = selectable
+            .iter()
+            .map(|e| (e.id, e.recursive_allowed))
+            .collect();
+        assert_eq!(
+            ids,
+            [(1, true), (2, false), (3, true), (4, true), (5, true)]
+        );
+    }
+
     #[test]
     fn sons_include_the_entity_itself() {
         assert_eq!(tree().sons_of(1), set(&[1, 3, 4, 5]));
@@ -238,15 +391,14 @@ mod tests {
 
     #[test]
     fn recursive_grant_on_root_sees_everything() {
-        let scope = EntityScope::for_profile(&tree(), &[grant(0, true)], 0).unwrap();
+        let scope = login_scope(&[grant(0, true)], 0).unwrap();
         assert!(scope.is_unrestricted());
         assert!(scope.can_see(5, false));
     }
 
     #[test]
     fn default_entity_granted_directly() {
-        let scope =
-            EntityScope::for_profile(&tree(), &[grant(1, true), grant(2, false)], 1).unwrap();
+        let scope = login_scope(&[grant(1, true), grant(2, false)], 1).unwrap();
         assert_eq!(scope.active(), &set(&[1, 3, 4, 5]));
         assert_eq!(scope.parents(), &set(&[0]));
         assert!(!scope.is_unrestricted());
@@ -259,28 +411,26 @@ mod tests {
 
     #[test]
     fn default_entity_below_a_recursive_grant() {
-        let scope = EntityScope::for_profile(&tree(), &[grant(1, true)], 4).unwrap();
+        let scope = login_scope(&[grant(1, true)], 4).unwrap();
         assert_eq!(scope.active(), &set(&[4, 5]));
         assert_eq!(scope.parents(), &set(&[0, 1]));
     }
 
     #[test]
     fn default_entity_below_a_non_recursive_grant_falls_back_to_all() {
-        let scope =
-            EntityScope::for_profile(&tree(), &[grant(1, false), grant(2, false)], 4).unwrap();
+        let scope = login_scope(&[grant(1, false), grant(2, false)], 4).unwrap();
         assert_eq!(scope.active(), &set(&[1, 2]));
         assert_eq!(scope.parents(), &set(&[0]));
     }
 
     #[test]
     fn duplicated_grant_keeps_recursion() {
-        let scope =
-            EntityScope::for_profile(&tree(), &[grant(1, false), grant(1, true)], 1).unwrap();
+        let scope = login_scope(&[grant(1, false), grant(1, true)], 1).unwrap();
         assert_eq!(scope.active(), &set(&[1, 3, 4, 5]));
     }
 
     #[test]
     fn profile_without_entity_is_not_usable() {
-        assert_eq!(EntityScope::for_profile(&tree(), &[], 0), None);
+        assert_eq!(login_scope(&[], 0), None);
     }
 }

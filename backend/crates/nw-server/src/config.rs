@@ -17,6 +17,12 @@ pub struct Config {
     pub cookie_secure: bool,
     /// Built web application (`frontend/dist`) served under `/app`.
     pub static_dir: Option<PathBuf>,
+    /// Behind a reverse proxy: the client address is the last entry of
+    /// `X-Forwarded-For`. Only enable it when a proxy always sets it.
+    pub trust_proxy: bool,
+    /// Key shared with the PHP application (`config/nw-bridge.key`) to log
+    /// in from one interface to the other. At least 32 bytes.
+    pub bridge_secret: Option<Vec<u8>>,
 }
 
 impl Config {
@@ -33,7 +39,31 @@ impl Config {
             session_ttl: Duration::from_secs(60 * parsed("NW_SESSION_TTL_MINUTES", 480u64)?),
             cookie_secure: parsed("NW_COOKIE_SECURE", true)?,
             static_dir: env::var_os("NW_STATIC_DIR").map(PathBuf::from),
+            trust_proxy: parsed("NW_TRUST_PROXY", false)?,
+            bridge_secret: bridge_secret()?,
         })
+    }
+}
+
+/// `NW_BRIDGE_SECRET_FILE` (usually the `config/nw-bridge.key` file of the
+/// PHP application) or `NW_BRIDGE_SECRET`; none disables the bridge.
+fn bridge_secret() -> anyhow::Result<Option<Vec<u8>>> {
+    let secret = if let Some(path) = env::var_os("NW_BRIDGE_SECRET_FILE") {
+        let content = std::fs::read(&path).with_context(|| {
+            format!(
+                "cannot read NW_BRIDGE_SECRET_FILE {}",
+                path.to_string_lossy()
+            )
+        })?;
+        Some(content.trim_ascii().to_vec())
+    } else {
+        env::var("NW_BRIDGE_SECRET").ok().map(String::into_bytes)
+    };
+    match secret {
+        Some(secret) if secret.len() < 32 => {
+            bail!("the bridge secret must be at least 32 bytes long")
+        }
+        secret => Ok(secret),
     }
 }
 

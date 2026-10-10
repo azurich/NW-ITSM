@@ -1,10 +1,10 @@
 //! Authenticated sessions.
 //!
-//! A session is a signed token (HS256) holding the user and the active
-//! profile. It is sent as an `HttpOnly` cookie to the web application, or
-//! as a `Bearer` token by API clients. The user, profile, rights and
-//! entities are reloaded on every request, so disabling an account or
-//! removing a profile takes effect immediately.
+//! A session is a signed token (HS256) holding the user, the active profile
+//! and the selected entities. It is sent as an `HttpOnly` cookie to the web
+//! application, or as a `Bearer` token by API clients. The user, profiles,
+//! rights and entities are reloaded on every request, so disabling an
+//! account or removing a profile takes effect immediately.
 
 use std::time::Duration;
 
@@ -17,11 +17,12 @@ use axum_extra::extract::cookie::{Cookie, CookieJar, SameSite};
 use chrono::Utc;
 use jsonwebtoken::{Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use nw_db::{
-    MySqlPool, entities, profiles,
+    MySqlPool, config, entities, profiles,
     users::{self, User},
 };
 use nw_domain::{
-    entity::{EntityScope, ProfileEntity},
+    entity::{EntityScope, EntitySelection, EntityTree, ProfileEntity},
+    naming::{NameDisplay, NamesFormat, format_user_name},
     rights::{Interface, Rights},
 };
 use serde::{Deserialize, Serialize};
@@ -39,6 +40,12 @@ struct Claims {
     uid: i32,
     /// Active profile id.
     pid: i32,
+    /// Selected entity, `None` for every entity of the profile.
+    ent: Option<i32>,
+    /// The selected entity includes its sub-entities.
+    rec: bool,
+    /// Last password change: changing the password ends the other sessions.
+    pwt: Option<i64>,
     iat: i64,
     exp: i64,
 }
@@ -64,13 +71,23 @@ impl SessionKeys {
         }
     }
 
-    /// Signs a token for a user and its active profile.
-    pub fn issue(&self, user_id: i32, profile_id: i32) -> anyhow::Result<String> {
+    /// Signs a token for the user, profile and entities of a session.
+    pub fn issue(&self, session: &Session) -> anyhow::Result<String> {
         let now = Utc::now().timestamp();
         let ttl = i64::try_from(self.ttl.as_secs()).context("session TTL too large")?;
+        let (ent, rec) = match session.selection {
+            EntitySelection::All => (None, false),
+            EntitySelection::Entity { id, recursive } => (Some(id), recursive),
+        };
         let claims = Claims {
-            uid: user_id,
-            pid: profile_id,
+            uid: session.user.id,
+            pid: session.profile.id,
+            ent,
+            rec,
+            pwt: session
+                .user
+                .password_last_update
+                .map(|date| date.timestamp()),
             iat: now,
             exp: now + ttl,
         };
@@ -84,16 +101,17 @@ impl SessionKeys {
             .map(|data| data.claims)
     }
 
-    /// Cookie carrying a session token.
-    pub fn cookie(&self, token: String, secure: bool) -> Cookie<'static> {
+    /// Cookie carrying a new token for the session.
+    pub fn cookie(&self, session: &Session, secure: bool) -> anyhow::Result<Cookie<'static>> {
+        let token = self.issue(session)?;
         let max_age = i64::try_from(self.ttl.as_secs()).unwrap_or(i64::MAX);
-        Cookie::build((COOKIE_NAME, token))
+        Ok(Cookie::build((COOKIE_NAME, token))
             .path("/")
             .http_only(true)
             .same_site(SameSite::Lax)
             .secure(secure)
             .max_age(time::Duration::seconds(max_age))
-            .build()
+            .build())
     }
 }
 
@@ -124,6 +142,17 @@ pub struct AvailableProfile {
     pub name: String,
 }
 
+/// Preferences of the user, completed with the configuration defaults
+/// (legacy `User::computePreferences`).
+#[derive(Debug, Clone)]
+pub struct Preferences {
+    /// Language code (`fr_FR`...): the user's choice or the default one.
+    pub language: String,
+    /// The user chose a language (otherwise the default one applies).
+    pub language_is_set: bool,
+    pub names: NameDisplay,
+}
+
 /// Everything known about the authenticated user for one request.
 #[derive(Debug, Clone)]
 pub struct Session {
@@ -131,7 +160,12 @@ pub struct Session {
     pub profile: ActiveProfile,
     pub profiles: Vec<AvailableProfile>,
     pub rights: Rights,
+    /// Entities of the active profile.
+    pub granted: Vec<ProfileEntity>,
+    pub tree: EntityTree,
+    pub selection: EntitySelection,
     pub scope: EntityScope,
+    pub preferences: Preferences,
 }
 
 /// Which profile to activate.
@@ -139,19 +173,26 @@ pub struct Session {
 pub enum ProfileChoice {
     /// At login: the user's default profile, or the first one by name.
     Default,
-    /// After login: the profile stored in the token, if still granted.
+    /// A given profile, if granted.
     Exact(i32),
 }
 
 impl Session {
-    /// Opens a session for a user whose credentials were checked, with the
-    /// same profile and entity selection as a legacy login.
+    /// Opens a session for a user whose identity was checked, with the same
+    /// profile and entity selection as a legacy login. A requested entity
+    /// selection that the profile no longer allows falls back to the
+    /// default one.
     ///
     /// Fails with [`ApiError::NoProfile`] when no usable profile remains.
-    pub async fn open(pool: &MySqlPool, user: User, choice: ProfileChoice) -> ApiResult<Self> {
+    pub async fn open(
+        pool: &MySqlPool,
+        user: User,
+        profile: ProfileChoice,
+        selection: Option<EntitySelection>,
+    ) -> ApiResult<Self> {
         let grants = profiles::grants_for_user(pool, user.id).await?;
 
-        let profile_id = match choice {
+        let profile_id = match profile {
             ProfileChoice::Exact(id) => id,
             ProfileChoice::Default => grants
                 .iter()
@@ -184,8 +225,12 @@ impl Session {
             })
             .collect();
         let tree = entities::tree(pool).await?;
-        let scope = EntityScope::for_profile(&tree, &granted, user.entities_id)
-            .ok_or(ApiError::NoProfile)?;
+        let selection = match selection {
+            Some(selection) if selection.is_allowed(&tree, &granted) => selection,
+            _ => EntitySelection::default_for(&tree, &granted, user.entities_id)
+                .ok_or(ApiError::NoProfile)?,
+        };
+        let scope = EntityScope::new(&tree, &granted, selection).ok_or(ApiError::NoProfile)?;
         let rights = Rights::new(interface, profiles::rights(pool, profile_id).await?);
 
         let mut profiles: Vec<AvailableProfile> = Vec::new();
@@ -198,12 +243,17 @@ impl Session {
             }
         }
 
+        let preferences = preferences(pool, &user).await?;
         Ok(Self {
             user,
             profile,
             profiles,
             rights,
+            granted,
+            tree,
+            selection,
             scope,
+            preferences,
         })
     }
 
@@ -216,6 +266,60 @@ impl Session {
             Err(ApiError::Forbidden)
         }
     }
+
+    /// Name of a user, formatted with this session's preferences.
+    pub fn user_name(
+        &self,
+        id: i32,
+        login: Option<&str>,
+        realname: Option<&str>,
+        firstname: Option<&str>,
+    ) -> String {
+        format_user_name(id, login, realname, firstname, self.preferences.names)
+    }
+
+    /// Name of the session's user, as the author of changes.
+    pub fn own_name(&self) -> String {
+        let user = &self.user;
+        self.user_name(
+            user.id,
+            user.name.as_deref(),
+            user.realname.as_deref(),
+            user.firstname.as_deref(),
+        )
+    }
+}
+
+async fn preferences(pool: &MySqlPool, user: &User) -> ApiResult<Preferences> {
+    const LANGUAGE: &str = "language";
+    const NAMES_FORMAT: &str = "names_format";
+    const IDS_VISIBLE: &str = "is_ids_visible";
+    let defaults = config::core_values(pool, &[LANGUAGE, NAMES_FORMAT, IDS_VISIBLE]).await?;
+    let default_number = |name: &str| {
+        defaults
+            .get(name)
+            .and_then(|value| value.parse::<i32>().ok())
+            .unwrap_or(0)
+    };
+    let user_language = user
+        .language
+        .clone()
+        .filter(|language| !language.is_empty());
+    Ok(Preferences {
+        language_is_set: user_language.is_some(),
+        language: user_language
+            .or_else(|| defaults.get(LANGUAGE).cloned())
+            .unwrap_or_else(|| "en_GB".to_owned()),
+        names: NameDisplay {
+            format: NamesFormat::from_legacy(
+                user.names_format
+                    .unwrap_or_else(|| default_number(NAMES_FORMAT)),
+            ),
+            show_ids: user
+                .is_ids_visible
+                .unwrap_or_else(|| default_number(IDS_VISIBLE) != 0),
+        },
+    })
 }
 
 impl FromRequestParts<AppState> for Session {
@@ -237,14 +341,27 @@ impl FromRequestParts<AppState> for Session {
         let user = users::find_by_id(&state.pool, claims.uid)
             .await?
             .filter(|user| user.is_allowed_at(Utc::now()))
+            .filter(|user| user.password_last_update.map(|date| date.timestamp()) == claims.pwt)
             .ok_or(ApiError::Unauthenticated)?;
+        let selection = match claims.ent {
+            None => EntitySelection::All,
+            Some(id) => EntitySelection::Entity {
+                id,
+                recursive: claims.rec,
+            },
+        };
 
-        Self::open(&state.pool, user, ProfileChoice::Exact(claims.pid))
-            .await
-            .map_err(|error| match error {
-                ApiError::NoProfile => ApiError::Unauthenticated,
-                other => other,
-            })
+        Self::open(
+            &state.pool,
+            user,
+            ProfileChoice::Exact(claims.pid),
+            Some(selection),
+        )
+        .await
+        .map_err(|error| match error {
+            ApiError::NoProfile => ApiError::Unauthenticated,
+            other => other,
+        })
     }
 }
 

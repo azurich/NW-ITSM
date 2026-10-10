@@ -7,6 +7,8 @@
 pub mod computers;
 pub mod config;
 pub mod entities;
+pub mod events;
+pub mod history;
 pub mod profiles;
 mod scope;
 pub mod users;

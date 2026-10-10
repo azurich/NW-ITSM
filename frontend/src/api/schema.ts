@@ -4,6 +4,43 @@
  */
 
 export interface paths {
+    "/api/v2/auth/bridge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Opens a session from the PHP application (`front/nw_bridge.php`) and
+         *     redirects to the application. On failure, redirects to the login page.
+         */
+        get: operations["bridge_from_legacy"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/auth/bridge/legacy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Issues a token opening the classic interface as the current user. */
+        post: operations["bridge_to_legacy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/auth/login": {
         parameters: {
             query?: never;
@@ -13,7 +50,11 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Logs in with a local ITSM-NG account and sets the session cookie. */
+        /**
+         * Logs in with a local ITSM-NG account and sets the session cookie.
+         * @description After 5 failures for a login from an address, or 20 from an address,
+         *     attempts are refused for 15 minutes.
+         */
         post: operations["login"];
         delete?: never;
         options?: never;
@@ -38,6 +79,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/auth/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Changes the password of the current user. The other sessions of the user
+         *     end; this one gets a new cookie.
+         */
+        post: operations["change_password"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/auth/password/expired": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Replaces an expired password and logs in (legacy `updatepassword.php`). */
+        post: operations["change_expired_password"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/auth/session": {
         parameters: {
             query?: never;
@@ -48,6 +126,60 @@ export interface paths {
         /** Returns the current session. */
         get: operations["current_session"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/auth/session/entities": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the entities the active profile can select. */
+        get: operations["selectable"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/auth/session/entity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Selects the entities to work on (legacy entity selector). */
+        put: operations["switch_entity"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/auth/session/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Activates another profile of the user, with its default entities (like
+         *     the legacy profile selector).
+         */
+        put: operations["switch_profile"];
         post?: never;
         delete?: never;
         options?: never;
@@ -106,10 +238,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/languages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Languages of the application. */
+        get: operations["list_languages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/me/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Updates the preferences of the current user, with an entry in the
+         *     user's history.
+         */
+        patch: operations["update_preferences"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        BridgeToken: {
+            /**
+             * @description To pass to `front/nw_bridge.php?token=...` within one minute, from
+             *     the same browser (a nonce cookie is set).
+             */
+            token: string;
+        };
         ComputerDetail: {
             comment?: string | null;
             contact?: string | null;
@@ -167,6 +343,21 @@ export interface components {
             /** Format: date-time */
             updated_at?: string | null;
         };
+        EntityRef: {
+            /** Format: int32 */
+            id: number;
+            /** @description Full name ("Root > Child"). */
+            name?: string | null;
+        };
+        EntitySwitch: {
+            /**
+             * Format: int32
+             * @description Entity to select; `null` selects every entity of the profile.
+             */
+            entity_id?: number | null;
+            /** @description Include the sub-entities. */
+            recursive?: boolean;
+        };
         /** @description Error payload: `{"error": {"code": "...", "message": "..."}}`. */
         ErrorBody: {
             error: components["schemas"]["ErrorDetail"];
@@ -174,7 +365,18 @@ export interface components {
         ErrorDetail: {
             /** @description Stable, machine-readable code (`unauthenticated`, `not_found`...). */
             code: string;
+            /**
+             * @description More codes, for example the broken rules of `weak_password`
+             *     (`too_short`, `missing_digit`, `missing_lowercase`,
+             *     `missing_uppercase`, `missing_symbol`).
+             */
+            details?: string[];
             message: string;
+        };
+        ExpiredPasswordChange: {
+            current_password: string;
+            login: string;
+            new_password: string;
         };
         Health: {
             /** @description `ok` or `unreachable`. */
@@ -183,14 +385,35 @@ export interface components {
             status: string;
             version: string;
         };
+        Language: {
+            /** @description `fr_FR`... */
+            code: string;
+            /** @description Name in the language itself. */
+            name: string;
+        };
         LoginRequest: {
             login: string;
             password: string;
+        };
+        PasswordChange: {
+            current_password: string;
+            new_password: string;
+        };
+        PreferencesUpdate: {
+            /**
+             * @description Language code (`fr_FR`...), `null` for the default language. Absent:
+             *     unchanged.
+             */
+            language?: string | null;
         };
         ProfileRef: {
             /** Format: int32 */
             id: number;
             name: string;
+        };
+        ProfileSwitch: {
+            /** Format: int32 */
+            profile_id: number;
         };
         /** @description A related object: id and display name. */
         Ref: {
@@ -199,13 +422,43 @@ export interface components {
             /** @description `null` when the related row no longer exists. */
             name?: string | null;
         };
+        SelectableEntities: {
+            /** @description Ordered by full name. */
+            items: components["schemas"]["SelectableEntity"][];
+        };
+        SelectableEntity: {
+            /** @description Full name ("Root > Child"). */
+            completename?: string | null;
+            /** Format: int32 */
+            id: number;
+            /**
+             * Format: int32
+             * @description Depth in the tree, 1 for the root.
+             */
+            level: number;
+            name?: string | null;
+            /** Format: int32 */
+            parent_id?: number | null;
+            /** @description It can be selected with its sub-entities. */
+            recursive_allowed: boolean;
+        };
+        SessionCapabilities: {
+            /** @description The classic interface can be opened without logging in again. */
+            bridge: boolean;
+            /** @description The user can change their password here (local account and right). */
+            change_password: boolean;
+        };
         SessionEntities: {
             /** @description Number of visible entities. */
             count: number;
+            /** @description The selected entity includes its sub-entities. */
+            recursive: boolean;
+            selected?: null | components["schemas"]["EntityRef"];
             /** @description Every entity is visible. */
             unrestricted: boolean;
         };
         SessionInfo: {
+            capabilities: components["schemas"]["SessionCapabilities"];
             entities: components["schemas"]["SessionEntities"];
             profile: components["schemas"]["SessionProfile"];
             /** @description Every profile granted to the user. */
@@ -231,8 +484,10 @@ export interface components {
             display_name: string;
             /** Format: int32 */
             id: number;
-            /** @description Preferred language (`fr_FR`...), if set. */
-            language?: string | null;
+            /** @description Language in use (`fr_FR`...): the user's choice or the default one. */
+            language: string;
+            /** @description The language is the default one of the application. */
+            language_is_default: boolean;
             login: string;
         };
     };
@@ -244,6 +499,67 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    bridge_from_legacy: {
+        parameters: {
+            query: {
+                /** @description Token signed by the PHP application. */
+                token: string;
+                /** @description Page of the application to open (`/app/...`). */
+                redirect?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Redirection to the application or to the login page */
+            303: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    bridge_to_legacy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Token for the PHP application, nonce cookie set */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BridgeToken"];
+                };
+            };
+            /** @description Password expired since the login */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Bridge not configured */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
     login: {
         parameters: {
             query?: never;
@@ -284,6 +600,15 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorBody"];
                 };
             };
+            /** @description Too many failures, see `Retry-After` */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
         };
     };
     logout: {
@@ -301,6 +626,117 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    change_password: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PasswordChange"];
+            };
+        };
+        responses: {
+            /** @description Password changed, new session cookie set */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionInfo"];
+                };
+            };
+            /** @description Wrong current password, same or weak new password */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description External account or no `password_update` right */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Too many wrong passwords */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    change_expired_password: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ExpiredPasswordChange"];
+            };
+        };
+        responses: {
+            /** @description Password changed, logged in */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionInfo"];
+                };
+            };
+            /** @description Password not expired, same or weak new password */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Wrong login or password */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Account disabled or locked */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Too many failures, see `Retry-After` */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
             };
         };
     };
@@ -324,6 +760,101 @@ export interface operations {
             };
             /** @description Not logged in */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    selectable: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Selectable entities */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SelectableEntities"];
+                };
+            };
+            /** @description Not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    switch_entity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EntitySwitch"];
+            };
+        };
+        responses: {
+            /** @description Entities changed, new session cookie set */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionInfo"];
+                };
+            };
+            /** @description Entity not allowed for the profile */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    switch_profile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ProfileSwitch"];
+            };
+        };
+        responses: {
+            /** @description Profile changed, new session cookie set */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionInfo"];
+                };
+            };
+            /** @description Profile not granted or not usable */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -464,6 +995,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Health"];
+                };
+            };
+        };
+    };
+    list_languages: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Every language */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Language"][];
+                };
+            };
+        };
+    };
+    update_preferences: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreferencesUpdate"];
+            };
+        };
+        responses: {
+            /** @description Preferences saved */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionInfo"];
+                };
+            };
+            /** @description Unknown language */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
                 };
             };
         };

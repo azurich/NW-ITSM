@@ -33,7 +33,10 @@ docker compose -f dev/compose.yaml run --rm legacy bin/console dependencies inst
 docker compose -f dev/compose.yaml run --rm legacy \
   bin/console db:install -H db -d itsm -u itsm -p itsm -L fr_FR -n
 
-# 3. Tout le reste
+# 3. Clé du pont de connexion entre les deux interfaces (une seule fois)
+openssl rand -hex 32 > config/nw-bridge.key
+
+# 4. Tout le reste
 docker compose -f dev/compose.yaml up -d --build
 ```
 
@@ -42,6 +45,12 @@ docker compose -f dev/compose.yaml up -d --build
 
 Comptes créés par l'installation : `itsm`/`itsm` (Super-Admin),
 `tech`/`tech`, `normal`/`normal` et `post-only`/`postonly`.
+
+On passe d'une interface à l'autre sans se reconnecter : menu « New
+interface » de l'interface classique, et lien « Interface classique » du
+menu utilisateur de la nouvelle ([ADR 0003](adr/0003-pont-de-connexion.md)).
+Le proxy de développement refuse les chemins privés (`config/`, `files/`...)
+que le serveur PHP intégré, qui ignore les `.htaccess`, servirait sinon.
 
 Pour modifier le frontend avec le rechargement à chaud, lancez Vite sur la
 machine hôte et faites-le passer derrière le proxy :
@@ -69,6 +78,9 @@ npm install
 npm run dev
 ```
 
+Sans proxy commun, le pont de connexion entre les deux interfaces ne
+fonctionne pas : il suppose que les deux sont servies par la même origine.
+
 ## Configuration de l'API
 
 | Variable | Défaut | Rôle |
@@ -80,6 +92,9 @@ npm run dev
 | `NW_COOKIE_SECURE` | `true` | Cookie réservé au HTTPS ; `false` en développement HTTP |
 | `NW_STATIC_DIR` | *(aucun)* | Dossier `frontend/dist` à servir sous `/app` |
 | `NW_DATABASE_MAX_CONNECTIONS` | `10` | Taille du pool de connexions |
+| `NW_TRUST_PROXY` | `false` | Derrière un proxy : adresse du client prise dans `X-Forwarded-For` (limites de connexion, journal) |
+| `NW_BRIDGE_SECRET_FILE` | *(aucun)* | Fichier de la clé du pont, en général `config/nw-bridge.key` du PHP. Sans clé, le pont est désactivé |
+| `NW_BRIDGE_SECRET` | *(aucun)* | La clé du pont elle-même, à la place du fichier |
 | `RUST_LOG` | `info,sqlx=warn` | Niveau des journaux |
 
 ## Tests et vérifications
@@ -92,11 +107,20 @@ cargo clippy --workspace --all-targets -- -D warnings
 NW_TEST_DATABASE_URL=mysql://root:root@127.0.0.1:3306 cargo test --workspace
 ```
 
-Les tests de l'API créent une base temporaire par test à partir de
+Les tests de l'API (`tests/api.rs`, `tests/session.rs`, `tests/bridge.rs`)
+créent une base temporaire par test à partir de
 `install/mysql/glpi-empty.sql` et de `backend/crates/nw-server/tests/fixtures/seed.sql`,
 puis la suppriment. `NW_TEST_DATABASE_URL` désigne le **serveur** (sans nom
 de base), avec un utilisateur autorisé à créer des bases. Sans cette
 variable, ces tests sont ignorés.
+
+Côté PHP, le format du pont est testé par `tests/units/itsmng/NwBridge.php`
+(atoum, lancé par la CI existante avec les autres tests unitaires) :
+
+```sh
+vendor/bin/atoum --bootstrap-file tests/bootstrap.php --no-code-coverage \
+  -f tests/units/itsmng/NwBridge.php
+```
 
 ```sh
 # Frontend

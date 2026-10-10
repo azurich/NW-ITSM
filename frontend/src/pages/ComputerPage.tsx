@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next'
 import { ApiError } from '../api/client'
 import { computerQuery } from '../api/computers'
 import { ErrorState, Loading } from '../components/States'
-import { formatDateTime, legacyUrl } from '../lib/format'
+import { LegacyLink } from '../components/LegacyLink'
+import { formatDateTime } from '../lib/format'
 
 export function ComputerPage() {
   const { t, i18n } = useTranslation()
@@ -45,12 +46,12 @@ export function ComputerPage() {
           {computer.is_deleted && <Badge tone="red">{t('computer.trash')}</Badge>}
           {computer.is_dynamic && <Badge tone="blue">{t('computer.dynamic')}</Badge>}
           {computer.is_recursive && <Badge tone="slate">{t('computer.recursive')}</Badge>}
-          <a
-            href={legacyUrl(`front/computer.form.php?id=${computer.id}`)}
+          <LegacyLink
+            path={`front/computer.form.php?id=${computer.id}`}
             className="ml-auto text-sm text-slate-500 hover:underline"
           >
             {t('computer.openLegacy')} ↗
-          </a>
+          </LegacyLink>
         </div>
       </div>
 

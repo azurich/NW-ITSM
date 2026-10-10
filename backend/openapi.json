@@ -9,12 +9,88 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/v2/auth/bridge": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Opens a session from the PHP application (`front/nw_bridge.php`) and\nredirects to the application. On failure, redirects to the login page.",
+        "operationId": "bridge_from_legacy",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "description": "Token signed by the PHP application.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirect",
+            "in": "query",
+            "description": "Page of the application to open (`/app/...`).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "303": {
+            "description": "Redirection to the application or to the login page"
+          }
+        }
+      }
+    },
+    "/api/v2/auth/bridge/legacy": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Issues a token opening the classic interface as the current user.",
+        "operationId": "bridge_to_legacy",
+        "responses": {
+          "200": {
+            "description": "Token for the PHP application, nonce cookie set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BridgeToken"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Password expired since the login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bridge not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/auth/login": {
       "post": {
         "tags": [
           "auth"
         ],
         "summary": "Logs in with a local ITSM-NG account and sets the session cookie.",
+        "description": "After 5 failures for a login from an address, or 20 from an address,\nattempts are refused for 15 minutes.",
         "operationId": "login",
         "requestBody": {
           "content": {
@@ -56,6 +132,16 @@
                 }
               }
             }
+          },
+          "429": {
+            "description": "Too many failures, see `Retry-After`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
           }
         }
       }
@@ -74,10 +160,142 @@
         }
       }
     },
+    "/api/v2/auth/password": {
+      "post": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Changes the password of the current user. The other sessions of the user\nend; this one gets a new cookie.",
+        "operationId": "change_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed, new session cookie set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Wrong current password, same or weak new password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "External account or no `password_update` right",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many wrong passwords",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/password/expired": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Replaces an expired password and logs in (legacy `updatepassword.php`).",
+        "operationId": "change_expired_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpiredPasswordChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed, logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Password not expired, same or weak new password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Wrong login or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Account disabled or locked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many failures, see `Retry-After`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/auth/session": {
       "get": {
         "tags": [
-          "auth"
+          "session"
         ],
         "summary": "Returns the current session.",
         "operationId": "current_session",
@@ -94,6 +312,119 @@
           },
           "401": {
             "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/session/entities": {
+      "get": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Lists the entities the active profile can select.",
+        "operationId": "selectable",
+        "responses": {
+          "200": {
+            "description": "Selectable entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SelectableEntities"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/session/entity": {
+      "put": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Selects the entities to work on (legacy entity selector).",
+        "operationId": "switch_entity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntitySwitch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Entities changed, new session cookie set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Entity not allowed for the profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/session/profile": {
+      "put": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Activates another profile of the user, with its default entities (like\nthe legacy profile selector).",
+        "operationId": "switch_profile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileSwitch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Profile changed, new session cookie set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Profile not granted or not usable",
             "content": {
               "application/json": {
                 "schema": {
@@ -316,10 +647,87 @@
           }
         }
       }
+    },
+    "/api/v2/languages": {
+      "get": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Languages of the application.",
+        "operationId": "list_languages",
+        "responses": {
+          "200": {
+            "description": "Every language",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Language"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/me/preferences": {
+      "patch": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Updates the preferences of the current user, with an entry in the\nuser's history.",
+        "operationId": "update_preferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferencesUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Preferences saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown language",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "BridgeToken": {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "To pass to `front/nw_bridge.php?token=...` within one minute, from\nthe same browser (a nonce cookie is set)."
+          }
+        }
+      },
       "ComputerDetail": {
         "type": "object",
         "required": [
@@ -610,6 +1018,42 @@
           }
         }
       },
+      "EntityRef": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Full name (\"Root > Child\")."
+          }
+        }
+      },
+      "EntitySwitch": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Entity to select; `null` selects every entity of the profile."
+          },
+          "recursive": {
+            "type": "boolean",
+            "description": "Include the sub-entities."
+          }
+        }
+      },
       "ErrorBody": {
         "type": "object",
         "description": "Error payload: `{\"error\": {\"code\": \"...\", \"message\": \"...\"}}`.",
@@ -633,7 +1077,33 @@
             "type": "string",
             "description": "Stable, machine-readable code (`unauthenticated`, `not_found`...)."
           },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "More codes, for example the broken rules of `weak_password`\n(`too_short`, `missing_digit`, `missing_lowercase`,\n`missing_uppercase`, `missing_symbol`)."
+          },
           "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ExpiredPasswordChange": {
+        "type": "object",
+        "required": [
+          "login",
+          "current_password",
+          "new_password"
+        ],
+        "properties": {
+          "current_password": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "new_password": {
             "type": "string"
           }
         }
@@ -659,6 +1129,23 @@
           }
         }
       },
+      "Language": {
+        "type": "object",
+        "required": [
+          "code",
+          "name"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "`fr_FR`..."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name in the language itself."
+          }
+        }
+      },
       "LoginRequest": {
         "type": "object",
         "required": [
@@ -671,6 +1158,33 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "PasswordChange": {
+        "type": "object",
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "properties": {
+          "current_password": {
+            "type": "string"
+          },
+          "new_password": {
+            "type": "string"
+          }
+        }
+      },
+      "PreferencesUpdate": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Language code (`fr_FR`...), `null` for the default language. Absent:\nunchanged."
           }
         }
       },
@@ -687,6 +1201,18 @@
           },
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "ProfileSwitch": {
+        "type": "object",
+        "required": [
+          "profile_id"
+        ],
+        "properties": {
+          "profile_id": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -710,9 +1236,85 @@
           }
         }
       },
+      "SelectableEntities": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SelectableEntity"
+            },
+            "description": "Ordered by full name."
+          }
+        }
+      },
+      "SelectableEntity": {
+        "type": "object",
+        "required": [
+          "id",
+          "level",
+          "recursive_allowed"
+        ],
+        "properties": {
+          "completename": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Full name (\"Root > Child\")."
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Depth in the tree, 1 for the root."
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "parent_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "recursive_allowed": {
+            "type": "boolean",
+            "description": "It can be selected with its sub-entities."
+          }
+        }
+      },
+      "SessionCapabilities": {
+        "type": "object",
+        "required": [
+          "change_password",
+          "bridge"
+        ],
+        "properties": {
+          "bridge": {
+            "type": "boolean",
+            "description": "The classic interface can be opened without logging in again."
+          },
+          "change_password": {
+            "type": "boolean",
+            "description": "The user can change their password here (local account and right)."
+          }
+        }
+      },
       "SessionEntities": {
         "type": "object",
         "required": [
+          "recursive",
           "unrestricted",
           "count"
         ],
@@ -721,6 +1323,21 @@
             "type": "integer",
             "description": "Number of visible entities.",
             "minimum": 0
+          },
+          "recursive": {
+            "type": "boolean",
+            "description": "The selected entity includes its sub-entities."
+          },
+          "selected": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EntityRef",
+                "description": "Selected entity; `null` when every entity of the profile is selected."
+              }
+            ]
           },
           "unrestricted": {
             "type": "boolean",
@@ -735,9 +1352,13 @@
           "profile",
           "profiles",
           "entities",
-          "rights"
+          "rights",
+          "capabilities"
         ],
         "properties": {
+          "capabilities": {
+            "$ref": "#/components/schemas/SessionCapabilities"
+          },
           "entities": {
             "$ref": "#/components/schemas/SessionEntities"
           },
@@ -800,7 +1421,9 @@
         "required": [
           "id",
           "login",
-          "display_name"
+          "display_name",
+          "language",
+          "language_is_default"
         ],
         "properties": {
           "display_name": {
@@ -811,11 +1434,12 @@
             "format": "int32"
           },
           "language": {
-            "type": [
-              "string",
-              "null"
-            ],
-            "description": "Preferred language (`fr_FR`...), if set."
+            "type": "string",
+            "description": "Language in use (`fr_FR`...): the user's choice or the default one."
+          },
+          "language_is_default": {
+            "type": "boolean",
+            "description": "The language is the default one of the application."
           },
           "login": {
             "type": "string"
@@ -851,7 +1475,11 @@
     },
     {
       "name": "auth",
-      "description": "Authentication and session"
+      "description": "Login, logout and the bridge with the classic interface"
+    },
+    {
+      "name": "session",
+      "description": "Current session: profile, entities, password, preferences"
     },
     {
       "name": "assets",

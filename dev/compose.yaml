@@ -43,7 +43,13 @@ services:
       NW_DATABASE_URL: mysql://itsm:itsm@db:3306/itsm
       NW_SESSION_SECRET: ${NW_SESSION_SECRET:-development-only-secret-0123456789}
       NW_COOKIE_SECURE: "false"
+      # Behind the proxy below: the client address is in X-Forwarded-For.
+      NW_TRUST_PROXY: "true"
+      # Key shared with the PHP application (see docs/DEVELOPMENT.md).
+      NW_BRIDGE_SECRET_FILE: /run/secrets/nw-bridge.key
       RUST_LOG: info,sqlx=warn
+    volumes:
+      - ../config/nw-bridge.key:/run/secrets/nw-bridge.key:ro
     depends_on:
       db:
         condition: service_healthy

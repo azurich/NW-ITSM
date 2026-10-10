@@ -1,11 +1,11 @@
 -- Data set of the API integration tests, loaded on top of
 -- install/mysql/glpi-empty.sql. Every password is "secret".
 --
--- Entities:            Profiles:
---   0 Root               1 Technician (central, computer = read + update)
---   ├── 1 Paris          2 Self-Service (helpdesk, computer right dropped)
---   │   └── 3 Office A   3 Broken (no interface)
---   └── 2 Lyon
+-- Entities:              Profiles:
+--   0 Root                 1 Technician (central): computer = read + update,
+--   ├── 1 Paris              password_update
+--   │   └── 3 Office A     2 Self-Service (helpdesk): computer right dropped
+--   └── 2 Lyon             3 Broken (no interface)
 
 SET SESSION sql_mode = CONCAT(@@sql_mode, ',NO_AUTO_VALUE_ON_ZERO');
 
@@ -23,6 +23,7 @@ INSERT INTO glpi_profiles (id, name, interface) VALUES
 INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES
   (1, 'computer', 3),
   (1, 'ticket', 1024),
+  (1, 'password_update', 1),
   (2, 'computer', 1),
   (2, 'ticket', 1),
   (3, 'computer', 1);
@@ -40,6 +41,7 @@ INSERT INTO glpi_users (id, name, password, realname, firstname, authtype, auths
 
 INSERT INTO glpi_profiles_users (users_id, profiles_id, entities_id, is_recursive) VALUES
   (10, 1, 0, 1),
+  (10, 2, 0, 1),
   (11, 1, 1, 1),
   (12, 1, 2, 0),
   (13, 2, 0, 1),

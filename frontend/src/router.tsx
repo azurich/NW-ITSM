@@ -16,6 +16,7 @@ import { parseComputerListSearch } from './lib/search'
 import { ComputerPage } from './pages/ComputerPage'
 import { ComputersPage } from './pages/ComputersPage'
 import { LoginPage } from './pages/LoginPage'
+import { PreferencesPage } from './pages/PreferencesPage'
 
 export interface RouterContext {
   queryClient: QueryClient
@@ -29,8 +30,10 @@ const rootRoute = createRootRouteWithContext<RouterContext>()({
 export const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
-  validateSearch: (search: Record<string, unknown>): { redirect?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { redirect?: string; bridge?: 'failed' } => ({
     redirect: isSafeRedirect(search.redirect) ? search.redirect : undefined,
+    // Set by the API when opening from the classic interface failed.
+    bridge: search.bridge === 'failed' ? 'failed' : undefined,
   }),
   component: LoginPage,
 })
@@ -78,9 +81,15 @@ export const computerRoute = createRoute({
   component: ComputerPage,
 })
 
+const preferencesRoute = createRoute({
+  getParentRoute: () => authenticatedRoute,
+  path: '/preferences',
+  component: PreferencesPage,
+})
+
 const routeTree = rootRoute.addChildren([
   loginRoute,
-  authenticatedRoute.addChildren([indexRoute, computersRoute, computerRoute]),
+  authenticatedRoute.addChildren([indexRoute, computersRoute, computerRoute, preferencesRoute]),
 ])
 
 export function createAppRouter(queryClient: QueryClient) {

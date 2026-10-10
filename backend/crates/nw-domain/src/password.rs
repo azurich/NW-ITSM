@@ -36,6 +36,92 @@ pub fn verify(password: &str, hash: &str) -> bool {
     }
 }
 
+/// Cost of new hashes: the PHP `PASSWORD_DEFAULT` cost.
+const BCRYPT_COST: u32 = 10;
+
+/// Hashes a new password like `Auth::getPasswordHash` (bcrypt, `$2y$`).
+pub fn hash(password: &str) -> String {
+    bcrypt::hash_with_result(password, BCRYPT_COST)
+        .expect("bcrypt with a valid cost cannot fail")
+        .format_for_version(bcrypt::Version::TwoY)
+}
+
+/// Whether the stored hash uses an obsolete format (MD5, SHA1) that should
+/// be replaced by bcrypt.
+pub fn is_obsolete(hash: &str) -> bool {
+    !is_bcrypt(hash)
+}
+
+/// Password rules of the configuration (`use_password_security` and
+/// `password_*`), checked like `Config::validatePassword`.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub struct PasswordPolicy {
+    pub enabled: bool,
+    pub min_length: usize,
+    pub need_digit: bool,
+    pub need_lowercase: bool,
+    pub need_uppercase: bool,
+    pub need_symbol: bool,
+}
+
+/// A rule of the policy that a password breaks.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum PolicyViolation {
+    TooShort,
+    MissingDigit,
+    MissingLowercase,
+    MissingUppercase,
+    MissingSymbol,
+}
+
+impl PolicyViolation {
+    /// Stable code for API clients.
+    pub fn code(self) -> &'static str {
+        match self {
+            Self::TooShort => "too_short",
+            Self::MissingDigit => "missing_digit",
+            Self::MissingLowercase => "missing_lowercase",
+            Self::MissingUppercase => "missing_uppercase",
+            Self::MissingSymbol => "missing_symbol",
+        }
+    }
+}
+
+impl PasswordPolicy {
+    /// Every rule the password breaks; empty when it is accepted.
+    ///
+    /// The PHP regular expressions work on bytes: letters and digits are
+    /// ASCII only, and any other byte (accents included, `_` excluded) is a
+    /// symbol.
+    pub fn violations(&self, password: &str) -> Vec<PolicyViolation> {
+        if !self.enabled {
+            return Vec::new();
+        }
+        let bytes = password.as_bytes();
+        let mut violations = Vec::new();
+        if password.chars().count() < self.min_length {
+            violations.push(PolicyViolation::TooShort);
+        }
+        if self.need_digit && !bytes.iter().any(u8::is_ascii_digit) {
+            violations.push(PolicyViolation::MissingDigit);
+        }
+        if self.need_lowercase && !bytes.iter().any(u8::is_ascii_lowercase) {
+            violations.push(PolicyViolation::MissingLowercase);
+        }
+        if self.need_uppercase && !bytes.iter().any(u8::is_ascii_uppercase) {
+            violations.push(PolicyViolation::MissingUppercase);
+        }
+        if self.need_symbol
+            && !bytes
+                .iter()
+                .any(|b| !b.is_ascii_alphanumeric() && *b != b'_')
+        {
+            violations.push(PolicyViolation::MissingSymbol);
+        }
+        violations
+    }
+}
+
 /// Spends the same time as a real bcrypt verification.
 pub fn equalize_timing(password: &str) {
     let _ = bcrypt::verify(password, TIMING_EQUALIZER_HASH);
@@ -136,6 +222,65 @@ mod tests {
         assert_eq!(expiration(ago(41), 30, 10, now), Expiration::Locked);
         assert_eq!(expiration(None, 30, -1, now), Expiration::Expired);
         assert_eq!(expiration(None, 30, 10, now), Expiration::Locked);
+    }
+
+    #[test]
+    fn new_hashes_use_the_php_format() {
+        let hash = hash("secret");
+        assert!(hash.starts_with("$2y$10$"));
+        assert!(verify("secret", &hash));
+        assert!(!is_obsolete(&hash));
+        assert!(is_obsolete("5ebe2294ecd0e0f08eab7690d2a6ee69"));
+    }
+
+    #[test]
+    fn policy_matches_the_php_regular_expressions() {
+        let strict = PasswordPolicy {
+            enabled: true,
+            min_length: 8,
+            need_digit: true,
+            need_lowercase: true,
+            need_uppercase: true,
+            need_symbol: true,
+        };
+        assert!(strict.violations("Abcdef1!").is_empty());
+        assert_eq!(
+            strict.violations("abc"),
+            [
+                PolicyViolation::TooShort,
+                PolicyViolation::MissingDigit,
+                PolicyViolation::MissingUppercase,
+                PolicyViolation::MissingSymbol,
+            ]
+        );
+        assert_eq!(
+            strict.violations("ABCDEFGH1!"),
+            [PolicyViolation::MissingLowercase]
+        );
+        // `_` is a word character, an accent is not.
+        assert_eq!(
+            strict.violations("Abcdefgh1_"),
+            [PolicyViolation::MissingSymbol]
+        );
+        assert!(strict.violations("Abcdefgh1é").is_empty());
+        // Length is counted in characters.
+        assert_eq!(
+            PasswordPolicy {
+                enabled: true,
+                min_length: 4,
+                ..Default::default()
+            }
+            .violations("ééé"),
+            [PolicyViolation::TooShort]
+        );
+        assert!(
+            PasswordPolicy {
+                enabled: false,
+                ..strict
+            }
+            .violations("")
+            .is_empty()
+        );
     }
 
     #[test]

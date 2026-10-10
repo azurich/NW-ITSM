@@ -8,7 +8,7 @@ use utoipa::{
 
 use crate::{
     error::{ErrorBody, ErrorDetail},
-    routes::{auth, computers, health},
+    routes::{auth, computers, health, session},
 };
 
 #[derive(OpenApi)]
@@ -22,7 +22,16 @@ use crate::{
         health::health,
         auth::login,
         auth::logout,
-        auth::current_session,
+        auth::change_expired_password,
+        auth::bridge_from_legacy,
+        auth::bridge_to_legacy,
+        session::current_session,
+        session::switch_profile,
+        session::selectable,
+        session::switch_entity,
+        session::change_password,
+        session::update_preferences,
+        session::list_languages,
         computers::list,
         computers::get_one,
     ),
@@ -31,7 +40,8 @@ use crate::{
     security(("session_cookie" = []), ("bearer" = [])),
     tags(
         (name = "system", description = "Service status"),
-        (name = "auth", description = "Authentication and session"),
+        (name = "auth", description = "Login, logout and the bridge with the classic interface"),
+        (name = "session", description = "Current session: profile, entities, password, preferences"),
         (name = "assets", description = "Inventory of assets"),
     )
 )]

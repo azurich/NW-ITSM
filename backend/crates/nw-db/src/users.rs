@@ -1,6 +1,7 @@
 //! Users (`glpi_users`).
 
 use chrono::{DateTime, Utc};
+use nw_domain::history::{self, Change};
 use sqlx::{FromRow, MySqlPool};
 
 /// Legacy `Auth::DB_GLPI`: account stored in the ITSM-NG database.
@@ -17,15 +18,24 @@ pub struct User {
     pub firstname: Option<String>,
     pub language: Option<String>,
     pub authtype: i32,
+    pub auths_id: i32,
     pub is_active: bool,
     pub is_deleted: bool,
     pub begin_date: Option<DateTime<Utc>>,
     pub end_date: Option<DateTime<Utc>>,
     pub profiles_id: i32,
     pub entities_id: i32,
+    /// Display preferences; `None` means the configuration default.
+    pub names_format: Option<i32>,
+    pub is_ids_visible: Option<bool>,
 }
 
 impl User {
+    /// Account stored in the ITSM-NG database (not LDAP, mail or external).
+    pub fn is_local(&self) -> bool {
+        self.authtype == AUTH_TYPE_LOCAL && self.auths_id == 0
+    }
+
     /// Same check as legacy `Session::init`: the account is active, not in
     /// the trash, and inside its optional validity period.
     pub fn is_allowed_at(&self, now: DateTime<Utc>) -> bool {
@@ -37,7 +47,8 @@ impl User {
 }
 
 const COLUMNS: &str = "id, name, password, password_last_update, realname, firstname, language, \
-    authtype, is_active, is_deleted, begin_date, end_date, profiles_id, entities_id";
+    authtype, auths_id, is_active, is_deleted, begin_date, end_date, profiles_id, entities_id, \
+    names_format, is_ids_visible";
 
 /// Finds a local account (not LDAP, mail or external) by login.
 ///
@@ -64,6 +75,81 @@ pub async fn find_by_id(pool: &MySqlPool, id: i32) -> Result<Option<User>, sqlx:
         .await
 }
 
+/// Records a successful login (`last_login`, not part of the history).
+pub async fn record_login(pool: &MySqlPool, id: i32) -> Result<(), sqlx::Error> {
+    sqlx::query("UPDATE glpi_users SET last_login = NOW() WHERE id = ?")
+        .bind(id)
+        .execute(pool)
+        .await
+        .map(|_| ())
+}
+
+/// Replaces an obsolete hash of the same password. Not a password change:
+/// the expiration date and the modification date are kept.
+pub async fn upgrade_password_hash(
+    pool: &MySqlPool,
+    id: i32,
+    old_hash: &str,
+    new_hash: &str,
+) -> Result<(), sqlx::Error> {
+    sqlx::query("UPDATE glpi_users SET password = ? WHERE id = ? AND password = ?")
+        .bind(new_hash)
+        .bind(id)
+        .bind(old_hash)
+        .execute(pool)
+        .await
+        .map(|_| ())
+}
+
+/// Sets a new password, like `User::prepareInputForUpdate`: the
+/// expiration delay starts again. The password has no history entry.
+pub async fn change_password(pool: &MySqlPool, id: i32, new_hash: &str) -> Result<(), sqlx::Error> {
+    sqlx::query(
+        "UPDATE glpi_users SET password = ?, password_last_update = NOW(), date_mod = NOW() \
+         WHERE id = ?",
+    )
+    .bind(new_hash)
+    .bind(id)
+    .execute(pool)
+    .await
+    .map(|_| ())
+}
+
+/// Changes the preferred language (`None`: configuration default) and
+/// records it in the history. Returns `false` when nothing changed.
+pub async fn change_language(
+    pool: &MySqlPool,
+    id: i32,
+    language: Option<&str>,
+    actor: &str,
+) -> Result<bool, sqlx::Error> {
+    let mut tx = pool.begin().await?;
+    let current: Option<(Option<String>,)> =
+        sqlx::query_as("SELECT language FROM glpi_users WHERE id = ? FOR UPDATE")
+            .bind(id)
+            .fetch_optional(&mut *tx)
+            .await?;
+    let Some((current,)) = current else {
+        return Ok(false);
+    };
+    if current.as_deref() == language {
+        return Ok(false);
+    }
+    sqlx::query("UPDATE glpi_users SET language = ?, date_mod = NOW() WHERE id = ?")
+        .bind(language)
+        .bind(id)
+        .execute(&mut *tx)
+        .await?;
+    let change = Change::new(
+        history::user::LANGUAGE,
+        current.as_deref().unwrap_or_default(),
+        language.unwrap_or_default(),
+    );
+    crate::history::record(&mut tx, history::user::ITEMTYPE, id, actor, &change).await?;
+    tx.commit().await?;
+    Ok(true)
+}
+
 #[cfg(test)]
 mod tests {
     use chrono::TimeDelta;
@@ -80,12 +166,15 @@ mod tests {
             firstname: None,
             language: None,
             authtype: AUTH_TYPE_LOCAL,
+            auths_id: 0,
             is_active: true,
             is_deleted: false,
             begin_date: None,
             end_date: None,
             profiles_id: 0,
             entities_id: 0,
+            names_format: None,
+            is_ids_visible: None,
         }
     }
 

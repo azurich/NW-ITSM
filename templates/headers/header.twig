@@ -69,6 +69,14 @@
 							</a>
 						</li>
 						{% endif %}
+						{% if nw_bridge %}
+						<li id="nw_app_link" class="dropdown-item">
+							<a href="{{root_doc}}/front/nw_bridge.php" title="{{'New interface'|trans}}">
+								<i class="fas fa-rocket" aria-hidden="true"></i>
+								{{'New interface'|trans}}
+							</a>
+						</li>
+						{% endif %}
 						<li id="preferences_link" class="dropdown-item">
 							<a href="{{root_doc}}/front/preference.php" title="{{'My settings'|trans}} - {{username}}">
 								<i class="fas fa-user" aria-hidden="true"></i>

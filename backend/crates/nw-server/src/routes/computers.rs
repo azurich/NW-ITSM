@@ -10,7 +10,7 @@ use axum::{
 };
 use chrono::{DateTime, Utc};
 use nw_db::computers::{self, ListQuery, Sort};
-use nw_domain::{fk::fk, naming::user_display_name, rights::READ};
+use nw_domain::{fk::fk, rights::READ};
 use serde::{Deserialize, Serialize};
 use utoipa::{IntoParams, ToSchema};
 
@@ -209,7 +209,7 @@ pub async fn get_one(
     let row = computers::get(&state.pool, &session.scope, id)
         .await?
         .ok_or(ApiError::NotFound)?;
-    Ok(Json(row.into()))
+    Ok(Json(ComputerDetail::from_row(row, &session)))
 }
 
 impl From<SortField> for Sort {
@@ -248,14 +248,17 @@ impl From<computers::ListItem> for ComputerSummary {
     }
 }
 
-impl From<computers::Detail> for ComputerDetail {
-    fn from(row: computers::Detail) -> Self {
-        let user_name =
-            |login: Option<String>, realname: Option<String>, firstname: Option<String>| {
-                login.map(|login| {
-                    user_display_name(Some(&login), realname.as_deref(), firstname.as_deref())
-                })
-            };
+impl ComputerDetail {
+    fn from_row(row: computers::Detail, session: &Session) -> Self {
+        // `None` when the user row no longer exists.
+        let user_name = |id: i32,
+                         login: Option<String>,
+                         realname: Option<String>,
+                         firstname: Option<String>| {
+            login.map(|login| {
+                session.user_name(id, Some(&login), realname.as_deref(), firstname.as_deref())
+            })
+        };
         Self {
             id: row.id,
             name: row.name,
@@ -281,12 +284,22 @@ impl From<computers::Detail> for ComputerDetail {
             state: Ref::optional(row.states_id, row.state),
             user: Ref::optional(
                 row.users_id,
-                user_name(row.user_name, row.user_realname, row.user_firstname),
+                user_name(
+                    row.users_id,
+                    row.user_name,
+                    row.user_realname,
+                    row.user_firstname,
+                ),
             ),
             group: Ref::optional(row.groups_id, row.group),
             tech_user: Ref::optional(
                 row.users_id_tech,
-                user_name(row.tech_name, row.tech_realname, row.tech_firstname),
+                user_name(
+                    row.users_id_tech,
+                    row.tech_name,
+                    row.tech_realname,
+                    row.tech_firstname,
+                ),
             ),
             tech_group: Ref::optional(row.groups_id_tech, row.tech_group),
         }

@@ -14,6 +14,11 @@
 		reverse_proxy {$APP_UPSTREAM}
 	}
 	handle {
+		# The PHP built-in server ignores the .htaccess files: refuse what
+		# they protect (keys, configuration, uploaded files), and the
+		# sources that are not part of the classic interface.
+		@private path /config/* /files/* /install/mysql/* /locales/* /.git* /backend/* /frontend/* /dev/* /docs/* /tests/*
+		respond @private 404
 		reverse_proxy legacy:8000
 	}
 }

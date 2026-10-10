@@ -1,190 +1,13 @@
-//! API tests against a real MariaDB/MySQL server.
-//!
-//! Each test creates its own database from `install/mysql/glpi-empty.sql`
-//! and `tests/fixtures/seed.sql`, then drops it. They need
-//! `NW_TEST_DATABASE_URL`, a server URL **without** database name whose
-//! user may create databases, e.g. `mysql://root@127.0.0.1:3306`.
-//! Without it the tests are skipped.
+//! API tests on a real database: login basics and computers.
 
-use std::time::Duration;
+mod common;
 
 use axum::{
-    Router,
-    body::{Body, to_bytes},
+    body::Body,
     http::{Request, StatusCode, header},
 };
-use nw_server::{config::Config, state::AppState};
 use serde_json::{Value, json};
 use tower::ServiceExt;
-
-const SCHEMA: &str = include_str!("../../../../install/mysql/glpi-empty.sql");
-const SEED: &str = include_str!("fixtures/seed.sql");
-const SECRET: &str = "test-secret-test-secret-test-secret";
-
-struct TestApp {
-    router: Router,
-    pool: nw_db::MySqlPool,
-    _database: TestDatabase,
-}
-
-/// Drops the database even when the test panics.
-struct TestDatabase {
-    server_url: String,
-    name: String,
-}
-
-impl Drop for TestDatabase {
-    fn drop(&mut self) {
-        let url = self.server_url.clone();
-        let name = self.name.clone();
-        // Drop cannot be async: use a dedicated runtime on another thread.
-        let _ = std::thread::spawn(move || {
-            tokio::runtime::Runtime::new().unwrap().block_on(async {
-                if let Ok(pool) = sqlx::MySqlPool::connect(&url).await {
-                    let _ = sqlx::query(&format!("DROP DATABASE IF EXISTS `{name}`"))
-                        .execute(&pool)
-                        .await;
-                }
-            });
-        })
-        .join();
-    }
-}
-
-async fn app() -> Option<TestApp> {
-    let Ok(server_url) = std::env::var("NW_TEST_DATABASE_URL") else {
-        eprintln!("skipped: NW_TEST_DATABASE_URL is not set");
-        return None;
-    };
-    let server_url = server_url.trim_end_matches('/').to_owned();
-    let name = format!("nw_test_{:08x}", rand::random::<u32>());
-
-    let server = sqlx::MySqlPool::connect(&server_url)
-        .await
-        .expect("database server reachable");
-    sqlx::query(&format!(
-        "CREATE DATABASE `{name}` CHARACTER SET utf8 COLLATE utf8_unicode_ci"
-    ))
-    .execute(&server)
-    .await
-    .expect("create test database");
-    server.close().await;
-    let database = TestDatabase {
-        server_url: server_url.clone(),
-        name: name.clone(),
-    };
-
-    let pool = nw_db::connect(&format!("{server_url}/{name}"), 5)
-        .await
-        .expect("connect");
-    sqlx::raw_sql(SCHEMA)
-        .execute(&pool)
-        .await
-        .expect("load schema");
-    sqlx::raw_sql(SEED)
-        .execute(&pool)
-        .await
-        .expect("load fixtures");
-
-    let config = Config {
-        database_url: String::new(),
-        database_max_connections: 5,
-        bind_address: ([127, 0, 0, 1], 0).into(),
-        session_secret: SECRET.as_bytes().to_vec(),
-        session_ttl: Duration::from_secs(3600),
-        cookie_secure: true,
-        static_dir: None,
-    };
-    let router = nw_server::router(AppState::new(pool.clone(), &config), &config);
-    Some(TestApp {
-        router,
-        pool,
-        _database: database,
-    })
-}
-
-struct Response {
-    status: StatusCode,
-    set_cookie: Option<String>,
-    body: Value,
-}
-
-impl TestApp {
-    async fn request(&self, request: Request<Body>) -> Response {
-        let response = self.router.clone().oneshot(request).await.unwrap();
-        let status = response.status();
-        let set_cookie = response
-            .headers()
-            .get(header::SET_COOKIE)
-            .map(|value| value.to_str().unwrap().to_owned());
-        let bytes = to_bytes(response.into_body(), usize::MAX).await.unwrap();
-        let body = if bytes.is_empty() {
-            Value::Null
-        } else {
-            serde_json::from_slice(&bytes)
-                .unwrap_or_else(|_| Value::String(String::from_utf8_lossy(&bytes).into()))
-        };
-        Response {
-            status,
-            set_cookie,
-            body,
-        }
-    }
-
-    async fn login_response(&self, login: &str, password: &str) -> Response {
-        self.request(
-            Request::post("/api/v2/auth/login")
-                .header(header::CONTENT_TYPE, "application/json")
-                .body(Body::from(
-                    json!({ "login": login, "password": password }).to_string(),
-                ))
-                .unwrap(),
-        )
-        .await
-    }
-
-    /// Logs in and returns the `nw_session=...` cookie pair.
-    async fn login(&self, login: &str) -> String {
-        let response = self.login_response(login, "secret").await;
-        assert_eq!(
-            response.status,
-            StatusCode::OK,
-            "login {login}: {}",
-            response.body
-        );
-        let cookie = response.set_cookie.expect("session cookie");
-        cookie.split(';').next().unwrap().to_owned()
-    }
-
-    async fn get(&self, uri: &str, cookie: Option<&str>) -> Response {
-        let mut request = Request::get(uri);
-        if let Some(cookie) = cookie {
-            request = request.header(header::COOKIE, cookie);
-        }
-        self.request(request.body(Body::empty()).unwrap()).await
-    }
-
-    /// Names of the computers listed by `uri` for a session.
-    async fn names(&self, uri: &str, cookie: &str) -> Vec<String> {
-        let response = self.get(uri, Some(cookie)).await;
-        assert_eq!(response.status, StatusCode::OK, "{uri}: {}", response.body);
-        response.body["items"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .map(|item| item["name"].as_str().unwrap().to_owned())
-            .collect()
-    }
-}
-
-macro_rules! test_app {
-    () => {
-        match app().await {
-            Some(app) => app,
-            None => return,
-        }
-    };
-}
 
 #[tokio::test]
 async fn health_reports_database() {
@@ -199,8 +22,7 @@ async fn login_sets_a_secure_http_only_cookie() {
     let app = test_app!();
     let response = app.login_response("admin", "secret").await;
     assert_eq!(response.status, StatusCode::OK, "{}", response.body);
-    let cookie = response.set_cookie.unwrap();
-    assert!(cookie.starts_with("nw_session="));
+    let cookie = response.set_cookie("nw_session").unwrap();
     assert!(cookie.contains("HttpOnly"));
     assert!(cookie.contains("Secure"));
     assert!(cookie.contains("SameSite=Lax"));
@@ -271,16 +93,14 @@ async fn inactive_accounts_and_unusable_profiles_cannot_log_in() {
 #[tokio::test]
 async fn password_expiration_policy_is_enforced() {
     let app = test_app!();
-    sqlx::raw_sql(
+    app.sql(
         "INSERT INTO glpi_configs (context, name, value) VALUES \
          ('core', 'password_expiration_delay', '30'), \
          ('core', 'password_expiration_lock_delay', '10');
          UPDATE glpi_users SET password_last_update = NOW() WHERE name = 'admin';
          UPDATE glpi_users SET password_last_update = NOW() - INTERVAL 35 DAY WHERE name = 'paris';",
     )
-    .execute(&app.pool)
-    .await
-    .unwrap();
+    .await;
 
     assert_eq!(
         app.login_response("admin", "secret").await.status,
@@ -310,10 +130,8 @@ async fn invalid_or_missing_session_is_unauthenticated() {
 async fn disabling_an_account_ends_its_sessions() {
     let app = test_app!();
     let cookie = app.login("admin").await;
-    sqlx::query("UPDATE glpi_users SET is_active = 0 WHERE name = 'admin'")
-        .execute(&app.pool)
-        .await
-        .unwrap();
+    app.sql("UPDATE glpi_users SET is_active = 0 WHERE name = 'admin'")
+        .await;
     let response = app.get("/api/v2/auth/session", Some(&cookie)).await;
     assert_eq!(response.status, StatusCode::UNAUTHORIZED);
 }
@@ -329,7 +147,7 @@ async fn logout_removes_the_cookie() {
         )
         .await;
     assert_eq!(response.status, StatusCode::NO_CONTENT);
-    let cookie = response.set_cookie.unwrap();
+    let cookie = response.set_cookie("nw_session").unwrap();
     assert!(cookie.starts_with("nw_session=;"), "{cookie}");
     assert!(cookie.contains("Max-Age=0"), "{cookie}");
 }
@@ -340,8 +158,7 @@ async fn computers_follow_the_entity_scope() {
 
     // Root, recursive: everything but the trash and templates.
     let admin = app.login("admin").await;
-    let mut names = app.names("/api/v2/computers?per_page=100", &admin).await;
-    names.sort();
+    let names = app.names("/api/v2/computers?per_page=100", &admin).await;
     assert_eq!(
         names,
         [
@@ -357,8 +174,7 @@ async fn computers_follow_the_entity_scope() {
     // Paris, recursive: Paris and Office A, plus root items shared with
     // sub-entities.
     let paris = app.login("paris").await;
-    let mut names = app.names("/api/v2/computers?per_page=100", &paris).await;
-    names.sort();
+    let names = app.names("/api/v2/computers?per_page=100", &paris).await;
     assert_eq!(
         names,
         ["100%_PC", "PC-PARIS-1", "PC-PARIS-A", "PC-ROOT-SHARED"]
@@ -366,8 +182,7 @@ async fn computers_follow_the_entity_scope() {
 
     // Lyon, not recursive.
     let lyon = app.login("lyon").await;
-    let mut names = app.names("/api/v2/computers?per_page=100", &lyon).await;
-    names.sort();
+    let names = app.names("/api/v2/computers?per_page=100", &lyon).await;
     assert_eq!(names, ["PC-LYON-1", "PC-ROOT-SHARED"]);
 }
 

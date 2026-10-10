@@ -40,17 +40,24 @@ Chaque lot suit la même « définition de terminé » :
 - écritures : mêmes effets de bord que le PHP (historique `glpi_logs`,
   notifications, règles).
 
-### Lot 1 — Socle transverse
+### Lot 1 — Socle transverse ✅
 
-- [ ] Connexion unique entre l'interface classique et la nouvelle
-      (jeton court signé émis par le PHP, échangé par le Rust)
-- [ ] Changement de profil et d'entité active
-- [ ] Authentification LDAP, puis OIDC, CAS et IMAP
-- [ ] Limitation des tentatives de connexion, journal des connexions (`glpi_events`)
-- [ ] Re-hachage bcrypt des anciens mots de passe à la connexion, changement de mot de passe
-- [ ] Écriture de l'historique (`glpi_logs`) au format du PHP
-- [ ] Préférences utilisateur, traductions (conversion des fichiers `.po`, Weblate)
-- [ ] Compatibilité avec les données chiffrées (`glpicrypt.key`, XChaCha20-Poly1305)
+- [x] Connexion unique entre l'interface classique et la nouvelle, dans les
+      deux sens ([ADR 0003](adr/0003-pont-de-connexion.md))
+- [x] Changement de profil et d'entités actives
+- [x] Limitation des tentatives de connexion, journal des connexions (`glpi_events`), `last_login`
+- [x] Re-hachage bcrypt des anciens mots de passe, changement de mot de passe
+      (y compris expiré) avec la politique de mots de passe ; fermeture des
+      autres sessions
+- [x] Écriture de l'historique (`glpi_logs`) au format du PHP, vérifiée contre une écriture PHP
+- [x] Préférences utilisateur : langue (les 57 langues de l'application), format des noms
+- [x] Compatibilité avec les données chiffrées (`glpicrypt.key`, XChaCha20-Poly1305) :
+      module prêt, branché au premier besoin (LDAP, SMTP)
+- Déplacé : authentification native LDAP, OIDC, CAS et IMAP. Ces comptes
+  utilisent déjà la nouvelle interface grâce au pont ; le portage natif
+  devient un préalable à l'arrêt du PHP (fin de la phase 1)
+- Déplacé : conversion des traductions `.po` vers la nouvelle interface, à
+  faire quand les écrans réutiliseront les textes de l'application
 
 ### Lot 2 — Parc
 
@@ -87,6 +94,7 @@ Chaque lot suit la même « définition de terminé » :
 
 ### Fin de la phase 1
 
+- [ ] Authentification native LDAP, OIDC, CAS et IMAP (aujourd'hui via le pont)
 - [ ] Arrêt de l'interface PHP
 - [ ] Modernisation du schéma : clés étrangères, `utf8mb4`, suppression des caches d'arbre
 

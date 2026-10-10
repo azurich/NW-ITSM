@@ -2,12 +2,15 @@
 //! application, running next to the legacy PHP application on the same
 //! database (see `docs/adr/0001-migration-progressive.md`).
 
+pub mod bridge;
+pub mod client;
 pub mod config;
 pub mod error;
 pub mod openapi;
 pub mod routes;
 pub mod session;
 pub mod state;
+pub mod throttle;
 
 use anyhow::Context;
 use axum::{
@@ -72,7 +75,8 @@ pub async fn run() -> anyhow::Result<()> {
         .await
         .with_context(|| format!("cannot listen on {}", config.bind_address))?;
     tracing::info!(address = %config.bind_address, "NW-ITSM API listening");
-    axum::serve(listener, router(state, &config))
+    let app = router(state, &config).into_make_service_with_connect_info::<std::net::SocketAddr>();
+    axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await
         .context("server error")

@@ -4,8 +4,11 @@
 //! and reproduces the semantics of the legacy ITSM-NG PHP code so both
 //! stacks can run side by side on the same database.
 
+pub mod crypto;
 pub mod entity;
 pub mod fk;
+pub mod history;
+pub mod languages;
 pub mod naming;
 pub mod password;
 pub mod rights;
