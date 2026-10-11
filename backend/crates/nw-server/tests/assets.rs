@@ -2746,3 +2746,197 @@ async fn software_like_php() {
         Some("0")
     );
 }
+
+#[tokio::test]
+async fn software_versions_like_php() {
+    let app = test_app!();
+    app.sql(
+        "INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES (4, 'software', 31), (1, 'software', 1); \
+         INSERT INTO glpi_operatingsystems (id, name) VALUES (3, 'Linux'); \
+         UPDATE glpi_states SET is_visible_softwareversion = 0 WHERE id = 1; \
+         INSERT INTO glpi_softwares (id, entities_id, is_recursive, name) VALUES (40, 1, 1, 'Editor'), (41, 2, 0, 'Lyon')",
+    )
+    .await;
+    let manager = app.login("manager").await;
+    let versions = "/api/v2/assets/softwares/40/versions";
+
+    // Added in the entity of the software, with its sharing; the software
+    // notes it, the version its creation, and the event is the software's.
+    let response = app
+        .post(
+            versions,
+            &manager,
+            Some(json!({ "name": "1.0", "comment": "first", "operating_system_id": 3, "state_id": 2 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    let version = response.body["id"].as_i64().unwrap() as i32;
+    assert_eq!(response.body["entity"]["id"], json!(1));
+    assert_eq!(response.body["is_recursive"], json!(true));
+    assert_eq!(response.body["operating_system"]["name"], json!("Linux"));
+    assert_eq!(response.body["state"]["name"], json!("Stock"));
+    let name = format!("Editor - 1.0 ({version})");
+    let subitem = |action: i32, old: &str, new: &str| {
+        (
+            0,
+            old.to_owned(),
+            new.to_owned(),
+            "SoftwareVersion".to_owned(),
+            action,
+            "manager (19)".to_owned(),
+        )
+    };
+    assert_eq!(
+        history(&app, "Software", 40).await,
+        [subitem(17, "", &name)]
+    );
+    assert_eq!(
+        history(&app, "SoftwareVersion", version).await,
+        [item_row(20)]
+    );
+    assert_eq!(
+        events(&app).await.pop().unwrap(),
+        (
+            40,
+            "software".into(),
+            "inventory".into(),
+            4,
+            format!("manager adds the version {version}")
+        )
+    );
+
+    // Changed: its own history for the fields having a search option,
+    // the raw values in the history of the software.
+    let response = app
+        .patch(
+            &format!("{versions}/{version}"),
+            &manager,
+            json!({ "name": "1.1", "operating_system_id": null, "state_id": 2 }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["operating_system"], Value::Null);
+    assert_eq!(
+        history(&app, "SoftwareVersion", version).await[1..],
+        [row(2, "1.0", "1.1"), row(4, "Linux (3)", "&nbsp; (0)")]
+    );
+    assert_eq!(
+        history(&app, "Software", 40).await[1..],
+        [subitem(18, "1.0", "1.1"), subitem(18, "3", "0")]
+    );
+    assert_eq!(
+        events(&app).await.pop().unwrap().4,
+        format!("manager updates the version {version}")
+    );
+    let response = app.get(versions, Some(&manager)).await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["can_edit"], json!(true));
+    assert_eq!(response.body["items"][0]["name"], json!("1.1"));
+
+    // The statuses offered for the versions; their fields are the
+    // software's only.
+    let response = app
+        .get(
+            "/api/v2/assets/softwares/choices/version_state?entity_id=1",
+            Some(&manager),
+        )
+        .await;
+    assert_eq!(
+        response.body,
+        json!({ "items": [{ "id": 2, "label": "Stock" }] })
+    );
+    let response = app
+        .get(
+            "/api/v2/assets/softwares/choices/version_operating_system?entity_id=1",
+            Some(&manager),
+        )
+        .await;
+    assert_eq!(
+        response.body,
+        json!({ "items": [{ "id": 3, "label": "Linux" }] })
+    );
+    let response = app
+        .get(
+            "/api/v2/assets/computers/choices/version_state?entity_id=1",
+            Some(&manager),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+
+    // Invalid values; unknown references.
+    let response = app
+        .post(versions, &manager, Some(json!({ "name": "x".repeat(256) })))
+        .await;
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+    let response = app
+        .post(
+            versions,
+            &manager,
+            Some(json!({ "operating_system_id": 99 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+
+    // The rights of the software: read only for the technician; another
+    // entity is not visible.
+    let paris = app.login("paris").await;
+    let response = app.get(versions, Some(&paris)).await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["can_edit"], json!(false));
+    let response = app.post(versions, &paris, Some(json!({}))).await;
+    assert_eq!(response.status, StatusCode::FORBIDDEN);
+    let response = app
+        .get("/api/v2/assets/softwares/41/versions", Some(&paris))
+        .await;
+    assert_eq!(response.status, StatusCode::NOT_FOUND);
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/softwares/41/versions/{version}"),
+            &manager,
+            json!({}),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::NOT_FOUND);
+
+    // Purge: licenses bought or used with it leave it to the classic
+    // interface; then its installations and its history go with it.
+    app.sql(&format!(
+        "INSERT INTO glpi_softwarelicenses (id, softwares_id, entities_id, name, softwareversions_id_buy) \
+         VALUES (5, 40, 1, 'L', {version}); \
+         INSERT INTO glpi_items_softwareversions (items_id, itemtype, softwareversions_id, entities_id) \
+         VALUES (105, 'Computer', {version}, 1)"
+    ))
+    .await;
+    let uri = format!("{versions}/{version}");
+    let response = app.send(Method::DELETE, &uri, Some(&manager), None).await;
+    assert_eq!(
+        response.error_code(),
+        "legacy_required",
+        "{}",
+        response.body
+    );
+    app.sql("DELETE FROM glpi_softwarelicenses").await;
+    let response = app.send(Method::DELETE, &uri, Some(&manager), None).await;
+    assert_eq!(response.status, StatusCode::NO_CONTENT, "{}", response.body);
+    assert_eq!(
+        count(
+            &app,
+            &format!(
+                "SELECT COUNT(*) FROM glpi_items_softwareversions WHERE softwareversions_id = {version}"
+            )
+        )
+        .await,
+        0
+    );
+    assert!(history(&app, "SoftwareVersion", version).await.is_empty());
+    assert_eq!(
+        history(&app, "Software", 40).await[3..],
+        [subitem(19, &format!("Editor - 1.1 ({version})"), "")]
+    );
+    assert_eq!(
+        events(&app).await.pop().unwrap().4,
+        format!("manager purges the version {version}")
+    );
+    let response = app.send(Method::DELETE, &uri, Some(&manager), None).await;
+    assert_eq!(response.status, StatusCode::NOT_FOUND);
+}

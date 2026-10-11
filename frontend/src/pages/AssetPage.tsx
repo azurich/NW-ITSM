@@ -6,6 +6,7 @@ import { ApiError } from '../api/client'
 import { ASSET_TYPES, assetQuery, purgeAsset, setTrashed, type AssetType } from '../api/assets'
 import { WriteError, useColumnLabel } from '../components/AssetForm'
 import { LegacyLink } from '../components/LegacyLink'
+import { SoftwareVersions } from '../components/SoftwareVersions'
 import { ErrorState, Loading } from '../components/States'
 import { hasField, type RefField, type TextField } from '../lib/assetForm'
 import { formatDateTime } from '../lib/format'
@@ -278,6 +279,10 @@ export function AssetPage() {
         <Section title={t('asset.fields.comment')}>
           <p className="col-span-2 whitespace-pre-wrap text-sm">{asset.comment}</p>
         </Section>
+      )}
+
+      {info.software && (
+        <SoftwareVersions softwareId={asset.id} entityId={asset.entity.id} editable={!asset.is_deleted} />
       )}
     </article>
   )

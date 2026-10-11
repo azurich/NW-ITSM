@@ -5,6 +5,7 @@ mod purge;
 pub mod racks;
 mod read;
 mod template;
+pub mod versions;
 mod write;
 
 pub use purge::{purge, purge_blockers};

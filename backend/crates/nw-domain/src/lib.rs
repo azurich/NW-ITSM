@@ -19,6 +19,7 @@ pub mod purge;
 pub mod rack;
 pub mod rights;
 pub mod rules;
+pub mod software;
 pub mod template;
 pub mod text;
 pub mod unicity;

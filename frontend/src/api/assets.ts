@@ -305,3 +305,42 @@ export async function createFromTemplate(kind: AssetType, id: number, fields: As
     }),
   )
 }
+
+export type SoftwareVersion = Schemas['Version']
+export type VersionFields = Schemas['VersionFields']
+
+/** Versions of a software, by name. */
+export const versionsQuery = (softwareId: number) =>
+  queryOptions({
+    queryKey: ['versions', softwareId],
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v2/assets/softwares/{id}/versions', { params: { path: { id: softwareId } } })),
+  })
+
+export async function createVersion(softwareId: number, fields: VersionFields): Promise<SoftwareVersion> {
+  return unwrap(
+    await api.POST('/api/v2/assets/softwares/{id}/versions', {
+      params: { path: { id: softwareId } },
+      body: fields,
+    }),
+  )
+}
+
+export async function updateVersion(softwareId: number, id: number, fields: VersionFields): Promise<SoftwareVersion> {
+  return unwrap(
+    await api.PATCH('/api/v2/assets/softwares/{id}/versions/{version_id}', {
+      params: { path: { id: softwareId, version_id: id } },
+      body: fields,
+    }),
+  )
+}
+
+/** Deletes a version for good, with its installations. */
+export async function purgeVersion(softwareId: number, id: number): Promise<void> {
+  const { response, error } = await api.DELETE('/api/v2/assets/softwares/{id}/versions/{version_id}', {
+    params: { path: { id: softwareId, version_id: id } },
+  })
+  if (!response.ok) {
+    throw toApiError(response.status, error)
+  }
+}

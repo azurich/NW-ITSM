@@ -594,7 +594,7 @@ async fn apply_changes(
 /// A value as `Log::constructHistory` writes it: raw for text, numbers and
 /// booleans, `"<name> (<id>)"` for dropdowns (users by login, trees by full
 /// name).
-async fn history_label(
+pub(crate) async fn history_label(
     conn: &mut MySqlConnection,
     kind: FieldKind,
     value: &Value,

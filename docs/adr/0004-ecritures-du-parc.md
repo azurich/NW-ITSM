@@ -517,6 +517,49 @@ formulaire PHP posté comme par un navigateur puis par l'API :
 
 Résultat : bases identiques, mêmes événements.
 
+### Logiciels : versions
+
+Deuxième étape : les versions d'un logiciel (`SoftwareVersion`, enfant du
+logiciel), sous `/assets/softwares/{id}/versions`.
+
+- **Droits** : ceux du logiciel (`CommonDBChild`) : lecture pour la liste,
+  modification du logiciel, dans une entité sélectionnée, pour ajouter,
+  modifier ou supprimer une version.
+- **Champs** du formulaire PHP : nom, statut (ceux visibles pour les
+  versions, `is_visible_softwareversion`), système d'exploitation,
+  commentaire. Une nouvelle version prend l'entité et le partage de son
+  logiciel ; le partage la suit ensuite (recopié à chaque modification du
+  logiciel). Le formulaire Twig d'ITSM-NG l'expose en case à cocher alors
+  que GLPI le déclare hérité : il n'est pas modifiable ici.
+- **Historique** comme le PHP, l'ordre des lignes compris :
+  - ajout : nom de la version dans l'historique du logiciel
+    (`HISTORY_ADD_SUBITEM`, « Logiciel - version (id) », dans la langue de
+    l'auteur ; « N/A » pour un nom vide), puis sa création ;
+  - modification : ses options (nom 2, système d'exploitation 4, statut
+    31, commentaire 16) dans son historique, et chaque valeur changée,
+    brute, dans celui du logiciel (`HISTORY_UPDATE_SUBITEM`) ;
+  - purge : son nom dans l'historique du logiciel
+    (`HISTORY_DELETE_SUBITEM`) ; son propre historique est effacé.
+- **Événements** du formulaire, sur le logiciel, avec l'id de la version :
+  « ajoute / met à jour / purge la version » (la mise à jour est notée
+  même sans changement, comme le formulaire).
+- **Purge** : ses installations sont supprimées sans historique
+  (`cleanDBonPurge`). Renvoyée vers l'interface classique
+  (`linked_data`) quand des licences sont achetées ou utilisées avec
+  elle : le PHP les modifie alors comme un formulaire, avec leur
+  historique, ce qui n'est pas porté.
+- La liste de choix du statut d'une version appliquait déjà sa condition
+  côté PHP grâce à la correction des listes des formulaires (ci-dessous).
+
+Vérification : sur des copies identiques de la base de référence, faites
+par le formulaire PHP de la version puis par l'API :
+- ajout (tous les champs ; vide, pour un logiciel partagé et sans nom) ;
+- modification (tous les champs ; aucun changement ; valeurs effacées) ;
+- purge avec installations et historique.
+
+Résultat : bases identiques, mêmes événements ; refus attendu quand une
+licence utilise la version.
+
 ### Correction côté PHP : conditions des listes des formulaires
 
 Les formulaires Twig d'ITSM-NG n'appliquaient aucune des conditions de
@@ -563,7 +606,7 @@ correction.
 | `business_rules` | Une règle métier utilise un critère ou une action de plugin, une condition textuelle sur « inventaire automatique » (libellé traduit), ou une expression régulière que les deux moteurs ne lisent pas pareil |
 | `field_unicity` | Un critère d'unicité porte sur un champ que le formulaire n'a pas, ou pourrait s'appliquer aux informations financières (créées, datées ou recopiées d'un gabarit) ou aux cartes SIM écrites en même temps |
 | `notifications` | Un doublon relève d'un critère qui envoie des notifications, et elles sont actives |
-| `linked_data` | Une purge toucherait des données liées dont la suppression n'est pas portée (ports réseau, composants, logiciels, tickets, place ou contenu d'une baie, d'un châssis, d'un PDU ou d'un cluster, cartouches, réservations en cours, impact, connexions avec nettoyage à la déconnexion), ou le gabarit d'une création a des liens dont la recopie n'est pas portée (système d'exploitation, composants, ports réseau, disques, logiciels, connexions, notes, base de connaissances, cartouches, éléments d'un châssis, prises d'un PDU) |
+| `linked_data` | Une purge toucherait des données liées dont la suppression n'est pas portée (ports réseau, composants, logiciels, licences d'une version, tickets, place ou contenu d'une baie, d'un châssis, d'un PDU ou d'un cluster, cartouches, réservations en cours, impact, connexions avec nettoyage à la déconnexion), ou le gabarit d'une création a des liens dont la recopie n'est pas portée (système d'exploitation, composants, ports réseau, disques, logiciels, connexions, notes, base de connaissances, cartouches, éléments d'un châssis, prises d'un PDU) |
 | `linked_items` | Partager l'élément changerait l'entité d'objets liés rangés dans une autre entité (données incohérentes : seule la recopie du partage est portée) |
 
 Une modification qui ne change rien, ou une mise à la corbeille d'un

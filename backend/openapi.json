@@ -91,6 +91,287 @@
         }
       }
     },
+    "/api/v2/assets/softwares/{id}/versions": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the versions of a software visible to the session, by name.",
+        "operationId": "list_versions",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Software id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Its versions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on the software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Adds a version to a software, in its entity and with its sharing. The\nsoftware notes it in its history.",
+        "operationId": "create_version",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Software id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right on the software, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/softwares/{id}/versions/{version_id}": {
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Deletes a version for good, with its installations (without history).\nLicenses bought or used with it leave it to the classic interface.",
+        "operationId": "purge_version",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Software id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "version_id",
+            "in": "path",
+            "description": "Version id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted for good"
+          },
+          "403": {
+            "description": "No update right on the software, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible software or version",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be done in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Changes a version: its history, and that of its software.",
+        "operationId": "update_version",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Software id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "version_id",
+            "in": "path",
+            "description": "Version id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right on the software, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible software or version",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/assets/{kind}": {
       "get": {
         "tags": [
@@ -2515,7 +2796,9 @@
           "power_supply",
           "room",
           "category",
-          "upgrade_from"
+          "upgrade_from",
+          "version_operating_system",
+          "version_state"
         ]
       },
       "ChoiceList": {
@@ -3518,6 +3801,121 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "Version": {
+        "type": "object",
+        "description": "A version of a software.",
+        "required": [
+          "id",
+          "entity",
+          "is_recursive",
+          "installations"
+        ],
+        "properties": {
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "entity": {
+            "$ref": "#/components/schemas/Ref",
+            "description": "The entity of its software."
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "installations": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Items it is installed on, outside the trash."
+          },
+          "is_recursive": {
+            "type": "boolean",
+            "description": "Follows the sharing of its software."
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "operating_system": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "state": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          }
+        }
+      },
+      "VersionFields": {
+        "type": "object",
+        "description": "Fields of a version. Absent fields are left unchanged (empty for a new\nversion); `null` clears a field.",
+        "properties": {
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "operating_system_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "state_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "A status offered for the versions (`is_visible_softwareversion`)."
+          }
+        }
+      },
+      "VersionList": {
+        "type": "object",
+        "description": "The versions of a software.",
+        "required": [
+          "items",
+          "can_edit"
+        ],
+        "properties": {
+          "can_edit": {
+            "type": "boolean",
+            "description": "The session may add, change and purge them (update right on the\nsoftware, in one of its entities)."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Version"
+            },
+            "description": "By name."
           }
         }
       }

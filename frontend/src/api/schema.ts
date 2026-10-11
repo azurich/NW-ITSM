@@ -24,6 +24,48 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/assets/softwares/{id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the versions of a software visible to the session, by name. */
+        get: operations["list_versions"];
+        put?: never;
+        /**
+         * Adds a version to a software, in its entity and with its sharing. The
+         *     software notes it in its history.
+         */
+        post: operations["create_version"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/assets/softwares/{id}/versions/{version_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Deletes a version for good, with its installations (without history).
+         *     Licenses bought or used with it leave it to the classic interface.
+         */
+        delete: operations["purge_version"];
+        options?: never;
+        head?: never;
+        /** Changes a version: its history, and that of its software. */
+        patch: operations["update_version"];
+        trace?: never;
+    };
     "/api/v2/assets/{kind}": {
         parameters: {
             query?: never;
@@ -669,7 +711,7 @@ export interface components {
          * @description A field of the asset forms offering a list of values.
          * @enum {string}
          */
-        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group" | "power_supply" | "room" | "category" | "upgrade_from";
+        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group" | "power_supply" | "room" | "category" | "upgrade_from" | "version_operating_system" | "version_state";
         ChoiceList: {
             /** @description At most 50 values, sorted by label. */
             items: components["schemas"]["Choice"][];
@@ -1050,6 +1092,49 @@ export interface components {
             name?: string | null;
             template_name?: string | null;
         };
+        /** @description A version of a software. */
+        Version: {
+            comment?: string | null;
+            /** @description The entity of its software. */
+            entity: components["schemas"]["Ref"];
+            /** Format: int32 */
+            id: number;
+            /**
+             * Format: int64
+             * @description Items it is installed on, outside the trash.
+             */
+            installations: number;
+            /** @description Follows the sharing of its software. */
+            is_recursive: boolean;
+            name?: string | null;
+            operating_system?: null | components["schemas"]["Ref"];
+            state?: null | components["schemas"]["Ref"];
+        };
+        /**
+         * @description Fields of a version. Absent fields are left unchanged (empty for a new
+         *     version); `null` clears a field.
+         */
+        VersionFields: {
+            comment?: string | null;
+            name?: string | null;
+            /** Format: int32 */
+            operating_system_id?: number | null;
+            /**
+             * Format: int32
+             * @description A status offered for the versions (`is_visible_softwareversion`).
+             */
+            state_id?: number | null;
+        };
+        /** @description The versions of a software. */
+        VersionList: {
+            /**
+             * @description The session may add, change and purge them (update right on the
+             *     software, in one of its entities).
+             */
+            can_edit: boolean;
+            /** @description By name. */
+            items: components["schemas"]["Version"][];
+        };
     };
     responses: never;
     parameters: never;
@@ -1110,6 +1195,216 @@ export interface operations {
                 };
             };
             /** @description Unknown or not visible room */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_versions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Software id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Its versions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VersionList"];
+                };
+            };
+            /** @description Not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No read right on the software */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible software */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    create_version: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Software id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionFields"];
+            };
+        };
+        responses: {
+            /** @description Added */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Version"];
+                };
+            };
+            /** @description Invalid fields */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No update right on the software, or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible software */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    purge_version: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Software id */
+                id: number;
+                /** @description Version id */
+                version_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deleted for good */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No update right on the software, or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible software or version */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Must be done in the classic interface (`legacy_required`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    update_version: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Software id */
+                id: number;
+                /** @description Version id */
+                version_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionFields"];
+            };
+        };
+        responses: {
+            /** @description Updated */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Version"];
+                };
+            };
+            /** @description Invalid fields */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No update right on the software, or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible software or version */
             404: {
                 headers: {
                     [name: string]: unknown;

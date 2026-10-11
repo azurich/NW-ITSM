@@ -9,6 +9,7 @@ mod guards;
 pub mod racks;
 pub mod templates;
 pub mod unicity;
+pub mod versions;
 
 use std::collections::{HashMap, HashSet, hash_map::Entry};
 
@@ -80,6 +81,14 @@ pub fn routes() -> Router<AppState> {
         .route("/assets/{kind}/choices/{field}", get(choices::choices))
         .route("/assets/{kind}/defaults", get(defaults::defaults))
         .route("/assets/racks/positions", get(racks::positions))
+        .route(
+            "/assets/softwares/{id}/versions",
+            get(versions::list).post(versions::create),
+        )
+        .route(
+            "/assets/softwares/{id}/versions/{version_id}",
+            axum::routing::patch(versions::update).delete(versions::purge),
+        )
 }
 
 /// Type of asset, in the paths.

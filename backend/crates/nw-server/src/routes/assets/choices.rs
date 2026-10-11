@@ -9,8 +9,9 @@ use axum::{
 };
 use nw_db::dropdowns::{self, Table, UserRight, Visibility};
 use nw_domain::{
-    asset::{AssetKind, FieldKind},
+    asset::{AssetKind, Field, FieldKind},
     rights::{CREATE, UPDATE},
+    software,
     text::from_stored,
 };
 use serde::{Deserialize, Serialize};
@@ -51,6 +52,10 @@ pub enum ChoiceField {
     Category,
     /// Software only: the software it is an upgrade of.
     UpgradeFrom,
+    /// Software only: operating system of a version.
+    VersionOperatingSystem,
+    /// Software only: status of a version.
+    VersionState,
 }
 
 impl ChoiceField {
@@ -72,7 +77,24 @@ impl ChoiceField {
             Self::Room => "dcrooms_id",
             Self::Category => "softwarecategories_id",
             Self::UpgradeFrom => "softwares_id",
+            Self::VersionOperatingSystem => "operatingsystems_id",
+            Self::VersionState => "states_id",
         })
+    }
+
+    /// The field, of the type or of the versions of a software.
+    fn field(self, kind: AssetKind) -> Option<Field> {
+        let column = self.column(kind)?;
+        match self {
+            Self::VersionOperatingSystem | Self::VersionState => {
+                if kind == AssetKind::Software {
+                    software::version_field(column)
+                } else {
+                    None
+                }
+            }
+            _ => kind.field(column),
+        }
     }
 }
 
@@ -132,8 +154,7 @@ pub async fn choices(
         return Err(ApiError::Forbidden);
     }
     let field_kind = field
-        .column(kind)
-        .and_then(|column| kind.field(column))
+        .field(kind)
         .ok_or_else(|| ApiError::BadRequest(format!("no such field for {}", kind.slug())))?
         .kind;
     let visibility = Visibility {
@@ -172,6 +193,7 @@ pub async fn choices(
         FieldKind::Dropdown { table, tree } => {
             let condition = match field {
                 ChoiceField::State => Some(format!("{} = 1", kind.state_visibility_column())),
+                ChoiceField::VersionState => Some("is_visible_softwareversion = 1".to_owned()),
                 ChoiceField::Group => Some("is_itemgroup = 1".to_owned()),
                 ChoiceField::TechGroup => Some("is_assign = 1".to_owned()),
                 // Not the trash nor the templates (`getDropdownValue`).

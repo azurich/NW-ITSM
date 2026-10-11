@@ -62,6 +62,9 @@ ar_SA.mo	Server room	Server rooms
 ar_SA.mo	Publisher	الناشر
 ar_SA.mo	Technician in charge of the software	Technician in charge of the software
 ar_SA.mo	Associable to a ticket	Associable to a ticket
+ar_SA.mo	%1$s adds the version %2$s	%1$s قام بإضافة الإصدار %2$s
+ar_SA.mo	%1$s updates the version %2$s	%1$s يقوم بتحديث النسخة %2$s
+ar_SA.mo	%1$s purges the version %2$s	%1$s قام بحذف الإصدار %2$s
 be_BY.mo	%1$s log in from IP %2$s	%1$s зайшоў у сістэму з IP %2$s
 be_BY.mo	Failed login for %1$s from IP %2$s	Няўдалы ўваход у сістэму для  %1$s з IP %2$s
 be_BY.mo	%1$s adds the item %2$s	%1$s дадае элемент %2$s
@@ -126,6 +129,9 @@ be_BY.mo	Server room	Server room
 be_BY.mo	Publisher	Publisher
 be_BY.mo	Technician in charge of the software	Technician in charge of the software
 be_BY.mo	Associable to a ticket	Associable to a ticket
+be_BY.mo	%1$s adds the version %2$s	%1$s дадаў ліцэнзію %2$s
+be_BY.mo	%1$s updates the version %2$s	%1$s змяніў версію %2$s
+be_BY.mo	%1$s purges the version %2$s	%1$s знішчыў версію %2$s
 bg_BG.mo	%1$s log in from IP %2$s	%1$s влиза от IP %2$s
 bg_BG.mo	Failed login for %1$s from IP %2$s	Неуспешен вход за %1$s от IP %2$s
 bg_BG.mo	%1$s adds the item %2$s	%1$s добави елемента %2$s
@@ -190,6 +196,9 @@ bg_BG.mo	Server room	Сървърна стая
 bg_BG.mo	Publisher	Издател
 bg_BG.mo	Technician in charge of the software	Изпълнител, отговорен за софтуера
 bg_BG.mo	Associable to a ticket	Свързан със заявка
+bg_BG.mo	%1$s adds the version %2$s	%1$s добави версията %2$s
+bg_BG.mo	%1$s updates the version %2$s	%1$s актуализира версията %2$s
+bg_BG.mo	%1$s purges the version %2$s	%1$s изчиства версията %2$s
 ca_ES.mo	%1$s log in from IP %2$s	%1$s ha entrat des de la IP %2$s
 ca_ES.mo	Failed login for %1$s from IP %2$s	Ha fallat l'inici de sessió per %1$s des de la IP %2$s
 ca_ES.mo	%1$s adds the item %2$s	%1$s afegeix l'element %2$s
@@ -254,6 +263,9 @@ ca_ES.mo	Server room	Sala de servidor
 ca_ES.mo	Publisher	Editor
 ca_ES.mo	Technician in charge of the software	Tècnic a càrrec del programari
 ca_ES.mo	Associable to a ticket	Associable a una incidència
+ca_ES.mo	%1$s adds the version %2$s	%1$s afegeix la versió %2$s
+ca_ES.mo	%1$s updates the version %2$s	%1$s actualitza la versió %2$s
+ca_ES.mo	%1$s purges the version %2$s	%1$s esborra la versió %2$s
 cs_CZ.mo	%1$s log in from IP %2$s	Uživatel %1$s se přihlásil z IP adresy %2$s
 cs_CZ.mo	Failed login for %1$s from IP %2$s	Neúspěšné přihlášení uživatele %1$s z IP adresy %2$s
 cs_CZ.mo	%1$s adds the item %2$s	%1$s přidal položku %2$s
@@ -318,6 +330,9 @@ cs_CZ.mo	Server room	Serverovna
 cs_CZ.mo	Publisher	Vydavatel
 cs_CZ.mo	Technician in charge of the software	Technik zodpovědný za software
 cs_CZ.mo	Associable to a ticket	Přidružitelné k požadavku
+cs_CZ.mo	%1$s adds the version %2$s	%1$s přidal verzi %2$s
+cs_CZ.mo	%1$s updates the version %2$s	%1$s změnil verzi %2$s
+cs_CZ.mo	%1$s purges the version %2$s	%1$s odstranil verzi %2$s
 da_DK.mo	%1$s log in from IP %2$s	%1$s log ind fra IP %2$s
 da_DK.mo	Failed login for %1$s from IP %2$s	Mislykket login for %1$s fra IP %2$s
 da_DK.mo	%1$s adds the item %2$s	%1$s tilføjer emnet %2$s
@@ -382,6 +397,9 @@ da_DK.mo	Server room	Server room
 da_DK.mo	Publisher	Udgiver
 da_DK.mo	Technician in charge of the software	Technician in charge of the software
 da_DK.mo	Associable to a ticket	Tilknyttet til en sag
+da_DK.mo	%1$s adds the version %2$s	%1$s tilføjer versionen %2$s
+da_DK.mo	%1$s updates the version %2$s	%1$s opdaterer versionen %2$s
+da_DK.mo	%1$s purges the version %2$s	%1$s rydder versionen %2$s
 de_DE.mo	%1$s log in from IP %2$s	%1$s loggt sich mit der IP %2$s ein
 de_DE.mo	Failed login for %1$s from IP %2$s	Anmeldung des Benutzers %1$s von IP %2$s fehlgeschlagen
 de_DE.mo	%1$s adds the item %2$s	%1$s fügt das Element %2$s hinzu
@@ -446,6 +464,9 @@ de_DE.mo	Server room	Serverraum
 de_DE.mo	Publisher	Hersteller
 de_DE.mo	Technician in charge of the software	Verantwortlicher Techniker der Software
 de_DE.mo	Associable to a ticket	Einem Ticket zuweisbar
+de_DE.mo	%1$s adds the version %2$s	%1$s fügt die Version %2$s hinzu
+de_DE.mo	%1$s updates the version %2$s	%1$s aktualisiert die Version %2$s
+de_DE.mo	%1$s purges the version %2$s	%1$s bereinigt die Version %2$s
 el_GR.mo	%1$s log in from IP %2$s	%1$s συνδέεται από την IP %2$s
 el_GR.mo	Failed login for %1$s from IP %2$s	Εσφαλμένη σύνδεση για %1$s από την IP %2$s
 el_GR.mo	%1$s adds the item %2$s	%1$s προσθέτει το στοιχείο %2$s
@@ -510,6 +531,9 @@ el_GR.mo	Server room	Server room
 el_GR.mo	Publisher	Εκδότης
 el_GR.mo	Technician in charge of the software	Technician in charge of the software
 el_GR.mo	Associable to a ticket	Συσχετιζόμενο με αίτημα
+el_GR.mo	%1$s adds the version %2$s	%1$s προσθέτει την έκδοση %2$s
+el_GR.mo	%1$s updates the version %2$s	%1$s ενημερώνει την έκδοση %2$s
+el_GR.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 en_GB.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 en_GB.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 en_GB.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -574,6 +598,9 @@ en_GB.mo	Server room	Server room
 en_GB.mo	Publisher	Publisher
 en_GB.mo	Technician in charge of the software	Technician in charge of the software
 en_GB.mo	Associable to a ticket	Associable to a ticket
+en_GB.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
+en_GB.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
+en_GB.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 en_US.mo	%1$s log in from IP %2$s	%1$s login from IP %2$s
 en_US.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 en_US.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -638,6 +665,9 @@ en_US.mo	Server room	Server room
 en_US.mo	Publisher	Publisher
 en_US.mo	Technician in charge of the software	Technician in charge of the software
 en_US.mo	Associable to a ticket	Associable to a Ticket
+en_US.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
+en_US.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
+en_US.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 eo.mo	%1$s log in from IP %2$s	%1$s вошел в систему с IP %2$s
 eo.mo	Failed login for %1$s from IP %2$s	Неудачная попытка входа пользователя %1$s с IP %2$s
 eo.mo	%1$s adds the item %2$s	%1$s aldonis objekto %2$s
@@ -702,6 +732,9 @@ eo.mo	Server room	Server room
 eo.mo	Publisher	Разработчик
 eo.mo	Technician in charge of the software	Специалист ответственный за программное обеспечение
 eo.mo	Associable to a ticket	Можно связать с заявкой
+eo.mo	%1$s adds the version %2$s	%1$s добавлено лицензий %2$s
+eo.mo	%1$s updates the version %2$s	%1$s обновлено версий %2$s
+eo.mo	%1$s purges the version %2$s	%1$s очищает версию %2$s
 es_419.mo	%1$s log in from IP %2$s	%1$s inicia sesión desde la IP %2$s
 es_419.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_419.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -766,6 +799,9 @@ es_419.mo	Server room	Cuarto de servidor
 es_419.mo	Publisher	Publicante
 es_419.mo	Technician in charge of the software	Técnico a cargo del software
 es_419.mo	Associable to a ticket	Asociable a un incidente
+es_419.mo	%1$s adds the version %2$s	%1$s agrega la versión %2$s
+es_419.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
+es_419.mo	%1$s purges the version %2$s	%1$s elimina la versión %2$s
 es_AR.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_AR.mo	Failed login for %1$s from IP %2$s	Login fallido de %1$s desde IP %2$s
 es_AR.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -830,6 +866,9 @@ es_AR.mo	Server room	Sala de servidor
 es_AR.mo	Publisher	Editor
 es_AR.mo	Technician in charge of the software	Técnico responsable del software
 es_AR.mo	Associable to a ticket	Asociable a un servicio
+es_AR.mo	%1$s adds the version %2$s	%1$s agrega la versión %2$s
+es_AR.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
+es_AR.mo	%1$s purges the version %2$s	%1$s purga la versión %2$s
 es_CL.mo	%1$s log in from IP %2$s	%1$s inicia sesión desde la IP %2$s
 es_CL.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_CL.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -894,6 +933,9 @@ es_CL.mo	Server room	Sala de Servidor
 es_CL.mo	Publisher	Publicante
 es_CL.mo	Technician in charge of the software	Technician in charge of the software
 es_CL.mo	Associable to a ticket	Asociable a un incidente
+es_CL.mo	%1$s adds the version %2$s	%1$s agrega la versión %2$s
+es_CL.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
+es_CL.mo	%1$s purges the version %2$s	%1$s elimina la versión %2$s
 es_CO.mo	%1$s log in from IP %2$s	%1$s inicio de sesión desde la IP %2$s
 es_CO.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_CO.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -958,6 +1000,9 @@ es_CO.mo	Server room	Sala de servidor
 es_CO.mo	Publisher	Editor
 es_CO.mo	Technician in charge of the software	Técnico a cargo del programa
 es_CO.mo	Associable to a ticket	Asociado a una caso
+es_CO.mo	%1$s adds the version %2$s	%1$s agregar la version %2$s
+es_CO.mo	%1$s updates the version %2$s	%1$s actualizar la version %2$s
+es_CO.mo	%1$s purges the version %2$s	%1$s limpiar la versión %2$s
 es_ES.mo	%1$s log in from IP %2$s	%1$s inició la sesión desde la IP %2$s
 es_ES.mo	Failed login for %1$s from IP %2$s	Fallo en el inicio de sesión de %1$s desde la IP %2$s
 es_ES.mo	%1$s adds the item %2$s	%1$s añade el elemento %2$s
@@ -1022,6 +1067,9 @@ es_ES.mo	Server room	Sala del servidor
 es_ES.mo	Publisher	Editor
 es_ES.mo	Technician in charge of the software	Técnico a cargo del software
 es_ES.mo	Associable to a ticket	Asociable a una petición
+es_ES.mo	%1$s adds the version %2$s	%1$s añade la versión %2$s
+es_ES.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
+es_ES.mo	%1$s purges the version %2$s	%1$s purga la versión %2$s
 es_MX.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_MX.mo	Failed login for %1$s from IP %2$s	Error de acceso para %1$s de la IP %2$s
 es_MX.mo	%1$s adds the item %2$s	%1$s añade un elemento %2$s
@@ -1086,6 +1134,9 @@ es_MX.mo	Server room	Sala de servidores
 es_MX.mo	Publisher	Editor
 es_MX.mo	Technician in charge of the software	Técnico responsable del software
 es_MX.mo	Associable to a ticket	Asociado a un ticket
+es_MX.mo	%1$s adds the version %2$s	%1$s agrega la versión %2$s
+es_MX.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
+es_MX.mo	%1$s purges the version %2$s	%1$s elimina la versión %2$s
 es_VE.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_VE.mo	Failed login for %1$s from IP %2$s	Login fallido de %1$s desde IP %2$s
 es_VE.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -1150,6 +1201,9 @@ es_VE.mo	Server room	Server room
 es_VE.mo	Publisher	Editor
 es_VE.mo	Technician in charge of the software	Technician in charge of the software
 es_VE.mo	Associable to a ticket	Asociable a un servicio
+es_VE.mo	%1$s adds the version %2$s	%1$s agrega la versión %2$s
+es_VE.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
+es_VE.mo	%1$s purges the version %2$s	%1$s purga la versión %2$s
 et_EE.mo	%1$s log in from IP %2$s	%1$s logis sisse aadresilt %2$s
 et_EE.mo	Failed login for %1$s from IP %2$s	Ebaõnnestunud sisselogimine kasutajalt %1$s IP-aadressilt %2$s
 et_EE.mo	%1$s adds the item %2$s	%1$s lisas asja %2$s
@@ -1214,6 +1268,9 @@ et_EE.mo	Server room	Serveriruum
 et_EE.mo	Publisher	Tootja
 et_EE.mo	Technician in charge of the software	Tarkvara eest vestutav tehnik
 et_EE.mo	Associable to a ticket	Teadetega seotav
+et_EE.mo	%1$s adds the version %2$s	%1$s lisas versiooni %2$s
+et_EE.mo	%1$s updates the version %2$s	%1$s uuendas versiooni %2$s
+et_EE.mo	%1$s purges the version %2$s	%1$s puhastas versiooni %2$s
 eu_ES.mo	%1$s log in from IP %2$s	%1$s %2$s IP helbidetik sesioa hasi du
 eu_ES.mo	Failed login for %1$s from IP %2$s	%1$s %2$s IP helbidetik sesioa hasteko arazoa
 eu_ES.mo	%1$s adds the item %2$s	%1$s-k %2$s elementua gehitzen du
@@ -1278,6 +1335,9 @@ eu_ES.mo	Server room	Server room
 eu_ES.mo	Publisher	Publikatzailea
 eu_ES.mo	Technician in charge of the software	Technician in charge of the software
 eu_ES.mo	Associable to a ticket	Intzindentziaren bati esleigarria
+eu_ES.mo	%1$s adds the version %2$s	%1$s-(e)k %2$s bertsioa gehitu du
+eu_ES.mo	%1$s updates the version %2$s	%1$s-(e)k %2$s bertsioa eguneratu du
+eu_ES.mo	%1$s purges the version %2$s	%1$s-(e)k %2$s bertsioa ezabatu du
 fa_IR.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 fa_IR.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 fa_IR.mo	%1$s adds the item %2$s	%1$s قلم به آيتم  %2$s شد.
@@ -1342,6 +1402,9 @@ fa_IR.mo	Server room	Server room
 fa_IR.mo	Publisher	ناشر
 fa_IR.mo	Technician in charge of the software	Technician in charge of the software
 fa_IR.mo	Associable to a ticket	منطبق به درخواست
+fa_IR.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
+fa_IR.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
+fa_IR.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 fi_FI.mo	%1$s log in from IP %2$s	%1$s kirjautuu IP-osoitteesta %2$s
 fi_FI.mo	Failed login for %1$s from IP %2$s	Epäonnistunut kirjautuminen käyttäjälle %1$s IP-osoitteesta %2$s
 fi_FI.mo	%1$s adds the item %2$s	%1$s lisää kohteen %2$s
@@ -1406,6 +1469,9 @@ fi_FI.mo	Server room	Palvelinhuone
 fi_FI.mo	Publisher	Ohjelmistojulkaisija
 fi_FI.mo	Technician in charge of the software	Technician in charge of the software
 fi_FI.mo	Associable to a ticket	Yhdistettävissä tikettiin
+fi_FI.mo	%1$s adds the version %2$s	%1$s lisää version %2$s
+fi_FI.mo	%1$s updates the version %2$s	%1$s päivittää version %2$s
+fi_FI.mo	%1$s purges the version %2$s	%1$s poistaa pysyvästi version %2$s
 fr_BE.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_BE.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_BE.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -1470,6 +1536,9 @@ fr_BE.mo	Server room	Server room
 fr_BE.mo	Publisher	Éditeur
 fr_BE.mo	Technician in charge of the software	Technicien chargé du logiciel
 fr_BE.mo	Associable to a ticket	Associable à un ticket
+fr_BE.mo	%1$s adds the version %2$s	%1$s ajoute la version %2$s
+fr_BE.mo	%1$s updates the version %2$s	%1$s met à jour la version %2$s
+fr_BE.mo	%1$s purges the version %2$s	%1$s purge la version %2$s 
 fr_CA.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_CA.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_CA.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -1534,6 +1603,9 @@ fr_CA.mo	Server room	Salle serveurs
 fr_CA.mo	Publisher	Éditeur
 fr_CA.mo	Technician in charge of the software	Technicien chargé du logiciel
 fr_CA.mo	Associable to a ticket	Associable à un ticket
+fr_CA.mo	%1$s adds the version %2$s	%1$s ajoute la version %2$s
+fr_CA.mo	%1$s updates the version %2$s	%1$s met à jour la version %2$s
+fr_CA.mo	%1$s purges the version %2$s	%1$s purge la version %2$s
 fr_FR.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_FR.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_FR.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -1598,6 +1670,9 @@ fr_FR.mo	Server room	Salle serveurs
 fr_FR.mo	Publisher	Éditeur
 fr_FR.mo	Technician in charge of the software	Technicien chargé du logiciel
 fr_FR.mo	Associable to a ticket	Associable à un ticket
+fr_FR.mo	%1$s adds the version %2$s	%1$s ajoute la version %2$s
+fr_FR.mo	%1$s updates the version %2$s	%1$s met à jour la version %2$s
+fr_FR.mo	%1$s purges the version %2$s	%1$s purge la version %2$s
 gl_ES.mo	%1$s log in from IP %2$s	%1$s logueouse dende a IP %2$s
 gl_ES.mo	Failed login for %1$s from IP %2$s	Erro en conexión %1$s dende IP %2$s
 gl_ES.mo	%1$s adds the item %2$s	%1$s engade o elemento %2$s
@@ -1662,6 +1737,9 @@ gl_ES.mo	Server room	Sala de servidores
 gl_ES.mo	Publisher	Editor
 gl_ES.mo	Technician in charge of the software	Technician in charge of the software
 gl_ES.mo	Associable to a ticket	Visible no CAU
+gl_ES.mo	%1$s adds the version %2$s	%1$s engadir a versión %2$s
+gl_ES.mo	%1$s updates the version %2$s	%1$s actualiza a versión %2$s
+gl_ES.mo	%1$s purges the version %2$s	%1$s purga a versión %2$s
 he_IL.mo	%1$s log in from IP %2$s	%1$sחיבור מכתובת IP %2$s
 he_IL.mo	Failed login for %1$s from IP %2$s	חיבור נכשל עבור %1$s מכתובת IP %2$s
 he_IL.mo	%1$s adds the item %2$s	%1$sהוסיף את הפריט %2$s
@@ -1726,6 +1804,9 @@ he_IL.mo	Server room	חדר שרתים
 he_IL.mo	Publisher	מפיץ
 he_IL.mo	Technician in charge of the software	Technician in charge of the software
 he_IL.mo	Associable to a ticket	להציג במסך מרכז התמיכה
+he_IL.mo	%1$s adds the version %2$s	%1$sהוסיף את גרסה %2$s
+he_IL.mo	%1$s updates the version %2$s	%1$sעדכן את הגרסה%2$s
+he_IL.mo	%1$s purges the version %2$s	%1$sמחק את הגרסה לצמיתות%2$s
 hi_IN.mo	%1$s log in from IP %2$s	IP %2$s से %1$s लॉग इन करें
 hi_IN.mo	Failed login for %1$s from IP %2$s	आईपी ​​%2$s से %1$s के लिए लॉगिन विफल
 hi_IN.mo	%1$s adds the item %2$s	1%1$sआइटम 2%2$sजोड़ता है
@@ -1790,6 +1871,9 @@ hi_IN.mo	Server room	सर्वर कमरे
 hi_IN.mo	Publisher	प्रकाशक
 hi_IN.mo	Technician in charge of the software	सॉफ्टवेयर के प्रभारी तकनीशियन
 hi_IN.mo	Associable to a ticket	टिकट के लिए एसोसिएशन
+hi_IN.mo	%1$s adds the version %2$s	%1$sसंस्करण जोड़ता है%2$s
+hi_IN.mo	%1$s updates the version %2$s	%1$sसंस्करण अद्यतन करता है%2$s
+hi_IN.mo	%1$s purges the version %2$s	%1$s%2$sसंस्करण परिष्कृत करता है
 hr_HR.mo	%1$s log in from IP %2$s	%1$s prijava s IP adrese %2$s
 hr_HR.mo	Failed login for %1$s from IP %2$s	Neusjela prijava za %1$s sa IP adrese %2$s
 hr_HR.mo	%1$s adds the item %2$s	%1$s dodaje predmet. %2$s
@@ -1854,6 +1938,9 @@ hr_HR.mo	Server room	Soba s poslužiteljem
 hr_HR.mo	Publisher	Izdavač
 hr_HR.mo	Technician in charge of the software	Tehničar zadužen za softver
 hr_HR.mo	Associable to a ticket	Povezivo s nalogom
+hr_HR.mo	%1$s adds the version %2$s	%1$s dodaje verziju %2$s
+hr_HR.mo	%1$s updates the version %2$s	%1$s aktualizira verziju %2$s
+hr_HR.mo	%1$s purges the version %2$s	%1$s briše verziju %2$s
 hu_HU.mo	%1$s log in from IP %2$s	%1$s bejelentkezett a következő IP-ről: %2$s
 hu_HU.mo	Failed login for %1$s from IP %2$s	Sikertelen bejelentkezés %1$s a %2$s IP-ről.
 hu_HU.mo	%1$s adds the item %2$s	%1$s hozzáadta a %2$s elemet
@@ -1918,6 +2005,9 @@ hu_HU.mo	Server room	Server room
 hu_HU.mo	Publisher	Kiadó
 hu_HU.mo	Technician in charge of the software	Szoftverért felelős technikus
 hu_HU.mo	Associable to a ticket	Látható a Helpdesk-ben
+hu_HU.mo	%1$s adds the version %2$s	%1$s hozzáadta a következő verziót: %2$s
+hu_HU.mo	%1$s updates the version %2$s	%1$s frissítette a következő verziót %2$s
+hu_HU.mo	%1$s purges the version %2$s	%1$s törölte a %2$s verziót
 id_ID.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 id_ID.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 id_ID.mo	%1$s adds the item %2$s	%1$s menambahkan item %2$s
@@ -1982,6 +2072,9 @@ id_ID.mo	Server room	Server room
 id_ID.mo	Publisher	Publisher
 id_ID.mo	Technician in charge of the software	Technician in charge of the software
 id_ID.mo	Associable to a ticket	Dapat dikaitkan ke tiket
+id_ID.mo	%1$s adds the version %2$s	%1$s menambahkan versi %2$s 
+id_ID.mo	%1$s updates the version %2$s	%1$s diperbarui versi %2$s 
+id_ID.mo	%1$s purges the version %2$s	%1$s pembersihan versi %2$s 
 is_IS.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 is_IS.mo	Failed login for %1$s from IP %2$s	Misheppnaðar innskráningar fyrir %1$s frá IP %2$s 
 is_IS.mo	%1$s adds the item %2$s	%1$s bætir við %2$s 
@@ -2046,6 +2139,9 @@ is_IS.mo	Server room	Server room
 is_IS.mo	Publisher	Útgefandi
 is_IS.mo	Technician in charge of the software	Technician in charge of the software
 is_IS.mo	Associable to a ticket	Associable to a ticket
+is_IS.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
+is_IS.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
+is_IS.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 it_IT.mo	%1$s log in from IP %2$s	Accesso di %1$s dall'IP %2$s
 it_IT.mo	Failed login for %1$s from IP %2$s	Accesso non riuscito per %1$s dall'IP %2$s
 it_IT.mo	%1$s adds the item %2$s	%1$s aggiunge l'elemento %2$s
@@ -2110,6 +2206,9 @@ it_IT.mo	Server room	Sala server
 it_IT.mo	Publisher	Editore
 it_IT.mo	Technician in charge of the software	Tecnico incaricato del software
 it_IT.mo	Associable to a ticket	Associabile a una chiamata
+it_IT.mo	%1$s adds the version %2$s	%1$s aggiunge la versione %2$s
+it_IT.mo	%1$s updates the version %2$s	%1$s aggiorna la versione %2$s
+it_IT.mo	%1$s purges the version %2$s	%1$s ha cancellato la versione %2$s
 ja_JP.mo	%1$s log in from IP %2$s	%1$s は IP: %2$s からログインしました
 ja_JP.mo	Failed login for %1$s from IP %2$s	%1$s は IP: %2$s からのログインに失敗しました
 ja_JP.mo	%1$s adds the item %2$s	%1$s がアイテム %2$s を追加
@@ -2174,6 +2273,9 @@ ja_JP.mo	Server room	サーバールーム
 ja_JP.mo	Publisher	発行者/出版社
 ja_JP.mo	Technician in charge of the software	ソフトウェア担当技術者
 ja_JP.mo	Associable to a ticket	チケットに関連付ける
+ja_JP.mo	%1$s adds the version %2$s	%1$s はバージョン %2$s を追加しました
+ja_JP.mo	%1$s updates the version %2$s	%1$s はバージョン %2$s を更新しました
+ja_JP.mo	%1$s purges the version %2$s	%1$s はバージョン %2$s を消去しました
 kn.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 kn.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 kn.mo	%1$s adds the item %2$s	%1$sಐಟಂ ಸೇರಿಸುತ್ತದೆ %2$s 
@@ -2238,6 +2340,9 @@ kn.mo	Server room	Server room
 kn.mo	Publisher	Publisher
 kn.mo	Technician in charge of the software	ಸಾಫ್ಟ್ವೇರ್ನ ಉಸ್ತುವಾರಿ ವಹಿಸುವ ತಂತ್ರಜ್ಞ
 kn.mo	Associable to a ticket	Associable to a ticket
+kn.mo	%1$s adds the version %2$s	%1$sಆವೃತ್ತಿ ಸೇರಿಸುತ್ತದೆ %2$s 
+kn.mo	%1$s updates the version %2$s	%1$sಆವೃತ್ತಿಯನ್ನು ನವೀಕರಿಸುತ್ತದೆ %2$s 
+kn.mo	%1$s purges the version %2$s	%1$sಆವೃತ್ತಿಯನ್ನು ಶುದ್ಧೀಕರಿಸುತ್ತದೆ %2$s 
 ko_KR.mo	%1$s log in from IP %2$s	IP %2$s에서 %1$s로 로그인
 ko_KR.mo	Failed login for %1$s from IP %2$s	IP %2$s에서 %1$s로 로그인 실패
 ko_KR.mo	%1$s adds the item %2$s	%1$s 는 %2$s 아이템을 추가합니다.
@@ -2302,6 +2407,9 @@ ko_KR.mo	Server room	서버실
 ko_KR.mo	Publisher	제작자
 ko_KR.mo	Technician in charge of the software	소프트웨어 담당 기술자
 ko_KR.mo	Associable to a ticket	표에 연결 가능
+ko_KR.mo	%1$s adds the version %2$s	%1$s 는 버전 %2$s을 추가합니다.
+ko_KR.mo	%1$s updates the version %2$s	%1$s 는 버전 %2$s을 갱신합니다.
+ko_KR.mo	%1$s purges the version %2$s	%1$s 는 버전 %2$s을 제거합니다.
 lt_LT.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 lt_LT.mo	Failed login for %1$s from IP %2$s	Nepavyko %1$s prisijungimas iš IP %2$s
 lt_LT.mo	%1$s adds the item %2$s	%1$s pridėjo elementą %2$s
@@ -2366,6 +2474,9 @@ lt_LT.mo	Server room	Server room
 lt_LT.mo	Publisher	Leidėjas
 lt_LT.mo	Technician in charge of the software	Technician in charge of the software
 lt_LT.mo	Associable to a ticket	Galima susieti su paraiška
+lt_LT.mo	%1$s adds the version %2$s	%1$s prideda versiją %2$s
+lt_LT.mo	%1$s updates the version %2$s	%1$s atnaujina versiją %2$s
+lt_LT.mo	%1$s purges the version %2$s	%1$s išvalo versiją %2$s
 lv_LV.mo	%1$s log in from IP %2$s	%1$s pieteicās no IP %2$s
 lv_LV.mo	Failed login for %1$s from IP %2$s	Neveiksmīgs meiģinājums pieteikties lietotājam %1$s no IP %2$s
 lv_LV.mo	%1$s adds the item %2$s	%1$s pievieno ierakstu %2$s
@@ -2430,6 +2541,9 @@ lv_LV.mo	Server room	Serveru telpas
 lv_LV.mo	Publisher	Ražotājs / Izdevējs
 lv_LV.mo	Technician in charge of the software	Tehniķis, kas atbild par programmatūru
 lv_LV.mo	Associable to a ticket	Piesaistāms pieteikumam
+lv_LV.mo	%1$s adds the version %2$s	%1$s pievieno versiju %2$s
+lv_LV.mo	%1$s updates the version %2$s	%1$s atjaunoja versiju %2$s
+lv_LV.mo	%1$s purges the version %2$s	%1$s tīra versiju %2$s
 mn_MN.mo	%1$s log in from IP %2$s	%1$sнь IP %2$s-ээр нэвтрэв
 mn_MN.mo	Failed login for %1$s from IP %2$s	%1$s-с IP %2$s-д нэвтрэх явц амжилтгүй боллоо
 mn_MN.mo	%1$s adds the item %2$s	%1$sтөхөөрөмжийг нэмэх%2$s
@@ -2494,6 +2608,9 @@ mn_MN.mo	Server room	Серверийн өрөө
 mn_MN.mo	Publisher	Хэвлэн нийтлэгч
 mn_MN.mo	Technician in charge of the software	Програм хангамж хариуцсан техникч
 mn_MN.mo	Associable to a ticket	Дуудлагатай холбоотой
+mn_MN.mo	%1$s adds the version %2$s	%1$s нь %2$s хувилбарыг нэмнэ
+mn_MN.mo	%1$s updates the version %2$s	%1$s нь %2$s хувилбарыг шинэчлэнэ
+mn_MN.mo	%1$s purges the version %2$s	%1$s нь %2$s хувилбарыг арилгана
 ms_MY.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 ms_MY.mo	Failed login for %1$s from IP %2$s	Gagal masuk bagi %1$s dari IP %2$s
 ms_MY.mo	%1$s adds the item %2$s	%1$s menambah kepada item %2$s
@@ -2558,6 +2675,9 @@ ms_MY.mo	Server room	Server room
 ms_MY.mo	Publisher	Publisher
 ms_MY.mo	Technician in charge of the software	Technician in charge of the software
 ms_MY.mo	Associable to a ticket	Associable to a ticket
+ms_MY.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
+ms_MY.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
+ms_MY.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 nb_NO.mo	%1$s log in from IP %2$s	%1$s innlogget fra IP %2$s
 nb_NO.mo	Failed login for %1$s from IP %2$s	Innlogging feilet for %1$s fra IP %2$s
 nb_NO.mo	%1$s adds the item %2$s	%1$s legger til elementet %2$s
@@ -2622,6 +2742,9 @@ nb_NO.mo	Server room	Server room
 nb_NO.mo	Publisher	Utgiver
 nb_NO.mo	Technician in charge of the software	Technician in charge of the software
 nb_NO.mo	Associable to a ticket	Kan knyttes til en sak
+nb_NO.mo	%1$s adds the version %2$s	%1$s legger til versjon %2$s
+nb_NO.mo	%1$s updates the version %2$s	%1$s oppdaterer versjon %2$s
+nb_NO.mo	%1$s purges the version %2$s	%1$s sletter versjonen permanent %2$s
 nl_BE.mo	%1$s log in from IP %2$s	%1$s log in van IP %2$s
 nl_BE.mo	Failed login for %1$s from IP %2$s	Mislukt login voor %1$s van IP %2$s
 nl_BE.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
@@ -2686,6 +2809,9 @@ nl_BE.mo	Server room	Server room
 nl_BE.mo	Publisher	Uitgever
 nl_BE.mo	Technician in charge of the software	Technicus die verantwoordelijk is voor de software
 nl_BE.mo	Associable to a ticket	Bruikbaar in incident-tickets
+nl_BE.mo	%1$s adds the version %2$s	%1$s voegt versie %2$s toe
+nl_BE.mo	%1$s updates the version %2$s	%1$s actualiseert versie %2$s
+nl_BE.mo	%1$s purges the version %2$s	%1$s verwijdert versie %2$s
 nl_NL.mo	%1$s log in from IP %2$s	%1$s log in van IP %2$s
 nl_NL.mo	Failed login for %1$s from IP %2$s	Mislukt login voor %1$s van IP %2$s
 nl_NL.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
@@ -2750,6 +2876,9 @@ nl_NL.mo	Server room	Server room
 nl_NL.mo	Publisher	Uitgever
 nl_NL.mo	Technician in charge of the software	Technicus die verantwoordelijk is voor de software
 nl_NL.mo	Associable to a ticket	Bruikbaar in incident-tickets
+nl_NL.mo	%1$s adds the version %2$s	%1$s voegt versie %2$s toe
+nl_NL.mo	%1$s updates the version %2$s	%1$s actualiseert versie %2$s
+nl_NL.mo	%1$s purges the version %2$s	%1$s verwijdert versie %2$s
 nn_NO.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 nn_NO.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 nn_NO.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -2814,6 +2943,9 @@ nn_NO.mo	Server room	Server room
 nn_NO.mo	Publisher	Publisher
 nn_NO.mo	Technician in charge of the software	Technician in charge of the software
 nn_NO.mo	Associable to a ticket	Associable to a ticket
+nn_NO.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
+nn_NO.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
+nn_NO.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 pl_PL.mo	%1$s log in from IP %2$s	%1$s zalogował się z IP %2$s
 pl_PL.mo	Failed login for %1$s from IP %2$s	Nieudane logowanie %1$s z IP %2$s
 pl_PL.mo	%1$s adds the item %2$s	%1$s dodał element %2$s
@@ -2878,6 +3010,9 @@ pl_PL.mo	Server room	Serwerownia
 pl_PL.mo	Publisher	Wydawca
 pl_PL.mo	Technician in charge of the software	Technik odpowiedzialny za oprogramowanie
 pl_PL.mo	Associable to a ticket	Możliwość połączenia ze zgłoszeniem
+pl_PL.mo	%1$s adds the version %2$s	%1$s dodał wersję %2$s
+pl_PL.mo	%1$s updates the version %2$s	%1$s zaktualizował wersję %2$s
+pl_PL.mo	%1$s purges the version %2$s	%1$s wyczyścił wersje %2$s
 pt_BR.mo	%1$s log in from IP %2$s	%1$s fez login no IP %2$s
 pt_BR.mo	Failed login for %1$s from IP %2$s	Login falhou para %1$s no IP %2$s
 pt_BR.mo	%1$s adds the item %2$s	%1$s adicionou o item %2$s
@@ -2942,6 +3077,9 @@ pt_BR.mo	Server room	Sala de servidor
 pt_BR.mo	Publisher	Publicador
 pt_BR.mo	Technician in charge of the software	Técnico responsável pelo software
 pt_BR.mo	Associable to a ticket	Associável a um chamado
+pt_BR.mo	%1$s adds the version %2$s	%1$s adicionou a versão %2$s
+pt_BR.mo	%1$s updates the version %2$s	%1$s atualizou a versão %2$s
+pt_BR.mo	%1$s purges the version %2$s	%1$s apagou a versão %2$s
 pt_PT.mo	%1$s log in from IP %2$s	%1$s ligou-se do IP %2$s
 pt_PT.mo	Failed login for %1$s from IP %2$s	Falhou login para %1$s do IP %2$s
 pt_PT.mo	%1$s adds the item %2$s	%1$s adiciona o item %2$s
@@ -3006,6 +3144,9 @@ pt_PT.mo	Server room	Sala de servidor
 pt_PT.mo	Publisher	Editor
 pt_PT.mo	Technician in charge of the software	Técnico responsável pelo software
 pt_PT.mo	Associable to a ticket	Associável a um ticket
+pt_PT.mo	%1$s adds the version %2$s	%1$s adiciona a versão %2$s
+pt_PT.mo	%1$s updates the version %2$s	%1$s atualiza a versão %2$s
+pt_PT.mo	%1$s purges the version %2$s	%1$s remove a versão %2$s
 ro_RO.mo	%1$s log in from IP %2$s	%1$s s-a conectat de la IP -ul  %2$s
 ro_RO.mo	Failed login for %1$s from IP %2$s	Conexiune eşuată pentru %1$s de la IP %2$s
 ro_RO.mo	%1$s adds the item %2$s	%1$sadaugă elementzl %2$s
@@ -3070,6 +3211,9 @@ ro_RO.mo	Server room	Server room
 ro_RO.mo	Publisher	Editor
 ro_RO.mo	Technician in charge of the software	Technician in charge of the software
 ro_RO.mo	Associable to a ticket	Asociabil la tichet
+ro_RO.mo	%1$s adds the version %2$s	%1$s adaugă versiunea %2$s
+ro_RO.mo	%1$s updates the version %2$s	%1$sactualizează versiunea %2$s
+ro_RO.mo	%1$s purges the version %2$s	%1$s elimină versiunea %2$s
 ru_RU.mo	%1$s log in from IP %2$s	%1$s вошел в систему с IP %2$s
 ru_RU.mo	Failed login for %1$s from IP %2$s	Неудачная попытка входа пользователя %1$s с IP %2$s
 ru_RU.mo	%1$s adds the item %2$s	%1$s добавил объект %2$s
@@ -3134,6 +3278,9 @@ ru_RU.mo	Server room	Серверная
 ru_RU.mo	Publisher	Разработчик
 ru_RU.mo	Technician in charge of the software	Специалист ответственный за программное обеспечение
 ru_RU.mo	Associable to a ticket	Можно связать с заявкой
+ru_RU.mo	%1$s adds the version %2$s	%1$s добавил версию %2$s
+ru_RU.mo	%1$s updates the version %2$s	%1$s обновил версию %2$s
+ru_RU.mo	%1$s purges the version %2$s	%1$s очистил версию %2$s
 sk_SK.mo	%1$s log in from IP %2$s	%1$s sa prihlásil z IP %2$s
 sk_SK.mo	Failed login for %1$s from IP %2$s	Neúspešné prihlásenie %1$s z IP %2$s
 sk_SK.mo	%1$s adds the item %2$s	%1$s pridal položku %2$s
@@ -3198,6 +3345,9 @@ sk_SK.mo	Server room	Serverovňa
 sk_SK.mo	Publisher	Výrobca
 sk_SK.mo	Technician in charge of the software	Technik zodpovedný za softvér
 sk_SK.mo	Associable to a ticket	Priraditeľné k požiadavke
+sk_SK.mo	%1$s adds the version %2$s	%1$s pridal verziu %2$s
+sk_SK.mo	%1$s updates the version %2$s	%1$s aktualizoval verziu %2$s
+sk_SK.mo	%1$s purges the version %2$s	%1$s vymazal verziu %2$s
 sl_SI.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 sl_SI.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 sl_SI.mo	%1$s adds the item %2$s	%1$s doda predmet %2$s
@@ -3262,6 +3412,9 @@ sl_SI.mo	Server room	Server room
 sl_SI.mo	Publisher	Publisher
 sl_SI.mo	Technician in charge of the software	Technician in charge of the software
 sl_SI.mo	Associable to a ticket	Vidno v Helpdesku
+sl_SI.mo	%1$s adds the version %2$s	%1$s doda različico %2$s
+sl_SI.mo	%1$s updates the version %2$s	%1$s posodobi različico %2$s
+sl_SI.mo	%1$s purges the version %2$s	%1$s  počisti različico %2$s
 sr_RS.mo	%1$s log in from IP %2$s	%1$s loguj se sa IP %2$s
 sr_RS.mo	Failed login for %1$s from IP %2$s	Neuspelo logovanje za %1$s sa IP %2$s
 sr_RS.mo	%1$s adds the item %2$s	%1$s dodavanje stavke %2$s
@@ -3326,6 +3479,9 @@ sr_RS.mo	Server room	Server room
 sr_RS.mo	Publisher	Izdavač
 sr_RS.mo	Technician in charge of the software	Technician in charge of the software
 sr_RS.mo	Associable to a ticket	Dodeljivo tiketu
+sr_RS.mo	%1$s adds the version %2$s	%1$s dodaje verziju %2$s
+sr_RS.mo	%1$s updates the version %2$s	%1$s ažurira verziju %2$s
+sr_RS.mo	%1$s purges the version %2$s	%1$s čisti verziju %2$s
 sv_SE.mo	%1$s log in from IP %2$s	%1$s är inloggad från ip %2$s
 sv_SE.mo	Failed login for %1$s from IP %2$s	%1$s misslyckades att logga in från IP %2$s
 sv_SE.mo	%1$s adds the item %2$s	%1$s lägger till objektet %2$s
@@ -3390,6 +3546,9 @@ sv_SE.mo	Server room	Server room
 sv_SE.mo	Publisher	Utgivare
 sv_SE.mo	Technician in charge of the software	Technician in charge of the software
 sv_SE.mo	Associable to a ticket	Kopplingsbar till ärenden
+sv_SE.mo	%1$s adds the version %2$s	%1$s lägger till version %2$s
+sv_SE.mo	%1$s updates the version %2$s	%1$s uppdaterar version %2$s
+sv_SE.mo	%1$s purges the version %2$s	%1$s rensar bort version %2$s
 ta.mo	%1$s log in from IP %2$s	IP %2$s இலிருந்து %1$s உள்நுழைக
 ta.mo	Failed login for %1$s from IP %2$s	ஐபி %2$s இலிருந்து %1$s க்கான உள்நுழைவு தோல்வியுற்றது
 ta.mo	%1$s adds the item %2$s	%1$s உருப்படி %2$s ஐ சேர்க்கிறது
@@ -3454,6 +3613,9 @@ ta.mo	Server room	சேவையக அறை
 ta.mo	Publisher	வெளியீட்டாளர்
 ta.mo	Technician in charge of the software	மென்பொருளின் பொறுப்பான தொழில்நுட்ப வல்லுநர்
 ta.mo	Associable to a ticket	ஒரு டிக்கெட்டுடன் தொடர்புடையது
+ta.mo	%1$s adds the version %2$s	%1$s பதிப்பை %2$s சேர்க்கிறது
+ta.mo	%1$s updates the version %2$s	%1$s பதிப்பு %2$s ஐ புதுப்பிக்கிறது
+ta.mo	%1$s purges the version %2$s	%1$s பதிப்பை %2$s ஐ சுத்தப்படுத்துகிறது
 th_TH.mo	%1$s log in from IP %2$s	%1$s เข้าสู่ระบบจาก IP %2$s
 th_TH.mo	Failed login for %1$s from IP %2$s	เข้าสู่ระบบไม่ผ่าน %1$s จาก IP %2$s
 th_TH.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -3518,6 +3680,9 @@ th_TH.mo	Server room	Server room
 th_TH.mo	Publisher	ผู้ผลิต
 th_TH.mo	Technician in charge of the software	ไอทีผู้รับผิดชอบซอฟต์แวร์
 th_TH.mo	Associable to a ticket	Associable to a ticket
+th_TH.mo	%1$s adds the version %2$s	%1$s เพิ่มรุ่น %2$s
+th_TH.mo	%1$s updates the version %2$s	%1$s อัพเดทรุ่น %2$s
+th_TH.mo	%1$s purges the version %2$s	%1$s ล้างข้อมูล รุ่นที่ %2$s
 tr_TR.mo	%1$s log in from IP %2$s	%1$s, %2$s IP adresinden oturum açtı
 tr_TR.mo	Failed login for %1$s from IP %2$s	%1$s, %2$s IP adresinden oturum açamadı
 tr_TR.mo	%1$s adds the item %2$s	%1$s %2$s ögesini ekledi
@@ -3582,6 +3747,9 @@ tr_TR.mo	Server room	Sunucu odası
 tr_TR.mo	Publisher	Yayınlayan
 tr_TR.mo	Technician in charge of the software	Yazılımdan sorumlu teknisyen
 tr_TR.mo	Associable to a ticket	Destek kaydı ile ilişkilendirilebilir
+tr_TR.mo	%1$s adds the version %2$s	%1$s, %2$s sürümünü ekledi
+tr_TR.mo	%1$s updates the version %2$s	%1$s, %2$s sürümünü güncelledi
+tr_TR.mo	%1$s purges the version %2$s	%1$s %2$s sürümünü sildi
 uk_UA.mo	%1$s log in from IP %2$s	%1$s зайшов з IP %2$s
 uk_UA.mo	Failed login for %1$s from IP %2$s	Невдала реєстрація %1$s з IP %2$s
 uk_UA.mo	%1$s adds the item %2$s	%1$s додав елемент %2$s
@@ -3646,6 +3814,9 @@ uk_UA.mo	Server room	Серверне приміщення
 uk_UA.mo	Publisher	Видавник
 uk_UA.mo	Technician in charge of the software	Інженер, відповідальний за програмне забезпечення
 uk_UA.mo	Associable to a ticket	Може пов’язуватись з Заявкою
+uk_UA.mo	%1$s adds the version %2$s	%1$s додав версію %2$s
+uk_UA.mo	%1$s updates the version %2$s	%1$s змінив версію %2$s
+uk_UA.mo	%1$s purges the version %2$s	%1$s знищив версію %2$s
 vi_VN.mo	%1$s log in from IP %2$s	%1$s đăng nhập từ IP %2$s
 vi_VN.mo	Failed login for %1$s from IP %2$s	Đăng nhập thất bại cho %1$s từ IP %2$s
 vi_VN.mo	%1$s adds the item %2$s	%1$s thêm mục %2$s
@@ -3710,6 +3881,9 @@ vi_VN.mo	Server room	Server room
 vi_VN.mo	Publisher	Người công bố
 vi_VN.mo	Technician in charge of the software	Technician in charge of the software
 vi_VN.mo	Associable to a ticket	Có thể liên kết đến một ticket
+vi_VN.mo	%1$s adds the version %2$s	%1$s thêm phiên bản %2$s
+vi_VN.mo	%1$s updates the version %2$s	%1$s cập nhật phiên bản %2$s
+vi_VN.mo	%1$s purges the version %2$s	%1$s loại bỏ phiên bản %2$s
 zh_CN.mo	%1$s log in from IP %2$s	%1$s 登陆来自 IP %2$s
 zh_CN.mo	Failed login for %1$s from IP %2$s	 %1$s 从 IP %2$s登陆失败
 zh_CN.mo	%1$s adds the item %2$s	%1$s 添加项目 %2$s
@@ -3774,6 +3948,9 @@ zh_CN.mo	Server room	服务器房间
 zh_CN.mo	Publisher	发布者
 zh_CN.mo	Technician in charge of the software	软件技术员 
 zh_CN.mo	Associable to a ticket	可关联到工单
+zh_CN.mo	%1$s adds the version %2$s	%1$s 新增版本 %2$s
+zh_CN.mo	%1$s updates the version %2$s	%1$s 更新版本 %2$s
+zh_CN.mo	%1$s purges the version %2$s	%1$s 清除版本 %2$s
 zh_HK.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 zh_HK.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 zh_HK.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -3838,6 +4015,9 @@ zh_HK.mo	Server room	Server room
 zh_HK.mo	Publisher	Publisher
 zh_HK.mo	Technician in charge of the software	Technician in charge of the software
 zh_HK.mo	Associable to a ticket	Associable to a ticket
+zh_HK.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
+zh_HK.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
+zh_HK.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 zh_TW.mo	%1$s log in from IP %2$s	%1$s 登錄從 IP %2$s
 zh_TW.mo	Failed login for %1$s from IP %2$s	從IP %2$s的%1$s 的登錄失敗
 zh_TW.mo	%1$s adds the item %2$s	%1$s 新增項目 %2$s
@@ -3902,3 +4082,6 @@ zh_TW.mo	Server room	Server room
 zh_TW.mo	Publisher	出版商
 zh_TW.mo	Technician in charge of the software	Technician in charge of the software
 zh_TW.mo	Associable to a ticket	可與待辦事項關聯的項目
+zh_TW.mo	%1$s adds the version %2$s	%1$s 新增版本 %2$s
+zh_TW.mo	%1$s updates the version %2$s	%1$s 更新版本 %2$s
+zh_TW.mo	%1$s purges the version %2$s	%1$s 清除版本 %2$s
