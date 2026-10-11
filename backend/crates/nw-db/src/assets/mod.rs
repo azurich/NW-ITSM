@@ -2,6 +2,7 @@
 //! and phones (`nw_domain::asset`).
 
 pub mod installations;
+pub mod licenses;
 mod purge;
 pub mod racks;
 mod read;
@@ -11,8 +12,8 @@ mod write;
 
 pub use purge::{purge, purge_blockers};
 pub use read::{
-    Detail, ListItem, ListQuery, Sort, Specific, TemplateSummary, get, list, list_templates,
-    row_texts, specific,
+    Detail, LicenseNames, ListItem, ListQuery, Sort, Specific, TemplateSummary, get, list,
+    list_templates, row_texts, specific,
 };
 pub use template::template_blockers;
 pub use write::{

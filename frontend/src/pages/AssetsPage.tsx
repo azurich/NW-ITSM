@@ -196,7 +196,7 @@ function Results({ kind, page, params, dimmed, onSort, onPage }: ResultsProps) {
                   }
                 >
                   <button type="button" onClick={() => onSort(column)} className="hover:text-slate-900 dark:hover:text-white">
-                    {column === 'manufacturer' && ASSET_TYPES[kind].software
+                    {column === 'manufacturer' && (ASSET_TYPES[kind].software || ASSET_TYPES[kind].license)
                       ? t('assets.columns.publisher')
                       : t(`assets.columns.${column}`)}
                     {params.sort === column && (params.order === 'asc' ? ' ▲' : ' ▼')}

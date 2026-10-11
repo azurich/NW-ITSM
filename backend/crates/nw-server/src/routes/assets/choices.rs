@@ -56,8 +56,15 @@ pub enum ChoiceField {
     VersionOperatingSystem,
     /// Software only: status of a version.
     VersionState,
-    /// Types with software: a software to install.
+    /// Types with software: a software to install. Licenses: their
+    /// software.
     Software,
+    /// Licenses only: the parent license, of the same software
+    /// (`software_id`), not the license itself (`exclude_id`).
+    ParentLicense,
+    /// Licenses only: a version of their software (`software_id`), bought
+    /// or used.
+    LicenseVersion,
 }
 
 impl ChoiceField {
@@ -82,6 +89,8 @@ impl ChoiceField {
             Self::VersionOperatingSystem => "operatingsystems_id",
             Self::VersionState => "states_id",
             Self::Software => "softwares_id",
+            Self::ParentLicense => "softwarelicenses_id",
+            Self::LicenseVersion => "softwareversions_id_use",
         })
     }
 
@@ -92,6 +101,14 @@ impl ChoiceField {
             Self::VersionOperatingSystem | Self::VersionState => {
                 if kind == AssetKind::Software {
                     software::version_field(column)
+                } else {
+                    None
+                }
+            }
+            Self::Software if kind == AssetKind::SoftwareLicense => kind.field(column),
+            Self::ParentLicense | Self::LicenseVersion => {
+                if kind == AssetKind::SoftwareLicense {
+                    kind.field(column)
                 } else {
                     None
                 }
@@ -116,6 +133,10 @@ pub struct ChoiceParams {
     pub entity_id: i32,
     /// Text searched in the names.
     pub search: Option<String>,
+    /// The software whose licenses or versions are offered (licenses).
+    pub software_id: Option<i32>,
+    /// A license not offered as parent: the one being edited.
+    pub exclude_id: Option<i32>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -160,7 +181,9 @@ pub async fn choices(
     // The software to install: those the session sees, from the software
     // tab of the asset.
     let allowed = match field {
-        ChoiceField::Software => session.rights.has(AssetKind::Software.right(), READ),
+        ChoiceField::Software if kind.has_software() => {
+            session.rights.has(AssetKind::Software.right(), READ)
+        }
         _ => session.rights.has(kind.right(), CREATE) || session.rights.has(kind.right(), UPDATE),
     };
     if !allowed {
@@ -217,6 +240,10 @@ pub async fn choices(
                 ChoiceField::UpgradeFrom | ChoiceField::Software => {
                     Some("is_deleted = 0 AND is_template = 0".to_owned())
                 }
+                ChoiceField::LicenseVersion => Some(format!(
+                    "softwares_id = {}",
+                    params.software_id.unwrap_or(0)
+                )),
                 _ => None,
             };
             let table = Table {
@@ -240,11 +267,41 @@ pub async fn choices(
             })
             .collect()
         }
+        // The licenses of the software, by full name, outside the trash
+        // and the templates, without the license itself.
+        FieldKind::Parent { table } => {
+            let condition = format!(
+                "softwares_id = {} AND id <> {} AND is_deleted = 0 AND is_template = 0",
+                params.software_id.unwrap_or(0),
+                params.exclude_id.unwrap_or(0)
+            );
+            let table = Table {
+                name: table,
+                tree: true,
+                entity_scoped: true,
+            };
+            dropdowns::search(
+                &state.pool,
+                table,
+                Some(&condition),
+                Some(&visibility),
+                search,
+                LIMIT,
+            )
+            .await?
+            .into_iter()
+            .map(|choice| Choice {
+                id: choice.id,
+                label: from_stored(&choice.label.unwrap_or_default()),
+            })
+            .collect()
+        }
         FieldKind::Text
         | FieldKind::Bool
         | FieldKind::Integer
         | FieldKind::Decimal
-        | FieldKind::Number => {
+        | FieldKind::Number
+        | FieldKind::Date => {
             return Err(ApiError::BadRequest("not a list field".to_owned()));
         }
     };
@@ -252,10 +309,11 @@ pub async fn choices(
 }
 
 /// Dropdown tables of the asset forms having an entity.
-const ENTITY_SCOPED: [&str; 5] = [
+const ENTITY_SCOPED: [&str; 6] = [
     "glpi_locations",
     "glpi_states",
     "glpi_groups",
     "glpi_dcrooms",
     "glpi_softwares",
+    "glpi_softwareversions",
 ];

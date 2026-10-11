@@ -36,6 +36,7 @@ use nw_domain::{
     rack,
     rights::{CREATE, DELETE, PURGE, READ, UPDATE},
     rules::Operation,
+    software::license_name,
     template::ClonedLink,
     text::{from_stored, to_stored},
 };
@@ -116,6 +117,7 @@ pub enum AssetType {
     PassiveDcEquipments,
     Clusters,
     Softwares,
+    SoftwareLicenses,
 }
 
 impl From<AssetType> for AssetKind {
@@ -133,6 +135,7 @@ impl From<AssetType> for AssetKind {
             AssetType::PassiveDcEquipments => Self::PassiveDcEquipment,
             AssetType::Clusters => Self::Cluster,
             AssetType::Softwares => Self::Software,
+            AssetType::SoftwareLicenses => Self::SoftwareLicense,
         }
     }
 }
@@ -152,6 +155,7 @@ impl From<AssetKind> for AssetType {
             AssetKind::PassiveDcEquipment => Self::PassiveDcEquipments,
             AssetKind::Cluster => Self::Clusters,
             AssetKind::Software => Self::Softwares,
+            AssetKind::SoftwareLicense => Self::SoftwareLicenses,
         }
     }
 }
@@ -197,6 +201,8 @@ pub struct ListParams {
     pub sort: Option<SortField>,
     #[param(inline)]
     pub order: Option<SortOrder>,
+    /// Licenses only: those of this software.
+    pub software_id: Option<i32>,
 }
 
 /// A related object: id and display name.
@@ -285,6 +291,9 @@ pub struct AssetDetail {
     /// Fields of the software, `null` for the other types.
     #[serde(flatten)]
     pub software: SoftwareDetail,
+    /// Fields of the licenses, `null` for the other types.
+    #[serde(flatten)]
+    pub license: LicenseDetail,
     /// In the trash.
     pub is_deleted: bool,
     /// Updated by an inventory tool.
@@ -401,6 +410,72 @@ impl SoftwareDetail {
             valid_licenses: specific.valid_licenses,
         }
     }
+}
+
+/// Fields of the licenses of a software.
+#[derive(Debug, Default, Serialize, ToSchema)]
+pub struct LicenseDetail {
+    pub software: Option<Ref>,
+    pub parent_license: Option<Ref>,
+    /// Name under its parent licenses (`completename`).
+    pub full_name: Option<String>,
+    /// Number of affectations it covers (`0` or more; the classic form
+    /// calls 0 unlimited, but its validity counts it as 0).
+    pub number: Option<i32>,
+    /// Its number covers its affectations (computed).
+    pub is_valid: Option<bool>,
+    /// More affectations than its number are allowed.
+    pub allow_overquota: Option<bool>,
+    /// Expiration date, `YYYY-MM-DD`.
+    pub expire: Option<String>,
+    pub version_use: Option<Ref>,
+    pub version_buy: Option<Ref>,
+}
+
+impl LicenseDetail {
+    fn read(specific: &assets::Specific) -> Self {
+        let Some(names) = &specific.license else {
+            return Self::default();
+        };
+        let id = |column: &str| specific.text(column).and_then(|value| value.parse().ok());
+        let reference = |column: &str, name: &Option<String>| {
+            id(column).and_then(|id| Ref::optional(id, name.clone()))
+        };
+        Self {
+            software: reference("softwares_id", &names.software),
+            parent_license: reference("softwarelicenses_id", &names.parent),
+            full_name: decode(names.completename.clone()),
+            number: id("number"),
+            is_valid: Some(names.is_valid),
+            allow_overquota: specific.flag("allow_overquota"),
+            expire: specific.text("expire"),
+            version_use: reference("softwareversions_id_use", &names.version_use),
+            version_buy: reference("softwareversions_id_buy", &names.version_buy),
+        }
+    }
+}
+
+/// Fields of the licenses in a creation or an update.
+#[derive(Debug, Default, Deserialize, ToSchema)]
+pub struct LicenseFields {
+    /// Its software, chosen at its creation (required then).
+    pub software_id: Option<i32>,
+    /// A license of the same software, not under this one.
+    #[serde(default, deserialize_with = "nullable_id")]
+    #[schema(value_type = Option<i32>)]
+    pub parent_license_id: Option<i32>,
+    pub number: Option<i32>,
+    pub allow_overquota: Option<bool>,
+    /// `YYYY-MM-DD`; `null` or empty for none.
+    #[serde(default, deserialize_with = "nullable_text")]
+    #[schema(value_type = Option<String>)]
+    pub expire: Option<String>,
+    #[serde(default, deserialize_with = "nullable_id")]
+    #[schema(value_type = Option<i32>)]
+    pub version_use_id: Option<i32>,
+    #[serde(default, deserialize_with = "nullable_id")]
+    #[schema(value_type = Option<i32>)]
+    pub version_buy_id: Option<i32>,
 }
 
 /// Fields of the software in a creation or an update.
@@ -649,6 +724,8 @@ pub struct AssetFields {
     pub datacenter: DatacenterFields,
     #[serde(flatten)]
     pub software: SoftwareFields,
+    #[serde(flatten)]
+    pub license: LicenseFields,
 }
 
 #[derive(Debug, Deserialize, ToSchema)]
@@ -713,6 +790,7 @@ pub async fn list(
         descending: matches!(params.order, Some(SortOrder::Desc)),
         limit: per_page,
         offset: (page - 1).saturating_mul(per_page),
+        software: params.software_id,
     };
     let (rows, total) = assets::list(&state.pool, kind, &session.scope, &query).await?;
 
@@ -868,8 +946,12 @@ async fn create_asset(
             _ => None,
         })
         .unwrap_or_default();
-    // `prepareInputForAdd` of a rack, before the rules and the unicity.
+    // `prepareInputForAdd` of a rack or a license, before the rules and
+    // the unicity.
     check_rack_position(state, kind, &values, None).await?;
+    if kind == AssetKind::SoftwareLicense {
+        license_input(state, &mut values, None).await?;
+    }
     if kind == AssetKind::Software {
         // A new software shows the setting of the classic interface.
         let posted = |column: &str| requested.iter().any(|(field, _)| field.column == column);
@@ -885,8 +967,8 @@ async fn create_asset(
         }
         software_input(state, kind, &mut values, true).await?;
     }
-    // Only the inventory assets have business rules.
-    if kind.is_inventory_asset() {
+    // Only the inventory assets and the licenses have business rules.
+    if kind.has_business_rules() {
         let rules = nw_db::rules::asset_rules(&state.pool).await?;
         let rule_values = business::run(
             &state.pool,
@@ -968,7 +1050,16 @@ async fn create_asset(
     )
     .await?
     .ok_or(ApiError::NotFound)?;
-    log_asset_event(state, session, kind, id, text::ADDS_ITEM, &[&posted_name]).await;
+    match kind {
+        AssetKind::SoftwareLicense => {
+            let software = values
+                .iter()
+                .find(|(field, _)| field.column == "softwares_id")
+                .map_or(0, |(_, value)| value.id());
+            log_license_event(state, session, software, text::ADDS_LICENSE, id).await;
+        }
+        _ => log_asset_event(state, session, kind, id, text::ADDS_ITEM, &[&posted_name]).await,
+    }
     let template = matches!(creation, Creation::Template);
     let mut created = detail(state, session, kind, id, template).await?;
     created.duplicates = notices;
@@ -1023,6 +1114,13 @@ async fn update_asset(
 ) -> ApiResult<AssetDetail> {
     let current = writable(state, session, kind, id, template).await?;
     check_references(state, &values).await?;
+    if kind == AssetKind::SoftwareLicense
+        && let Err(error) = license_input(state, &mut values, Some(id)).await
+    {
+        // A refused update still logs the event of the form.
+        log_updated(state, session, kind, &current).await;
+        return Err(error);
+    }
 
     // The legacy form posts the whole form: the stored values and the
     // changes. `prepareInputForUpdate` of a rack checks its place first; a
@@ -1030,7 +1128,7 @@ async fn update_asset(
     let mut form = current.values.clone();
     business::merge(&mut form, values.clone());
     if let Err(error) = check_rack_position(state, kind, &form, Some(id)).await {
-        log_asset_event(state, session, kind, id, text::UPDATES_ITEM, &[]).await;
+        log_updated(state, session, kind, &current).await;
         return Err(error);
     }
     // `prepareInputForUpdate` of a software: the form posts both fields.
@@ -1043,13 +1141,14 @@ async fn update_asset(
             .cloned();
         business::merge(&mut values, upgrade.into_iter().collect());
     }
-    // The rules see the whole form; only the inventory assets have some.
-    let rules = if kind.is_inventory_asset() {
+    // The rules see the whole form; only the inventory assets and the
+    // licenses have some.
+    let rules = if kind.has_business_rules() {
         nw_db::rules::asset_rules(&state.pool).await?
     } else {
         Vec::new()
     };
-    if kind.is_inventory_asset() {
+    if kind.has_business_rules() {
         let rule_values = business::run(
             &state.pool,
             session,
@@ -1153,7 +1252,7 @@ async fn update_asset(
             Err(error) => {
                 // The legacy form logs its event even when the update is
                 // refused.
-                log_asset_event(state, session, kind, id, text::UPDATES_ITEM, &[]).await;
+                log_updated(state, session, kind, &current).await;
                 return Err(error);
             }
         },
@@ -1176,7 +1275,7 @@ async fn update_asset(
     assets::update(&state.pool, kind, id, &values, &actor, effects)
         .await?
         .ok_or(ApiError::NotFound)?;
-    log_asset_event(state, session, kind, id, text::UPDATES_ITEM, &[]).await;
+    log_updated(state, session, kind, &current).await;
     let mut updated = detail(state, session, kind, id, template).await?;
     updated.duplicates = notices;
     Ok(updated)
@@ -1281,10 +1380,16 @@ async fn purge_asset(
         return Err(ApiError::Forbidden);
     }
     guards::check_purge(&state.pool, kind, id).await?;
-    if !assets::purge(&state.pool, kind, id).await? {
+    let actor = history::actor(session.user.id, &session.own_name());
+    if !assets::purge(&state.pool, kind, id, &actor).await? {
         return Err(ApiError::NotFound);
     }
-    log_asset_event(state, session, kind, id, text::PURGES_ITEM, &[]).await;
+    match license_software(kind, &current) {
+        Some(software) => {
+            log_license_event(state, session, software, text::PURGES_LICENSE, id).await;
+        }
+        None => log_asset_event(state, session, kind, id, text::PURGES_ITEM, &[]).await,
+    }
     Ok(())
 }
 
@@ -1301,17 +1406,33 @@ async fn set_trashed(
     if current.is_deleted != trashed {
         guards::check_trash(&state.pool).await?;
     }
+    // The trash of a license moves its children under its parent, with
+    // their history (`pre_deleteItem` of the trees).
+    if trashed
+        && kind == AssetKind::SoftwareLicense
+        && assets::licenses::has_children(&state.pool, id).await?
+    {
+        return Err(ApiError::LegacyRequired("linked_data"));
+    }
     let actor = history::actor(session.user.id, &session.own_name());
     let changed = assets::set_trashed(&state.pool, kind, id, trashed, &actor)
         .await?
         .ok_or(ApiError::NotFound)?;
     if changed {
-        let action = if trashed {
-            text::DELETES_ITEM
-        } else {
-            text::RESTORES_ITEM
-        };
-        log_asset_event(&state, &session, kind, id, action, &[]).await;
+        match license_software(kind, &current) {
+            // The restoration of a license is logged on it, as any item.
+            Some(software) if trashed => {
+                log_license_event(&state, &session, software, text::DELETES_LICENSE, id).await;
+            }
+            _ => {
+                let action = if trashed {
+                    text::DELETES_ITEM
+                } else {
+                    text::RESTORES_ITEM
+                };
+                log_asset_event(&state, &session, kind, id, action, &[]).await;
+            }
+        }
     }
     Ok(Json(detail(&state, &session, kind, id, false).await?))
 }
@@ -1420,8 +1541,36 @@ fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, 
         ),
         (
             "upgrade_from_id",
-            "softwares_id",
+            if kind == AssetKind::Software {
+                "softwares_id"
+            } else {
+                ""
+            },
             fields.software.upgrade_from_id,
+        ),
+        (
+            "software_id",
+            if kind == AssetKind::SoftwareLicense {
+                "softwares_id"
+            } else {
+                ""
+            },
+            fields.license.software_id,
+        ),
+        (
+            "parent_license_id",
+            "softwarelicenses_id",
+            fields.license.parent_license_id,
+        ),
+        (
+            "version_use_id",
+            "softwareversions_id_use",
+            fields.license.version_use_id,
+        ),
+        (
+            "version_buy_id",
+            "softwareversions_id_buy",
+            fields.license.version_buy_id,
         ),
     ];
     let field = |name: &str, column: &str| {
@@ -1460,6 +1609,11 @@ fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, 
             fields.software.is_helpdesk_visible,
         ),
         ("is_update", "is_update", fields.software.is_update),
+        (
+            "allow_overquota",
+            "allow_overquota",
+            fields.license.allow_overquota,
+        ),
     ];
     for (name, column, flag) in flags.into_iter().chain(fields.features.columns(kind)) {
         let Some(flag) = flag else { continue };
@@ -1516,6 +1670,23 @@ fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, 
     for (name, column, counter) in counters {
         let Some(counter) = counter else { continue };
         values.push((field(name, column)?, Value::Text(Some(counter.to_string()))));
+    }
+    if let Some(number) = fields.license.number {
+        values.push((
+            field("number", "number")?,
+            Value::Text(Some(number.to_string())),
+        ));
+    }
+    if let Some(expire) = &fields.license.expire {
+        if !expire.is_empty() && chrono::NaiveDate::parse_from_str(expire, "%Y-%m-%d").is_err() {
+            return Err(ApiError::BadRequest(
+                "expire: a date YYYY-MM-DD is required".to_owned(),
+            ));
+        }
+        values.push((
+            field("expire", "expire")?,
+            Value::Text(Some(expire.clone())),
+        ));
     }
     datacenter_values(kind, &fields.datacenter, &mut values)?;
     Ok(values)
@@ -1727,6 +1898,96 @@ async fn log_asset_event(
     .await;
 }
 
+/// Event of the update form, even when the update is refused or changes
+/// nothing.
+async fn log_updated(
+    state: &AppState,
+    session: &Session,
+    kind: AssetKind,
+    current: &assets::Current,
+) {
+    match license_software(kind, current) {
+        Some(software) => {
+            log_license_event(state, session, software, text::UPDATES_LICENSE, current.id).await;
+        }
+        None => log_asset_event(state, session, kind, current.id, text::UPDATES_ITEM, &[]).await,
+    }
+}
+
+/// `prepareInputForAdd` / `prepareInputForUpdate` of a license: a software
+/// chosen at its creation, a name without its leading and ending spaces
+/// (the trees), an empty expiration dropped at the creation (the column
+/// default), a parent that is neither the license nor under it.
+async fn license_input(
+    state: &AppState,
+    values: &mut Vec<(Field, Value)>,
+    license: Option<i32>,
+) -> ApiResult<()> {
+    for (field, value) in values.iter_mut() {
+        if let (true, Value::Text(Some(name))) = (field.column == "name", &mut *value) {
+            *name = license_name(name).to_owned();
+        }
+    }
+    let given = |values: &[(Field, Value)], column: &str| {
+        values
+            .iter()
+            .find(|(field, _)| field.column == column)
+            .map(|(_, value)| value.clone())
+    };
+    match license {
+        None => {
+            if given(values, "softwares_id").map_or(0, |value| value.id()) == 0 {
+                return Err(ApiError::BadRequest("software_id: required".to_owned()));
+            }
+            values.retain(|(field, value)| !(field.column == "expire" && value.raw().is_empty()));
+        }
+        Some(id) => {
+            if given(values, "softwares_id").is_some() {
+                return Err(ApiError::BadRequest(
+                    "software_id: chosen at the creation only".to_owned(),
+                ));
+            }
+            let parent = given(values, "softwarelicenses_id").map_or(0, |value| value.id());
+            if parent != 0
+                && assets::licenses::with_descendants(&state.pool, id)
+                    .await?
+                    .contains(&parent)
+            {
+                return Err(ApiError::BadRequest(
+                    "parent_license_id: the license itself or one under it".to_owned(),
+                ));
+            }
+        }
+    }
+    Ok(())
+}
+
+/// The software of a license, whose events the license forms log.
+fn license_software(kind: AssetKind, current: &assets::Current) -> Option<i32> {
+    (kind == AssetKind::SoftwareLicense)
+        .then(|| current.value("softwares_id").map(Value::id))
+        .flatten()
+}
+
+/// Event of the license form: on its software, with the id of the license.
+async fn log_license_event(
+    state: &AppState,
+    session: &Session,
+    software: i32,
+    action: Source,
+    license: i32,
+) {
+    log_asset_event(
+        state,
+        session,
+        AssetKind::SoftwareLicense,
+        software,
+        action,
+        &[&license.to_string()],
+    )
+    .await;
+}
+
 fn decode(text: Option<String>) -> Option<String> {
     text.map(|text| from_stored(&text))
 }
@@ -1827,6 +2088,7 @@ impl AssetDetail {
             features: Features::read(kind, specific),
             datacenter: DatacenterDetail::read(specific),
             software: SoftwareDetail::read(specific),
+            license: LicenseDetail::read(specific),
             is_deleted: row.is_deleted,
             is_dynamic: row.is_dynamic != 0,
             is_recursive: row.is_recursive,

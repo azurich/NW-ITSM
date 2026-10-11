@@ -48,9 +48,20 @@ export function withDefaults(search: AssetListSearch): AssetListParams {
 export interface AssetCreateSearch {
   /** Template to start from; `0` for none. */
   template?: number
+  /** A license of this software (from its page), and its name. */
+  software?: number
+  software_name?: string
 }
 
 export function parseAssetCreateSearch(raw: Record<string, unknown>): AssetCreateSearch {
   const template = Number(raw.template)
-  return { template: raw.template !== undefined && Number.isInteger(template) && template >= 0 ? template : undefined }
+  const software = Number(raw.software)
+  const search: AssetCreateSearch = {
+    template: raw.template !== undefined && Number.isInteger(template) && template >= 0 ? template : undefined,
+  }
+  if (raw.software !== undefined && Number.isInteger(software) && software > 0) {
+    search.software = software
+    search.software_name = typeof raw.software_name === 'string' ? raw.software_name : undefined
+  }
+  return search
 }

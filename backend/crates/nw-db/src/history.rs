@@ -23,7 +23,7 @@ pub async fn record(
     .bind(actor)
     .bind(entry.change.search_option)
     .bind(&entry.change.old)
-    .bind(&entry.change.new)
+    .bind((!entry.change.new_is_null).then_some(&entry.change.new))
     .execute(conn)
     .await
     .map(|_| ())

@@ -462,6 +462,16 @@
                 "desc"
               ]
             }
+          },
+          {
+            "name": "software_id",
+            "in": "query",
+            "description": "Licenses only: those of this software.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
           }
         ],
         "responses": {
@@ -621,6 +631,26 @@
             "required": false,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "software_id",
+            "in": "query",
+            "description": "The software whose licenses or versions are offered (licenses).",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "exclude_id",
+            "in": "query",
+            "description": "A license not offered as parent: the one being edited.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
             }
           }
         ],
@@ -2349,6 +2379,10 @@
             "description": "Fields of the software, `null` for the other types."
           },
           {
+            "$ref": "#/components/schemas/LicenseDetail",
+            "description": "Fields of the licenses, `null` for the other types."
+          },
+          {
             "type": "object",
             "required": [
               "kind",
@@ -2647,6 +2681,9 @@
           },
           {
             "$ref": "#/components/schemas/SoftwareFields"
+          },
+          {
+            "$ref": "#/components/schemas/LicenseFields"
           },
           {
             "type": "object",
@@ -2994,7 +3031,8 @@
           "pdus",
           "passive-dc-equipments",
           "clusters",
-          "softwares"
+          "softwares",
+          "software-licenses"
         ]
       },
       "BridgeToken": {
@@ -3046,7 +3084,9 @@
           "upgrade_from",
           "version_operating_system",
           "version_state",
-          "software"
+          "software",
+          "parent_license",
+          "license_version"
         ]
       },
       "ChoiceList": {
@@ -3631,6 +3671,144 @@
           "name": {
             "type": "string",
             "description": "Name in the language itself."
+          }
+        }
+      },
+      "LicenseDetail": {
+        "type": "object",
+        "description": "Fields of the licenses of a software.",
+        "properties": {
+          "allow_overquota": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "More affectations than its number are allowed."
+          },
+          "expire": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Expiration date, `YYYY-MM-DD`."
+          },
+          "full_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Name under its parent licenses (`completename`)."
+          },
+          "is_valid": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Its number covers its affectations (computed)."
+          },
+          "number": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Number of affectations it covers (`0` or more; the classic form\ncalls 0 unlimited, but its validity counts it as 0)."
+          },
+          "parent_license": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "software": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "version_buy": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "version_use": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          }
+        }
+      },
+      "LicenseFields": {
+        "type": "object",
+        "description": "Fields of the licenses in a creation or an update.",
+        "properties": {
+          "allow_overquota": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "expire": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`YYYY-MM-DD`; `null` or empty for none."
+          },
+          "number": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "parent_license_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "A license of the same software, not under this one."
+          },
+          "software_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Its software, chosen at its creation (required then)."
+          },
+          "version_buy_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "version_use_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
           }
         }
       },

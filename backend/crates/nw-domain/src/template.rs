@@ -44,8 +44,11 @@ impl AssetKind {
     pub fn template_blockers(self) -> Vec<Blocker> {
         let devices = DEVICE_ITEMS.iter().map(|(_, table)| Blocker::Item(table));
         match self {
-            // Not `Clonable`: nothing is cloned. No templates for clusters.
-            Self::Rack | Self::PassiveDcEquipment | Self::Cluster => return Vec::new(),
+            // Not `Clonable`, or no relation to clone (licenses): nothing is
+            // cloned. No templates for clusters.
+            Self::Rack | Self::PassiveDcEquipment | Self::Cluster | Self::SoftwareLicense => {
+                return Vec::new();
+            }
             Self::Enclosure => {
                 let mut blockers = vec![Blocker::Column("glpi_items_enclosures", "enclosures_id")];
                 blockers.extend(devices);
@@ -91,7 +94,8 @@ impl AssetKind {
             | Self::Pdu
             | Self::PassiveDcEquipment
             | Self::Cluster
-            | Self::Software => {
+            | Self::Software
+            | Self::SoftwareLicense => {
                 unreachable!("handled above")
             }
         }

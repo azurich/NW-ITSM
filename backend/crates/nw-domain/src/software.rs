@@ -73,9 +73,46 @@ pub fn version_history_name(
     history::name_id(name_id, Some(&sprintf(dash, &[software, version])), id)
 }
 
+/// Name of a license as stored: without its leading and ending spaces
+/// (`adaptTreeFieldsFromUpdateOrAdd`, PHP `trim`).
+pub fn license_name(name: &str) -> &str {
+    name.trim_matches([' ', '\t', '\n', '\r', '\0', '\x0B'])
+}
+
+/// Full name and level of a license under its parent (`completename` and
+/// `level` of the trees); `None` for a license without parent.
+pub fn license_tree(parent: Option<(&str, i32)>, name: &str) -> (String, i32) {
+    match parent {
+        Some((parent_name, parent_level)) => (format!("{parent_name} > {name}"), parent_level + 1),
+        None => (name.to_owned(), 1),
+    }
+}
+
+/// Whether a license is valid (`computeValidityIndicator`): not when it
+/// has a number (`-1` for none) below its affectations. A number of 0
+/// makes it invalid from the first affectation, whatever the form says.
+pub fn license_is_valid(number: i64, affectations: i64) -> bool {
+    !(number >= 0 && number < affectations)
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn licenses_form_a_tree_and_count_their_affectations() {
+        assert_eq!(license_name(" LIC\t"), "LIC");
+        assert_eq!(license_tree(None, "A"), ("A".to_owned(), 1));
+        assert_eq!(
+            license_tree(Some(("P > Q", 2)), "A"),
+            ("P > Q > A".to_owned(), 3)
+        );
+        assert!(license_is_valid(3, 3));
+        assert!(!license_is_valid(1, 2));
+        assert!(!license_is_valid(0, 1));
+        assert!(license_is_valid(0, 0));
+        assert!(license_is_valid(-1, 10));
+    }
 
     #[test]
     fn versions_are_named_like_php() {

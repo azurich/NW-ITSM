@@ -47,6 +47,10 @@ pub mod text {
     pub const UPDATES_VERSION: Source = Text("%1$s updates the version %2$s");
     pub const PURGES_VERSION: Source = Text("%1$s purges the version %2$s");
     pub const INSTALLS_SOFTWARE: Source = Text("%s installs software");
+    pub const ADDS_LICENSE: Source = Text("%1$s adds the license %2$s");
+    pub const UPDATES_LICENSE: Source = Text("%1$s updates the license %2$s");
+    pub const DELETES_LICENSE: Source = Text("%1$s deletes the license %2$s");
+    pub const PURGES_LICENSE: Source = Text("%1$s purges the license %2$s");
     pub const DUPLICATE_EVENT: Source =
         Text("%1$s trying to add an item that already exists: %2$s");
     pub const IMPOSSIBLE_RECORD: Source = Text("Impossible record for %s");
@@ -105,9 +109,15 @@ pub mod text {
     pub const PUBLISHER: Source = Text("Publisher");
     pub const TECH_SOFTWARE: Source = Text("Technician in charge of the software");
     pub const HELPDESK_VISIBLE: Source = Text("Associable to a ticket");
+    pub const TECH_LICENSE: Source = Text("Technician in charge of the license");
+    pub const SOFTWARE: Source = One("Software", "Software");
+    pub const QUANTITY: Source = Context("quantity", "Number");
+    pub const PURCHASE_VERSION: Source = Text("Purchase version");
+    pub const EXPIRATION: Source = Text("Expiration");
+    pub const ALLOW_OVERQUOTA: Source = Text("Allow Over-Quota");
 
     /// Every text, for the catalog.
-    pub const ALL: [Source; 68] = [
+    pub const ALL: [Source; 78] = [
         LOGIN,
         FAILED_LOGIN,
         ADDS_ITEM,
@@ -176,6 +186,16 @@ pub mod text {
         UPDATES_VERSION,
         PURGES_VERSION,
         INSTALLS_SOFTWARE,
+        ADDS_LICENSE,
+        UPDATES_LICENSE,
+        DELETES_LICENSE,
+        PURGES_LICENSE,
+        TECH_LICENSE,
+        SOFTWARE,
+        QUANTITY,
+        PURCHASE_VERSION,
+        EXPIRATION,
+        ALLOW_OVERQUOTA,
     ];
 }
 

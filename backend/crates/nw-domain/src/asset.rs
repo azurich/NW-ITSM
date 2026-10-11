@@ -1,8 +1,8 @@
 //! Assets of the inventory: computers, monitors, printers, network
-//! equipment, peripherals and phones, and the datacenter items (racks,
-//! enclosures, PDUs, passive equipment, clusters). They share most of their
-//! columns, so one description drives the reads, the writes and the history
-//! of all.
+//! equipment, peripherals and phones, the datacenter items (racks,
+//! enclosures, PDUs, passive equipment, clusters), the software and their
+//! licenses. They share most of their columns, so one description drives
+//! the reads, the writes and the history of all.
 
 use crate::php;
 
@@ -21,6 +21,7 @@ pub enum AssetKind {
     PassiveDcEquipment,
     Cluster,
     Software,
+    SoftwareLicense,
 }
 
 /// How a field is stored, which decides how it is validated and shown in
@@ -44,6 +45,13 @@ pub enum FieldKind {
     /// Decimal number (search option `decimal`): `floatval(cleanDecimal())`,
     /// compared as a number.
     Decimal,
+    /// Date (`YYYY-MM-DD`), NULL when empty.
+    Date,
+    /// Id of a row of the same table (the parent of a tree), `0` for none:
+    /// logged raw (`itemlink` to the item's own table).
+    Parent {
+        table: &'static str,
+    },
     /// Whole number of a column without search option: not filtered by the
     /// legacy code, an empty value is stored as `0` (the PHP connection
     /// runs without strict SQL mode). Compared as a number.
@@ -108,6 +116,14 @@ const fn integer(column: &'static str, search_option: i32) -> Field {
     }
 }
 
+const fn date(column: &'static str, search_option: i32) -> Field {
+    Field {
+        column,
+        search_option,
+        kind: FieldKind::Date,
+    }
+}
+
 const fn number(column: &'static str) -> Field {
     Field {
         column,
@@ -141,13 +157,14 @@ impl Field {
     pub fn form_default(&self) -> Option<Value> {
         Some(match self.kind {
             FieldKind::Text => Value::Text(Some(String::new())),
-            FieldKind::Dropdown { .. } | FieldKind::User => Value::Id(0),
+            FieldKind::Dropdown { .. } | FieldKind::User | FieldKind::Parent { .. } => Value::Id(0),
             FieldKind::Bool => Value::Bool(false),
             FieldKind::Integer => {
                 Value::Text(Some(if self.column == "ram" { "" } else { "0" }.to_owned()))
             }
             FieldKind::Number => Value::Text(Some(String::new())),
-            FieldKind::Decimal => return None,
+            // `prepareInputForAdd` of the licenses drops an empty date.
+            FieldKind::Decimal | FieldKind::Date => return None,
         })
     }
 
@@ -211,7 +228,7 @@ const NETWORK: Field = dropdown("networks_id", 32, "glpi_networks", false);
 const IS_GLOBAL: Field = flag("is_global", 82);
 
 impl AssetKind {
-    pub const ALL: [Self; 12] = [
+    pub const ALL: [Self; 13] = [
         Self::Computer,
         Self::Monitor,
         Self::Printer,
@@ -224,6 +241,7 @@ impl AssetKind {
         Self::PassiveDcEquipment,
         Self::Cluster,
         Self::Software,
+        Self::SoftwareLicense,
     ];
 
     /// One of the assets of the inventory (`$CFG_GLPI['asset_types']`):
@@ -239,6 +257,12 @@ impl AssetKind {
                 | Self::Peripheral
                 | Self::Phone
         )
+    }
+
+    /// Processed by the business rules of the assets
+    /// (`$CFG_GLPI['asset_types']`): the inventory assets and the licenses.
+    pub fn has_business_rules(self) -> bool {
+        self.is_inventory_asset() || self == Self::SoftwareLicense
     }
 
     /// Checked by the field unicity (`$CFG_GLPI['unicity_types']`).
@@ -281,6 +305,7 @@ impl AssetKind {
             Self::PassiveDcEquipment => "passive-dc-equipments",
             Self::Cluster => "clusters",
             Self::Software => "softwares",
+            Self::SoftwareLicense => "software-licenses",
         }
     }
 
@@ -303,6 +328,7 @@ impl AssetKind {
             Self::PassiveDcEquipment => "PassiveDCEquipment",
             Self::Cluster => "Cluster",
             Self::Software => "Software",
+            Self::SoftwareLicense => "SoftwareLicense",
         }
     }
 
@@ -326,6 +352,7 @@ impl AssetKind {
             Self::PassiveDcEquipment => "glpi_passivedcequipments",
             Self::Cluster => "glpi_clusters",
             Self::Software => "glpi_softwares",
+            Self::SoftwareLicense => "glpi_softwarelicenses",
         }
     }
 
@@ -341,6 +368,7 @@ impl AssetKind {
             Self::Rack | Self::Enclosure | Self::Pdu | Self::PassiveDcEquipment => "datacenter",
             Self::Cluster => "cluster",
             Self::Software => "software",
+            Self::SoftwareLicense => "license",
         }
     }
 
@@ -358,7 +386,8 @@ impl AssetKind {
             Self::Pdu => "pdus",
             Self::PassiveDcEquipment => "passivedcequipment",
             Self::Cluster => "cluster",
-            Self::Software => "software",
+            // The license forms log on their software.
+            Self::Software | Self::SoftwareLicense => "software",
         }
     }
 
@@ -376,6 +405,7 @@ impl AssetKind {
             Self::PassiveDcEquipment => "passivedcequipment",
             Self::Cluster => "cluster",
             Self::Software => "software",
+            Self::SoftwareLicense => "softwarelicense",
         }
     }
 
@@ -395,6 +425,7 @@ impl AssetKind {
                 ("passivedcequipmenttypes_id", "glpi_passivedcequipmenttypes")
             }
             Self::Cluster => ("clustertypes_id", "glpi_clustertypes"),
+            Self::SoftwareLicense => ("softwarelicensetypes_id", "glpi_softwarelicensetypes"),
         })
     }
 
@@ -415,7 +446,7 @@ impl AssetKind {
                 "passivedcequipmentmodels_id",
                 "glpi_passivedcequipmentmodels",
             ),
-            Self::Cluster | Self::Software => return None,
+            Self::Cluster | Self::Software | Self::SoftwareLicense => return None,
         })
     }
 
@@ -521,6 +552,14 @@ impl AssetKind {
                 "softwarecategories_id", "users_id_tech", "is_helpdesk_visible", "groups_id_tech",
                 "users_id", "groups_id", "comment", "is_update", "softwares_id",
             ],
+            // The software is chosen when it is created only.
+            Self::SoftwareLicense => &[
+                "is_recursive", "softwares_id", "name", "states_id", "softwarelicenses_id",
+                "locations_id", "softwarelicensetypes_id", "users_id_tech", "manufacturers_id",
+                "groups_id_tech", "serial", "users_id", "otherserial", "groups_id", "comment",
+                "softwareversions_id_use", "softwareversions_id_buy", "number", "allow_overquota",
+                "expire",
+            ],
         }
     }
 
@@ -532,6 +571,17 @@ impl AssetKind {
             Self::PassiveDcEquipment => &[
                 text("comment", NOT_LOGGED),
                 flag("is_recursive", NOT_LOGGED),
+            ],
+            Self::SoftwareLicense => &[
+                text("serial", 11),
+                text("otherserial", 162),
+                dropdown("manufacturers_id", NOT_LOGGED, "glpi_manufacturers", false),
+                dropdown(
+                    "softwarelicensetypes_id",
+                    5,
+                    "glpi_softwarelicensetypes",
+                    true,
+                ),
             ],
             Self::Cluster => &[
                 text("uuid", 5),
@@ -632,6 +682,23 @@ impl AssetKind {
                 flag("is_helpdesk_visible", 61),
                 flag("is_update", NOT_LOGGED),
                 dropdown("softwares_id", NOT_LOGGED, "glpi_softwares", false),
+            ],
+            // The parent license is logged raw (an item link to the same
+            // table), like its full name.
+            Self::SoftwareLicense => &[
+                dropdown("softwares_id", NOT_LOGGED, "glpi_softwares", false),
+                Field {
+                    column: "softwarelicenses_id",
+                    search_option: 13,
+                    kind: FieldKind::Parent {
+                        table: "glpi_softwarelicenses",
+                    },
+                },
+                dropdown("softwareversions_id_use", 7, "glpi_softwareversions", false),
+                dropdown("softwareversions_id_buy", 6, "glpi_softwareversions", false),
+                integer("number", 4),
+                flag("allow_overquota", 168),
+                date("expire", 8),
             ],
         };
         specific
@@ -767,13 +834,14 @@ impl AssetKind {
             }
             // Owned by `softwares_id` for the versions.
             Self::Software => &["glpi_reservationitems", "glpi_softwareversions"],
+            Self::SoftwareLicense => &[],
         }
     }
 
     /// Whether the infocom follows the entity and sharing of the item (in
     /// `$forward_entity_to`).
     pub fn forwards_to_infocom(self) -> bool {
-        self.is_inventory_asset() || self == Self::Software
+        self.is_inventory_asset() || matches!(self, Self::Software | Self::SoftwareLicense)
     }
 
     pub fn field(self, column: &str) -> Option<Field> {

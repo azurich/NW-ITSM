@@ -303,9 +303,10 @@ pub async fn create_item(
     Ok((StatusCode::CREATED, Json(created)))
 }
 
-/// A type having templates (not the clusters).
+/// A type having templates (not the clusters). The templates of the
+/// licenses stay in the classic interface.
 fn with_templates(kind: AssetKind) -> ApiResult<AssetKind> {
-    if kind.has_templates() {
+    if kind.has_templates() && kind != AssetKind::SoftwareLicense {
         Ok(kind)
     } else {
         Err(ApiError::NotFound)

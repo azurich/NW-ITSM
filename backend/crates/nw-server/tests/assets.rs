@@ -13,8 +13,8 @@ async fn history(
     id: i32,
 ) -> Vec<(i32, String, String, String, i32, String)> {
     sqlx::query_as(
-        "SELECT id_search_option, old_value, new_value, itemtype_link, linked_action, user_name \
-         FROM glpi_logs WHERE itemtype = ? AND items_id = ? ORDER BY id",
+        "SELECT id_search_option, old_value, IFNULL(new_value, 'NULL'), itemtype_link, \
+         linked_action, user_name FROM glpi_logs WHERE itemtype = ? AND items_id = ? ORDER BY id",
     )
     .bind(itemtype)
     .bind(id)
@@ -3135,4 +3135,222 @@ async fn software_installations_like_php() {
         .get("/api/v2/assets/computers/102/software", Some(&helpdesk))
         .await;
     assert_eq!(response.status, StatusCode::FORBIDDEN);
+}
+
+#[tokio::test]
+async fn software_licenses_like_php() {
+    let app = test_app!();
+    app.sql(
+        "INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES (4, 'software', 31), (4, 'license', 31); \
+         INSERT INTO glpi_softwares (id, entities_id, name) VALUES (40, 1, 'Editor'); \
+         INSERT INTO glpi_softwareversions (id, softwares_id, entities_id, name) VALUES (50, 40, 1, '1.0'), (51, 40, 1, '2.0'); \
+         INSERT INTO glpi_softwarelicenses (id, softwares_id, entities_id, name, completename, level, number) \
+         VALUES (60, 40, 1, 'Site', 'Site', 1, 5)",
+    )
+    .await;
+    let manager = app.login("manager").await;
+    let licenses = "/api/v2/assets/software-licenses";
+
+    // Created under a parent: its full name and level, the event of its
+    // software. The name loses its spaces; the software is required.
+    let response = app
+        .post(
+            licenses,
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "Seats" })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+    let response = app
+        .post(
+            licenses,
+            &manager,
+            Some(json!({
+                "entity_id": 1, "software_id": 40, "name": " Seats ", "parent_license_id": 60,
+                "number": 1, "expire": "2027-06-30", "version_use_id": 51, "allow_overquota": true
+            })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    let license = response.body["id"].as_i64().unwrap() as i32;
+    assert_eq!(response.body["name"], json!("Seats"));
+    assert_eq!(response.body["full_name"], json!("Site > Seats"));
+    assert_eq!(response.body["software"]["name"], json!("Editor"));
+    assert_eq!(response.body["version_use"]["name"], json!("2.0"));
+    assert_eq!(response.body["expire"], json!("2027-06-30"));
+    assert_eq!(response.body["is_valid"], json!(true));
+    assert_eq!(
+        column(
+            &app,
+            &format!("SELECT CAST(level AS CHAR) FROM glpi_softwarelicenses WHERE id = {license}")
+        )
+        .await
+        .as_deref(),
+        Some("2")
+    );
+    assert_eq!(
+        history(&app, "SoftwareLicense", license).await,
+        [item_row(20)]
+    );
+    assert_eq!(
+        events(&app).await.pop().unwrap(),
+        (
+            40,
+            "software".into(),
+            "inventory".into(),
+            4,
+            format!("manager adds the license {license}")
+        )
+    );
+
+    // Each update computes its validity from its affectations: invalid,
+    // the software too. A new parent: a new full name, after the fields.
+    app.sql(&format!(
+        "INSERT INTO glpi_items_softwarelicenses (items_id, itemtype, softwarelicenses_id) \
+         VALUES (102, 'Computer', {license}), (103, 'Computer', {license})"
+    ))
+    .await;
+    let response = app
+        .patch(
+            &format!("{licenses}/{license}"),
+            &manager,
+            json!({ "name": "Seats 2", "parent_license_id": null, "expire": null }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["is_valid"], json!(false));
+    assert_eq!(response.body["full_name"], json!("Seats 2"));
+    assert_eq!(
+        history(&app, "SoftwareLicense", license).await[1..],
+        [
+            row(1, "Seats", "Seats 2"),
+            row(13, "60", "0"),
+            row(8, "2027-06-30", "NULL"),
+            row(13, "Site &gt; Seats", "Seats 2"),
+            row(9, "1", "0"),
+        ]
+    );
+    assert_eq!(history(&app, "Software", 40).await, [row(63, "1", "0")]);
+    assert_eq!(
+        events(&app).await.pop().unwrap().4,
+        format!("manager updates the license {license}")
+    );
+    // Not under itself; its software is chosen at its creation.
+    let response = app
+        .patch(
+            &format!("{licenses}/60"),
+            &manager,
+            json!({ "parent_license_id": 60 }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+    let response = app
+        .patch(
+            &format!("{licenses}/{license}"),
+            &manager,
+            json!({ "software_id": 40 }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+
+    // The parents of the form: the licenses of the software, not itself.
+    let response = app
+        .get(
+            &format!(
+                "/api/v2/assets/software-licenses/choices/parent_license?entity_id=1&software_id=40&exclude_id={license}"
+            ),
+            Some(&manager),
+        )
+        .await;
+    assert_eq!(
+        response.body,
+        json!({ "items": [{ "id": 60, "label": "Site" }] })
+    );
+    let response = app
+        .get(
+            "/api/v2/assets/software-licenses/choices/license_version?entity_id=1&software_id=40",
+            Some(&manager),
+        )
+        .await;
+    assert_eq!(response.body["items"].as_array().unwrap().len(), 2);
+
+    // Trash: not with licenses under it; its restoration is logged on it.
+    app.sql(&format!(
+        "UPDATE glpi_softwarelicenses SET softwarelicenses_id = 60 WHERE id = {license}"
+    ))
+    .await;
+    let response = app
+        .post(&format!("{licenses}/60/trash"), &manager, None)
+        .await;
+    assert_eq!(
+        response.error_code(),
+        "legacy_required",
+        "{}",
+        response.body
+    );
+    let response = app
+        .post(&format!("{licenses}/{license}/trash"), &manager, None)
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(
+        events(&app).await.pop().unwrap().4,
+        format!("manager deletes the license {license}")
+    );
+    app.post(&format!("{licenses}/{license}/restore"), &manager, None)
+        .await;
+    assert_eq!(
+        events(&app).await.pop().unwrap(),
+        (
+            license,
+            "software".into(),
+            "inventory".into(),
+            4,
+            "manager restores an item".into()
+        )
+    );
+
+    // Purge: not with affectations; then the software is valid again.
+    app.post(&format!("{licenses}/{license}/trash"), &manager, None)
+        .await;
+    let uri = format!("{licenses}/{license}");
+    let response = app.send(Method::DELETE, &uri, Some(&manager), None).await;
+    assert_eq!(
+        response.error_code(),
+        "legacy_required",
+        "{}",
+        response.body
+    );
+    app.sql("DELETE FROM glpi_items_softwarelicenses").await;
+    let response = app.send(Method::DELETE, &uri, Some(&manager), None).await;
+    assert_eq!(response.status, StatusCode::NO_CONTENT, "{}", response.body);
+    assert_eq!(
+        history(&app, "Software", 40).await[1..],
+        [row(63, "0", "1")]
+    );
+    assert_eq!(
+        events(&app).await.pop().unwrap().4,
+        format!("manager purges the license {license}")
+    );
+
+    // The licenses of a software.
+    let response = app
+        .get(
+            "/api/v2/assets/software-licenses?software_id=40",
+            Some(&manager),
+        )
+        .await;
+    assert_eq!(response.body["total"], json!(1));
+    let response = app
+        .get(
+            "/api/v2/assets/software-licenses?software_id=41",
+            Some(&manager),
+        )
+        .await;
+    assert_eq!(response.body["total"], json!(0));
+
+    // Their templates stay in the classic interface.
+    let response = app
+        .get("/api/v2/assets/software-licenses/templates", Some(&manager))
+        .await;
+    assert_eq!(response.status, StatusCode::NOT_FOUND);
 }

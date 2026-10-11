@@ -558,7 +558,7 @@ export interface components {
              */
             is_helpdesk_visible?: boolean | null;
         };
-        AssetDetail: components["schemas"]["Features"] & components["schemas"]["DatacenterDetail"] & components["schemas"]["SoftwareDetail"] & {
+        AssetDetail: components["schemas"]["Features"] & components["schemas"]["DatacenterDetail"] & components["schemas"]["SoftwareDetail"] & components["schemas"]["LicenseDetail"] & {
             /** @description Peripherals and phones only. */
             brand?: string | null;
             comment?: string | null;
@@ -628,7 +628,7 @@ export interface components {
          * @description Fields of a creation or an update. Absent fields are left unchanged;
          *     `null` clears a field (empty text, no related object).
          */
-        AssetFields: components["schemas"]["Features"] & components["schemas"]["DatacenterFields"] & components["schemas"]["SoftwareFields"] & {
+        AssetFields: components["schemas"]["Features"] & components["schemas"]["DatacenterFields"] & components["schemas"]["SoftwareFields"] & components["schemas"]["LicenseFields"] & {
             /** @description Peripherals and phones only. */
             brand?: string | null;
             comment?: string | null;
@@ -737,7 +737,7 @@ export interface components {
          * @description Type of asset, in the paths.
          * @enum {string}
          */
-        AssetType: "computers" | "monitors" | "printers" | "network-equipments" | "peripherals" | "phones" | "racks" | "enclosures" | "pdus" | "passive-dc-equipments" | "clusters" | "softwares";
+        AssetType: "computers" | "monitors" | "printers" | "network-equipments" | "peripherals" | "phones" | "racks" | "enclosures" | "pdus" | "passive-dc-equipments" | "clusters" | "softwares" | "software-licenses";
         BridgeToken: {
             /**
              * @description To pass to `front/nw_bridge.php?token=...` within one minute, from
@@ -754,7 +754,7 @@ export interface components {
          * @description A field of the asset forms offering a list of values.
          * @enum {string}
          */
-        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group" | "power_supply" | "room" | "category" | "upgrade_from" | "version_operating_system" | "version_state" | "software";
+        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group" | "power_supply" | "room" | "category" | "upgrade_from" | "version_operating_system" | "version_state" | "software" | "parent_license" | "license_version";
         ChoiceList: {
             /** @description At most 50 values, sorted by label. */
             items: components["schemas"]["Choice"][];
@@ -1005,6 +1005,49 @@ export interface components {
             code: string;
             /** @description Name in the language itself. */
             name: string;
+        };
+        /** @description Fields of the licenses of a software. */
+        LicenseDetail: {
+            /** @description More affectations than its number are allowed. */
+            allow_overquota?: boolean | null;
+            /** @description Expiration date, `YYYY-MM-DD`. */
+            expire?: string | null;
+            /** @description Name under its parent licenses (`completename`). */
+            full_name?: string | null;
+            /** @description Its number covers its affectations (computed). */
+            is_valid?: boolean | null;
+            /**
+             * Format: int32
+             * @description Number of affectations it covers (`0` or more; the classic form
+             *     calls 0 unlimited, but its validity counts it as 0).
+             */
+            number?: number | null;
+            parent_license?: null | components["schemas"]["Ref"];
+            software?: null | components["schemas"]["Ref"];
+            version_buy?: null | components["schemas"]["Ref"];
+            version_use?: null | components["schemas"]["Ref"];
+        };
+        /** @description Fields of the licenses in a creation or an update. */
+        LicenseFields: {
+            allow_overquota?: boolean | null;
+            /** @description `YYYY-MM-DD`; `null` or empty for none. */
+            expire?: string | null;
+            /** Format: int32 */
+            number?: number | null;
+            /**
+             * Format: int32
+             * @description A license of the same software, not under this one.
+             */
+            parent_license_id?: number | null;
+            /**
+             * Format: int32
+             * @description Its software, chosen at its creation (required then).
+             */
+            software_id?: number | null;
+            /** Format: int32 */
+            version_buy_id?: number | null;
+            /** Format: int32 */
+            version_use_id?: number | null;
         };
         LoginRequest: {
             login: string;
@@ -1512,6 +1555,8 @@ export interface operations {
                 trash?: boolean;
                 sort?: "name" | "serial" | "inventory_number" | "entity" | "location" | "type" | "manufacturer" | "state" | "updated_at";
                 order?: "asc" | "desc";
+                /** @description Licenses only: those of this software. */
+                software_id?: number;
             };
             header?: never;
             path: {
@@ -1621,6 +1666,10 @@ export interface operations {
                 entity_id: number;
                 /** @description Text searched in the names. */
                 search?: string;
+                /** @description The software whose licenses or versions are offered (licenses). */
+                software_id?: number;
+                /** @description A license not offered as parent: the one being edited. */
+                exclude_id?: number;
             };
             header?: never;
             path: {

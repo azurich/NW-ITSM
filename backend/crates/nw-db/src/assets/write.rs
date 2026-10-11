@@ -165,6 +165,15 @@ pub async fn create(
     let id = i32::try_from(result.last_insert_id())
         .map_err(|error| sqlx::Error::Decode(Box::new(error)))?;
 
+    if kind == AssetKind::SoftwareLicense {
+        // Its place in the tree (`prepareInputForAdd`), then the validity
+        // of its software (`post_addItem`), before its creation is logged.
+        super::licenses::place_in_tree(&mut tx, id).await?;
+        if let Some(software) = super::licenses::software_of(&mut tx, id).await? {
+            super::licenses::update_software_validity(&mut tx, software, actor).await?;
+        }
+    }
+
     let entry = Entry::item(kind.itemtype(), id, Action::CreateItem);
     crate::history::record(&mut tx, actor, &entry).await?;
 
@@ -234,6 +243,19 @@ pub async fn update(
         changed: apply_changes(&mut tx, kind, &current, values, actor).await?,
         ..UpdateOutcome::default()
     };
+    // A license: its place in the tree after a new name or parent, and its
+    // validity, computed by each update of its form.
+    let mut license_software = None;
+    if kind == AssetKind::SoftwareLicense {
+        if outcome
+            .changed
+            .iter()
+            .any(|column| matches!(*column, "name" | "softwarelicenses_id"))
+        {
+            super::licenses::replace_in_tree(&mut tx, id, actor).await?;
+        }
+        license_software = super::licenses::update_validity(&mut tx, id, actor).await?;
+    }
     after_update(
         &mut tx,
         kind,
@@ -244,6 +266,10 @@ pub async fn update(
         actor,
     )
     .await?;
+    // `post_updateItem` of a license whose validity changed.
+    if let Some(software) = license_software {
+        super::licenses::update_software_validity(&mut tx, software, actor).await?;
+    }
 
     if kind == AssetKind::Computer && !outcome.changed.is_empty() {
         let new_value = |column: &str| {
@@ -525,10 +551,14 @@ fn read_value(row: &MySqlRow, field: Field) -> Result<Value, sqlx::Error> {
         FieldKind::Text | FieldKind::Integer | FieldKind::Decimal | FieldKind::Number => {
             Value::Text(row.try_get(field.column)?)
         }
-        FieldKind::Dropdown { .. } | FieldKind::User => row
+        FieldKind::Dropdown { .. } | FieldKind::User | FieldKind::Parent { .. } => row
             .try_get::<Option<i32>, _>(field.column)?
             .map_or(Value::NoId, Value::Id),
         FieldKind::Bool => Value::Bool(row.try_get(field.column)?),
+        FieldKind::Date => Value::Text(
+            row.try_get::<Option<chrono::NaiveDate>, _>(field.column)?
+                .map(|date| date.format("%Y-%m-%d").to_string()),
+        ),
     })
 }
 
@@ -541,6 +571,10 @@ fn push_value(sql: &mut QueryBuilder<'_, MySql>, field: Field, value: &Value) {
                 && text.as_deref().unwrap_or_default().is_empty() =>
         {
             sql.push_bind(0)
+        }
+        // An empty date is NULL.
+        Value::Text(text) if field.kind == FieldKind::Date => {
+            sql.push_bind(text.clone().filter(|date| !date.is_empty()))
         }
         Value::Text(text) => sql.push_bind(text.clone()),
         Value::Id(id) => sql.push_bind(*id),
@@ -580,11 +614,16 @@ async fn apply_changes(
     sql.build().execute(&mut *conn).await?;
 
     for (field, new, old) in changes.iter().filter(|(field, _, _)| field.is_logged()) {
-        let change = Change::new(
-            field.search_option,
-            &history_label(conn, field.kind, old).await?,
-            &history_label(conn, field.kind, new).await?,
-        );
+        let old_label = history_label(conn, field.kind, old).await?;
+        let change = if field.kind == FieldKind::Date && new.raw().is_empty() {
+            Change::to_null(field.search_option, &old_label)
+        } else {
+            Change::new(
+                field.search_option,
+                &old_label,
+                &history_label(conn, field.kind, new).await?,
+            )
+        };
         let entry = Entry::field(kind.itemtype(), current.id, change);
         crate::history::record(conn, actor, &entry).await?;
     }
@@ -605,7 +644,9 @@ pub(crate) async fn history_label(
             | FieldKind::Bool
             | FieldKind::Integer
             | FieldKind::Decimal
-            | FieldKind::Number,
+            | FieldKind::Number
+            | FieldKind::Date
+            | FieldKind::Parent { .. },
             value,
         ) => {
             return Ok(value.raw());
@@ -625,7 +666,9 @@ pub(crate) async fn history_label(
             | FieldKind::Bool
             | FieldKind::Integer
             | FieldKind::Decimal
-            | FieldKind::Number => {
+            | FieldKind::Number
+            | FieldKind::Date
+            | FieldKind::Parent { .. } => {
                 unreachable!("handled above")
             }
         };
@@ -672,12 +715,13 @@ pub async fn references_exist(
     for (field, value) in values {
         let table = match field.kind {
             FieldKind::User => "glpi_users",
-            FieldKind::Dropdown { table, .. } => table,
+            FieldKind::Dropdown { table, .. } | FieldKind::Parent { table } => table,
             FieldKind::Text
             | FieldKind::Bool
             | FieldKind::Integer
             | FieldKind::Decimal
-            | FieldKind::Number => continue,
+            | FieldKind::Number
+            | FieldKind::Date => continue,
         };
         let id = value.id();
         if id == 0 {

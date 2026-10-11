@@ -66,6 +66,16 @@ ar_SA.mo	%1$s adds the version %2$s	%1$s قام بإضافة الإصدار %2$s
 ar_SA.mo	%1$s updates the version %2$s	%1$s يقوم بتحديث النسخة %2$s
 ar_SA.mo	%1$s purges the version %2$s	%1$s قام بحذف الإصدار %2$s
 ar_SA.mo	%s installs software	%s يقوم بتثبيت برنامج
+ar_SA.mo	%1$s adds the license %2$s	%1$s adds the license %2$s
+ar_SA.mo	%1$s updates the license %2$s	%1$s يقوم بتعديل الترخيص %2$s
+ar_SA.mo	%1$s deletes the license %2$s	%1$s deletes the license %2$s
+ar_SA.mo	%1$s purges the license %2$s	%1$s purges the license %2$s
+ar_SA.mo	Technician in charge of the license	Technician in charge of the license
+ar_SA.mo	Software	برنامج
+ar_SA.mo	Number	الرقم
+ar_SA.mo	Purchase version	Purchase version
+ar_SA.mo	Expiration	Expiration
+ar_SA.mo	Allow Over-Quota	Allow Over-Quota
 be_BY.mo	%1$s log in from IP %2$s	%1$s зайшоў у сістэму з IP %2$s
 be_BY.mo	Failed login for %1$s from IP %2$s	Няўдалы ўваход у сістэму для  %1$s з IP %2$s
 be_BY.mo	%1$s adds the item %2$s	%1$s дадае элемент %2$s
@@ -134,6 +144,16 @@ be_BY.mo	%1$s adds the version %2$s	%1$s дадаў ліцэнзію %2$s
 be_BY.mo	%1$s updates the version %2$s	%1$s змяніў версію %2$s
 be_BY.mo	%1$s purges the version %2$s	%1$s знішчыў версію %2$s
 be_BY.mo	%s installs software	%s усталёўвае програмнае забяспячэнне
+be_BY.mo	%1$s adds the license %2$s	%1$s дадаў ліцэнзію %2$s
+be_BY.mo	%1$s updates the license %2$s	%1$s змяніў ліцэнзію %2$s
+be_BY.mo	%1$s deletes the license %2$s	%1$s deletes the license %2$s
+be_BY.mo	%1$s purges the license %2$s	%1$s знішчыў ліцэнзію %2$s
+be_BY.mo	Technician in charge of the license	Technician in charge of the license
+be_BY.mo	Software	Software
+be_BY.mo	Number	Колькасць
+be_BY.mo	Purchase version	Purchase version
+be_BY.mo	Expiration	Expiration
+be_BY.mo	Allow Over-Quota	Allow Over-Quota
 bg_BG.mo	%1$s log in from IP %2$s	%1$s влиза от IP %2$s
 bg_BG.mo	Failed login for %1$s from IP %2$s	Неуспешен вход за %1$s от IP %2$s
 bg_BG.mo	%1$s adds the item %2$s	%1$s добави елемента %2$s
@@ -202,6 +222,16 @@ bg_BG.mo	%1$s adds the version %2$s	%1$s добави версията %2$s
 bg_BG.mo	%1$s updates the version %2$s	%1$s актуализира версията %2$s
 bg_BG.mo	%1$s purges the version %2$s	%1$s изчиства версията %2$s
 bg_BG.mo	%s installs software	%s инсталиран софтуер
+bg_BG.mo	%1$s adds the license %2$s	%1$s добави лиценза %2$s
+bg_BG.mo	%1$s updates the license %2$s	%1$s актуализира лиценза %2$s
+bg_BG.mo	%1$s deletes the license %2$s	%1$s изтрива лиценза %2$s
+bg_BG.mo	%1$s purges the license %2$s	%1$s изчиства лиценза %2$s
+bg_BG.mo	Technician in charge of the license	Изпълнител, отговорен за лиценза
+bg_BG.mo	Software	Софтуер
+bg_BG.mo	Number	Номер
+bg_BG.mo	Purchase version	Закупена версия
+bg_BG.mo	Expiration	Крайна дата
+bg_BG.mo	Allow Over-Quota	Разрешение над квотата
 ca_ES.mo	%1$s log in from IP %2$s	%1$s ha entrat des de la IP %2$s
 ca_ES.mo	Failed login for %1$s from IP %2$s	Ha fallat l'inici de sessió per %1$s des de la IP %2$s
 ca_ES.mo	%1$s adds the item %2$s	%1$s afegeix l'element %2$s
@@ -270,6 +300,16 @@ ca_ES.mo	%1$s adds the version %2$s	%1$s afegeix la versió %2$s
 ca_ES.mo	%1$s updates the version %2$s	%1$s actualitza la versió %2$s
 ca_ES.mo	%1$s purges the version %2$s	%1$s esborra la versió %2$s
 ca_ES.mo	%s installs software	%s instal·la programari
+ca_ES.mo	%1$s adds the license %2$s	%1$s afegeix la llicència %2$s
+ca_ES.mo	%1$s updates the license %2$s	%1$s actualitza la llicència %2$s
+ca_ES.mo	%1$s deletes the license %2$s	%1$s suprimeix la llicència %2$s
+ca_ES.mo	%1$s purges the license %2$s	%1$s esborra la llicència %2$s
+ca_ES.mo	Technician in charge of the license	Tècnic a càrrec de la llicència
+ca_ES.mo	Software	Programari
+ca_ES.mo	Number	Número
+ca_ES.mo	Purchase version	Versió de compra
+ca_ES.mo	Expiration	Expiració
+ca_ES.mo	Allow Over-Quota	Permet Over-Quota
 cs_CZ.mo	%1$s log in from IP %2$s	Uživatel %1$s se přihlásil z IP adresy %2$s
 cs_CZ.mo	Failed login for %1$s from IP %2$s	Neúspěšné přihlášení uživatele %1$s z IP adresy %2$s
 cs_CZ.mo	%1$s adds the item %2$s	%1$s přidal položku %2$s
@@ -338,6 +378,16 @@ cs_CZ.mo	%1$s adds the version %2$s	%1$s přidal verzi %2$s
 cs_CZ.mo	%1$s updates the version %2$s	%1$s změnil verzi %2$s
 cs_CZ.mo	%1$s purges the version %2$s	%1$s odstranil verzi %2$s
 cs_CZ.mo	%s installs software	%s nainstaloval software
+cs_CZ.mo	%1$s adds the license %2$s	%1$s přidal licenci %2$s
+cs_CZ.mo	%1$s updates the license %2$s	%1$s změnil licenci %2$s
+cs_CZ.mo	%1$s deletes the license %2$s	%1$s smazal licenci %2$s
+cs_CZ.mo	%1$s purges the license %2$s	%1$s odstranil licenci %2$s
+cs_CZ.mo	Technician in charge of the license	Technik zodpovědný za tuto licenci
+cs_CZ.mo	Software	Software
+cs_CZ.mo	Number	Počet
+cs_CZ.mo	Purchase version	Zakoupená verze
+cs_CZ.mo	Expiration	Konec platnosti
+cs_CZ.mo	Allow Over-Quota	Umožnit překročení kvóty
 da_DK.mo	%1$s log in from IP %2$s	%1$s log ind fra IP %2$s
 da_DK.mo	Failed login for %1$s from IP %2$s	Mislykket login for %1$s fra IP %2$s
 da_DK.mo	%1$s adds the item %2$s	%1$s tilføjer emnet %2$s
@@ -406,6 +456,16 @@ da_DK.mo	%1$s adds the version %2$s	%1$s tilføjer versionen %2$s
 da_DK.mo	%1$s updates the version %2$s	%1$s opdaterer versionen %2$s
 da_DK.mo	%1$s purges the version %2$s	%1$s rydder versionen %2$s
 da_DK.mo	%s installs software	%s installerer software
+da_DK.mo	%1$s adds the license %2$s	%1$s tilføjer licensen %2$s
+da_DK.mo	%1$s updates the license %2$s	%1$s opdaterer licensen %2$s
+da_DK.mo	%1$s deletes the license %2$s	%1$s sletter licensen %2$s
+da_DK.mo	%1$s purges the license %2$s	%1$s rydder licensen %2$s
+da_DK.mo	Technician in charge of the license	Technician in charge of the license
+da_DK.mo	Software	Software
+da_DK.mo	Number	Nummer
+da_DK.mo	Purchase version	Købt version
+da_DK.mo	Expiration	Slut dato
+da_DK.mo	Allow Over-Quota	Allow Over-Quota
 de_DE.mo	%1$s log in from IP %2$s	%1$s loggt sich mit der IP %2$s ein
 de_DE.mo	Failed login for %1$s from IP %2$s	Anmeldung des Benutzers %1$s von IP %2$s fehlgeschlagen
 de_DE.mo	%1$s adds the item %2$s	%1$s fügt das Element %2$s hinzu
@@ -474,6 +534,16 @@ de_DE.mo	%1$s adds the version %2$s	%1$s fügt die Version %2$s hinzu
 de_DE.mo	%1$s updates the version %2$s	%1$s aktualisiert die Version %2$s
 de_DE.mo	%1$s purges the version %2$s	%1$s bereinigt die Version %2$s
 de_DE.mo	%s installs software	%s installiert Software
+de_DE.mo	%1$s adds the license %2$s	%1$s fügt die Lizenz %2$s hinzu
+de_DE.mo	%1$s updates the license %2$s	%1$s aktualisiert die Lizenz %2$s
+de_DE.mo	%1$s deletes the license %2$s	%1$s löscht die Lizenz %2$s
+de_DE.mo	%1$s purges the license %2$s	%1$s bereinigt die Lizenz %2$s
+de_DE.mo	Technician in charge of the license	Verantwortlicher Techniker der Lizenz
+de_DE.mo	Software	Software
+de_DE.mo	Number	Anzahl
+de_DE.mo	Purchase version	Kauf-Version
+de_DE.mo	Expiration	Läuft ab
+de_DE.mo	Allow Over-Quota	Überschreitung der Quote zulassen
 el_GR.mo	%1$s log in from IP %2$s	%1$s συνδέεται από την IP %2$s
 el_GR.mo	Failed login for %1$s from IP %2$s	Εσφαλμένη σύνδεση για %1$s από την IP %2$s
 el_GR.mo	%1$s adds the item %2$s	%1$s προσθέτει το στοιχείο %2$s
@@ -542,6 +612,16 @@ el_GR.mo	%1$s adds the version %2$s	%1$s προσθέτει την έκδοση 
 el_GR.mo	%1$s updates the version %2$s	%1$s ενημερώνει την έκδοση %2$s
 el_GR.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 el_GR.mo	%s installs software	%s εγκαθιστά λογισμικό
+el_GR.mo	%1$s adds the license %2$s	%1$s προσθέτει την άδεια %2$s
+el_GR.mo	%1$s updates the license %2$s	%1$s ενημερώνει την άδεια %2$s
+el_GR.mo	%1$s deletes the license %2$s	%1$s διαγράφει την άδεια %2$s
+el_GR.mo	%1$s purges the license %2$s	%1$s εκκαθαρίζει την άδεια %2$s
+el_GR.mo	Technician in charge of the license	Technician in charge of the license
+el_GR.mo	Software	Λογισμικό
+el_GR.mo	Number	Αριθμός
+el_GR.mo	Purchase version	Έκδοση αγοράς
+el_GR.mo	Expiration	Ημερομηνία λήξης
+el_GR.mo	Allow Over-Quota	Allow Over-Quota
 en_GB.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 en_GB.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 en_GB.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -610,6 +690,16 @@ en_GB.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
 en_GB.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
 en_GB.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 en_GB.mo	%s installs software	%s installs software
+en_GB.mo	%1$s adds the license %2$s	%1$s adds the license %2$s
+en_GB.mo	%1$s updates the license %2$s	%1$s updates the license %2$s
+en_GB.mo	%1$s deletes the license %2$s	%1$s deletes the license %2$s
+en_GB.mo	%1$s purges the license %2$s	%1$s purges the license %2$s
+en_GB.mo	Technician in charge of the license	Technician in charge of the license
+en_GB.mo	Software	Software
+en_GB.mo	Number	Number
+en_GB.mo	Purchase version	Purchase version
+en_GB.mo	Expiration	Expiration
+en_GB.mo	Allow Over-Quota	Allow Over-Quota
 en_US.mo	%1$s log in from IP %2$s	%1$s login from IP %2$s
 en_US.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 en_US.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -678,6 +768,16 @@ en_US.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
 en_US.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
 en_US.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 en_US.mo	%s installs software	%s Installs Software
+en_US.mo	%1$s adds the license %2$s	%1$s adds the license %2$s
+en_US.mo	%1$s updates the license %2$s	%1$s updates the license %2$s
+en_US.mo	%1$s deletes the license %2$s	%1$s deletes the license %2$s
+en_US.mo	%1$s purges the license %2$s	%1$s purges the license %2$s
+en_US.mo	Technician in charge of the license	Technician in Charge of the License
+en_US.mo	Software	Software
+en_US.mo	Number	Number
+en_US.mo	Purchase version	Purchased Version
+en_US.mo	Expiration	Expiration
+en_US.mo	Allow Over-Quota	Allow Over Quota
 eo.mo	%1$s log in from IP %2$s	%1$s вошел в систему с IP %2$s
 eo.mo	Failed login for %1$s from IP %2$s	Неудачная попытка входа пользователя %1$s с IP %2$s
 eo.mo	%1$s adds the item %2$s	%1$s aldonis objekto %2$s
@@ -746,6 +846,16 @@ eo.mo	%1$s adds the version %2$s	%1$s добавлено лицензий %2$s
 eo.mo	%1$s updates the version %2$s	%1$s обновлено версий %2$s
 eo.mo	%1$s purges the version %2$s	%1$s очищает версию %2$s
 eo.mo	%s installs software	%s instalis la programaron
+eo.mo	%1$s adds the license %2$s	%1$s добавлено лицензий %2$s
+eo.mo	%1$s updates the license %2$s	%1$s обновлено лицензий %2$s
+eo.mo	%1$s deletes the license %2$s	%1$s удалено лицензий %2$s
+eo.mo	%1$s purges the license %2$s	%1$s очищает лицензию %2$s
+eo.mo	Technician in charge of the license	Специалист ответственный за лицензию
+eo.mo	Software	Software
+eo.mo	Number	Количество
+eo.mo	Purchase version	Купленная версия
+eo.mo	Expiration	Истечение срока
+eo.mo	Allow Over-Quota	Allow Over-Quota
 es_419.mo	%1$s log in from IP %2$s	%1$s inicia sesión desde la IP %2$s
 es_419.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_419.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -814,6 +924,16 @@ es_419.mo	%1$s adds the version %2$s	%1$s agrega la versión %2$s
 es_419.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
 es_419.mo	%1$s purges the version %2$s	%1$s elimina la versión %2$s
 es_419.mo	%s installs software	%s instala software
+es_419.mo	%1$s adds the license %2$s	%1$s agrega la licencia %2$s
+es_419.mo	%1$s updates the license %2$s	%1$s actualiza la licencia %2$s
+es_419.mo	%1$s deletes the license %2$s	%1$s elimina la licencia %2$s
+es_419.mo	%1$s purges the license %2$s	%1$s elimna la licencia %2$s
+es_419.mo	Technician in charge of the license	Técnico a cargo de la licencia
+es_419.mo	Software	Programa
+es_419.mo	Number	Número
+es_419.mo	Purchase version	Versión comprada
+es_419.mo	Expiration	Expiración
+es_419.mo	Allow Over-Quota	Allow Over-Quota
 es_AR.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_AR.mo	Failed login for %1$s from IP %2$s	Login fallido de %1$s desde IP %2$s
 es_AR.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -882,6 +1002,16 @@ es_AR.mo	%1$s adds the version %2$s	%1$s agrega la versión %2$s
 es_AR.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
 es_AR.mo	%1$s purges the version %2$s	%1$s purga la versión %2$s
 es_AR.mo	%s installs software	%s instala software
+es_AR.mo	%1$s adds the license %2$s	%1$s agrega la licencia %2$s
+es_AR.mo	%1$s updates the license %2$s	%1$s actualiza la licencia %2$s
+es_AR.mo	%1$s deletes the license %2$s	%1$s elimina la licencia %2$s
+es_AR.mo	%1$s purges the license %2$s	%1$s purga la licencia %2$s
+es_AR.mo	Technician in charge of the license	Técnico responsable de la licencia
+es_AR.mo	Software	Software
+es_AR.mo	Number	Número
+es_AR.mo	Purchase version	Versión comprada
+es_AR.mo	Expiration	Expiración
+es_AR.mo	Allow Over-Quota	Allow Over-Quota
 es_CL.mo	%1$s log in from IP %2$s	%1$s inicia sesión desde la IP %2$s
 es_CL.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_CL.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -950,6 +1080,16 @@ es_CL.mo	%1$s adds the version %2$s	%1$s agrega la versión %2$s
 es_CL.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
 es_CL.mo	%1$s purges the version %2$s	%1$s elimina la versión %2$s
 es_CL.mo	%s installs software	%s instala software
+es_CL.mo	%1$s adds the license %2$s	%1$s agrega la licencia %2$s
+es_CL.mo	%1$s updates the license %2$s	%1$s actualiza la licencia %2$s
+es_CL.mo	%1$s deletes the license %2$s	%1$s elimina la licencia %2$s
+es_CL.mo	%1$s purges the license %2$s	%1$s elimna la licencia %2$s
+es_CL.mo	Technician in charge of the license	Technician in charge of the license
+es_CL.mo	Software	Software
+es_CL.mo	Number	Número
+es_CL.mo	Purchase version	Versión comprada
+es_CL.mo	Expiration	Expiración
+es_CL.mo	Allow Over-Quota	Allow Over-Quota
 es_CO.mo	%1$s log in from IP %2$s	%1$s inicio de sesión desde la IP %2$s
 es_CO.mo	Failed login for %1$s from IP %2$s	Inicio de sesión fallido para %1$s desde la IP %2$s
 es_CO.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -1018,6 +1158,16 @@ es_CO.mo	%1$s adds the version %2$s	%1$s agregar la version %2$s
 es_CO.mo	%1$s updates the version %2$s	%1$s actualizar la version %2$s
 es_CO.mo	%1$s purges the version %2$s	%1$s limpiar la versión %2$s
 es_CO.mo	%s installs software	%s instala software
+es_CO.mo	%1$s adds the license %2$s	%1$s agregar la licencia %2$s
+es_CO.mo	%1$s updates the license %2$s	%1$s actualizar la licencias %2$s
+es_CO.mo	%1$s deletes the license %2$s	%1$s borrar las licencias %2$s
+es_CO.mo	%1$s purges the license %2$s	%1$s limpiar la licencia %2$s
+es_CO.mo	Technician in charge of the license	Técnico a cargo de la licencia
+es_CO.mo	Software	Programa
+es_CO.mo	Number	Número
+es_CO.mo	Purchase version	Versión comprada
+es_CO.mo	Expiration	Finalización
+es_CO.mo	Allow Over-Quota	Permitir exceso de cuota
 es_ES.mo	%1$s log in from IP %2$s	%1$s inició la sesión desde la IP %2$s
 es_ES.mo	Failed login for %1$s from IP %2$s	Fallo en el inicio de sesión de %1$s desde la IP %2$s
 es_ES.mo	%1$s adds the item %2$s	%1$s añade el elemento %2$s
@@ -1086,6 +1236,16 @@ es_ES.mo	%1$s adds the version %2$s	%1$s añade la versión %2$s
 es_ES.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
 es_ES.mo	%1$s purges the version %2$s	%1$s purga la versión %2$s
 es_ES.mo	%s installs software	%s instala software
+es_ES.mo	%1$s adds the license %2$s	%1$s añade la licencia %2$s
+es_ES.mo	%1$s updates the license %2$s	%1$s actualiza la licencia %2$s
+es_ES.mo	%1$s deletes the license %2$s	%1$s suprime la licencia %2$s
+es_ES.mo	%1$s purges the license %2$s	%1$s purga la licencia %2$s
+es_ES.mo	Technician in charge of the license	Técnico encargado de la licencia
+es_ES.mo	Software	Software
+es_ES.mo	Number	Número
+es_ES.mo	Purchase version	Versión comprada
+es_ES.mo	Expiration	Vencimiento
+es_ES.mo	Allow Over-Quota	Permitir sobre cuota
 es_MX.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_MX.mo	Failed login for %1$s from IP %2$s	Error de acceso para %1$s de la IP %2$s
 es_MX.mo	%1$s adds the item %2$s	%1$s añade un elemento %2$s
@@ -1154,6 +1314,16 @@ es_MX.mo	%1$s adds the version %2$s	%1$s agrega la versión %2$s
 es_MX.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
 es_MX.mo	%1$s purges the version %2$s	%1$s elimina la versión %2$s
 es_MX.mo	%s installs software	%s instala software
+es_MX.mo	%1$s adds the license %2$s	%1$s agrega la licencia %2$s
+es_MX.mo	%1$s updates the license %2$s	%1$s actualiza la licencia %2$s
+es_MX.mo	%1$s deletes the license %2$s	%1$s elimina la licencia %2$s
+es_MX.mo	%1$s purges the license %2$s	%1$s borra la licencia %2$s
+es_MX.mo	Technician in charge of the license	Técnico a cargo de la licencia
+es_MX.mo	Software	Software
+es_MX.mo	Number	Número
+es_MX.mo	Purchase version	Versión comprada
+es_MX.mo	Expiration	Expiración
+es_MX.mo	Allow Over-Quota	Permitir exceso de cuota
 es_VE.mo	%1$s log in from IP %2$s	%1$s login desde IP %2$s
 es_VE.mo	Failed login for %1$s from IP %2$s	Login fallido de %1$s desde IP %2$s
 es_VE.mo	%1$s adds the item %2$s	%1$s agrega el elemento %2$s
@@ -1222,6 +1392,16 @@ es_VE.mo	%1$s adds the version %2$s	%1$s agrega la versión %2$s
 es_VE.mo	%1$s updates the version %2$s	%1$s actualiza la versión %2$s
 es_VE.mo	%1$s purges the version %2$s	%1$s purga la versión %2$s
 es_VE.mo	%s installs software	%s instala software
+es_VE.mo	%1$s adds the license %2$s	%1$s agrega la licencia %2$s
+es_VE.mo	%1$s updates the license %2$s	%1$s actualiza la licencia %2$s
+es_VE.mo	%1$s deletes the license %2$s	%1$s elimina la licencia %2$s
+es_VE.mo	%1$s purges the license %2$s	%1$s purga la licencia %2$s
+es_VE.mo	Technician in charge of the license	Technician in charge of the license
+es_VE.mo	Software	Software
+es_VE.mo	Number	Número
+es_VE.mo	Purchase version	Versión comprada
+es_VE.mo	Expiration	Expiración
+es_VE.mo	Allow Over-Quota	Allow Over-Quota
 et_EE.mo	%1$s log in from IP %2$s	%1$s logis sisse aadresilt %2$s
 et_EE.mo	Failed login for %1$s from IP %2$s	Ebaõnnestunud sisselogimine kasutajalt %1$s IP-aadressilt %2$s
 et_EE.mo	%1$s adds the item %2$s	%1$s lisas asja %2$s
@@ -1290,6 +1470,16 @@ et_EE.mo	%1$s adds the version %2$s	%1$s lisas versiooni %2$s
 et_EE.mo	%1$s updates the version %2$s	%1$s uuendas versiooni %2$s
 et_EE.mo	%1$s purges the version %2$s	%1$s puhastas versiooni %2$s
 et_EE.mo	%s installs software	%s paigaldas tarkvara
+et_EE.mo	%1$s adds the license %2$s	%1$s sisestas litsentsi %2$s
+et_EE.mo	%1$s updates the license %2$s	%1$s uuendas litsentsi %2$s
+et_EE.mo	%1$s deletes the license %2$s	%1$s kustutas litsentsi %2$s
+et_EE.mo	%1$s purges the license %2$s	%1$s puhastas litsentsi %2$s
+et_EE.mo	Technician in charge of the license	Litsentsi eest vastutav tehnik
+et_EE.mo	Software	Tarkvara
+et_EE.mo	Number	Lepingunumber
+et_EE.mo	Purchase version	Soetatud versioon
+et_EE.mo	Expiration	Aegumine
+et_EE.mo	Allow Over-Quota	Luba üle kvoodi
 eu_ES.mo	%1$s log in from IP %2$s	%1$s %2$s IP helbidetik sesioa hasi du
 eu_ES.mo	Failed login for %1$s from IP %2$s	%1$s %2$s IP helbidetik sesioa hasteko arazoa
 eu_ES.mo	%1$s adds the item %2$s	%1$s-k %2$s elementua gehitzen du
@@ -1358,6 +1548,16 @@ eu_ES.mo	%1$s adds the version %2$s	%1$s-(e)k %2$s bertsioa gehitu du
 eu_ES.mo	%1$s updates the version %2$s	%1$s-(e)k %2$s bertsioa eguneratu du
 eu_ES.mo	%1$s purges the version %2$s	%1$s-(e)k %2$s bertsioa ezabatu du
 eu_ES.mo	%s installs software	%s -k softwarea instalatzen du
+eu_ES.mo	%1$s adds the license %2$s	%1$s-(e)k %2$s lizentzia gehitu du
+eu_ES.mo	%1$s updates the license %2$s	%1$s-(e)k %2$s lizentzia eguneratu du
+eu_ES.mo	%1$s deletes the license %2$s	%1$s-(e)k %2$s lizentzia ezabatu du
+eu_ES.mo	%1$s purges the license %2$s	%1$s-(e)k %2$s lizentzia ezabatu du
+eu_ES.mo	Technician in charge of the license	Lizentziaren kargu dagoen teknikaria
+eu_ES.mo	Software	Softwarea
+eu_ES.mo	Number	Zenbakia
+eu_ES.mo	Purchase version	Erositako bertsioa
+eu_ES.mo	Expiration	Iraungitzea
+eu_ES.mo	Allow Over-Quota	Allow Over-Quota
 fa_IR.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 fa_IR.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 fa_IR.mo	%1$s adds the item %2$s	%1$s قلم به آيتم  %2$s شد.
@@ -1426,6 +1626,16 @@ fa_IR.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
 fa_IR.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
 fa_IR.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 fa_IR.mo	%s installs software	%s installs software
+fa_IR.mo	%1$s adds the license %2$s	%1$s adds the license %2$s
+fa_IR.mo	%1$s updates the license %2$s	%1$s updates the license %2$s
+fa_IR.mo	%1$s deletes the license %2$s	%1$s deletes the license %2$s
+fa_IR.mo	%1$s purges the license %2$s	%1$s purges the license %2$s
+fa_IR.mo	Technician in charge of the license	Technician in charge of the license
+fa_IR.mo	Software	نرم افزار
+fa_IR.mo	Number	عدد
+fa_IR.mo	Purchase version	نسخه خرید
+fa_IR.mo	Expiration	انقضاء
+fa_IR.mo	Allow Over-Quota	Allow Over-Quota
 fi_FI.mo	%1$s log in from IP %2$s	%1$s kirjautuu IP-osoitteesta %2$s
 fi_FI.mo	Failed login for %1$s from IP %2$s	Epäonnistunut kirjautuminen käyttäjälle %1$s IP-osoitteesta %2$s
 fi_FI.mo	%1$s adds the item %2$s	%1$s lisää kohteen %2$s
@@ -1494,6 +1704,16 @@ fi_FI.mo	%1$s adds the version %2$s	%1$s lisää version %2$s
 fi_FI.mo	%1$s updates the version %2$s	%1$s päivittää version %2$s
 fi_FI.mo	%1$s purges the version %2$s	%1$s poistaa pysyvästi version %2$s
 fi_FI.mo	%s installs software	%s asentaa ohjelmiston
+fi_FI.mo	%1$s adds the license %2$s	%1$s lisää lisenssin %2$s
+fi_FI.mo	%1$s updates the license %2$s	%1$s päivittää lisenssin %2$s
+fi_FI.mo	%1$s deletes the license %2$s	%1$s poistaa lisenssin %2$s
+fi_FI.mo	%1$s purges the license %2$s	%1$s poistaa pysyvästi lisenssin %2$s
+fi_FI.mo	Technician in charge of the license	Lisenssistä vastaava asentaja
+fi_FI.mo	Software	Ohjelma
+fi_FI.mo	Number	Lukumäärä
+fi_FI.mo	Purchase version	Ostettu versio
+fi_FI.mo	Expiration	Päättyminen
+fi_FI.mo	Allow Over-Quota	Allow Over-Quota
 fr_BE.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_BE.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_BE.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -1562,6 +1782,16 @@ fr_BE.mo	%1$s adds the version %2$s	%1$s ajoute la version %2$s
 fr_BE.mo	%1$s updates the version %2$s	%1$s met à jour la version %2$s
 fr_BE.mo	%1$s purges the version %2$s	%1$s purge la version %2$s 
 fr_BE.mo	%s installs software	%s installe un logiciel
+fr_BE.mo	%1$s adds the license %2$s	%1$s ajoute la licence %2$s
+fr_BE.mo	%1$s updates the license %2$s	%1$s met à jour la licence %2$s
+fr_BE.mo	%1$s deletes the license %2$s	%1$s supprime la licence %2$s
+fr_BE.mo	%1$s purges the license %2$s	%1$s purge la licence %2$s 
+fr_BE.mo	Technician in charge of the license	Technicien chargé de la licence
+fr_BE.mo	Software	Software
+fr_BE.mo	Number	Nombre
+fr_BE.mo	Purchase version	Version d'achat
+fr_BE.mo	Expiration	Expiration
+fr_BE.mo	Allow Over-Quota	Allow Over-Quota
 fr_CA.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_CA.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_CA.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -1630,6 +1860,16 @@ fr_CA.mo	%1$s adds the version %2$s	%1$s ajoute la version %2$s
 fr_CA.mo	%1$s updates the version %2$s	%1$s met à jour la version %2$s
 fr_CA.mo	%1$s purges the version %2$s	%1$s purge la version %2$s
 fr_CA.mo	%s installs software	%s installe un logiciel
+fr_CA.mo	%1$s adds the license %2$s	%1$s ajoute la licence %2$s
+fr_CA.mo	%1$s updates the license %2$s	%1$s met à jour la licence %2$s
+fr_CA.mo	%1$s deletes the license %2$s	%1$s supprime la licence %2$s
+fr_CA.mo	%1$s purges the license %2$s	%1$s purge la licence %2$s
+fr_CA.mo	Technician in charge of the license	Technicien chargé de la licence
+fr_CA.mo	Software	Logiciel
+fr_CA.mo	Number	Nombre
+fr_CA.mo	Purchase version	Version d'achat
+fr_CA.mo	Expiration	Expiration
+fr_CA.mo	Allow Over-Quota	Autoriser le dépassement du quota
 fr_FR.mo	%1$s log in from IP %2$s	%1$s se connecte depuis l'IP %2$s
 fr_FR.mo	Failed login for %1$s from IP %2$s	Connexion échouée de %1$s depuis l'IP %2$s
 fr_FR.mo	%1$s adds the item %2$s	%1$s ajoute l'élément %2$s
@@ -1698,6 +1938,16 @@ fr_FR.mo	%1$s adds the version %2$s	%1$s ajoute la version %2$s
 fr_FR.mo	%1$s updates the version %2$s	%1$s met à jour la version %2$s
 fr_FR.mo	%1$s purges the version %2$s	%1$s purge la version %2$s
 fr_FR.mo	%s installs software	%s installe un logiciel
+fr_FR.mo	%1$s adds the license %2$s	%1$s ajoute la licence %2$s
+fr_FR.mo	%1$s updates the license %2$s	%1$s met à jour la licence %2$s
+fr_FR.mo	%1$s deletes the license %2$s	%1$s supprime la licence %2$s
+fr_FR.mo	%1$s purges the license %2$s	%1$s purge la licence %2$s
+fr_FR.mo	Technician in charge of the license	Technicien chargé de la licence
+fr_FR.mo	Software	Logiciel
+fr_FR.mo	Number	Nombre
+fr_FR.mo	Purchase version	Version d'achat
+fr_FR.mo	Expiration	Expiration
+fr_FR.mo	Allow Over-Quota	Autoriser le dépassement de quota
 gl_ES.mo	%1$s log in from IP %2$s	%1$s logueouse dende a IP %2$s
 gl_ES.mo	Failed login for %1$s from IP %2$s	Erro en conexión %1$s dende IP %2$s
 gl_ES.mo	%1$s adds the item %2$s	%1$s engade o elemento %2$s
@@ -1766,6 +2016,16 @@ gl_ES.mo	%1$s adds the version %2$s	%1$s engadir a versión %2$s
 gl_ES.mo	%1$s updates the version %2$s	%1$s actualiza a versión %2$s
 gl_ES.mo	%1$s purges the version %2$s	%1$s purga a versión %2$s
 gl_ES.mo	%s installs software	%s instala software
+gl_ES.mo	%1$s adds the license %2$s	%1$s engadir a licenza %2$s
+gl_ES.mo	%1$s updates the license %2$s	%1$s actualiza a licenza %2$s
+gl_ES.mo	%1$s deletes the license %2$s	%1$s elimina a licenza %2$s
+gl_ES.mo	%1$s purges the license %2$s	%1$s purga a licenza %2$s
+gl_ES.mo	Technician in charge of the license	Técnico a cargo da licenza
+gl_ES.mo	Software	Software
+gl_ES.mo	Number	Número
+gl_ES.mo	Purchase version	Versión comprada
+gl_ES.mo	Expiration	Expiración
+gl_ES.mo	Allow Over-Quota	Permitir exceso de cota
 he_IL.mo	%1$s log in from IP %2$s	%1$sחיבור מכתובת IP %2$s
 he_IL.mo	Failed login for %1$s from IP %2$s	חיבור נכשל עבור %1$s מכתובת IP %2$s
 he_IL.mo	%1$s adds the item %2$s	%1$sהוסיף את הפריט %2$s
@@ -1834,6 +2094,16 @@ he_IL.mo	%1$s adds the version %2$s	%1$sהוסיף את גרסה %2$s
 he_IL.mo	%1$s updates the version %2$s	%1$sעדכן את הגרסה%2$s
 he_IL.mo	%1$s purges the version %2$s	%1$sמחק את הגרסה לצמיתות%2$s
 he_IL.mo	%s installs software	%s התקין תוכנה
+he_IL.mo	%1$s adds the license %2$s	%1$s הוסיף רישיון %2$s
+he_IL.mo	%1$s updates the license %2$s	%1$sעדכן את הרישיון%2$s
+he_IL.mo	%1$s deletes the license %2$s	%1$sמחק את הרישיון%2$s
+he_IL.mo	%1$s purges the license %2$s	%1$sמחק את הרישיון לצמיתות%2$s
+he_IL.mo	Technician in charge of the license	Technician in charge of the license
+he_IL.mo	Software	תוכנה
+he_IL.mo	Number	מספר
+he_IL.mo	Purchase version	גירסה שנרכשה
+he_IL.mo	Expiration	תפוגה
+he_IL.mo	Allow Over-Quota	Allow Over-Quota
 hi_IN.mo	%1$s log in from IP %2$s	IP %2$s से %1$s लॉग इन करें
 hi_IN.mo	Failed login for %1$s from IP %2$s	आईपी ​​%2$s से %1$s के लिए लॉगिन विफल
 hi_IN.mo	%1$s adds the item %2$s	1%1$sआइटम 2%2$sजोड़ता है
@@ -1902,6 +2172,16 @@ hi_IN.mo	%1$s adds the version %2$s	%1$sसंस्करण जोड़ता
 hi_IN.mo	%1$s updates the version %2$s	%1$sसंस्करण अद्यतन करता है%2$s
 hi_IN.mo	%1$s purges the version %2$s	%1$s%2$sसंस्करण परिष्कृत करता है
 hi_IN.mo	%s installs software	%sसॉफ्टवेयर स्थापित करता है
+hi_IN.mo	%1$s adds the license %2$s	%1$sलाइसेंस जोड़ता है%2$s
+hi_IN.mo	%1$s updates the license %2$s	%1$sलाइसेंस अद्यतन करता है%2$s
+hi_IN.mo	%1$s deletes the license %2$s	%1$sलाइसेंस हटा देता है%2$s
+hi_IN.mo	%1$s purges the license %2$s	%1$s%2$sलाइसेंस परिष्कृत करता है
+hi_IN.mo	Technician in charge of the license	लाइसेंस के प्रभारी तकनीशियन
+hi_IN.mo	Software	सॉफ्टवेयर
+hi_IN.mo	Number	संख्या
+hi_IN.mo	Purchase version	खरीद संस्करण
+hi_IN.mo	Expiration	समय सीमा समाप्ति
+hi_IN.mo	Allow Over-Quota	Allow Over-Quota
 hr_HR.mo	%1$s log in from IP %2$s	%1$s prijava s IP adrese %2$s
 hr_HR.mo	Failed login for %1$s from IP %2$s	Neusjela prijava za %1$s sa IP adrese %2$s
 hr_HR.mo	%1$s adds the item %2$s	%1$s dodaje predmet. %2$s
@@ -1970,6 +2250,16 @@ hr_HR.mo	%1$s adds the version %2$s	%1$s dodaje verziju %2$s
 hr_HR.mo	%1$s updates the version %2$s	%1$s aktualizira verziju %2$s
 hr_HR.mo	%1$s purges the version %2$s	%1$s briše verziju %2$s
 hr_HR.mo	%s installs software	%s instalira softver
+hr_HR.mo	%1$s adds the license %2$s	%1$s dodaje licencu %2$s
+hr_HR.mo	%1$s updates the license %2$s	%1$s aktualizira licencu %2$s
+hr_HR.mo	%1$s deletes the license %2$s	%1$s briše licencu %2$s
+hr_HR.mo	%1$s purges the license %2$s	%1$s briše licencu %2$s
+hr_HR.mo	Technician in charge of the license	Tehničar zadužen za licencu
+hr_HR.mo	Software	Softver
+hr_HR.mo	Number	Broj
+hr_HR.mo	Purchase version	Verzija kupnje
+hr_HR.mo	Expiration	Istek
+hr_HR.mo	Allow Over-Quota	Dozvoli iznad kvote
 hu_HU.mo	%1$s log in from IP %2$s	%1$s bejelentkezett a következő IP-ről: %2$s
 hu_HU.mo	Failed login for %1$s from IP %2$s	Sikertelen bejelentkezés %1$s a %2$s IP-ről.
 hu_HU.mo	%1$s adds the item %2$s	%1$s hozzáadta a %2$s elemet
@@ -2038,6 +2328,16 @@ hu_HU.mo	%1$s adds the version %2$s	%1$s hozzáadta a következő verziót: %2$s
 hu_HU.mo	%1$s updates the version %2$s	%1$s frissítette a következő verziót %2$s
 hu_HU.mo	%1$s purges the version %2$s	%1$s törölte a %2$s verziót
 hu_HU.mo	%s installs software	%s szoftvert telepített
+hu_HU.mo	%1$s adds the license %2$s	%1$s licenceli a következőt: %2$s
+hu_HU.mo	%1$s updates the license %2$s	%1$s frissítette a következő licencet %2$s
+hu_HU.mo	%1$s deletes the license %2$s	%1$s törölte a következő licencet %2$s
+hu_HU.mo	%1$s purges the license %2$s	%1$s törölte a %2$s licenszet
+hu_HU.mo	Technician in charge of the license	Licenszért felelős technikus
+hu_HU.mo	Software	Szoftver
+hu_HU.mo	Number	Szám
+hu_HU.mo	Purchase version	Vásárolt verzió
+hu_HU.mo	Expiration	Befejezés dátuma
+hu_HU.mo	Allow Over-Quota	Allow Over-Quota
 id_ID.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 id_ID.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 id_ID.mo	%1$s adds the item %2$s	%1$s menambahkan item %2$s
@@ -2106,6 +2406,16 @@ id_ID.mo	%1$s adds the version %2$s	%1$s menambahkan versi %2$s
 id_ID.mo	%1$s updates the version %2$s	%1$s diperbarui versi %2$s 
 id_ID.mo	%1$s purges the version %2$s	%1$s pembersihan versi %2$s 
 id_ID.mo	%s installs software	%s memasang perangkat lunak
+id_ID.mo	%1$s adds the license %2$s	%1$s menambahkan lisensi %2$s
+id_ID.mo	%1$s updates the license %2$s	%1$s Pembaruan lisensi %2$s
+id_ID.mo	%1$s deletes the license %2$s	%1$s Hapus lisensi %2$s
+id_ID.mo	%1$s purges the license %2$s	%1$s pembersihan lisensi %2$s
+id_ID.mo	Technician in charge of the license	Technician in charge of the license
+id_ID.mo	Software	Perangkat lunak
+id_ID.mo	Number	Nomor
+id_ID.mo	Purchase version	Purchase version
+id_ID.mo	Expiration	Kadaluarsa
+id_ID.mo	Allow Over-Quota	Allow Over-Quota
 is_IS.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 is_IS.mo	Failed login for %1$s from IP %2$s	Misheppnaðar innskráningar fyrir %1$s frá IP %2$s 
 is_IS.mo	%1$s adds the item %2$s	%1$s bætir við %2$s 
@@ -2174,6 +2484,16 @@ is_IS.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
 is_IS.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
 is_IS.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 is_IS.mo	%s installs software	%s setur upp hugbúnað
+is_IS.mo	%1$s adds the license %2$s	%1$s adds the license %2$s
+is_IS.mo	%1$s updates the license %2$s	%1$s updates the license %2$s
+is_IS.mo	%1$s deletes the license %2$s	%1$s deletes the license %2$s
+is_IS.mo	%1$s purges the license %2$s	%1$s purges the license %2$s
+is_IS.mo	Technician in charge of the license	Technician in charge of the license
+is_IS.mo	Software	Software
+is_IS.mo	Number	Númer
+is_IS.mo	Purchase version	Purchase version
+is_IS.mo	Expiration	Expiration
+is_IS.mo	Allow Over-Quota	Allow Over-Quota
 it_IT.mo	%1$s log in from IP %2$s	Accesso di %1$s dall'IP %2$s
 it_IT.mo	Failed login for %1$s from IP %2$s	Accesso non riuscito per %1$s dall'IP %2$s
 it_IT.mo	%1$s adds the item %2$s	%1$s aggiunge l'elemento %2$s
@@ -2242,6 +2562,16 @@ it_IT.mo	%1$s adds the version %2$s	%1$s aggiunge la versione %2$s
 it_IT.mo	%1$s updates the version %2$s	%1$s aggiorna la versione %2$s
 it_IT.mo	%1$s purges the version %2$s	%1$s ha cancellato la versione %2$s
 it_IT.mo	%s installs software	%s installa software
+it_IT.mo	%1$s adds the license %2$s	%1$s aggiunge la licenza %2$s
+it_IT.mo	%1$s updates the license %2$s	%1$s aggiorna la licenza %2$s
+it_IT.mo	%1$s deletes the license %2$s	%1$s elimina la licenza %2$s
+it_IT.mo	%1$s purges the license %2$s	%1$s ha cancellato la licenza %2$s
+it_IT.mo	Technician in charge of the license	Tecnico in carico per la licenza
+it_IT.mo	Software	Software
+it_IT.mo	Number	Numero
+it_IT.mo	Purchase version	Versione acquisita
+it_IT.mo	Expiration	Data fine
+it_IT.mo	Allow Over-Quota	Consenti superamento quota
 ja_JP.mo	%1$s log in from IP %2$s	%1$s は IP: %2$s からログインしました
 ja_JP.mo	Failed login for %1$s from IP %2$s	%1$s は IP: %2$s からのログインに失敗しました
 ja_JP.mo	%1$s adds the item %2$s	%1$s がアイテム %2$s を追加
@@ -2310,6 +2640,16 @@ ja_JP.mo	%1$s adds the version %2$s	%1$s はバージョン %2$s を追加しま
 ja_JP.mo	%1$s updates the version %2$s	%1$s はバージョン %2$s を更新しました
 ja_JP.mo	%1$s purges the version %2$s	%1$s はバージョン %2$s を消去しました
 ja_JP.mo	%s installs software	%s はソフトウェアをインストールしました
+ja_JP.mo	%1$s adds the license %2$s	%1$s はライセンス %2$s を追加しました
+ja_JP.mo	%1$s updates the license %2$s	%1$s はライセンス %2$s を更新しました
+ja_JP.mo	%1$s deletes the license %2$s	%1$s はライセンス %2$s を削除しました
+ja_JP.mo	%1$s purges the license %2$s	%1$s はライセンス %2$s を消去しました
+ja_JP.mo	Technician in charge of the license	ライセンス担当技術者
+ja_JP.mo	Software	ソフトウェア
+ja_JP.mo	Number	数量
+ja_JP.mo	Purchase version	購入版
+ja_JP.mo	Expiration	終了日
+ja_JP.mo	Allow Over-Quota	クォータ超過を許可
 kn.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 kn.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 kn.mo	%1$s adds the item %2$s	%1$sಐಟಂ ಸೇರಿಸುತ್ತದೆ %2$s 
@@ -2378,6 +2718,16 @@ kn.mo	%1$s adds the version %2$s	%1$sಆವೃತ್ತಿ ಸೇರಿಸುತ
 kn.mo	%1$s updates the version %2$s	%1$sಆವೃತ್ತಿಯನ್ನು ನವೀಕರಿಸುತ್ತದೆ %2$s 
 kn.mo	%1$s purges the version %2$s	%1$sಆವೃತ್ತಿಯನ್ನು ಶುದ್ಧೀಕರಿಸುತ್ತದೆ %2$s 
 kn.mo	%s installs software	%s installs software
+kn.mo	%1$s adds the license %2$s	%1$sಪರವಾನಗಿ ಸೇರಿಸುತ್ತದೆ %2$s 
+kn.mo	%1$s updates the license %2$s	%1$sಪರವಾನಗಿಯನ್ನು ನವೀಕರಿಸುತ್ತದೆ %2$s 
+kn.mo	%1$s deletes the license %2$s	%1$sಪರವಾನಗಿಯನ್ನು ಅಳಿಸಲಾಗುತ್ತದೆ %2$s 
+kn.mo	%1$s purges the license %2$s	%1$sಪರವಾನಗಿ ತೆಗೆದುಹಾಕುತ್ತದೆ %2$s 
+kn.mo	Technician in charge of the license	ಪರವಾನಗಿ ಉಸ್ತುವಾರಿ ತಂತ್ರಜ್ಞ
+kn.mo	Software	Software
+kn.mo	Number	ಸಂಖ್ಯೆ
+kn.mo	Purchase version	Purchase version
+kn.mo	Expiration	Expiration
+kn.mo	Allow Over-Quota	Allow Over-Quota
 ko_KR.mo	%1$s log in from IP %2$s	IP %2$s에서 %1$s로 로그인
 ko_KR.mo	Failed login for %1$s from IP %2$s	IP %2$s에서 %1$s로 로그인 실패
 ko_KR.mo	%1$s adds the item %2$s	%1$s 는 %2$s 아이템을 추가합니다.
@@ -2446,6 +2796,16 @@ ko_KR.mo	%1$s adds the version %2$s	%1$s 는 버전 %2$s을 추가합니다.
 ko_KR.mo	%1$s updates the version %2$s	%1$s 는 버전 %2$s을 갱신합니다.
 ko_KR.mo	%1$s purges the version %2$s	%1$s 는 버전 %2$s을 제거합니다.
 ko_KR.mo	%s installs software	%s는 소프트웨어를 설치합니다.
+ko_KR.mo	%1$s adds the license %2$s	%1$s는 라이선스 %2$s를 추가합니다
+ko_KR.mo	%1$s updates the license %2$s	%1$s는 라이선스 %2$s를 갱신합니다
+ko_KR.mo	%1$s deletes the license %2$s	%1$s는 라이선스 %2$s를 삭제합니다
+ko_KR.mo	%1$s purges the license %2$s	%1$s는 라이선스 %2$s를 제거합니다
+ko_KR.mo	Technician in charge of the license	라이선스 담당 기술자
+ko_KR.mo	Software	소프트웨어
+ko_KR.mo	Number	번호
+ko_KR.mo	Purchase version	구매 버전
+ko_KR.mo	Expiration	만기
+ko_KR.mo	Allow Over-Quota	할당-초과 허용
 lt_LT.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 lt_LT.mo	Failed login for %1$s from IP %2$s	Nepavyko %1$s prisijungimas iš IP %2$s
 lt_LT.mo	%1$s adds the item %2$s	%1$s pridėjo elementą %2$s
@@ -2514,6 +2874,16 @@ lt_LT.mo	%1$s adds the version %2$s	%1$s prideda versiją %2$s
 lt_LT.mo	%1$s updates the version %2$s	%1$s atnaujina versiją %2$s
 lt_LT.mo	%1$s purges the version %2$s	%1$s išvalo versiją %2$s
 lt_LT.mo	%s installs software	%s įdiegė programinę įrangą
+lt_LT.mo	%1$s adds the license %2$s	%1$s prideda licenziją %2$s
+lt_LT.mo	%1$s updates the license %2$s	%1$s atnaujina licenziją %2$s
+lt_LT.mo	%1$s deletes the license %2$s	%1$s ištrina licenziją %2$s
+lt_LT.mo	%1$s purges the license %2$s	%1$s išvalo licenziją %2$s
+lt_LT.mo	Technician in charge of the license	Technician in charge of the license
+lt_LT.mo	Software	Programinė įranga
+lt_LT.mo	Number	Numeris
+lt_LT.mo	Purchase version	Pirkimo versija
+lt_LT.mo	Expiration	Galiojimo pabaiga
+lt_LT.mo	Allow Over-Quota	Allow Over-Quota
 lv_LV.mo	%1$s log in from IP %2$s	%1$s pieteicās no IP %2$s
 lv_LV.mo	Failed login for %1$s from IP %2$s	Neveiksmīgs meiģinājums pieteikties lietotājam %1$s no IP %2$s
 lv_LV.mo	%1$s adds the item %2$s	%1$s pievieno ierakstu %2$s
@@ -2582,6 +2952,16 @@ lv_LV.mo	%1$s adds the version %2$s	%1$s pievieno versiju %2$s
 lv_LV.mo	%1$s updates the version %2$s	%1$s atjaunoja versiju %2$s
 lv_LV.mo	%1$s purges the version %2$s	%1$s tīra versiju %2$s
 lv_LV.mo	%s installs software	%s uzstādīja programmatūru
+lv_LV.mo	%1$s adds the license %2$s	%1$s pievieno licenci %2$s
+lv_LV.mo	%1$s updates the license %2$s	%1$s atjaunoja licenci %2$s
+lv_LV.mo	%1$s deletes the license %2$s	%1$s dzēsa licenci %2$s
+lv_LV.mo	%1$s purges the license %2$s	%1$s tīra licenci %2$s
+lv_LV.mo	Technician in charge of the license	Tehniķis atbildīgais par licenci
+lv_LV.mo	Software	Programmatūras
+lv_LV.mo	Number	Numurs
+lv_LV.mo	Purchase version	Iegādes versija
+lv_LV.mo	Expiration	Izbeigšanās
+lv_LV.mo	Allow Over-Quota	Allow Over-Quota
 mn_MN.mo	%1$s log in from IP %2$s	%1$sнь IP %2$s-ээр нэвтрэв
 mn_MN.mo	Failed login for %1$s from IP %2$s	%1$s-с IP %2$s-д нэвтрэх явц амжилтгүй боллоо
 mn_MN.mo	%1$s adds the item %2$s	%1$sтөхөөрөмжийг нэмэх%2$s
@@ -2650,6 +3030,16 @@ mn_MN.mo	%1$s adds the version %2$s	%1$s нь %2$s хувилбарыг нэмн
 mn_MN.mo	%1$s updates the version %2$s	%1$s нь %2$s хувилбарыг шинэчлэнэ
 mn_MN.mo	%1$s purges the version %2$s	%1$s нь %2$s хувилбарыг арилгана
 mn_MN.mo	%s installs software	%s програм хангамжийг суулгадаг
+mn_MN.mo	%1$s adds the license %2$s	%1$s нь %2$s лицензийг нэмж байна
+mn_MN.mo	%1$s updates the license %2$s	%1$s лицензийг %2$s шинэчлэсэн
+mn_MN.mo	%1$s deletes the license %2$s	%1$s лицензийг %2$s устгана
+mn_MN.mo	%1$s purges the license %2$s	%1$s лицензийг %2$s-ээс цэвэрлэсэн
+mn_MN.mo	Technician in charge of the license	Тусгай зөвшөөрөл хариуцсан техникч
+mn_MN.mo	Software	Програм хангамж
+mn_MN.mo	Number	Дугаар
+mn_MN.mo	Purchase version	Худалдан авах хувилбар
+mn_MN.mo	Expiration	Дуусах хугацаа
+mn_MN.mo	Allow Over-Quota	Хэт их Quota олгохыг зөвшөөрөх
 ms_MY.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 ms_MY.mo	Failed login for %1$s from IP %2$s	Gagal masuk bagi %1$s dari IP %2$s
 ms_MY.mo	%1$s adds the item %2$s	%1$s menambah kepada item %2$s
@@ -2718,6 +3108,16 @@ ms_MY.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
 ms_MY.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
 ms_MY.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 ms_MY.mo	%s installs software	%s memasang perisian
+ms_MY.mo	%1$s adds the license %2$s	%1$s adds the license %2$s
+ms_MY.mo	%1$s updates the license %2$s	%1$s updates the license %2$s
+ms_MY.mo	%1$s deletes the license %2$s	%1$s deletes the license %2$s
+ms_MY.mo	%1$s purges the license %2$s	%1$s purges the license %2$s
+ms_MY.mo	Technician in charge of the license	Technician in charge of the license
+ms_MY.mo	Software	Perisian
+ms_MY.mo	Number	Number
+ms_MY.mo	Purchase version	Purchase version
+ms_MY.mo	Expiration	Expiration
+ms_MY.mo	Allow Over-Quota	Allow Over-Quota
 nb_NO.mo	%1$s log in from IP %2$s	%1$s innlogget fra IP %2$s
 nb_NO.mo	Failed login for %1$s from IP %2$s	Innlogging feilet for %1$s fra IP %2$s
 nb_NO.mo	%1$s adds the item %2$s	%1$s legger til elementet %2$s
@@ -2786,6 +3186,16 @@ nb_NO.mo	%1$s adds the version %2$s	%1$s legger til versjon %2$s
 nb_NO.mo	%1$s updates the version %2$s	%1$s oppdaterer versjon %2$s
 nb_NO.mo	%1$s purges the version %2$s	%1$s sletter versjonen permanent %2$s
 nb_NO.mo	%s installs software	%s installerer programvare
+nb_NO.mo	%1$s adds the license %2$s	%1$s legger til lisensen %2$s
+nb_NO.mo	%1$s updates the license %2$s	%1$s oppdaterer lisensen %2$s
+nb_NO.mo	%1$s deletes the license %2$s	%1$s slette lisens %2$s
+nb_NO.mo	%1$s purges the license %2$s	%1$s sletter lisensen permanent %2$s
+nb_NO.mo	Technician in charge of the license	Technician in charge of the license
+nb_NO.mo	Software	Programvare
+nb_NO.mo	Number	Nummer
+nb_NO.mo	Purchase version	Kjøp versjon
+nb_NO.mo	Expiration	Utløpsdato
+nb_NO.mo	Allow Over-Quota	Allow Over-Quota
 nl_BE.mo	%1$s log in from IP %2$s	%1$s log in van IP %2$s
 nl_BE.mo	Failed login for %1$s from IP %2$s	Mislukt login voor %1$s van IP %2$s
 nl_BE.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
@@ -2854,6 +3264,16 @@ nl_BE.mo	%1$s adds the version %2$s	%1$s voegt versie %2$s toe
 nl_BE.mo	%1$s updates the version %2$s	%1$s actualiseert versie %2$s
 nl_BE.mo	%1$s purges the version %2$s	%1$s verwijdert versie %2$s
 nl_BE.mo	%s installs software	%s installeert software
+nl_BE.mo	%1$s adds the license %2$s	%1$s voegt de licensie %2$s toe
+nl_BE.mo	%1$s updates the license %2$s	%1$s actualiseert licentie %2$s
+nl_BE.mo	%1$s deletes the license %2$s	%1$s verwijdert licentie %2$s
+nl_BE.mo	%1$s purges the license %2$s	%1$s verwijdert licentie %2$s
+nl_BE.mo	Technician in charge of the license	Technicus die verantwoordelijk is voor de licentie
+nl_BE.mo	Software	Software
+nl_BE.mo	Number	Aantal
+nl_BE.mo	Purchase version	Gekochte versie
+nl_BE.mo	Expiration	Vervaldatum
+nl_BE.mo	Allow Over-Quota	Allow Over-Quota
 nl_NL.mo	%1$s log in from IP %2$s	%1$s log in van IP %2$s
 nl_NL.mo	Failed login for %1$s from IP %2$s	Mislukt login voor %1$s van IP %2$s
 nl_NL.mo	%1$s adds the item %2$s	%1$s voegt het item %2$s toe
@@ -2922,6 +3342,16 @@ nl_NL.mo	%1$s adds the version %2$s	%1$s voegt versie %2$s toe
 nl_NL.mo	%1$s updates the version %2$s	%1$s actualiseert versie %2$s
 nl_NL.mo	%1$s purges the version %2$s	%1$s verwijdert versie %2$s
 nl_NL.mo	%s installs software	%s installeert software
+nl_NL.mo	%1$s adds the license %2$s	%1$s voegt de licensie %2$s toe
+nl_NL.mo	%1$s updates the license %2$s	%1$s actualiseert licentie %2$s
+nl_NL.mo	%1$s deletes the license %2$s	%1$s verwijdert licentie %2$s
+nl_NL.mo	%1$s purges the license %2$s	%1$s verwijdert licentie %2$s
+nl_NL.mo	Technician in charge of the license	Technicus die verantwoordelijk is voor de licentie
+nl_NL.mo	Software	Software
+nl_NL.mo	Number	Aantal
+nl_NL.mo	Purchase version	Gekochte versie
+nl_NL.mo	Expiration	Vervaldatum
+nl_NL.mo	Allow Over-Quota	Allow Over-Quota
 nn_NO.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 nn_NO.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 nn_NO.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -2990,6 +3420,16 @@ nn_NO.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
 nn_NO.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
 nn_NO.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 nn_NO.mo	%s installs software	%s installs software
+nn_NO.mo	%1$s adds the license %2$s	%1$s adds the license %2$s
+nn_NO.mo	%1$s updates the license %2$s	%1$s updates the license %2$s
+nn_NO.mo	%1$s deletes the license %2$s	%1$s deletes the license %2$s
+nn_NO.mo	%1$s purges the license %2$s	%1$s purges the license %2$s
+nn_NO.mo	Technician in charge of the license	Technician in charge of the license
+nn_NO.mo	Software	Software
+nn_NO.mo	Number	Nummer
+nn_NO.mo	Purchase version	Kjøp versjon
+nn_NO.mo	Expiration	Utløpsdato
+nn_NO.mo	Allow Over-Quota	Allow Over-Quota
 pl_PL.mo	%1$s log in from IP %2$s	%1$s zalogował się z IP %2$s
 pl_PL.mo	Failed login for %1$s from IP %2$s	Nieudane logowanie %1$s z IP %2$s
 pl_PL.mo	%1$s adds the item %2$s	%1$s dodał element %2$s
@@ -3058,6 +3498,16 @@ pl_PL.mo	%1$s adds the version %2$s	%1$s dodał wersję %2$s
 pl_PL.mo	%1$s updates the version %2$s	%1$s zaktualizował wersję %2$s
 pl_PL.mo	%1$s purges the version %2$s	%1$s wyczyścił wersje %2$s
 pl_PL.mo	%s installs software	%s zainstalował oprogramowanie
+pl_PL.mo	%1$s adds the license %2$s	%1$s dodał licencję %2$s
+pl_PL.mo	%1$s updates the license %2$s	%1$s zaktualizował licencję %2$s
+pl_PL.mo	%1$s deletes the license %2$s	%1$s usunął licencję %2$s
+pl_PL.mo	%1$s purges the license %2$s	%1$s wyczyścił licencje  %2$s
+pl_PL.mo	Technician in charge of the license	Technik odpowiedzialny za licencje
+pl_PL.mo	Software	Oprogramowanie
+pl_PL.mo	Number	Numer
+pl_PL.mo	Purchase version	Zakupiona wersja
+pl_PL.mo	Expiration	Data wygaśnięcia
+pl_PL.mo	Allow Over-Quota	Zezwalaj na przekroczenie limitu
 pt_BR.mo	%1$s log in from IP %2$s	%1$s fez login no IP %2$s
 pt_BR.mo	Failed login for %1$s from IP %2$s	Login falhou para %1$s no IP %2$s
 pt_BR.mo	%1$s adds the item %2$s	%1$s adicionou o item %2$s
@@ -3126,6 +3576,16 @@ pt_BR.mo	%1$s adds the version %2$s	%1$s adicionou a versão %2$s
 pt_BR.mo	%1$s updates the version %2$s	%1$s atualizou a versão %2$s
 pt_BR.mo	%1$s purges the version %2$s	%1$s apagou a versão %2$s
 pt_BR.mo	%s installs software	%s instalou um software
+pt_BR.mo	%1$s adds the license %2$s	%1$s adicionou a licença %2$s
+pt_BR.mo	%1$s updates the license %2$s	%1$s atualizou a licença %2$s
+pt_BR.mo	%1$s deletes the license %2$s	%1$s excluiu a licença %2$s
+pt_BR.mo	%1$s purges the license %2$s	%1$s apagou a licença %2$s
+pt_BR.mo	Technician in charge of the license	Técnico encarregado da licença
+pt_BR.mo	Software	Software
+pt_BR.mo	Number	Número
+pt_BR.mo	Purchase version	Versão comprada
+pt_BR.mo	Expiration	Expira
+pt_BR.mo	Allow Over-Quota	Permitir exceder cota
 pt_PT.mo	%1$s log in from IP %2$s	%1$s ligou-se do IP %2$s
 pt_PT.mo	Failed login for %1$s from IP %2$s	Falhou login para %1$s do IP %2$s
 pt_PT.mo	%1$s adds the item %2$s	%1$s adiciona o item %2$s
@@ -3194,6 +3654,16 @@ pt_PT.mo	%1$s adds the version %2$s	%1$s adiciona a versão %2$s
 pt_PT.mo	%1$s updates the version %2$s	%1$s atualiza a versão %2$s
 pt_PT.mo	%1$s purges the version %2$s	%1$s remove a versão %2$s
 pt_PT.mo	%s installs software	%s instala software
+pt_PT.mo	%1$s adds the license %2$s	%1$s adiciona a licença %2$s
+pt_PT.mo	%1$s updates the license %2$s	%1$s atualiza a licença %2$s
+pt_PT.mo	%1$s deletes the license %2$s	%1$s apaga a licença %2$s
+pt_PT.mo	%1$s purges the license %2$s	%1$s remove a licença %2$s
+pt_PT.mo	Technician in charge of the license	Técnico responsável pela licença
+pt_PT.mo	Software	Software
+pt_PT.mo	Number	Número
+pt_PT.mo	Purchase version	Versão adquirida
+pt_PT.mo	Expiration	Data de término
+pt_PT.mo	Allow Over-Quota	Permitir acima da quota
 ro_RO.mo	%1$s log in from IP %2$s	%1$s s-a conectat de la IP -ul  %2$s
 ro_RO.mo	Failed login for %1$s from IP %2$s	Conexiune eşuată pentru %1$s de la IP %2$s
 ro_RO.mo	%1$s adds the item %2$s	%1$sadaugă elementzl %2$s
@@ -3262,6 +3732,16 @@ ro_RO.mo	%1$s adds the version %2$s	%1$s adaugă versiunea %2$s
 ro_RO.mo	%1$s updates the version %2$s	%1$sactualizează versiunea %2$s
 ro_RO.mo	%1$s purges the version %2$s	%1$s elimină versiunea %2$s
 ro_RO.mo	%s installs software	%s instalează un soft
+ro_RO.mo	%1$s adds the license %2$s	%1$s adaugă licenţa %2$s
+ro_RO.mo	%1$s updates the license %2$s	%1$s actualizează  licenţa %2$s
+ro_RO.mo	%1$s deletes the license %2$s	%1$s şterge licenţa %2$s
+ro_RO.mo	%1$s purges the license %2$s	%1$s elimină licenţa %2$s
+ro_RO.mo	Technician in charge of the license	Tehnician responsabil  al licentei
+ro_RO.mo	Software	Software
+ro_RO.mo	Number	Numar
+ro_RO.mo	Purchase version	Achizitioneaza versiune
+ro_RO.mo	Expiration	Data expirarii
+ro_RO.mo	Allow Over-Quota	Allow Over-Quota
 ru_RU.mo	%1$s log in from IP %2$s	%1$s вошел в систему с IP %2$s
 ru_RU.mo	Failed login for %1$s from IP %2$s	Неудачная попытка входа пользователя %1$s с IP %2$s
 ru_RU.mo	%1$s adds the item %2$s	%1$s добавил объект %2$s
@@ -3330,6 +3810,16 @@ ru_RU.mo	%1$s adds the version %2$s	%1$s добавил версию %2$s
 ru_RU.mo	%1$s updates the version %2$s	%1$s обновил версию %2$s
 ru_RU.mo	%1$s purges the version %2$s	%1$s очистил версию %2$s
 ru_RU.mo	%s installs software	%s инсталлировал ПО
+ru_RU.mo	%1$s adds the license %2$s	%1$s добавил лицензию %2$s
+ru_RU.mo	%1$s updates the license %2$s	%1$s обновил лицензию %2$s
+ru_RU.mo	%1$s deletes the license %2$s	%1$s удалил лицензию %2$s
+ru_RU.mo	%1$s purges the license %2$s	%1$s очистил лицензию %2$s
+ru_RU.mo	Technician in charge of the license	Специалист ответственный за лицензию
+ru_RU.mo	Software	Программное обеспечение
+ru_RU.mo	Number	Количество
+ru_RU.mo	Purchase version	Купленная версия
+ru_RU.mo	Expiration	Истечение срока
+ru_RU.mo	Allow Over-Quota	Разрешить превышение квоты
 sk_SK.mo	%1$s log in from IP %2$s	%1$s sa prihlásil z IP %2$s
 sk_SK.mo	Failed login for %1$s from IP %2$s	Neúspešné prihlásenie %1$s z IP %2$s
 sk_SK.mo	%1$s adds the item %2$s	%1$s pridal položku %2$s
@@ -3398,6 +3888,16 @@ sk_SK.mo	%1$s adds the version %2$s	%1$s pridal verziu %2$s
 sk_SK.mo	%1$s updates the version %2$s	%1$s aktualizoval verziu %2$s
 sk_SK.mo	%1$s purges the version %2$s	%1$s vymazal verziu %2$s
 sk_SK.mo	%s installs software	%s nainštaloval softvér
+sk_SK.mo	%1$s adds the license %2$s	%1$s pridal licenciu %2$s
+sk_SK.mo	%1$s updates the license %2$s	%1$s aktualizoval licenciu %2$s
+sk_SK.mo	%1$s deletes the license %2$s	%1$s zmazal licenciu %2$s
+sk_SK.mo	%1$s purges the license %2$s	%1$s vymazal licenciu %2$s
+sk_SK.mo	Technician in charge of the license	Technik zodpovedný za licenciu
+sk_SK.mo	Software	Softvér
+sk_SK.mo	Number	Počet
+sk_SK.mo	Purchase version	Zakúpená verzia
+sk_SK.mo	Expiration	Exspirácia
+sk_SK.mo	Allow Over-Quota	Umožniť prekročenie kvóty
 sl_SI.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 sl_SI.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 sl_SI.mo	%1$s adds the item %2$s	%1$s doda predmet %2$s
@@ -3466,6 +3966,16 @@ sl_SI.mo	%1$s adds the version %2$s	%1$s doda različico %2$s
 sl_SI.mo	%1$s updates the version %2$s	%1$s posodobi različico %2$s
 sl_SI.mo	%1$s purges the version %2$s	%1$s  počisti različico %2$s
 sl_SI.mo	%s installs software	%s namesti programsko opremo
+sl_SI.mo	%1$s adds the license %2$s	%1$s doda licenco %2$s
+sl_SI.mo	%1$s updates the license %2$s	%1$s posodobi licenco %2$s
+sl_SI.mo	%1$s deletes the license %2$s	%1$s deletes the license %2$s
+sl_SI.mo	%1$s purges the license %2$s	%1$s počisti licenco %2$s
+sl_SI.mo	Technician in charge of the license	Technician in charge of the license
+sl_SI.mo	Software	Software
+sl_SI.mo	Number	Številka
+sl_SI.mo	Purchase version	Nakup različice
+sl_SI.mo	Expiration	Potek roka
+sl_SI.mo	Allow Over-Quota	Allow Over-Quota
 sr_RS.mo	%1$s log in from IP %2$s	%1$s loguj se sa IP %2$s
 sr_RS.mo	Failed login for %1$s from IP %2$s	Neuspelo logovanje za %1$s sa IP %2$s
 sr_RS.mo	%1$s adds the item %2$s	%1$s dodavanje stavke %2$s
@@ -3534,6 +4044,16 @@ sr_RS.mo	%1$s adds the version %2$s	%1$s dodaje verziju %2$s
 sr_RS.mo	%1$s updates the version %2$s	%1$s ažurira verziju %2$s
 sr_RS.mo	%1$s purges the version %2$s	%1$s čisti verziju %2$s
 sr_RS.mo	%s installs software	%s instalira softver
+sr_RS.mo	%1$s adds the license %2$s	%1$s dodaje licencu %2$s
+sr_RS.mo	%1$s updates the license %2$s	%1$s ažurira licencu %2$s
+sr_RS.mo	%1$s deletes the license %2$s	%1$s briše licencu %2$s
+sr_RS.mo	%1$s purges the license %2$s	%1$s čisti licencu %2$s
+sr_RS.mo	Technician in charge of the license	Technician in charge of the license
+sr_RS.mo	Software	Software
+sr_RS.mo	Number	Broj
+sr_RS.mo	Purchase version	Poruči verziju
+sr_RS.mo	Expiration	Ističe
+sr_RS.mo	Allow Over-Quota	Allow Over-Quota
 sv_SE.mo	%1$s log in from IP %2$s	%1$s är inloggad från ip %2$s
 sv_SE.mo	Failed login for %1$s from IP %2$s	%1$s misslyckades att logga in från IP %2$s
 sv_SE.mo	%1$s adds the item %2$s	%1$s lägger till objektet %2$s
@@ -3602,6 +4122,16 @@ sv_SE.mo	%1$s adds the version %2$s	%1$s lägger till version %2$s
 sv_SE.mo	%1$s updates the version %2$s	%1$s uppdaterar version %2$s
 sv_SE.mo	%1$s purges the version %2$s	%1$s rensar bort version %2$s
 sv_SE.mo	%s installs software	%s installerar mjukvara
+sv_SE.mo	%1$s adds the license %2$s	%1$s lägger till licensen %2$s
+sv_SE.mo	%1$s updates the license %2$s	%1$s uppdaterar licensen %2$s
+sv_SE.mo	%1$s deletes the license %2$s	%1$s deletes the license %2$s
+sv_SE.mo	%1$s purges the license %2$s	%1$s rensar bort licensen %2$s
+sv_SE.mo	Technician in charge of the license	Technician in charge of the license
+sv_SE.mo	Software	Mjukvara
+sv_SE.mo	Number	Nummer
+sv_SE.mo	Purchase version	Inköpt version
+sv_SE.mo	Expiration	Avslut
+sv_SE.mo	Allow Over-Quota	Allow Over-Quota
 ta.mo	%1$s log in from IP %2$s	IP %2$s இலிருந்து %1$s உள்நுழைக
 ta.mo	Failed login for %1$s from IP %2$s	ஐபி %2$s இலிருந்து %1$s க்கான உள்நுழைவு தோல்வியுற்றது
 ta.mo	%1$s adds the item %2$s	%1$s உருப்படி %2$s ஐ சேர்க்கிறது
@@ -3670,6 +4200,16 @@ ta.mo	%1$s adds the version %2$s	%1$s பதிப்பை %2$s சேர்க
 ta.mo	%1$s updates the version %2$s	%1$s பதிப்பு %2$s ஐ புதுப்பிக்கிறது
 ta.mo	%1$s purges the version %2$s	%1$s பதிப்பை %2$s ஐ சுத்தப்படுத்துகிறது
 ta.mo	%s installs software	%s மென்பொருளை நிறுவுகின்றன
+ta.mo	%1$s adds the license %2$s	%1$s உரிமம் %2$s ஐ சேர்க்கிறது
+ta.mo	%1$s updates the license %2$s	%1$s உரிமம் %2$s ஐ புதுப்பிக்கிறது
+ta.mo	%1$s deletes the license %2$s	%1$s உரிமத்தை நீக்குகிறது %2$s
+ta.mo	%1$s purges the license %2$s	%1$s உரிமத்தை %2$s சுத்தப்படுத்துகிறது
+ta.mo	Technician in charge of the license	உரிமத்தின் பொறுப்பான தொழில்நுட்ப வல்லுநர்
+ta.mo	Software	மென்பொருள்
+ta.mo	Number	எண்
+ta.mo	Purchase version	கொள்முதல் பதிப்பு
+ta.mo	Expiration	காலாவதி
+ta.mo	Allow Over-Quota	ஓவர்-குவோட்டாவை அனுமதிக்கவும்
 th_TH.mo	%1$s log in from IP %2$s	%1$s เข้าสู่ระบบจาก IP %2$s
 th_TH.mo	Failed login for %1$s from IP %2$s	เข้าสู่ระบบไม่ผ่าน %1$s จาก IP %2$s
 th_TH.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -3738,6 +4278,16 @@ th_TH.mo	%1$s adds the version %2$s	%1$s เพิ่มรุ่น %2$s
 th_TH.mo	%1$s updates the version %2$s	%1$s อัพเดทรุ่น %2$s
 th_TH.mo	%1$s purges the version %2$s	%1$s ล้างข้อมูล รุ่นที่ %2$s
 th_TH.mo	%s installs software	%s ติดตั้งโปรแกรม
+th_TH.mo	%1$s adds the license %2$s	%1$s เพิ่มลิขสิทธิ์ %2$s
+th_TH.mo	%1$s updates the license %2$s	%1$s อัพเดทลิขสิทธิ์ %2$s
+th_TH.mo	%1$s deletes the license %2$s	%1$s ลบลิขสิทธิ์ %2$s
+th_TH.mo	%1$s purges the license %2$s	%1$s ล้างข้อมูล ใบอนุญาต %2$s
+th_TH.mo	Technician in charge of the license	Technician in charge of the license
+th_TH.mo	Software	โปรแกรม
+th_TH.mo	Number	จำนวน
+th_TH.mo	Purchase version	รุ่นที่ซื้อ
+th_TH.mo	Expiration	สิ้นสุด
+th_TH.mo	Allow Over-Quota	Allow Over-Quota
 tr_TR.mo	%1$s log in from IP %2$s	%1$s, %2$s IP adresinden oturum açtı
 tr_TR.mo	Failed login for %1$s from IP %2$s	%1$s, %2$s IP adresinden oturum açamadı
 tr_TR.mo	%1$s adds the item %2$s	%1$s %2$s ögesini ekledi
@@ -3806,6 +4356,16 @@ tr_TR.mo	%1$s adds the version %2$s	%1$s, %2$s sürümünü ekledi
 tr_TR.mo	%1$s updates the version %2$s	%1$s, %2$s sürümünü güncelledi
 tr_TR.mo	%1$s purges the version %2$s	%1$s %2$s sürümünü sildi
 tr_TR.mo	%s installs software	%s yazılım kurdu
+tr_TR.mo	%1$s adds the license %2$s	%1$s, %2$s lisansını ekledi
+tr_TR.mo	%1$s updates the license %2$s	%1$s, %2$s lisansını güncelledi
+tr_TR.mo	%1$s deletes the license %2$s	%1$s, %2$s lisansını sildi
+tr_TR.mo	%1$s purges the license %2$s	%1$s %2$s lisansını sildi
+tr_TR.mo	Technician in charge of the license	Lisanstan sorumlu teknisyen
+tr_TR.mo	Software	Yazılım
+tr_TR.mo	Number	Sayı
+tr_TR.mo	Purchase version	Satın alınan sürüm
+tr_TR.mo	Expiration	Sona erme
+tr_TR.mo	Allow Over-Quota	Kota Aşılabilsin
 uk_UA.mo	%1$s log in from IP %2$s	%1$s зайшов з IP %2$s
 uk_UA.mo	Failed login for %1$s from IP %2$s	Невдала реєстрація %1$s з IP %2$s
 uk_UA.mo	%1$s adds the item %2$s	%1$s додав елемент %2$s
@@ -3874,6 +4434,16 @@ uk_UA.mo	%1$s adds the version %2$s	%1$s додав версію %2$s
 uk_UA.mo	%1$s updates the version %2$s	%1$s змінив версію %2$s
 uk_UA.mo	%1$s purges the version %2$s	%1$s знищив версію %2$s
 uk_UA.mo	%s installs software	%s встановив програмне забезпечення
+uk_UA.mo	%1$s adds the license %2$s	%1$s додав ліцензію %2$s
+uk_UA.mo	%1$s updates the license %2$s	%1$s змінив ліцензію %2$s
+uk_UA.mo	%1$s deletes the license %2$s	%1$s видалив ліцензію %2$s
+uk_UA.mo	%1$s purges the license %2$s	%1$s знищив ліцензію %2$s
+uk_UA.mo	Technician in charge of the license	Інженер, відповідальний за ліцензію
+uk_UA.mo	Software	Програмне забезпечення
+uk_UA.mo	Number	Кількість
+uk_UA.mo	Purchase version	Куплена версія
+uk_UA.mo	Expiration	Закінчення
+uk_UA.mo	Allow Over-Quota	Дозволити оверквоту
 vi_VN.mo	%1$s log in from IP %2$s	%1$s đăng nhập từ IP %2$s
 vi_VN.mo	Failed login for %1$s from IP %2$s	Đăng nhập thất bại cho %1$s từ IP %2$s
 vi_VN.mo	%1$s adds the item %2$s	%1$s thêm mục %2$s
@@ -3942,6 +4512,16 @@ vi_VN.mo	%1$s adds the version %2$s	%1$s thêm phiên bản %2$s
 vi_VN.mo	%1$s updates the version %2$s	%1$s cập nhật phiên bản %2$s
 vi_VN.mo	%1$s purges the version %2$s	%1$s loại bỏ phiên bản %2$s
 vi_VN.mo	%s installs software	%s cài phần mềm
+vi_VN.mo	%1$s adds the license %2$s	%1$s thêm giấy phép %2$s
+vi_VN.mo	%1$s updates the license %2$s	%1$s cập nhật giấy phép %2$s
+vi_VN.mo	%1$s deletes the license %2$s	%1$s xóa giấy phép %2$s
+vi_VN.mo	%1$s purges the license %2$s	%1$s loại bỏ giấy phép %2$s
+vi_VN.mo	Technician in charge of the license	Technician in charge of the license
+vi_VN.mo	Software	Phần mềm
+vi_VN.mo	Number	Số
+vi_VN.mo	Purchase version	Mua phiên bản
+vi_VN.mo	Expiration	Hết hiệu lực
+vi_VN.mo	Allow Over-Quota	Allow Over-Quota
 zh_CN.mo	%1$s log in from IP %2$s	%1$s 登陆来自 IP %2$s
 zh_CN.mo	Failed login for %1$s from IP %2$s	 %1$s 从 IP %2$s登陆失败
 zh_CN.mo	%1$s adds the item %2$s	%1$s 添加项目 %2$s
@@ -4010,6 +4590,16 @@ zh_CN.mo	%1$s adds the version %2$s	%1$s 新增版本 %2$s
 zh_CN.mo	%1$s updates the version %2$s	%1$s 更新版本 %2$s
 zh_CN.mo	%1$s purges the version %2$s	%1$s 清除版本 %2$s
 zh_CN.mo	%s installs software	%s 安装软件
+zh_CN.mo	%1$s adds the license %2$s	%1$s 添加许可证 %2$s
+zh_CN.mo	%1$s updates the license %2$s	%1$s 更新许可证 %2$s
+zh_CN.mo	%1$s deletes the license %2$s	%1$s 删除许可证 %2$s
+zh_CN.mo	%1$s purges the license %2$s	%1$s 清除许可证 %2$s
+zh_CN.mo	Technician in charge of the license	许可证技术员
+zh_CN.mo	Software	软件
+zh_CN.mo	Number	数字
+zh_CN.mo	Purchase version	购买版本
+zh_CN.mo	Expiration	到期日
+zh_CN.mo	Allow Over-Quota	允许超出配额
 zh_HK.mo	%1$s log in from IP %2$s	%1$s log in from IP %2$s
 zh_HK.mo	Failed login for %1$s from IP %2$s	Failed login for %1$s from IP %2$s
 zh_HK.mo	%1$s adds the item %2$s	%1$s adds the item %2$s
@@ -4078,6 +4668,16 @@ zh_HK.mo	%1$s adds the version %2$s	%1$s adds the version %2$s
 zh_HK.mo	%1$s updates the version %2$s	%1$s updates the version %2$s
 zh_HK.mo	%1$s purges the version %2$s	%1$s purges the version %2$s
 zh_HK.mo	%s installs software	%s installs software
+zh_HK.mo	%1$s adds the license %2$s	%1$s adds the license %2$s
+zh_HK.mo	%1$s updates the license %2$s	%1$s updates the license %2$s
+zh_HK.mo	%1$s deletes the license %2$s	%1$s deletes the license %2$s
+zh_HK.mo	%1$s purges the license %2$s	%1$s purges the license %2$s
+zh_HK.mo	Technician in charge of the license	Technician in charge of the license
+zh_HK.mo	Software	Software
+zh_HK.mo	Number	Number
+zh_HK.mo	Purchase version	Purchase version
+zh_HK.mo	Expiration	Expiration
+zh_HK.mo	Allow Over-Quota	Allow Over-Quota
 zh_TW.mo	%1$s log in from IP %2$s	%1$s 登錄從 IP %2$s
 zh_TW.mo	Failed login for %1$s from IP %2$s	從IP %2$s的%1$s 的登錄失敗
 zh_TW.mo	%1$s adds the item %2$s	%1$s 新增項目 %2$s
@@ -4146,3 +4746,13 @@ zh_TW.mo	%1$s adds the version %2$s	%1$s 新增版本 %2$s
 zh_TW.mo	%1$s updates the version %2$s	%1$s 更新版本 %2$s
 zh_TW.mo	%1$s purges the version %2$s	%1$s 清除版本 %2$s
 zh_TW.mo	%s installs software	%s 安裝軟體
+zh_TW.mo	%1$s adds the license %2$s	%1$s 新增授權 %2$s
+zh_TW.mo	%1$s updates the license %2$s	%1$s 更新授權 %2$s
+zh_TW.mo	%1$s deletes the license %2$s	%1$s 刪除授權 %2$s
+zh_TW.mo	%1$s purges the license %2$s	%1$s 清除授權 %2$s
+zh_TW.mo	Technician in charge of the license	Technician in charge of the license
+zh_TW.mo	Software	軟體
+zh_TW.mo	Number	數字
+zh_TW.mo	Purchase version	採購版本
+zh_TW.mo	Expiration	到期日
+zh_TW.mo	Allow Over-Quota	Allow Over-Quota

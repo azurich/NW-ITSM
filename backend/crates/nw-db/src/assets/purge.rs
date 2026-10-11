@@ -115,7 +115,12 @@ pub(super) async fn present(
 
 /// Deletes the asset, its history and its linked rows. `false` when it no
 /// longer exists.
-pub async fn purge(pool: &MySqlPool, kind: AssetKind, id: i32) -> Result<bool, sqlx::Error> {
+pub async fn purge(
+    pool: &MySqlPool,
+    kind: AssetKind,
+    id: i32,
+    actor: &str,
+) -> Result<bool, sqlx::Error> {
     let mut tx = pool.begin().await?;
     let found: Option<i32> = sqlx::query_scalar(&format!(
         "SELECT id FROM {} WHERE id = ? FOR UPDATE",
@@ -146,10 +151,19 @@ pub async fn purge(pool: &MySqlPool, kind: AssetKind, id: i32) -> Result<bool, s
         .bind(id)
         .execute(&mut *tx)
         .await?;
+    let software = if kind == AssetKind::SoftwareLicense {
+        super::licenses::software_of(&mut tx, id).await?
+    } else {
+        None
+    };
     sqlx::query(&format!("DELETE FROM {} WHERE id = ?", kind.table()))
         .bind(id)
         .execute(&mut *tx)
         .await?;
+    // `post_deleteFromDB` of a license: the validity of its software.
+    if let Some(software) = software {
+        super::licenses::update_software_validity(&mut tx, software, actor).await?;
+    }
     tx.commit().await?;
     Ok(true)
 }

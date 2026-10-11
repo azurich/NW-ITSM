@@ -43,6 +43,15 @@ describe('parseAssetCreateSearch', () => {
     expect(parseAssetCreateSearch({ template: 0 })).toEqual({ template: 0 })
     expect(parseAssetCreateSearch({})).toEqual({ template: undefined })
     expect(parseAssetCreateSearch({ template: '-1' })).toEqual({ template: undefined })
+  })
+
+  it('keeps the software of a new license', () => {
+    expect(parseAssetCreateSearch({ software: '40', software_name: 'Editor' })).toEqual({
+      template: undefined,
+      software: 40,
+      software_name: 'Editor',
+    })
+    expect(parseAssetCreateSearch({ software: 'x' })).toEqual({ template: undefined })
     expect(parseAssetCreateSearch({ template: 'x' })).toEqual({ template: undefined })
   })
 })

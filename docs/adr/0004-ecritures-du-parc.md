@@ -618,6 +618,65 @@ par l'API :
 Résultat : bases identiques, mêmes événements, y compris le refus du
 profil en lecture seule après la correction du PHP.
 
+### Logiciels : licences
+
+Quatrième étape, première partie : les licences d'un logiciel
+(`SoftwareLicense`), un type du parc à part entière sous
+`/assets/software-licenses` (droit `license`). Elles ont, comme les
+matériels, les règles métier du parc (`asset_types`), l'unicité des
+champs, les informations financières (créées automatiquement, datées par
+leur statut, recopiées au partage), la corbeille et la purge. Leurs
+affectations aux matériels sont la seconde partie de l'étape.
+
+- **Champs** du formulaire PHP : logiciel (choisi à la création, puis
+  fixe), nom, statut, licence parente, lieu, type, technicien et groupe
+  responsables, éditeur, numéros de série et d'inventaire, utilisateur,
+  groupe, commentaire, versions utilisée et d'achat, nombre, dépassement
+  de quota autorisé, expiration. Historique avec les options du PHP
+  (série 11, inventaire 162, type 5, version d'achat 6, version utilisée 7,
+  expiration 8, nombre 4, dépassement 168...) ; l'éditeur n'en a pas. Une
+  date d'expiration vidée est journalisée à `NULL`.
+- **Arborescence** (`CommonTreeDropdown`) : le nom perd ses espaces de
+  début et de fin ; le nom complet et le niveau suivent la licence parente
+  à la création et quand le nom ou le parent change (le nom complet est
+  alors journalisé, option 13, comme l'identifiant du parent, en brut).
+  Une licence ne peut pas devenir sa propre fille. Comme en PHP, les noms
+  complets des filles ne sont pas régénérés, et rien n'est noté sur la
+  licence parente (`SoftwareLicense` remplace les `post_*` des arbres sans
+  les appeler).
+- **Validité en chaîne** : chaque modification recalcule la validité de
+  la licence (`computeValidityIndicator` : invalide quand son nombre est
+  inférieur à ses affectations hors corbeille, d'éléments existants hors
+  corbeille et gabarits ; un nombre de 0 la rend invalide dès la première
+  affectation, malgré le libellé « 0 = illimité »), puis celle de son
+  logiciel (aucune licence invalide), écrite comme un formulaire (option
+  63, nouvelle `date_mod`). Aussi à la création et à la purge d'une
+  licence ; pas à la corbeille.
+- **Événements** du formulaire, sur le logiciel, avec l'id de la licence :
+  « ajoute / met à jour / supprime / purge la licence » ; la restauration
+  est notée sur la licence (« restaure un élément »).
+- **Corbeille et purge** : renvoyées vers l'interface classique quand des
+  licences sont sous elle (le PHP les rattache à son parent, avec leur
+  historique) ; la purge aussi quand elle a des affectations, des
+  certificats ou des tickets. Sinon ses alertes, son information
+  financière, ses contrats, documents, notes, liens vers la base de
+  connaissances, changements et problèmes sont supprimés.
+- **Gabarits** des licences : laissés à l'interface classique.
+- **Interface** : liste des licences, fiche, formulaire (licences parentes
+  et versions limitées à celles du logiciel), et section « Licences » de
+  la fiche d'un logiciel, d'où une licence s'ajoute avec ce logiciel.
+
+Vérification : sur des copies identiques de la base de référence, par le
+formulaire PHP puis par l'API :
+- création (sous une licence parente, nom à espaces, expiration,
+  versions, information financière automatique) ;
+- modification (nom, parent, validité qui change avec celle du logiciel ;
+  aucun changement ; expiration vidée) ;
+- corbeille (sans parent, avec parent), restauration, purge (information
+  financière, alertes, historique, validité du logiciel).
+
+Résultat : bases identiques, mêmes événements.
+
 ### Correction côté PHP : conditions des listes des formulaires
 
 Les formulaires Twig d'ITSM-NG n'appliquaient aucune des conditions de
@@ -664,7 +723,7 @@ correction.
 | `business_rules` | Une règle métier utilise un critère ou une action de plugin, une condition textuelle sur « inventaire automatique » (libellé traduit), ou une expression régulière que les deux moteurs ne lisent pas pareil |
 | `field_unicity` | Un critère d'unicité porte sur un champ que le formulaire n'a pas, ou pourrait s'appliquer aux informations financières (créées, datées ou recopiées d'un gabarit) ou aux cartes SIM écrites en même temps |
 | `notifications` | Un doublon relève d'un critère qui envoie des notifications, et elles sont actives |
-| `linked_data` | Une purge toucherait des données liées dont la suppression n'est pas portée (ports réseau, composants, logiciels, licences d'une version, tickets, place ou contenu d'une baie, d'un châssis, d'un PDU ou d'un cluster, cartouches, réservations en cours, impact, connexions avec nettoyage à la déconnexion), ou le gabarit d'une création a des liens dont la recopie n'est pas portée (système d'exploitation, composants, ports réseau, disques, logiciels, connexions, notes, base de connaissances, cartouches, éléments d'un châssis, prises d'un PDU) |
+| `linked_data` | Une purge toucherait des données liées dont la suppression n'est pas portée (ports réseau, composants, logiciels, licences d'une version, licences filles ou affectations d'une licence, tickets, place ou contenu d'une baie, d'un châssis, d'un PDU ou d'un cluster, cartouches, réservations en cours, impact, connexions avec nettoyage à la déconnexion), ou le gabarit d'une création a des liens dont la recopie n'est pas portée (système d'exploitation, composants, ports réseau, disques, logiciels, connexions, notes, base de connaissances, cartouches, éléments d'un châssis, prises d'un PDU) |
 | `linked_items` | Partager l'élément changerait l'entité d'objets liés rangés dans une autre entité (données incohérentes : seule la recopie du partage est portée) |
 
 Une modification qui ne change rien, ou une mise à la corbeille d'un

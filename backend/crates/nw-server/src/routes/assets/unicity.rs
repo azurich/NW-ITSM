@@ -319,8 +319,26 @@ fn label(kind: AssetKind, field: &str, tr: &impl Fn(Source) -> String) -> String
             return tr(source);
         }
     }
+    // The licenses too: the first of the users is their technician's,
+    // their parent is shown by its name, both versions as the purchase one.
+    if kind == AssetKind::SoftwareLicense {
+        let source = match field {
+            "users_id" | "users_id_tech" => Some(text::TECH_LICENSE),
+            "softwares_id" => Some(text::SOFTWARE),
+            "softwarelicenses_id" => Some(text::NAME),
+            "number" => Some(text::QUANTITY),
+            "softwareversions_id_use" | "softwareversions_id_buy" => Some(text::PURCHASE_VERSION),
+            "expire" => Some(text::EXPIRATION),
+            "allow_overquota" => Some(text::ALLOW_OVERQUOTA),
+            "manufacturers_id" | "groups_id_tech" => return String::new(),
+            _ => None,
+        };
+        if let Some(source) = source {
+            return tr(source);
+        }
+    }
     // The options of the datacenter items differ: no user nor location.
-    if !kind.is_inventory_asset() {
+    if !kind.is_inventory_asset() && kind != AssetKind::SoftwareLicense {
         let source = match field {
             "users_id_tech" => Some(text::TECH_USER),
             "comment" if kind == AssetKind::Cluster => Some(text::COMMENTS),

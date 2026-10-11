@@ -76,6 +76,11 @@ export interface AssetTypeInfo {
   software?: boolean
   /** Software can be installed on it. */
   installations?: boolean
+  /**
+   * Licenses of a software: their software, parent license, versions,
+   * number, over-quota, expiration and validity.
+   */
+  license?: boolean
 }
 
 /** The datacenter items have no user, group nor contact. */
@@ -154,6 +159,14 @@ export const ASSET_TYPES: Record<AssetType, AssetTypeInfo> = {
     software: true,
     without: ['type', 'model', 'serial', 'inventory_number', 'contact', 'contact_number', 'state'],
   },
+  // Their templates stay in the classic interface.
+  'software-licenses': {
+    right: 'license',
+    legacy: 'softwarelicense',
+    license: true,
+    noTemplates: true,
+    without: ['model', 'contact', 'contact_number'],
+  },
 }
 
 export const ASSET_TYPE_LIST = Object.keys(ASSET_TYPES) as AssetType[]
@@ -201,16 +214,28 @@ export const assetQuery = (kind: AssetType, id: number) =>
       unwrap(await api.GET('/api/v2/assets/{kind}/{id}', { params: { path: { kind, id } } })),
   })
 
+/** Filters of the choices of a license: its software, itself. */
+export interface ChoiceFilters {
+  software_id?: number
+  exclude_id?: number
+}
+
 /** At most 50 values: the pickers search as the user types. */
-export const choicesQuery = (kind: AssetType, field: ChoiceField, entityId: number, search: string) =>
+export const choicesQuery = (
+  kind: AssetType,
+  field: ChoiceField,
+  entityId: number,
+  search: string,
+  filters: ChoiceFilters = {},
+) =>
   queryOptions({
-    queryKey: ['choices', kind, field, entityId, search],
+    queryKey: ['choices', kind, field, entityId, search, filters],
     queryFn: async () =>
       unwrap(
         await api.GET('/api/v2/assets/{kind}/choices/{field}', {
           params: {
             path: { kind, field },
-            query: { entity_id: entityId, search: search || undefined },
+            query: { entity_id: entityId, search: search || undefined, ...filters },
           },
         }),
       ).items,
@@ -391,3 +416,18 @@ export async function uninstallSoftware(kind: AssetType, id: number, installatio
     throw toApiError(response.status, error)
   }
 }
+
+/** Licenses of a software, by name. */
+export const softwareLicensesQuery = (softwareId: number, trash = false) =>
+  queryOptions({
+    queryKey: ['assets', 'software-licenses', { software: softwareId, trash }],
+    queryFn: async () =>
+      unwrap(
+        await api.GET('/api/v2/assets/{kind}', {
+          params: {
+            path: { kind: 'software-licenses' },
+            query: { software_id: softwareId, per_page: 100, sort: 'name', trash: trash || undefined },
+          },
+        }),
+      ),
+  })

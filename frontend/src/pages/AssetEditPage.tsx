@@ -16,6 +16,7 @@ import {
   updateTemplate,
   type AssetDetail,
   type AssetType,
+  type Choice,
   type DuplicateNotice,
   type TemplateSummary,
 } from '../api/assets'
@@ -44,7 +45,7 @@ function useStoreAsset() {
 export function AssetCreatePage() {
   const { t } = useTranslation()
   const { kind } = useParams({ from: '/authenticated/assets/$kind/new' })
-  const { template } = useSearch({ from: '/authenticated/assets/$kind/new' })
+  const { template, software, software_name } = useSearch({ from: '/authenticated/assets/$kind/new' })
   const { data: session } = useSuspenseQuery(sessionQuery)
   const withTemplates = !ASSET_TYPES[kind].noTemplates
   const templates = useQuery({ ...templatesQuery(kind), enabled: withTemplates && template === undefined })
@@ -82,7 +83,11 @@ export function AssetCreatePage() {
   return template ? (
     <CreateFromTemplate kind={kind} templateId={template} header={header} />
   ) : (
-    <CreateBlank kind={kind} header={header} />
+    <CreateBlank
+      kind={kind}
+      header={header}
+      software={software ? { id: software, label: software_name ?? `#${software}` } : undefined}
+    />
   )
 }
 
@@ -173,7 +178,7 @@ function useEntityChoice() {
   return { entity, field }
 }
 
-function CreateBlank({ kind, header }: { kind: AssetType; header: ReactNode }) {
+function CreateBlank({ kind, header, software }: { kind: AssetType; header: ReactNode; software?: Choice }) {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const store = useStoreAsset()
@@ -202,6 +207,9 @@ function CreateBlank({ kind, header }: { kind: AssetType; header: ReactNode }) {
   }
   const { entity } = choice
   const initial = blank.form
+  // A license of the software whose page it was added from.
+  const start =
+    software && ASSET_TYPES[kind].license ? { ...initial, refs: { ...initial.refs, software } } : initial
   return (
     <div className="space-y-6">
       {header}
@@ -211,7 +219,7 @@ function CreateBlank({ kind, header }: { kind: AssetType; header: ReactNode }) {
         kind={kind}
         entityId={entity.id}
         entityField={choice.field}
-        initial={initial}
+        initial={start}
         submitLabel={t('asset.form.create')}
         pending={mutation.isPending}
         error={mutation.error}
@@ -514,6 +522,7 @@ export function AssetEditPage() {
         legacyPath={`front/${ASSET_TYPES[kind].legacy}.form.php?id=${asset.id}`}
         onSubmit={(form) => mutation.mutate({ form, initial })}
         onCancel={() => void toDetail()}
+        itemId={asset.id}
       />
     </div>
   )

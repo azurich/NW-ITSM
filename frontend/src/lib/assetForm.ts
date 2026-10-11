@@ -24,6 +24,7 @@ export const TEXT_FIELDS = [
   'version',
   'position',
   'background_color',
+  'expire',
 ] as const
 export type TextField = (typeof TEXT_FIELDS)[number]
 
@@ -44,6 +45,10 @@ export const REF_FIELDS = [
   'room',
   'category',
   'upgrade_from',
+  'software',
+  'parent_license',
+  'version_use',
+  'version_buy',
 ] as const
 export type RefField = (typeof REF_FIELDS)[number]
 
@@ -60,6 +65,7 @@ export const NUMBER_FIELDS = [
   'measured_power',
   'max_weight',
   'power_supplies',
+  'number',
 ] as const
 export type NumberField = (typeof NUMBER_FIELDS)[number]
 
@@ -82,8 +88,17 @@ const RACK_FIELDS: readonly (TextField | RefField | NumberField)[] = [
   'background_color',
 ]
 
-/** Switches: the management type, the features, those of the software. */
-export type FlagField = Feature | 'is_global' | 'is_helpdesk_visible' | 'is_update'
+const LICENSE_FIELDS: readonly (TextField | RefField | NumberField)[] = [
+  'software',
+  'parent_license',
+  'version_use',
+  'version_buy',
+  'number',
+  'expire',
+]
+
+/** Switches: the management type, the features, those of the software and licenses. */
+export type FlagField = Feature | 'is_global' | 'is_helpdesk_visible' | 'is_update' | 'allow_overquota'
 
 export interface AssetForm {
   text: Record<TextField, string>
@@ -102,6 +117,7 @@ export function flagFields(kind: AssetType): FlagField[] {
     ...(info.global ? (['is_global'] as const) : []),
     ...(info.features ?? []),
     ...(info.software ? (['is_helpdesk_visible', 'is_update'] as const) : []),
+    ...(info.license ? (['allow_overquota'] as const) : []),
   ]
 }
 
@@ -113,6 +129,9 @@ export function hasField(kind: AssetType, field: TextField | RefField | NumberFi
   }
   if (RACK_FIELDS.includes(field)) {
     return !!info.rack
+  }
+  if (LICENSE_FIELDS.includes(field)) {
+    return !!info.license
   }
   switch (field) {
     case 'size':
@@ -170,6 +189,11 @@ export function emptyForm(kind?: AssetType, defaults?: AssetDefaults): AssetForm
   if (kind && ASSET_TYPES[kind].software) {
     form.flags.is_helpdesk_visible = defaults?.is_helpdesk_visible ?? false
     form.flags.is_update = false
+  }
+  // The classic form of a new license offers one.
+  if (kind && ASSET_TYPES[kind].license) {
+    form.numbers.number = '1'
+    form.flags.allow_overquota = false
   }
   return form
 }

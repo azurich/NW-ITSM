@@ -63,6 +63,8 @@ pub struct ListQuery {
     pub descending: bool,
     pub limit: u32,
     pub offset: u32,
+    /// Licenses only: those of a software.
+    pub software: Option<i32>,
 }
 
 /// An asset in a list.
@@ -224,6 +226,13 @@ pub async fn list(
             sql.push(" AND a.is_template = 0");
         }
         restrict_entities(sql, "a", scope);
+        if let Some(software) = query
+            .software
+            .filter(|_| kind == AssetKind::SoftwareLicense)
+        {
+            sql.push(" AND a.softwares_id = ");
+            sql.push_bind(software);
+        }
         if let Some(pattern) = &pattern {
             sql.push(" AND (");
             for (i, column) in searched.iter().enumerate() {
@@ -372,6 +381,22 @@ pub struct Specific {
     pub upgrade_from: Option<String>,
     /// A software whose licenses are all valid (`is_valid`, computed).
     pub valid_licenses: Option<bool>,
+    /// What a license shows besides its fields.
+    pub license: Option<LicenseNames>,
+}
+
+/// Names of the rows a license points to, its full name and validity.
+#[derive(Debug, Clone, Default)]
+pub struct LicenseNames {
+    pub software: Option<String>,
+    /// Full name of the parent license.
+    pub parent: Option<String>,
+    pub version_use: Option<String>,
+    pub version_buy: Option<String>,
+    /// Full name, under its parents.
+    pub completename: Option<String>,
+    /// Its number covers its affectations (computed).
+    pub is_valid: bool,
 }
 
 impl Specific {
@@ -418,6 +443,23 @@ pub async fn specific(pool: &MySqlPool, kind: AssetKind, id: i32) -> Result<Spec
              LEFT JOIN glpi_softwares up ON up.id = a.softwares_id",
         );
     }
+    let is_license = kind == AssetKind::SoftwareLicense;
+    if is_license {
+        columns.extend([
+            "sw.name AS software".to_owned(),
+            "pl.completename AS parent_license".to_owned(),
+            "vu.name AS version_use".to_owned(),
+            "vb.name AS version_buy".to_owned(),
+            "a.completename AS completename".to_owned(),
+            "CAST(a.is_valid AS SIGNED) AS license_valid".to_owned(),
+        ]);
+        joins.push_str(
+            " LEFT JOIN glpi_softwares sw ON sw.id = a.softwares_id \
+             LEFT JOIN glpi_softwarelicenses pl ON pl.id = a.softwarelicenses_id \
+             LEFT JOIN glpi_softwareversions vu ON vu.id = a.softwareversions_id_use \
+             LEFT JOIN glpi_softwareversions vb ON vb.id = a.softwareversions_id_buy",
+        );
+    }
     let row = sqlx::query(&format!(
         "SELECT {} FROM {} a{joins} WHERE a.id = ?",
         columns.join(", "),
@@ -445,6 +487,16 @@ pub async fn specific(pool: &MySqlPool, kind: AssetKind, id: i32) -> Result<Spec
         specific.category = row.try_get("category")?;
         specific.upgrade_from = row.try_get("upgrade_from")?;
         specific.valid_licenses = Some(row.try_get::<i64, _>("valid_licenses")? != 0);
+    }
+    if is_license {
+        specific.license = Some(LicenseNames {
+            software: row.try_get("software")?,
+            parent: row.try_get("parent_license")?,
+            version_use: row.try_get("version_use")?,
+            version_buy: row.try_get("version_buy")?,
+            completename: row.try_get("completename")?,
+            is_valid: row.try_get::<i64, _>("license_valid")? != 0,
+        });
     }
     Ok(specific)
 }

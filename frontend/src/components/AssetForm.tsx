@@ -11,6 +11,7 @@ import {
 } from '../lib/assetForm'
 import { ChoicePicker } from './ChoicePicker'
 import { LegacyLink } from './LegacyLink'
+import { LicenseFields } from './LicenseFields'
 import { inputClass } from './PasswordFields'
 import { RackFields } from './RackFields'
 
@@ -28,6 +29,7 @@ export function AssetFormView({
   legacyPath,
   onSubmit,
   onCancel,
+  itemId,
 }: {
   kind: AssetType
   /** Entity whose values are offered in the lists. */
@@ -42,6 +44,8 @@ export function AssetFormView({
   legacyPath: string
   onSubmit: (form: AssetForm) => void
   onCancel: () => void
+  /** The item being edited. */
+  itemId?: number
 }) {
   const { t } = useTranslation()
   const [form, setForm] = useState(initial)
@@ -138,7 +142,7 @@ export function AssetFormView({
           {entityField}
           {text('name')}
           {choice('type')}
-          {choice('manufacturer', info.software ? t('asset.fields.publisher') : undefined)}
+          {choice('manufacturer', info.software || info.license ? t('asset.fields.publisher') : undefined)}
           {choice('category')}
           {choice('model')}
           {text('serial')}
@@ -183,6 +187,15 @@ export function AssetFormView({
           </legend>
           {checkbox('is_update')}
           {choice('upgrade_from', undefined, !form.flags.is_update)}
+        </fieldset>
+      )}
+
+      {info.license && (
+        <fieldset className={`${sectionClass} space-y-4`}>
+          <legend className="px-1 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            {t('asset.sections.license')}
+          </legend>
+          <LicenseFields kind={kind} entityId={entityId} form={form} itemId={itemId} onChange={setForm} />
         </fieldset>
       )}
 

@@ -71,6 +71,9 @@ impl AssetKind {
         if self == Self::Software {
             return software_purged_links();
         }
+        if self == Self::SoftwareLicense {
+            return license_purged_links();
+        }
         if !self.is_inventory_asset() {
             return self.datacenter_purged_links();
         }
@@ -166,6 +169,17 @@ impl AssetKind {
                 Blocker::Item("glpi_items_tickets"),
                 Blocker::Reservations,
                 Blocker::Impact,
+            ];
+        }
+        if self == Self::SoftwareLicense {
+            // Its children are moved under its parent with their history
+            // (`pre_deleteItem` of the trees); its affectations and
+            // certificates are deleted with the history of their items.
+            return vec![
+                Blocker::Column("glpi_softwarelicenses", "softwarelicenses_id"),
+                Blocker::Column("glpi_items_softwarelicenses", "softwarelicenses_id"),
+                Blocker::Item("glpi_certificates_items"),
+                Blocker::Item("glpi_items_tickets"),
             ];
         }
         if !self.is_inventory_asset() {
@@ -265,6 +279,24 @@ fn software_purged_links() -> Vec<Link> {
         link("glpi_changes_items", Owner::Item),
         link("glpi_items_problems", Owner::Item),
         link("glpi_domains_items", Owner::Item),
+    ]
+}
+
+/// Rows deleted with a license: its alerts (`cleanDBonPurge`), then the
+/// branches of `cleanRelationTable` its type is in.
+fn license_purged_links() -> Vec<Link> {
+    vec![
+        link("glpi_alerts", Owner::Item),
+        INFOCOM,
+        link("glpi_contracts_items", Owner::Item),
+        link("glpi_documents_items", Owner::Item),
+        link("glpi_notepads", Owner::Item),
+        Link {
+            history: Some("KnowbaseItem_Item"),
+            ..link("glpi_knowbaseitems_items", Owner::Item)
+        },
+        link("glpi_changes_items", Owner::Item),
+        link("glpi_items_problems", Owner::Item),
     ]
 }
 

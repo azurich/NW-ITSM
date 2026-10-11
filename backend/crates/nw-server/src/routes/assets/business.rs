@@ -117,10 +117,12 @@ pub async fn run(
             continue;
         };
         let value = match field.kind {
-            FieldKind::Text | FieldKind::Integer | FieldKind::Decimal | FieldKind::Number => {
-                Value::Text(Some(value))
-            }
-            FieldKind::Dropdown { .. } | FieldKind::User => Value::Id(
+            FieldKind::Text
+            | FieldKind::Integer
+            | FieldKind::Decimal
+            | FieldKind::Number
+            | FieldKind::Date => Value::Text(Some(value)),
+            FieldKind::Dropdown { .. } | FieldKind::User | FieldKind::Parent { .. } => Value::Id(
                 value
                     .parse()
                     .map_err(|_| ApiError::LegacyRequired("business_rules"))?,

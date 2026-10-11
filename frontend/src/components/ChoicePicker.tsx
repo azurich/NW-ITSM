@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useEffect, useId, useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { choicesQuery, type AssetType, type Choice, type ChoiceField } from '../api/assets'
+import { choicesQuery, type AssetType, type Choice, type ChoiceField, type ChoiceFilters } from '../api/assets'
 import { usePopover } from '../hooks/usePopover'
 
 const SEARCH_DELAY_MS = 250
@@ -18,6 +18,7 @@ export function ChoicePicker({
   value,
   onChange,
   disabled,
+  filters,
 }: {
   kind: AssetType
   field: ChoiceField
@@ -26,6 +27,8 @@ export function ChoicePicker({
   value: Choice | null
   onChange: (value: Choice | null) => void
   disabled?: boolean
+  /** Licenses: the software of the values offered, the license itself. */
+  filters?: ChoiceFilters
 }) {
   const { t } = useTranslation()
   const { open, setOpen, ref } = usePopover<HTMLDivElement>()
@@ -33,7 +36,7 @@ export function ChoicePicker({
   const [search, setSearch] = useState('')
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined)
   useEffect(() => () => clearTimeout(timer.current), [])
-  const choices = useQuery({ ...choicesQuery(kind, field, entityId, search), enabled: open })
+  const choices = useQuery({ ...choicesQuery(kind, field, entityId, search, filters), enabled: open })
   const labelId = useId()
 
   const onSearch = (next: string) => {

@@ -7,10 +7,11 @@ import { ASSET_TYPES, assetQuery, purgeAsset, setTrashed, type AssetType } from 
 import { WriteError, useColumnLabel } from '../components/AssetForm'
 import { LegacyLink } from '../components/LegacyLink'
 import { SoftwareInstallations } from '../components/SoftwareInstallations'
+import { SoftwareLicenses } from '../components/SoftwareLicenses'
 import { SoftwareVersions } from '../components/SoftwareVersions'
 import { ErrorState, Loading } from '../components/States'
 import { hasField, type RefField, type TextField } from '../lib/assetForm'
-import { formatDateTime } from '../lib/format'
+import { formatDate, formatDateTime } from '../lib/format'
 import { ORIENTATIONS, parsePosition } from '../lib/rack'
 
 export function AssetPage() {
@@ -68,6 +69,7 @@ export function AssetPage() {
   const ref = (field: RefField, label = t(`asset.fields.${field}`)) =>
     hasField(kind, field) && <Field label={label}>{asset[field]?.name}</Field>
   const yesNo = (value: boolean | null | undefined) => (value ? t('asset.yes') : t('asset.no'))
+  const linkClass = 'text-indigo-600 hover:underline dark:text-indigo-400'
   const place = parsePosition(asset.position)
   const orientation = ORIENTATIONS[asset.room_orientation as keyof typeof ORIENTATIONS] as
     | (typeof ORIENTATIONS)[keyof typeof ORIENTATIONS]
@@ -175,7 +177,7 @@ export function AssetPage() {
         <Section title={t('asset.sections.general')}>
           <Field label={t('asset.fields.entity')}>{asset.entity.name}</Field>
           {ref('type')}
-          {ref('manufacturer', info.software ? t('asset.fields.publisher') : undefined)}
+          {ref('manufacturer', info.software || info.license ? t('asset.fields.publisher') : undefined)}
           {ref('category')}
           {ref('model')}
           {text('serial')}
@@ -211,6 +213,45 @@ export function AssetPage() {
         <Section title={t('asset.sections.upgrade')}>
           <Field label={t('asset.fields.is_update')}>{yesNo(asset.is_update)}</Field>
           {asset.is_update && <Field label={t('asset.fields.upgrade_from')}>{asset.upgrade_from?.name}</Field>}
+        </Section>
+      )}
+
+      {info.license && (
+        <Section title={t('asset.sections.license')}>
+          <Field label={t('asset.fields.software')}>
+            {asset.software && (
+              <Link to="/assets/$kind/$id" params={{ kind: 'softwares', id: asset.software.id }} className={linkClass}>
+                {asset.software.name || `#${asset.software.id}`}
+              </Link>
+            )}
+          </Field>
+          <Field label={t('asset.fields.parent_license')}>
+            {asset.parent_license && (
+              <Link
+                to="/assets/$kind/$id"
+                params={{ kind: 'software-licenses', id: asset.parent_license.id }}
+                className={linkClass}
+              >
+                {asset.parent_license.name || `#${asset.parent_license.id}`}
+              </Link>
+            )}
+          </Field>
+          <Field label={t('asset.fields.full_name')}>{asset.full_name}</Field>
+          <Field label={t('asset.fields.number')}>{asset.number}</Field>
+          <Field label={t('asset.fields.is_valid')}>
+            {/* As the classic form shows its quota. */}
+            {asset.is_valid
+              ? t('asset.license.valid')
+              : asset.allow_overquota
+                ? t('asset.license.overQuota')
+                : t('asset.license.invalid')}
+          </Field>
+          <Field label={t('asset.fields.allow_overquota')}>{yesNo(asset.allow_overquota)}</Field>
+          <Field label={t('asset.fields.expire')}>
+            {formatDate(asset.expire, i18n.language, t('asset.license.neverExpire'))}
+          </Field>
+          <Field label={t('asset.fields.version_use')}>{asset.version_use?.name}</Field>
+          <Field label={t('asset.fields.version_buy')}>{asset.version_buy?.name}</Field>
         </Section>
       )}
 
@@ -285,6 +326,8 @@ export function AssetPage() {
       {info.software && (
         <SoftwareVersions softwareId={asset.id} entityId={asset.entity.id} editable={!asset.is_deleted} />
       )}
+
+      {info.software && <SoftwareLicenses softwareId={asset.id} softwareName={asset.name ?? ''} />}
 
       {info.installations && (
         <SoftwareInstallations

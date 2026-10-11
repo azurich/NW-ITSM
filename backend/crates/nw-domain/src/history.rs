@@ -13,6 +13,10 @@ pub struct Change {
     pub search_option: i32,
     pub old: String,
     pub new: String,
+    /// The new value is NULL: a date emptied (`Log::constructHistory`
+    /// slashes the old value, which turns NULL into an empty text, not the
+    /// new one).
+    pub new_is_null: bool,
 }
 
 impl Change {
@@ -21,6 +25,15 @@ impl Change {
             search_option,
             old: truncate(old),
             new: truncate(new),
+            new_is_null: false,
+        }
+    }
+
+    /// A field emptied to NULL.
+    pub fn to_null(search_option: i32, old: &str) -> Self {
+        Self {
+            new_is_null: true,
+            ..Self::new(search_option, old, "")
         }
     }
 }
