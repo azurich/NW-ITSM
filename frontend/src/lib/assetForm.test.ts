@@ -191,3 +191,31 @@ describe('datacenter items', () => {
     expect(changedFields('clusters', cluster)).toEqual({ version: '2.1' })
   })
 })
+
+describe('software', () => {
+  it('has the fields of a software', () => {
+    expect(hasField('softwares', 'category')).toBe(true)
+    expect(hasField('softwares', 'upgrade_from')).toBe(true)
+    expect(hasField('softwares', 'serial')).toBe(false)
+    expect(hasField('softwares', 'state')).toBe(false)
+    expect(hasField('softwares', 'user')).toBe(true)
+    expect(hasField('computers', 'category')).toBe(false)
+  })
+
+  it('starts from the settings and sends what differs from them', () => {
+    const initial = emptyForm('softwares', { is_helpdesk_visible: true })
+    expect(initial.flags).toEqual({ is_helpdesk_visible: true, is_update: false })
+    const form = emptyForm('softwares', { is_helpdesk_visible: true })
+    form.text.name = 'Editor'
+    expect(changedFields('softwares', form, initial)).toEqual({ name: 'Editor' })
+    form.flags.is_helpdesk_visible = false
+    form.flags.is_update = true
+    form.refs.upgrade_from = { id: 3, label: 'Editor 1' }
+    expect(changedFields('softwares', form, initial)).toEqual({
+      name: 'Editor',
+      upgrade_from_id: 3,
+      is_helpdesk_visible: false,
+      is_update: true,
+    })
+  })
+})

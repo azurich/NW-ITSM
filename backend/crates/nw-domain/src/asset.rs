@@ -20,6 +20,7 @@ pub enum AssetKind {
     Pdu,
     PassiveDcEquipment,
     Cluster,
+    Software,
 }
 
 /// How a field is stored, which decides how it is validated and shown in
@@ -210,7 +211,7 @@ const NETWORK: Field = dropdown("networks_id", 32, "glpi_networks", false);
 const IS_GLOBAL: Field = flag("is_global", 82);
 
 impl AssetKind {
-    pub const ALL: [Self; 11] = [
+    pub const ALL: [Self; 12] = [
         Self::Computer,
         Self::Monitor,
         Self::Printer,
@@ -222,6 +223,7 @@ impl AssetKind {
         Self::Pdu,
         Self::PassiveDcEquipment,
         Self::Cluster,
+        Self::Software,
     ];
 
     /// One of the assets of the inventory (`$CFG_GLPI['asset_types']`):
@@ -278,6 +280,7 @@ impl AssetKind {
             Self::Pdu => "pdus",
             Self::PassiveDcEquipment => "passive-dc-equipments",
             Self::Cluster => "clusters",
+            Self::Software => "softwares",
         }
     }
 
@@ -299,6 +302,7 @@ impl AssetKind {
             Self::Pdu => "PDU",
             Self::PassiveDcEquipment => "PassiveDCEquipment",
             Self::Cluster => "Cluster",
+            Self::Software => "Software",
         }
     }
 
@@ -321,6 +325,7 @@ impl AssetKind {
             Self::Pdu => "glpi_pdus",
             Self::PassiveDcEquipment => "glpi_passivedcequipments",
             Self::Cluster => "glpi_clusters",
+            Self::Software => "glpi_softwares",
         }
     }
 
@@ -335,6 +340,7 @@ impl AssetKind {
             Self::Phone => "phone",
             Self::Rack | Self::Enclosure | Self::Pdu | Self::PassiveDcEquipment => "datacenter",
             Self::Cluster => "cluster",
+            Self::Software => "software",
         }
     }
 
@@ -352,6 +358,7 @@ impl AssetKind {
             Self::Pdu => "pdus",
             Self::PassiveDcEquipment => "passivedcequipment",
             Self::Cluster => "cluster",
+            Self::Software => "software",
         }
     }
 
@@ -368,10 +375,11 @@ impl AssetKind {
             Self::Pdu => "pdu",
             Self::PassiveDcEquipment => "passivedcequipment",
             Self::Cluster => "cluster",
+            Self::Software => "software",
         }
     }
 
-    /// Type dropdown: `(column, table)`; enclosures have none.
+    /// Type dropdown: `(column, table)`; enclosures and software have none.
     pub fn type_dropdown(self) -> Option<(&'static str, &'static str)> {
         Some(match self {
             Self::Computer => ("computertypes_id", "glpi_computertypes"),
@@ -381,7 +389,7 @@ impl AssetKind {
             Self::Peripheral => ("peripheraltypes_id", "glpi_peripheraltypes"),
             Self::Phone => ("phonetypes_id", "glpi_phonetypes"),
             Self::Rack => ("racktypes_id", "glpi_racktypes"),
-            Self::Enclosure => return None,
+            Self::Enclosure | Self::Software => return None,
             Self::Pdu => ("pdutypes_id", "glpi_pdutypes"),
             Self::PassiveDcEquipment => {
                 ("passivedcequipmenttypes_id", "glpi_passivedcequipmenttypes")
@@ -390,7 +398,7 @@ impl AssetKind {
         })
     }
 
-    /// Model dropdown: `(column, table)`; clusters have none. The models of
+    /// Model dropdown: `(column, table)`; clusters and software have none. The models of
     /// the datacenter items can be NULL.
     pub fn model_dropdown(self) -> Option<(&'static str, &'static str)> {
         Some(match self {
@@ -407,7 +415,7 @@ impl AssetKind {
                 "passivedcequipmentmodels_id",
                 "glpi_passivedcequipmentmodels",
             ),
-            Self::Cluster => return None,
+            Self::Cluster | Self::Software => return None,
         })
     }
 
@@ -506,6 +514,12 @@ impl AssetKind {
             Self::Cluster => &[
                 "is_recursive", "name", "states_id", "uuid", "version", "clustertypes_id",
                 "autoupdatesystems_id", "users_id_tech", "groups_id_tech", "comment",
+            ],
+            // The comment is restored in the PHP form, after the groups.
+            Self::Software => &[
+                "is_recursive", "name", "manufacturers_id", "locations_id",
+                "softwarecategories_id", "users_id_tech", "is_helpdesk_visible", "groups_id_tech",
+                "users_id", "groups_id", "comment", "is_update", "softwares_id",
             ],
         }
     }
@@ -612,6 +626,13 @@ impl AssetKind {
             Self::Enclosure => &[number("power_supplies")],
             Self::Pdu | Self::PassiveDcEquipment => &[],
             Self::Cluster => &[text("version", NOT_LOGGED)],
+            // The software it is an upgrade of: no search option.
+            Self::Software => &[
+                dropdown("softwarecategories_id", 62, "glpi_softwarecategories", true),
+                flag("is_helpdesk_visible", 61),
+                flag("is_update", NOT_LOGGED),
+                dropdown("softwares_id", NOT_LOGGED, "glpi_softwares", false),
+            ],
         };
         specific
             .iter()
@@ -659,6 +680,7 @@ impl AssetKind {
     pub fn template_name_field(self) -> Field {
         let search_option = match self {
             Self::Computer | Self::NetworkEquipment => 65,
+            Self::Software => 64,
             _ => 61,
         };
         text("template_name", search_option)
@@ -722,13 +744,15 @@ impl AssetKind {
             Self::Rack | Self::Enclosure | Self::Pdu | Self::PassiveDcEquipment | Self::Cluster => {
                 &[]
             }
+            // Owned by `softwares_id` for the versions.
+            Self::Software => &["glpi_reservationitems", "glpi_softwareversions"],
         }
     }
 
     /// Whether the infocom follows the entity and sharing of the item (in
     /// `$forward_entity_to`).
     pub fn forwards_to_infocom(self) -> bool {
-        self.is_inventory_asset()
+        self.is_inventory_asset() || self == Self::Software
     }
 
     pub fn field(self, column: &str) -> Option<Field> {

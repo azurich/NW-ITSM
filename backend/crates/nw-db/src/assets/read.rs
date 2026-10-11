@@ -32,7 +32,8 @@ impl Sort {
             Self::Location => kind.has_column("locations_id"),
             Self::Type => kind.type_dropdown().is_some(),
             Self::Manufacturer => kind.has_column("manufacturers_id"),
-            Self::Name | Self::Entity | Self::State | Self::UpdatedAt => true,
+            Self::State => kind.has_column("states_id"),
+            Self::Name | Self::Entity | Self::UpdatedAt => true,
         };
         if !present {
             return "NULL";
@@ -166,7 +167,9 @@ fn joins(kind: AssetKind) -> String {
     if kind.has_column("manufacturers_id") {
         sql.push_str(" LEFT JOIN glpi_manufacturers m ON m.id = a.manufacturers_id");
     }
-    sql.push_str(" LEFT JOIN glpi_states s ON s.id = a.states_id");
+    if kind.has_column("states_id") {
+        sql.push_str(" LEFT JOIN glpi_states s ON s.id = a.states_id");
+    }
     sql
 }
 
@@ -182,7 +185,7 @@ fn summary_columns(kind: AssetKind) -> String {
          {locations_id} AS locations_id, {location} AS location, \
          {type_id} AS types_id, {type_name} AS type_name, \
          {manufacturers_id} AS manufacturers_id, {manufacturer} AS manufacturer, \
-         a.states_id, s.completename AS state",
+         {states_id} AS states_id, {state} AS state",
         serial = optional_column(kind, "serial", "NULL"),
         otherserial = optional_column(kind, "otherserial", "NULL"),
         locations_id = optional_column(kind, "locations_id", "0"),
@@ -190,6 +193,8 @@ fn summary_columns(kind: AssetKind) -> String {
         type_name = joined(kind.type_dropdown().is_some(), "t.name"),
         manufacturers_id = optional_column(kind, "manufacturers_id", "0"),
         manufacturer = joined(kind.has_column("manufacturers_id"), "m.name"),
+        states_id = optional_column(kind, "states_id", "0"),
+        state = joined(kind.has_column("states_id"), "s.completename"),
     )
 }
 
@@ -361,6 +366,12 @@ pub struct Specific {
     pub power_supply: Option<String>,
     /// Server room of a rack.
     pub room: Option<String>,
+    /// Category of a software (full name).
+    pub category: Option<String>,
+    /// Name of the software a software is an upgrade of.
+    pub upgrade_from: Option<String>,
+    /// A software whose licenses are all valid (`is_valid`, computed).
+    pub valid_licenses: Option<bool>,
 }
 
 impl Specific {
@@ -395,6 +406,18 @@ pub async fn specific(pool: &MySqlPool, kind: AssetKind, id: i32) -> Result<Spec
         columns.push("r.name AS room".to_owned());
         joins.push_str(" LEFT JOIN glpi_dcrooms r ON r.id = a.dcrooms_id");
     }
+    let is_software = kind == AssetKind::Software;
+    if is_software {
+        columns.extend([
+            "sc.completename AS category".to_owned(),
+            "up.name AS upgrade_from".to_owned(),
+            "CAST(a.is_valid AS SIGNED) AS valid_licenses".to_owned(),
+        ]);
+        joins.push_str(
+            " LEFT JOIN glpi_softwarecategories sc ON sc.id = a.softwarecategories_id \
+             LEFT JOIN glpi_softwares up ON up.id = a.softwares_id",
+        );
+    }
     let row = sqlx::query(&format!(
         "SELECT {} FROM {} a{joins} WHERE a.id = ?",
         columns.join(", "),
@@ -417,6 +440,11 @@ pub async fn specific(pool: &MySqlPool, kind: AssetKind, id: i32) -> Result<Spec
     }
     if has_room {
         specific.room = row.try_get("room")?;
+    }
+    if is_software {
+        specific.category = row.try_get("category")?;
+        specific.upgrade_from = row.try_get("upgrade_from")?;
+        specific.valid_licenses = Some(row.try_get::<i64, _>("valid_licenses")? != 0);
     }
     Ok(specific)
 }

@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { ApiError } from '../api/client'
 import { ASSET_TYPES, type AssetType, type ChoiceField, type Feature } from '../api/assets'
 import {
-  flagFields,
   hasField,
   type AssetForm,
   type NumberField,
@@ -89,18 +88,29 @@ export function AssetFormView({
     </label>
   )
   const hasFeatures =
-    info.size || info.memory || info.pageCounters || info.powerSupply || info.powerSupplies || flagFields(kind).length > 0
-  const choice = (field: RefField) =>
+    info.size || info.memory || info.pageCounters || info.powerSupply || info.powerSupplies || info.global || info.features
+  const choice = (field: RefField, label = t(`asset.fields.${field}`), disabled?: boolean) =>
     hasField(kind, field) && (
       <ChoicePicker
         kind={kind}
         field={field as ChoiceField}
         entityId={entityId}
-        label={t(`asset.fields.${field}`)}
+        label={label}
         value={form.refs[field]}
+        disabled={disabled}
         onChange={(value) => setForm({ ...form, refs: { ...form.refs, [field]: value } })}
       />
     )
+  const checkbox = (field: 'is_helpdesk_visible' | 'is_update') => (
+    <label className="flex items-center gap-2 text-sm">
+      <input
+        type="checkbox"
+        checked={form.flags[field] ?? false}
+        onChange={(event) => setForm({ ...form, flags: { ...form.flags, [field]: event.target.checked } })}
+      />
+      {t(`asset.fields.${field}`)}
+    </label>
+  )
   const submit = (event: FormEvent) => {
     event.preventDefault()
     onSubmit(form)
@@ -128,7 +138,8 @@ export function AssetFormView({
           {entityField}
           {text('name')}
           {choice('type')}
-          {choice('manufacturer')}
+          {choice('manufacturer', info.software ? t('asset.fields.publisher') : undefined)}
+          {choice('category')}
           {choice('model')}
           {text('serial')}
           {text('inventory_number')}
@@ -151,6 +162,7 @@ export function AssetFormView({
           {text('contact_number')}
           {choice('tech_user')}
           {choice('tech_group')}
+          {info.software && checkbox('is_helpdesk_visible')}
           <div>
             <label className="flex items-center gap-2 text-sm">
               <input
@@ -163,6 +175,16 @@ export function AssetFormView({
           </div>
         </fieldset>
       </div>
+
+      {info.software && (
+        <fieldset className={`${sectionClass} space-y-4`}>
+          <legend className="px-1 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            {t('asset.sections.upgrade')}
+          </legend>
+          {checkbox('is_update')}
+          {choice('upgrade_from', undefined, !form.flags.is_update)}
+        </fieldset>
+      )}
 
       {info.rack && (
         <fieldset className={`${sectionClass} space-y-4`}>
@@ -291,6 +313,10 @@ const FIELD_OF_COLUMN: Record<string, string> = {
   max_weight: 'max_weight',
   bgcolor: 'background_color',
   power_supplies: 'power_supplies',
+  softwarecategories_id: 'category',
+  is_helpdesk_visible: 'is_helpdesk_visible',
+  is_update: 'is_update',
+  softwares_id: 'upgrade_from',
 }
 
 /** Features by column. */

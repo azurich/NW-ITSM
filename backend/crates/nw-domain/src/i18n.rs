@@ -98,9 +98,12 @@ pub mod text {
     pub const TEMPLATE_NAME: Source = Text("Template name");
     pub const NUMBER_OF_UNITS: Source = Text("Number of units");
     pub const SERVER_ROOM: Source = One("Server room", "Server rooms");
+    pub const PUBLISHER: Source = Text("Publisher");
+    pub const TECH_SOFTWARE: Source = Text("Technician in charge of the software");
+    pub const HELPDESK_VISIBLE: Source = Text("Associable to a ticket");
 
     /// Every text, for the catalog.
-    pub const ALL: [Source; 61] = [
+    pub const ALL: [Source; 64] = [
         LOGIN,
         FAILED_LOGIN,
         ADDS_ITEM,
@@ -162,6 +165,9 @@ pub mod text {
         TEMPLATE_NAME,
         NUMBER_OF_UNITS,
         SERVER_ROOM,
+        PUBLISHER,
+        TECH_SOFTWARE,
+        HELPDESK_VISIBLE,
     ];
 }
 

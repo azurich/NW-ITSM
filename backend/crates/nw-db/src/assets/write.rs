@@ -188,8 +188,9 @@ pub async fn create(
     {
         infocoms::create_for_new_item(&mut tx, infocom_settings, owner, actor).await?;
     }
-    // The form always posts a status, even none; not for a template.
-    if kind.has_infocom() && origin != Origin::Template {
+    // The form always posts a status, even none; not for a template nor a
+    // type without status (software).
+    if kind.has_infocom() && kind.has_column("states_id") && origin != Origin::Template {
         let states_id = value_of("states_id").map_or(0, Value::id);
         infocoms::fill_status_dates(&mut tx, infocom_settings, owner, states_id, actor).await?;
     }
@@ -749,14 +750,19 @@ pub async fn entity_mismatches(
         &[]
     };
     for &table in kind.forward_entity_tables().iter().chain(infocom) {
-        let owner = if table == "glpi_computervirtualmachines" {
-            "computers_id = ?"
-        } else {
-            "itemtype = ? AND items_id = ?"
+        // Rows of a child class point to the asset by its foreign key.
+        let owner_column = match table {
+            "glpi_computervirtualmachines" => Some("computers_id"),
+            "glpi_softwareversions" => Some("softwares_id"),
+            _ => None,
         };
+        let owner = owner_column.map_or_else(
+            || "itemtype = ? AND items_id = ?".to_owned(),
+            |column| format!("{column} = ?"),
+        );
         let sql = format!("SELECT COUNT(*) FROM {table} WHERE {owner} AND entities_id <> ?");
         let mut query = sqlx::query_scalar::<_, i64>(&sql);
-        if table != "glpi_computervirtualmachines" {
+        if owner_column.is_none() {
             query = query.bind(kind.itemtype());
         }
         if query.bind(id).bind(entity).fetch_one(pool).await? > 0 {
@@ -807,6 +813,20 @@ pub async fn unshare_blockers(
             if query.fetch_one(pool).await? > 0 {
                 found.push(table);
             }
+        }
+    }
+    if kind == AssetKind::Software {
+        // `canUnrecurs`: the software upgrading it (`softwares_id`).
+        let sql = format!(
+            "SELECT COUNT(*) FROM glpi_softwares WHERE softwares_id = ? AND {}",
+            not_in("entities_id")
+        );
+        let mut query = sqlx::query_scalar::<_, i64>(&sql).bind(id);
+        for entity in entities {
+            query = query.bind(*entity);
+        }
+        if query.fetch_one(pool).await? > 0 {
+            found.push("glpi_softwares");
         }
     }
     if matches!(kind, AssetKind::Printer | AssetKind::NetworkEquipment) {
@@ -868,6 +888,18 @@ async fn forward_sharing(
         ))
         .bind(is_recursive)
         .bind(kind.itemtype())
+        .bind(id)
+        .bind(is_recursive)
+        .execute(&mut *conn)
+        .await?;
+    }
+    // The versions of a software (`SoftwareVersion`, a child class).
+    if kind == AssetKind::Software {
+        sqlx::query(
+            "UPDATE glpi_softwareversions SET is_recursive = ?, date_mod = NOW() \
+             WHERE softwares_id = ? AND is_recursive <> ?",
+        )
+        .bind(is_recursive)
         .bind(id)
         .bind(is_recursive)
         .execute(&mut *conn)

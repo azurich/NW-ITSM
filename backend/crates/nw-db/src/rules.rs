@@ -12,6 +12,17 @@ use sqlx::{MySqlConnection, MySqlPool};
 /// A criterion or action row: rule id and three text columns.
 type RuleRow = (i32, Option<String>, Option<String>, Option<String>);
 
+/// Whether software category rules (`RuleSoftwareCategory`) are active:
+/// they choose the category of a new software given none.
+pub async fn software_category_rules_active(pool: &MySqlPool) -> Result<bool, sqlx::Error> {
+    let found: Option<i32> = sqlx::query_scalar(
+        "SELECT id FROM glpi_rules WHERE sub_type = 'RuleSoftwareCategory' AND is_active = 1 LIMIT 1",
+    )
+    .fetch_optional(pool)
+    .await?;
+    Ok(found.is_some())
+}
+
 /// Active rules run on the assets, in the order of the PHP code.
 ///
 /// `CommonDBTM::assetBusinessRules` uses a rule collection on the root

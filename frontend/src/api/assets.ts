@@ -11,6 +11,7 @@ export type ChoiceField = Schemas['ChoiceField']
 export type Choice = Schemas['Choice']
 export type DuplicateNotice = Schemas['DuplicateNotice']
 export type RoomPosition = Schemas['RoomPosition']
+export type AssetDefaults = Schemas['AssetDefaults']
 export type TemplateList = Schemas['TemplateList']
 export type TemplateSummary = Schemas['TemplateSummary']
 /** Fields of a template: those of its items, and its own name. */
@@ -34,6 +35,7 @@ export type OptionalField =
   | 'group'
   | 'contact'
   | 'contact_number'
+  | 'state'
 
 /** What differs between the asset types. */
 export interface AssetTypeInfo {
@@ -67,6 +69,11 @@ export interface AssetTypeInfo {
   powerSupplies?: boolean
   /** Version (clusters). */
   version?: boolean
+  /**
+   * Software: a category, a publisher (the manufacturer), associable to
+   * tickets, an upgrade of another software, valid licenses.
+   */
+  software?: boolean
 }
 
 /** The datacenter items have no user, group nor contact. */
@@ -122,6 +129,12 @@ export const ASSET_TYPES: Record<AssetType, AssetTypeInfo> = {
     version: true,
     noTemplates: true,
     without: [...NO_USER, 'manufacturer', 'model', 'serial', 'inventory_number', 'location'],
+  },
+  softwares: {
+    right: 'software',
+    legacy: 'software',
+    software: true,
+    without: ['type', 'model', 'serial', 'inventory_number', 'contact', 'contact_number', 'state'],
   },
 }
 
@@ -200,6 +213,15 @@ export const roomPositionsQuery = (roomId: number, current?: string) =>
           params: { query: { room_id: roomId, current: current || undefined } },
         }),
       ).items,
+  })
+
+/** Values of a new item set by the settings (`getEmpty`). */
+export const defaultsQuery = (kind: AssetType) =>
+  queryOptions({
+    queryKey: ['asset-defaults', kind],
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v2/assets/{kind}/defaults', { params: { path: { kind } } })),
+    staleTime: 60_000,
   })
 
 export async function createAsset(kind: AssetType, entityId: number, fields: AssetFields): Promise<AssetDetail> {

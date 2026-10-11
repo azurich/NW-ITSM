@@ -62,6 +62,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/assets/{kind}/defaults": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Values the form of a new item of the type starts with, as the classic
+         *     form (`getEmpty`) shows them.
+         */
+        get: operations["defaults"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/assets/{kind}/templates": {
         parameters: {
             query?: never;
@@ -445,7 +465,15 @@ export interface components {
              */
             entity_id: number;
         };
-        AssetDetail: components["schemas"]["Features"] & components["schemas"]["DatacenterDetail"] & {
+        /** @description Values of a new item set by the settings; `null` for the other types. */
+        AssetDefaults: {
+            /**
+             * @description Software: can be chosen in a ticket
+             *     (`default_software_helpdesk_visible`).
+             */
+            is_helpdesk_visible?: boolean | null;
+        };
+        AssetDetail: components["schemas"]["Features"] & components["schemas"]["DatacenterDetail"] & components["schemas"]["SoftwareDetail"] & {
             /** @description Peripherals and phones only. */
             brand?: string | null;
             comment?: string | null;
@@ -515,7 +543,7 @@ export interface components {
          * @description Fields of a creation or an update. Absent fields are left unchanged;
          *     `null` clears a field (empty text, no related object).
          */
-        AssetFields: components["schemas"]["Features"] & components["schemas"]["DatacenterFields"] & {
+        AssetFields: components["schemas"]["Features"] & components["schemas"]["DatacenterFields"] & components["schemas"]["SoftwareFields"] & {
             /** @description Peripherals and phones only. */
             brand?: string | null;
             comment?: string | null;
@@ -624,7 +652,7 @@ export interface components {
          * @description Type of asset, in the paths.
          * @enum {string}
          */
-        AssetType: "computers" | "monitors" | "printers" | "network-equipments" | "peripherals" | "phones" | "racks" | "enclosures" | "pdus" | "passive-dc-equipments" | "clusters";
+        AssetType: "computers" | "monitors" | "printers" | "network-equipments" | "peripherals" | "phones" | "racks" | "enclosures" | "pdus" | "passive-dc-equipments" | "clusters" | "softwares";
         BridgeToken: {
             /**
              * @description To pass to `front/nw_bridge.php?token=...` within one minute, from
@@ -641,7 +669,7 @@ export interface components {
          * @description A field of the asset forms offering a list of values.
          * @enum {string}
          */
-        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group" | "power_supply" | "room";
+        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group" | "power_supply" | "room" | "category" | "upgrade_from";
         ChoiceList: {
             /** @description At most 50 values, sorted by label. */
             items: components["schemas"]["Choice"][];
@@ -967,6 +995,30 @@ export interface components {
             language_is_default: boolean;
             login: string;
         };
+        /** @description Fields of the software. */
+        SoftwareDetail: {
+            category?: null | components["schemas"]["Ref"];
+            /** @description Can be chosen in a ticket. */
+            is_helpdesk_visible?: boolean | null;
+            /** @description An upgrade of another software (`upgrade_from`). */
+            is_update?: boolean | null;
+            upgrade_from?: null | components["schemas"]["Ref"];
+            /** @description None of its licenses is invalid (computed from the licenses). */
+            valid_licenses?: boolean | null;
+        };
+        /** @description Fields of the software in a creation or an update. */
+        SoftwareFields: {
+            /** Format: int32 */
+            category_id?: number | null;
+            is_helpdesk_visible?: boolean | null;
+            /** @description Not an upgrade: the software it upgrades is cleared. */
+            is_update?: boolean | null;
+            /**
+             * Format: int32
+             * @description Software it is an upgrade of, kept only with `is_update`.
+             */
+            upgrade_from_id?: number | null;
+        };
         TemplateCreation: components["schemas"]["AssetFields"] & {
             /**
              * Format: int32
@@ -1233,6 +1285,47 @@ export interface operations {
                 };
             };
             /** @description No create or update right, or entity not selected */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    defaults: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Values of a new item */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetDefaults"];
+                };
+            };
+            /** @description Not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No create or update right on this type */
             403: {
                 headers: {
                     [name: string]: unknown;

@@ -305,6 +305,20 @@ fn link(kind: AssetKind, session: &Session, double: &db::Double) -> String {
 /// trees and the entity, shown by their full name), else the first option
 /// on a column of that name, whatever its table.
 fn label(kind: AssetKind, field: &str, tr: &impl Fn(Source) -> String) -> String {
+    // The software has its own options: the first of the users is its
+    // technician's, the software it upgrades is shown by its name.
+    if kind == AssetKind::Software {
+        let source = match field {
+            "users_id" | "users_id_tech" => Some(text::TECH_SOFTWARE),
+            "manufacturers_id" => Some(text::PUBLISHER),
+            "is_helpdesk_visible" => Some(text::HELPDESK_VISIBLE),
+            "softwares_id" => Some(text::NAME),
+            _ => None,
+        };
+        if let Some(source) = source {
+            return tr(source);
+        }
+    }
     // The options of the datacenter items differ: no user nor location.
     if !kind.is_inventory_asset() {
         let source = match field {

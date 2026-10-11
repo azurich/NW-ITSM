@@ -387,6 +387,58 @@
         }
       }
     },
+    "/api/v2/assets/{kind}/defaults": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Values the form of a new item of the type starts with, as the classic\nform (`getEmpty`) shows them.",
+        "operationId": "defaults",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Values of a new item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDefaults"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create or update right on this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/assets/{kind}/templates": {
       "get": {
         "tags": [
@@ -1741,6 +1793,19 @@
           }
         ]
       },
+      "AssetDefaults": {
+        "type": "object",
+        "description": "Values of a new item set by the settings; `null` for the other types.",
+        "properties": {
+          "is_helpdesk_visible": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Software: can be chosen in a ticket\n(`default_software_helpdesk_visible`)."
+          }
+        }
+      },
       "AssetDetail": {
         "allOf": [
           {
@@ -1750,6 +1815,10 @@
           {
             "$ref": "#/components/schemas/DatacenterDetail",
             "description": "Fields of the datacenter items, `null` for the other types."
+          },
+          {
+            "$ref": "#/components/schemas/SoftwareDetail",
+            "description": "Fields of the software, `null` for the other types."
           },
           {
             "type": "object",
@@ -2047,6 +2116,9 @@
           },
           {
             "$ref": "#/components/schemas/DatacenterFields"
+          },
+          {
+            "$ref": "#/components/schemas/SoftwareFields"
           },
           {
             "type": "object",
@@ -2393,7 +2465,8 @@
           "enclosures",
           "pdus",
           "passive-dc-equipments",
-          "clusters"
+          "clusters",
+          "softwares"
         ]
       },
       "BridgeToken": {
@@ -2440,7 +2513,9 @@
           "tech_user",
           "tech_group",
           "power_supply",
-          "room"
+          "room",
+          "category",
+          "upgrade_from"
         ]
       },
       "ChoiceList": {
@@ -3265,6 +3340,87 @@
           },
           "login": {
             "type": "string"
+          }
+        }
+      },
+      "SoftwareDetail": {
+        "type": "object",
+        "description": "Fields of the software.",
+        "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "is_helpdesk_visible": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Can be chosen in a ticket."
+          },
+          "is_update": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "An upgrade of another software (`upgrade_from`)."
+          },
+          "upgrade_from": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "valid_licenses": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "None of its licenses is invalid (computed from the licenses)."
+          }
+        }
+      },
+      "SoftwareFields": {
+        "type": "object",
+        "description": "Fields of the software in a creation or an update.",
+        "properties": {
+          "category_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "is_helpdesk_visible": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "is_update": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Not an upgrade: the software it upgrades is cleared."
+          },
+          "upgrade_from_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Software it is an upgrade of, kept only with `is_update`."
           }
         }
       },

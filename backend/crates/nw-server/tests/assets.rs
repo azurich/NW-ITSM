@@ -2540,3 +2540,209 @@ async fn datacenter_items_like_php() {
         0
     );
 }
+
+#[tokio::test]
+async fn software_like_php() {
+    let app = test_app!();
+    app.sql(
+        "INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES (4, 'software', 31), (4, 'infocom', 31); \
+         INSERT INTO glpi_softwarecategories (id, name, completename, level) VALUES (5, 'Office', 'Office', 1); \
+         INSERT INTO glpi_configs (context, name, value) VALUES \
+           ('core', 'default_software_helpdesk_visible', '1'), ('core', 'auto_create_infocoms', '1')",
+    )
+    .await;
+    // Business rules are for the inventory assets only.
+    rule(&app, 9, 3, &[], &[("assign", "comment", "by rule")]).await;
+    let manager = app.login("manager").await;
+    let column = |sql: String| {
+        let app = &app;
+        async move { column(app, &sql).await }
+    };
+
+    // As the classic form creates it: associable to tickets as set, an
+    // infocom, no category without category rules, the software events.
+    let response = app
+        .post(
+            "/api/v2/assets/softwares",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "Editor" })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    let editor = response.body["id"].as_i64().unwrap() as i32;
+    assert_eq!(response.body["kind"], json!("softwares"));
+    assert_eq!(response.body["is_helpdesk_visible"], json!(true));
+    assert_eq!(response.body["category"], Value::Null);
+    assert_eq!(response.body["valid_licenses"], json!(true));
+    assert_eq!(response.body["serial"], Value::Null);
+    assert_eq!(response.body["state"], Value::Null);
+    assert_eq!(
+        column(format!(
+            "SELECT CAST(CONCAT_WS('|', softwarecategories_id, is_helpdesk_visible, IFNULL(comment, '-')) AS CHAR) \
+             FROM glpi_softwares WHERE id = {editor}"
+        ))
+        .await
+        .as_deref(),
+        Some("0|1|")
+    );
+    assert_eq!(
+        count(
+            &app,
+            &format!("SELECT COUNT(*) FROM glpi_infocoms WHERE itemtype = 'Software' AND items_id = {editor}")
+        )
+        .await,
+        1
+    );
+    assert_eq!(history(&app, "Software", editor).await, [item_row(20)]);
+    let response = app
+        .get("/api/v2/assets/softwares/defaults", Some(&manager))
+        .await;
+    assert_eq!(response.body, json!({ "is_helpdesk_visible": true }));
+    assert_eq!(
+        events(&app).await.pop().unwrap(),
+        (
+            editor,
+            "software".into(),
+            "inventory".into(),
+            4,
+            "manager adds the item Editor".into()
+        )
+    );
+
+    // Its fields in the history, as the PHP options; the software it
+    // upgrades is not, and goes with the upgrade flag.
+    let response = app
+        .post(
+            "/api/v2/assets/softwares",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "Editor 2", "category_id": 5 })),
+        )
+        .await;
+    let editor2 = response.body["id"].as_i64().unwrap() as i32;
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/softwares/{editor2}"),
+            &manager,
+            json!({ "is_update": true, "upgrade_from_id": editor, "is_helpdesk_visible": false, "category_id": 0 }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["upgrade_from"]["name"], json!("Editor"));
+    assert_eq!(
+        history(&app, "Software", editor2).await[1..],
+        [row(62, "Office (5)", "&nbsp; (0)"), row(61, "1", "0")]
+    );
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/softwares/{editor2}"),
+            &manager,
+            json!({ "is_update": false }),
+        )
+        .await;
+    assert_eq!(response.body["upgrade_from"], Value::Null);
+    assert_eq!(history(&app, "Software", editor2).await.len(), 3);
+
+    // Category rules choose the category of a new software given none.
+    app.sql(
+        "INSERT INTO glpi_rules (entities_id, sub_type, ranking, name, `match`, is_active) \
+         VALUES (0, 'RuleSoftwareCategory', 1, 'Categories', 'AND', 1)",
+    )
+    .await;
+    let response = app
+        .post(
+            "/api/v2/assets/softwares",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "Viewer" })),
+        )
+        .await;
+    assert_eq!(
+        response.error_code(),
+        "legacy_required",
+        "{}",
+        response.body
+    );
+    assert_eq!(response.body["error"]["details"], json!(["business_rules"]));
+    let response = app
+        .post(
+            "/api/v2/assets/softwares",
+            &manager,
+            Some(json!({ "entity_id": 1, "name": "Viewer", "category_id": 5 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+
+    // Its sharing goes to its versions; it stays shared while a software
+    // of another entity upgrades it.
+    app.sql(&format!(
+        "INSERT INTO glpi_softwareversions (id, entities_id, is_recursive, softwares_id, name) \
+         VALUES (7, 1, 0, {editor}, '1.0')"
+    ))
+    .await;
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/softwares/{editor}"),
+            &manager,
+            json!({ "is_recursive": true }),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(
+        column("SELECT CAST(is_recursive AS CHAR) FROM glpi_softwareversions WHERE id = 7".into())
+            .await
+            .as_deref(),
+        Some("1")
+    );
+    app.sql(&format!(
+        "INSERT INTO glpi_softwares (id, entities_id, name, is_update, softwares_id) \
+         VALUES (90, 2, 'Lyon editor', 1, {editor})"
+    ))
+    .await;
+    let response = app
+        .patch(
+            &format!("/api/v2/assets/softwares/{editor}"),
+            &manager,
+            json!({ "is_recursive": false }),
+        )
+        .await;
+    assert_eq!(response.error_code(), "sharing_in_use", "{}", response.body);
+
+    // Purge: its versions leave it to the classic interface; then the
+    // software upgrading it forgets it.
+    app.post(
+        &format!("/api/v2/assets/softwares/{editor}/trash"),
+        &manager,
+        None,
+    )
+    .await;
+    let response = app
+        .send(
+            Method::DELETE,
+            &format!("/api/v2/assets/softwares/{editor}"),
+            Some(&manager),
+            None,
+        )
+        .await;
+    assert_eq!(
+        response.error_code(),
+        "legacy_required",
+        "{}",
+        response.body
+    );
+    app.sql("DELETE FROM glpi_softwareversions WHERE id = 7")
+        .await;
+    let response = app
+        .send(
+            Method::DELETE,
+            &format!("/api/v2/assets/softwares/{editor}"),
+            Some(&manager),
+            None,
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::NO_CONTENT, "{}", response.body);
+    assert_eq!(
+        column("SELECT CAST(softwares_id AS CHAR) FROM glpi_softwares WHERE id = 90".into())
+            .await
+            .as_deref(),
+        Some("0")
+    );
+}

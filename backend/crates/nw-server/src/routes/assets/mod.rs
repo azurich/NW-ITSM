@@ -1,9 +1,10 @@
 //! Assets: computers, monitors, printers, network equipment, peripherals
-//! and phones, and the datacenter items (racks, enclosures, PDUs, passive
-//! equipment, clusters), under `/assets/{type}`.
+//! and phones, the datacenter items (racks, enclosures, PDUs, passive
+//! equipment, clusters) and the software, under `/assets/{type}`.
 
 mod business;
 pub mod choices;
+pub mod defaults;
 mod guards;
 pub mod racks;
 pub mod templates;
@@ -77,6 +78,7 @@ pub fn routes() -> Router<AppState> {
         .route("/assets/{kind}/{id}/trash", post(trash))
         .route("/assets/{kind}/{id}/restore", post(restore))
         .route("/assets/{kind}/choices/{field}", get(choices::choices))
+        .route("/assets/{kind}/defaults", get(defaults::defaults))
         .route("/assets/racks/positions", get(racks::positions))
 }
 
@@ -95,6 +97,7 @@ pub enum AssetType {
     Pdus,
     PassiveDcEquipments,
     Clusters,
+    Softwares,
 }
 
 impl From<AssetType> for AssetKind {
@@ -111,6 +114,7 @@ impl From<AssetType> for AssetKind {
             AssetType::Pdus => Self::Pdu,
             AssetType::PassiveDcEquipments => Self::PassiveDcEquipment,
             AssetType::Clusters => Self::Cluster,
+            AssetType::Softwares => Self::Software,
         }
     }
 }
@@ -129,6 +133,7 @@ impl From<AssetKind> for AssetType {
             AssetKind::Pdu => Self::Pdus,
             AssetKind::PassiveDcEquipment => Self::PassiveDcEquipments,
             AssetKind::Cluster => Self::Clusters,
+            AssetKind::Software => Self::Softwares,
         }
     }
 }
@@ -259,6 +264,9 @@ pub struct AssetDetail {
     /// Fields of the datacenter items, `null` for the other types.
     #[serde(flatten)]
     pub datacenter: DatacenterDetail,
+    /// Fields of the software, `null` for the other types.
+    #[serde(flatten)]
+    pub software: SoftwareDetail,
     /// In the trash.
     pub is_deleted: bool,
     /// Updated by an inventory tool.
@@ -347,6 +355,49 @@ impl DatacenterDetail {
             version: decode(specific.text("version")),
         }
     }
+}
+
+/// Fields of the software.
+#[derive(Debug, Default, Serialize, ToSchema)]
+pub struct SoftwareDetail {
+    pub category: Option<Ref>,
+    /// Can be chosen in a ticket.
+    pub is_helpdesk_visible: Option<bool>,
+    /// An upgrade of another software (`upgrade_from`).
+    pub is_update: Option<bool>,
+    pub upgrade_from: Option<Ref>,
+    /// None of its licenses is invalid (computed from the licenses).
+    pub valid_licenses: Option<bool>,
+}
+
+impl SoftwareDetail {
+    fn read(specific: &assets::Specific) -> Self {
+        let id = |column: &str| specific.text(column).and_then(|value| value.parse().ok());
+        Self {
+            category: id("softwarecategories_id")
+                .and_then(|id| Ref::optional(id, decode(specific.category.clone()))),
+            is_helpdesk_visible: specific.flag("is_helpdesk_visible"),
+            is_update: specific.flag("is_update"),
+            upgrade_from: id("softwares_id")
+                .and_then(|id| Ref::optional(id, decode(specific.upgrade_from.clone()))),
+            valid_licenses: specific.valid_licenses,
+        }
+    }
+}
+
+/// Fields of the software in a creation or an update.
+#[derive(Debug, Default, Deserialize, ToSchema)]
+pub struct SoftwareFields {
+    #[serde(default, deserialize_with = "nullable_id")]
+    #[schema(value_type = Option<i32>)]
+    pub category_id: Option<i32>,
+    pub is_helpdesk_visible: Option<bool>,
+    /// Not an upgrade: the software it upgrades is cleared.
+    pub is_update: Option<bool>,
+    /// Software it is an upgrade of, kept only with `is_update`.
+    #[serde(default, deserialize_with = "nullable_id")]
+    #[schema(value_type = Option<i32>)]
+    pub upgrade_from_id: Option<i32>,
 }
 
 /// Fields of the datacenter items in a creation or an update.
@@ -578,6 +629,8 @@ pub struct AssetFields {
     pub features: Features,
     #[serde(flatten)]
     pub datacenter: DatacenterFields,
+    #[serde(flatten)]
+    pub software: SoftwareFields,
 }
 
 #[derive(Debug, Deserialize, ToSchema)]
@@ -746,16 +799,16 @@ async fn create_asset(
     let infocom_settings = infocoms::settings(&state.pool).await?;
     // Infocom written: created with the item (not for a clone), dated by
     // its status (not for a template), cloned from the template.
+    // A status dates the infocom of the types having one.
+    let status_dates = kind.has_column("states_id") && infocom_settings.any_status_date();
     let (writes_infocom, clones_infocom) = match &creation {
         _ if !kind.has_infocom() => (false, false),
-        Creation::Item => (
-            infocom_settings.auto_create || infocom_settings.any_status_date(),
-            false,
-        ),
+        Creation::Item => (infocom_settings.auto_create || status_dates, false),
         Creation::Template => (infocom_settings.auto_create, false),
-        // Only the inventory assets clone the infocom of their template.
+        // Only the inventory assets and the software clone the infocom of
+        // their template.
         Creation::FromTemplate(template) => (
-            infocom_settings.any_status_date(),
+            status_dates,
             kind.cloned_links().contains(&ClonedLink::Infocom)
                 && infocoms::exists(&state.pool, kind.itemtype(), template.id).await?,
         ),
@@ -799,6 +852,21 @@ async fn create_asset(
         .unwrap_or_default();
     // `prepareInputForAdd` of a rack, before the rules and the unicity.
     check_rack_position(state, kind, &values, None).await?;
+    if kind == AssetKind::Software {
+        // A new software shows the setting of the classic interface.
+        let posted = |column: &str| requested.iter().any(|(field, _)| field.column == column);
+        if !matches!(creation, Creation::FromTemplate(_)) && !posted("is_helpdesk_visible") {
+            let visible = defaults::software_helpdesk_visible(state).await?;
+            business::merge(
+                &mut values,
+                vec![(
+                    kind.field("is_helpdesk_visible").expect("software field"),
+                    Value::Bool(visible),
+                )],
+            );
+        }
+        software_input(state, kind, &mut values, true).await?;
+    }
     // Only the inventory assets have business rules.
     if kind.is_inventory_asset() {
         let rules = nw_db::rules::asset_rules(&state.pool).await?;
@@ -946,6 +1014,16 @@ async fn update_asset(
     if let Err(error) = check_rack_position(state, kind, &form, Some(id)).await {
         log_asset_event(state, session, kind, id, text::UPDATES_ITEM, &[]).await;
         return Err(error);
+    }
+    // `prepareInputForUpdate` of a software: the form posts both fields.
+    let given = |column: &str| values.iter().any(|(field, _)| field.column == column);
+    if kind == AssetKind::Software && (given("is_update") || given("softwares_id")) {
+        software_input(state, kind, &mut form, false).await?;
+        let upgrade = form
+            .iter()
+            .find(|(field, _)| field.column == "softwares_id")
+            .cloned();
+        business::merge(&mut values, upgrade.into_iter().collect());
     }
     // The rules see the whole form; only the inventory assets have some.
     let rules = if kind.is_inventory_asset() {
@@ -1317,6 +1395,16 @@ fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, 
             fields.power_supply_id,
         ),
         ("room_id", "dcrooms_id", fields.datacenter.room_id),
+        (
+            "category_id",
+            "softwarecategories_id",
+            fields.software.category_id,
+        ),
+        (
+            "upgrade_from_id",
+            "softwares_id",
+            fields.software.upgrade_from_id,
+        ),
     ];
     let field = |name: &str, column: &str| {
         kind.field(column).ok_or_else(|| {
@@ -1348,6 +1436,12 @@ fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, 
     let flags = [
         ("is_recursive", "is_recursive", fields.is_recursive),
         ("is_global", "is_global", fields.is_global),
+        (
+            "is_helpdesk_visible",
+            "is_helpdesk_visible",
+            fields.software.is_helpdesk_visible,
+        ),
+        ("is_update", "is_update", fields.software.is_update),
     ];
     for (name, column, flag) in flags.into_iter().chain(fields.features.columns(kind)) {
         let Some(flag) = flag else { continue };
@@ -1407,6 +1501,40 @@ fn field_values(kind: AssetKind, fields: &AssetFields) -> ApiResult<Vec<(Field, 
     }
     datacenter_values(kind, &fields.datacenter, &mut values)?;
     Ok(values)
+}
+
+/// `prepareInputForAdd` / `prepareInputForUpdate` of a software: not an
+/// upgrade, it upgrades no software; a new one without category takes the
+/// one of the category rules (`RuleSoftwareCategory`), none when no rule is
+/// active. Running those rules is not ported.
+async fn software_input(
+    state: &AppState,
+    kind: AssetKind,
+    values: &mut Vec<(Field, Value)>,
+    adding: bool,
+) -> ApiResult<()> {
+    let value = |values: &[(Field, Value)], column: &str| {
+        values
+            .iter()
+            .find(|(field, _)| field.column == column)
+            .map(|(_, value)| value.clone())
+    };
+    if value(values, "is_update") == Some(Value::Bool(false)) {
+        business::merge(
+            values,
+            vec![(
+                kind.field("softwares_id").expect("software field"),
+                Value::Id(0),
+            )],
+        );
+    }
+    if adding
+        && value(values, "softwarecategories_id").is_none_or(|category| category.id() == 0)
+        && nw_db::rules::software_category_rules_active(&state.pool).await?
+    {
+        return Err(ApiError::LegacyRequired("business_rules"));
+    }
+    Ok(())
 }
 
 /// Fields of the racks and enclosures, validated: what the classic form
@@ -1680,6 +1808,7 @@ impl AssetDetail {
                 .and_then(|id| Ref::optional(id, specific.power_supply.clone())),
             features: Features::read(kind, specific),
             datacenter: DatacenterDetail::read(specific),
+            software: SoftwareDetail::read(specific),
             is_deleted: row.is_deleted,
             is_dynamic: row.is_dynamic != 0,
             is_recursive: row.is_recursive,

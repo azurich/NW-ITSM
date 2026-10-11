@@ -1,5 +1,6 @@
 import {
   ASSET_TYPES,
+  type AssetDefaults,
   type AssetDetail,
   type AssetType,
   type Choice,
@@ -41,6 +42,8 @@ export const REF_FIELDS = [
   'tech_group',
   'power_supply',
   'room',
+  'category',
+  'upgrade_from',
 ] as const
 export type RefField = (typeof REF_FIELDS)[number]
 
@@ -79,8 +82,8 @@ const RACK_FIELDS: readonly (TextField | RefField | NumberField)[] = [
   'background_color',
 ]
 
-/** Switches: the management type and the features. */
-export type FlagField = Feature | 'is_global'
+/** Switches: the management type, the features, those of the software. */
+export type FlagField = Feature | 'is_global' | 'is_helpdesk_visible' | 'is_update'
 
 export interface AssetForm {
   text: Record<TextField, string>
@@ -95,7 +98,11 @@ export interface AssetForm {
 /** Switches of the type. */
 export function flagFields(kind: AssetType): FlagField[] {
   const info = ASSET_TYPES[kind]
-  return [...(info.global ? (['is_global'] as const) : []), ...(info.features ?? [])]
+  return [
+    ...(info.global ? (['is_global'] as const) : []),
+    ...(info.features ?? []),
+    ...(info.software ? (['is_helpdesk_visible', 'is_update'] as const) : []),
+  ]
 }
 
 /** Whether the type has the field. */
@@ -131,6 +138,9 @@ export function hasField(kind: AssetType, field: TextField | RefField | NumberFi
       return !!info.powerSupplies
     case 'version':
       return !!info.version
+    case 'category':
+    case 'upgrade_from':
+      return !!info.software
     default:
       return true
   }
@@ -139,9 +149,9 @@ export function hasField(kind: AssetType, field: TextField | RefField | NumberFi
 /**
  * Form of a new item or template: empty, but the defaults of the
  * datacenter forms (42 units, a door to the north, a light red background,
- * one power supply).
+ * one power supply) and those of the settings.
  */
-export function emptyForm(kind?: AssetType): AssetForm {
+export function emptyForm(kind?: AssetType, defaults?: AssetDefaults): AssetForm {
   const form: AssetForm = {
     text: Object.fromEntries(TEXT_FIELDS.map((field) => [field, ''])) as AssetForm['text'],
     refs: Object.fromEntries(REF_FIELDS.map((field) => [field, null])) as AssetForm['refs'],
@@ -156,6 +166,10 @@ export function emptyForm(kind?: AssetType): AssetForm {
   }
   if (kind && ASSET_TYPES[kind].powerSupplies) {
     form.numbers.power_supplies = '1'
+  }
+  if (kind && ASSET_TYPES[kind].software) {
+    form.flags.is_helpdesk_visible = defaults?.is_helpdesk_visible ?? false
+    form.flags.is_update = false
   }
   return form
 }

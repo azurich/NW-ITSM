@@ -9,6 +9,7 @@ import {
   createAsset,
   createFromTemplate,
   createTemplate,
+  defaultsQuery,
   templateQuery,
   templatesQuery,
   updateAsset,
@@ -111,6 +112,25 @@ function TemplateChooser({ kind, templates }: { kind: AssetType; templates: Temp
   )
 }
 
+/**
+ * Form of a new item or template, as the classic one starts (`getEmpty`):
+ * `null` while the settings it depends on load.
+ */
+function useNewForm(kind: AssetType): { form: AssetForm | null; state?: ReactNode } {
+  const needed = !!ASSET_TYPES[kind].software
+  const defaults = useQuery({ ...defaultsQuery(kind), enabled: needed })
+  if (!needed) {
+    return { form: emptyForm(kind) }
+  }
+  if (defaults.isPending) {
+    return { form: null, state: <Loading /> }
+  }
+  if (defaults.isError) {
+    return { form: null, state: <ErrorState onRetry={() => void defaults.refetch()} /> }
+  }
+  return { form: emptyForm(kind, defaults.data) }
+}
+
 /** Entity of a new item or template: one of the selected entities. */
 function useEntityChoice() {
   const { t } = useTranslation()
@@ -158,9 +178,11 @@ function CreateBlank({ kind, header }: { kind: AssetType; header: ReactNode }) {
   const navigate = useNavigate()
   const store = useStoreAsset()
   const choice = useEntityChoice()
+  const blank = useNewForm(kind)
   const mutation = useMutation({
-    mutationFn: ({ entity, form }: { entity: number; form: AssetForm }) =>
-      createAsset(kind, entity, changedFields(kind, form)),
+    // What differs from the form of a new item: the API gives the rest.
+    mutationFn: ({ entity, form, initial }: { entity: number; form: AssetForm; initial: AssetForm }) =>
+      createAsset(kind, entity, changedFields(kind, form, initial)),
     onSuccess: async (asset) => {
       await store(asset)
       await navigate({
@@ -170,15 +192,16 @@ function CreateBlank({ kind, header }: { kind: AssetType; header: ReactNode }) {
       })
     },
   })
-  if (!choice.entity) {
+  if (!choice.entity || !blank.form) {
     return (
       <div className="space-y-4">
         {header}
-        {choice.state}
+        {choice.state ?? blank.state}
       </div>
     )
   }
   const { entity } = choice
+  const initial = blank.form
   return (
     <div className="space-y-6">
       {header}
@@ -188,12 +211,12 @@ function CreateBlank({ kind, header }: { kind: AssetType; header: ReactNode }) {
         kind={kind}
         entityId={entity.id}
         entityField={choice.field}
-        initial={emptyForm(kind)}
+        initial={initial}
         submitLabel={t('asset.form.create')}
         pending={mutation.isPending}
         error={mutation.error}
         legacyPath={`front/${ASSET_TYPES[kind].legacy}.form.php`}
-        onSubmit={(form) => mutation.mutate({ entity: entity.id, form })}
+        onSubmit={(form) => mutation.mutate({ entity: entity.id, form, initial })}
         onCancel={() => void navigate({ to: '/assets/$kind', params: { kind } })}
       />
     </div>
@@ -276,10 +299,15 @@ export function TemplateCreatePage() {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
   const choice = useEntityChoice()
+  const blank = useNewForm(kind)
   const toList = () => navigate({ to: '/assets/$kind/templates', params: { kind } })
   const mutation = useMutation({
     mutationFn: ({ entity, form }: { entity: number; form: AssetForm }) =>
-      createTemplate(kind, entity, changedFields(kind, form)),
+      createTemplate(kind, entity, {
+        ...changedFields(kind, form),
+        // The switches the settings set, as shown.
+        ...(ASSET_TYPES[kind].software ? { is_helpdesk_visible: form.flags.is_helpdesk_visible ?? false } : {}),
+      }),
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['templates', kind] })
       await toList()
@@ -299,11 +327,11 @@ export function TemplateCreatePage() {
       </div>
     )
   }
-  if (!choice.entity) {
+  if (!choice.entity || !blank.form) {
     return (
       <div className="space-y-4">
         {header}
-        {choice.state}
+        {choice.state ?? blank.state}
       </div>
     )
   }
@@ -316,7 +344,7 @@ export function TemplateCreatePage() {
         kind={kind}
         entityId={entity.id}
         entityField={choice.field}
-        initial={{ ...emptyForm(kind), template_name: '' }}
+        initial={{ ...blank.form, template_name: '' }}
         submitLabel={t('asset.form.create')}
         pending={mutation.isPending}
         error={mutation.error}

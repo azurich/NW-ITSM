@@ -47,6 +47,10 @@ pub enum ChoiceField {
     PowerSupply,
     /// Racks only: server room.
     Room,
+    /// Software only.
+    Category,
+    /// Software only: the software it is an upgrade of.
+    UpgradeFrom,
 }
 
 impl ChoiceField {
@@ -66,6 +70,8 @@ impl ChoiceField {
             Self::TechGroup => "groups_id_tech",
             Self::PowerSupply => "phonepowersupplies_id",
             Self::Room => "dcrooms_id",
+            Self::Category => "softwarecategories_id",
+            Self::UpgradeFrom => "softwares_id",
         })
     }
 }
@@ -168,6 +174,8 @@ pub async fn choices(
                 ChoiceField::State => Some(format!("{} = 1", kind.state_visibility_column())),
                 ChoiceField::Group => Some("is_itemgroup = 1".to_owned()),
                 ChoiceField::TechGroup => Some("is_assign = 1".to_owned()),
+                // Not the trash nor the templates (`getDropdownValue`).
+                ChoiceField::UpgradeFrom => Some("is_deleted = 0 AND is_template = 0".to_owned()),
                 _ => None,
             };
             let table = Table {
@@ -203,9 +211,10 @@ pub async fn choices(
 }
 
 /// Dropdown tables of the asset forms having an entity.
-const ENTITY_SCOPED: [&str; 4] = [
+const ENTITY_SCOPED: [&str; 5] = [
     "glpi_locations",
     "glpi_states",
     "glpi_groups",
     "glpi_dcrooms",
+    "glpi_softwares",
 ];

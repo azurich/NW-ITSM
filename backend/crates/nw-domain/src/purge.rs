@@ -68,6 +68,9 @@ impl AssetKind {
     /// Rows deleted with the asset. Its own history (`glpi_logs`) is
     /// deleted too.
     pub fn purged_links(self) -> Vec<Link> {
+        if self == Self::Software {
+            return software_purged_links();
+        }
         if !self.is_inventory_asset() {
             return self.datacenter_purged_links();
         }
@@ -154,6 +157,17 @@ impl AssetKind {
     /// their only one), racks, cartridges, reservations, impact analysis,
     /// the items of a rack, an enclosure or a cluster, the plugs of a PDU.
     pub fn purge_blockers(self) -> Vec<Blocker> {
+        if self == Self::Software {
+            // Its versions are purged with their installations (history
+            // of the installed items), its licenses put in the trash.
+            return vec![
+                Blocker::Column("glpi_softwareversions", "softwares_id"),
+                Blocker::Column("glpi_softwarelicenses", "softwares_id"),
+                Blocker::Item("glpi_items_tickets"),
+                Blocker::Reservations,
+                Blocker::Impact,
+            ];
+        }
         if !self.is_inventory_asset() {
             return self.datacenter_purge_blockers();
         }
@@ -180,6 +194,16 @@ impl AssetKind {
             _ => {}
         }
         blockers
+    }
+
+    /// Columns of other items pointing to the asset, set to 0 by a form
+    /// update (`cleanRelationData`: a new `date_mod`, no history): the
+    /// software that is an upgrade of a software.
+    pub fn cleared_references(self) -> &'static [(&'static str, &'static str)] {
+        match self {
+            Self::Software => &[("glpi_softwares", "softwares_id")],
+            _ => &[],
+        }
     }
 
     fn datacenter_purge_blockers(self) -> Vec<Blocker> {
@@ -219,6 +243,29 @@ impl AssetKind {
         });
         blockers
     }
+}
+
+/// Rows deleted with a software: its projects (`cleanDBonPurge`), then
+/// the branches of `cleanRelationTable` its type is in.
+fn software_purged_links() -> Vec<Link> {
+    vec![
+        link("glpi_items_projects", Owner::Item),
+        INFOCOM,
+        Link {
+            alerts: Some("ReservationItem"),
+            ..link("glpi_reservationitems", Owner::Item)
+        },
+        link("glpi_contracts_items", Owner::Item),
+        link("glpi_documents_items", Owner::Item),
+        link("glpi_notepads", Owner::Item),
+        Link {
+            history: Some("KnowbaseItem_Item"),
+            ..link("glpi_knowbaseitems_items", Owner::Item)
+        },
+        link("glpi_changes_items", Owner::Item),
+        link("glpi_items_problems", Owner::Item),
+        link("glpi_domains_items", Owner::Item),
+    ]
 }
 
 #[cfg(test)]
@@ -269,6 +316,18 @@ mod tests {
             !AssetKind::PassiveDcEquipment
                 .purge_blockers()
                 .contains(&Blocker::Impact)
+        );
+        // Software.
+        assert!(tables(AssetKind::Software).contains(&"glpi_notepads"));
+        assert!(!tables(AssetKind::Software).contains(&"glpi_computers_items"));
+        assert!(
+            AssetKind::Software
+                .purge_blockers()
+                .contains(&Blocker::Column("glpi_softwareversions", "softwares_id"))
+        );
+        assert_eq!(
+            AssetKind::Software.cleared_references(),
+            [("glpi_softwares", "softwares_id")]
         );
     }
 }

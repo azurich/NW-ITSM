@@ -30,7 +30,7 @@ const COLUMNS: AssetSort[] = [
 ]
 
 /** Columns of the fields some types do not have. */
-const OPTIONAL_COLUMNS = ['serial', 'inventory_number', 'type', 'manufacturer', 'location'] as const
+const OPTIONAL_COLUMNS = ['serial', 'inventory_number', 'type', 'manufacturer', 'state', 'location'] as const
 
 /** Columns of the list of a type: those of its fields. */
 function columnsOf(kind: AssetType): AssetSort[] {
@@ -133,7 +133,9 @@ function AssetList({ kind }: { kind: AssetType }) {
           onChange={(event) => onSearch(event.target.value)}
           placeholder={
             !hasField(kind, 'serial')
-              ? t('assets.searchNameUuid')
+              ? ASSET_TYPES[kind].uuid
+                ? t('assets.searchNameUuid')
+                : t('assets.searchName')
               : ASSET_TYPES[kind].uuid
                 ? t('assets.searchWithUuid')
                 : t('assets.search')
@@ -194,7 +196,9 @@ function Results({ kind, page, params, dimmed, onSort, onPage }: ResultsProps) {
                   }
                 >
                   <button type="button" onClick={() => onSort(column)} className="hover:text-slate-900 dark:hover:text-white">
-                    {t(`assets.columns.${column}`)}
+                    {column === 'manufacturer' && ASSET_TYPES[kind].software
+                      ? t('assets.columns.publisher')
+                      : t(`assets.columns.${column}`)}
                     {params.sort === column && (params.order === 'asc' ? ' ▲' : ' ▼')}
                   </button>
                 </th>
@@ -225,7 +229,7 @@ function Results({ kind, page, params, dimmed, onSort, onPage }: ResultsProps) {
                   {shown('inventory_number') && <td className="px-3 py-2">{asset.inventory_number}</td>}
                   {shown('type') && <td className="px-3 py-2">{asset.type?.name}</td>}
                   {shown('manufacturer') && <td className="px-3 py-2">{asset.manufacturer?.name}</td>}
-                  <td className="px-3 py-2">{asset.state?.name}</td>
+                  {shown('state') && <td className="px-3 py-2">{asset.state?.name}</td>}
                   {shown('location') && <td className="px-3 py-2">{asset.location?.name}</td>}
                   <td className="whitespace-nowrap px-3 py-2">
                     {formatDateTime(asset.updated_at, i18n.language)}

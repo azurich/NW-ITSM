@@ -63,8 +63,9 @@ export function AssetPage() {
   // The fields of the type only.
   const text = (field: TextField) =>
     hasField(kind, field) && <Field label={t(`asset.fields.${field}`)}>{asset[field]}</Field>
-  const ref = (field: RefField) =>
-    hasField(kind, field) && <Field label={t(`asset.fields.${field}`)}>{asset[field]?.name}</Field>
+  const ref = (field: RefField, label = t(`asset.fields.${field}`)) =>
+    hasField(kind, field) && <Field label={label}>{asset[field]?.name}</Field>
+  const yesNo = (value: boolean | null | undefined) => (value ? t('asset.yes') : t('asset.no'))
   const place = parsePosition(asset.position)
   const orientation = ORIENTATIONS[asset.room_orientation as keyof typeof ORIENTATIONS] as
     | (typeof ORIENTATIONS)[keyof typeof ORIENTATIONS]
@@ -172,7 +173,8 @@ export function AssetPage() {
         <Section title={t('asset.sections.general')}>
           <Field label={t('asset.fields.entity')}>{asset.entity.name}</Field>
           {ref('type')}
-          {ref('manufacturer')}
+          {ref('manufacturer', info.software ? t('asset.fields.publisher') : undefined)}
+          {ref('category')}
           {ref('model')}
           {text('serial')}
           {text('inventory_number')}
@@ -194,8 +196,21 @@ export function AssetPage() {
           {text('contact_number')}
           {ref('tech_user')}
           {ref('tech_group')}
+          {info.software && (
+            <>
+              <Field label={t('asset.fields.is_helpdesk_visible')}>{yesNo(asset.is_helpdesk_visible)}</Field>
+              <Field label={t('asset.fields.valid_licenses')}>{yesNo(asset.valid_licenses)}</Field>
+            </>
+          )}
         </Section>
       </div>
+
+      {info.software && (
+        <Section title={t('asset.sections.upgrade')}>
+          <Field label={t('asset.fields.is_update')}>{yesNo(asset.is_update)}</Field>
+          {asset.is_update && <Field label={t('asset.fields.upgrade_from')}>{asset.upgrade_from?.name}</Field>}
+        </Section>
+      )}
 
       {info.rack && (
         <Section title={t('asset.sections.rack')}>

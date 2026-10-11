@@ -46,6 +46,25 @@ class Software extends DbTestCase
         $this->string(\Software::getTypeName(10))->isIdenticalTo('Software');
     }
 
+    public function testFormShowsTheComment()
+    {
+        $this->login();
+        $software = new \Software();
+        $id = $software->add([
+           'name'        => __FUNCTION__,
+           'comment'     => 'Licensed per seat',
+           'entities_id' => 0
+        ]);
+        $this->integer((int)$id)->isGreaterThan(0);
+
+        // The comment of a software can be read and changed in its form.
+        $this->output(
+            function () use ($software, $id) {
+                $software->showForm($id);
+            }
+        )->matches('/<textarea[^>]*name="comment"[^>]*>\s*Licensed per seat\s*<\/textarea>/');
+    }
+
     public function testGetMenuShorcut()
     {
         $this->string(\Software::getMenuShorcut())->isIdenticalTo('s');

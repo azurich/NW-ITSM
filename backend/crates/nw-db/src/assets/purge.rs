@@ -130,6 +130,16 @@ pub async fn purge(pool: &MySqlPool, kind: AssetKind, id: i32) -> Result<bool, s
     for link in kind.purged_links() {
         delete_link(&mut tx, kind, id, link).await?;
     }
+    // `cleanRelationData`: the other items forget it.
+    for (table, column) in kind.cleared_references() {
+        sqlx::query(&format!(
+            "UPDATE {table} SET {column} = 0, date_mod = NOW() WHERE {column} = ? AND id <> ?"
+        ))
+        .bind(id)
+        .bind(id)
+        .execute(&mut *tx)
+        .await?;
+    }
     // `cleanHistory`.
     sqlx::query("DELETE FROM glpi_logs WHERE itemtype = ? AND items_id = ?")
         .bind(kind.itemtype())

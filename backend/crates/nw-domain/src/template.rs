@@ -2,8 +2,8 @@
 //! (`CommonDBTM::clone`), then its linked rows (`Clonable::post_clone`, in
 //! the order of `getCloneRelations`).
 //!
-//! The infocom, the contracts and the documents of the inventory assets are
-//! cloned here the same way. The other links of the template (operating
+//! The infocom, the contracts and the documents of the inventory assets and
+//! of the software are cloned here the same way. The other links of the template (operating
 //! system, components, disks, software, network ports, connections, notes,
 //! knowledge base, cartridges, items of an enclosure, plugs of a PDU) leave
 //! the creation to the classic interface: see
@@ -29,7 +29,7 @@ pub enum ClonedLink {
 impl AssetKind {
     /// Rows of the template cloned for the new item, in this order.
     pub fn cloned_links(self) -> &'static [ClonedLink] {
-        if self.is_inventory_asset() {
+        if self.is_inventory_asset() || self == Self::Software {
             &[
                 ClonedLink::Infocom,
                 ClonedLink::Contract,
@@ -58,6 +58,8 @@ impl AssetKind {
                 blockers.push(Blocker::Item("glpi_networkports"));
                 return blockers;
             }
+            // Its versions and licenses are not cloned.
+            Self::Software => return vec![Blocker::Item("glpi_knowbaseitems_items")],
             _ => {}
         }
         let mut blockers = vec![
@@ -84,7 +86,12 @@ impl AssetKind {
             Self::Monitor | Self::Peripheral | Self::Phone => {
                 blockers.push(Blocker::Item("glpi_computers_items"));
             }
-            Self::Rack | Self::Enclosure | Self::Pdu | Self::PassiveDcEquipment | Self::Cluster => {
+            Self::Rack
+            | Self::Enclosure
+            | Self::Pdu
+            | Self::PassiveDcEquipment
+            | Self::Cluster
+            | Self::Software => {
                 unreachable!("handled above")
             }
         }
@@ -119,5 +126,10 @@ mod tests {
                 .contains(&Blocker::Column("glpi_pdus_plugs", "pdus_id"))
         );
         assert_eq!(AssetKind::Monitor.cloned_links().len(), 3);
+        assert_eq!(AssetKind::Software.cloned_links().len(), 3);
+        assert_eq!(
+            AssetKind::Software.template_blockers(),
+            [Blocker::Item("glpi_knowbaseitems_items")]
+        );
     }
 }

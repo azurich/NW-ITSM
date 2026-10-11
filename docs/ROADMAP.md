@@ -87,6 +87,8 @@ Chaque lot suit la même « définition de terminé » :
 - [x] Suppression définitive depuis la corbeille, avec les liens que le PHP
       supprime, vérifiée contre le PHP (refus explicite pour les ports
       réseau, composants, logiciels, tickets...)
+- [x] Listes de choix des formulaires PHP : conditions appliquées (statuts
+      du type, groupes...), corrigées des deux côtés
 - [x] Gabarits : liste, création, modification, suppression, et création
       d'un élément depuis un gabarit (informations financières, contrats et
       documents recopiés), vérifiés contre le PHP ; nom donné à l'élément
@@ -96,7 +98,11 @@ Chaque lot suit la même « définition de terminé » :
       refusée si occupée, informations financières, purge et gabarits,
       vérifiés contre le PHP ; numéro d'inventaire des PDU et équipements
       passifs corrigé côté PHP
-- [ ] Logiciels, licences, versions installées
+- [x] Logiciels : le logiciel lui-même (éditeur, catégorie, mise à jour
+      d'un autre logiciel, associable à un ticket, partage recopié aux
+      versions, purge, gabarits), vérifié contre le PHP ; commentaire
+      rétabli dans le formulaire PHP
+- [ ] Logiciels : versions, installations, licences et affectations
 - [ ] Liaisons entre objets (`itemtype` / `items_id`), composants, ports réseau
 - [ ] Gestion financière (`infocoms`), contrats, fournisseurs, documents
 - [ ] **Inventaire natif** : réception des agents (GLPI-Agent et/ou OCS),

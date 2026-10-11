@@ -3,7 +3,7 @@
 - **Statut** : accepté (complété le 2026-10-10 : règles métier,
   informations financières, unicité des champs, partage, champs propres à
   chaque type, suppression définitive, gabarits, baies, châssis, PDU,
-  équipements passifs et clusters portés)
+  équipements passifs, clusters et logiciels portés)
 - **Date** : 2026-10-10
 
 ## Contexte
@@ -11,8 +11,8 @@
 Le lot 2 ouvre les premières écritures métier : création, modification,
 mise à la corbeille et restauration des ordinateurs, moniteurs,
 imprimantes, matériels réseau, périphériques et téléphones, puis des
-éléments du centre de données (baies, châssis, PDU, équipements passifs)
-et des clusters.
+éléments du centre de données (baies, châssis, PDU, équipements passifs),
+des clusters et des logiciels.
 
 Côté PHP, une écriture (`CommonDBTM::add`, `update`, `delete`, `restore`)
 déclenche de nombreux effets de bord :
@@ -44,7 +44,8 @@ classique, sur le même élément. Rien n'est écrit en cas de refus.
 
 - Droits : `CREATE`, `UPDATE`, `DELETE` du profil sur le type (`computer`,
   `monitor`, `printer`, `networking`, `peripheral`, `phone`, `datacenter`
-  pour les baies, châssis, PDU et équipements passifs, `cluster`). Comme
+  pour les baies, châssis, PDU et équipements passifs, `cluster`,
+  `software`). Comme
   `canCreateItem` / `canUpdateItem`, l'élément doit appartenir à une entité
   **active** : un élément partagé par une entité parente est visible mais
   en lecture seule. La corbeille et la restauration demandent `DELETE`,
@@ -452,6 +453,67 @@ informations financières et date d'achat au statut :
   châssis ;
 - création, purge et utilisation de gabarits de baie, châssis, PDU et
   équipement passif.
+
+Résultat : bases identiques, mêmes événements.
+
+### Logiciels (le logiciel lui-même)
+
+Première étape des logiciels : l'élément `Software`, sans ses versions,
+installations ni licences (étapes suivantes).
+
+- Route `/assets/softwares`, avec les écritures des autres types
+  (création, modification, corbeille, purge, gabarits), le droit
+  `software` et les événements du formulaire PHP (type `software`).
+- **Champs** : éditeur (le fabricant), catégorie, lieu, utilisateur,
+  groupe, technicien et groupe responsables, associable à un ticket, mise
+  à jour d'un autre logiciel (et lequel), commentaire. Ni type, ni modèle,
+  ni statut, ni numéros de série et d'inventaire, ni contact. Les licences
+  valides (`is_valid`, calculé d'après les licences) sont affichées, pas
+  modifiables.
+- **Historique** comme les options du PHP : catégorie 62, associable à un
+  ticket 61, éditeur 23, commentaire 16, gabarit 64... Le logiciel mis à
+  jour (`softwares_id`) et l'indicateur de mise à jour n'y entrent pas.
+- **Nouveau logiciel** comme `getEmpty` : associable à un ticket selon le
+  réglage `default_software_helpdesk_visible` (lu par
+  `/assets/softwares/defaults`, pour que le formulaire l'affiche).
+- **`prepareInputForAdd` / `prepareInputForUpdate`** : sans l'indicateur
+  de mise à jour, le logiciel mis à jour est effacé. Un nouveau logiciel
+  sans catégorie prend celle des règles de catégorie
+  (`RuleSoftwareCategory`) : aucune sans règle active ; avec une règle
+  active, la création est renvoyée vers l'interface classique
+  (`business_rules`), ces règles n'étant pas portées. Pas de règles
+  métier du parc (le logiciel n'est pas dans `asset_types`).
+- Unicité des champs, information financière (créée automatiquement, sans
+  date de statut : le logiciel n'a pas de statut) comme les autres types.
+- **Partage** : recopié à son information financière, ses objets de
+  réservation et ses versions (`$forward_entity_to`, sans historique, avec
+  `date_mod`). Il ne peut plus être retiré tant qu'un logiciel d'une autre
+  entité est une mise à jour de celui-ci (`canUnrecurs`).
+- **Purge** : ses liens vers projets, contrats, documents, notes, base de
+  connaissances, changements, problèmes et domaines, son information
+  financière et ses objets de réservation sont supprimés ; un logiciel qui
+  en était la mise à jour l'oublie (`cleanRelationData` : `softwares_id` à
+  0, nouvelle `date_mod`). Renvoyé vers l'interface classique tant qu'il a
+  des versions (purgées avec leurs installations et l'historique des
+  matériels), des licences (mises à la corbeille), des tickets, des
+  réservations en cours ou une analyse d'impact.
+- **Gabarits** : un logiciel créé depuis un gabarit en recopie
+  l'information financière, les contrats et les documents ; les articles
+  de la base de connaissances renvoient vers l'interface classique.
+- **Correction côté PHP** : le formulaire Twig du logiciel avait perdu son
+  commentaire, qui ne pouvait plus être modifié ; il est rétabli (test
+  `tests/functional/Software.php`).
+
+Vérification : sur des copies identiques de la base de référence (deux
+logiciels de Paris, l'un mise à jour de l'autre, un contrat), faites par le
+formulaire PHP posté comme par un navigateur puis par l'API :
+- création (avec et sans catégorie, information financière automatique) ;
+- modification (historique, indicateur de mise à jour retiré) ;
+- partage recopié aux versions ;
+- corbeille, restauration et purge (liens, logiciel qui l'oublie) ;
+- création, et création depuis un gabarit (information financière et
+  contrat recopiés, catégorie vide) ;
+- refus d'unicité.
 
 Résultat : bases identiques, mêmes événements.
 
