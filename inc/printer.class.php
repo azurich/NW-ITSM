@@ -396,7 +396,7 @@ class Printer extends CommonDBTM
                        'name' => 'groups_id',
                        'type' => 'select',
                        'itemtype' => 'Group',
-                       'conditions' => ['is_assign' => 1],
+                       'conditions' => ['is_itemgroup' => 1],
                        'value' => $this->fields["groups_id"],
                        'actions' => getItemActionButtons(['info', 'add'], "Group"),
                     ],
@@ -406,6 +406,28 @@ class Printer extends CommonDBTM
                        'values' => getOptionForItems('Network'),
                        'value' => $this->fields["networks_id"],
                        'actions' => getItemActionButtons(['info', 'add'], "Network"),
+                    ],
+                    _n('Memory', 'Memories', 1) => [
+                       'name' => 'memory_size',
+                       'type' => 'text',
+                       'value' => $this->fields["memory_size"],
+                    ],
+                    __('Initial page counter') => [
+                       'name' => 'init_pages_counter',
+                       'type' => 'number',
+                       'value' => $this->fields["init_pages_counter"],
+                       'step' => 1,
+                    ],
+                    __('Current counter of pages') => [
+                       'name' => 'last_pages_counter',
+                       'type' => 'number',
+                       'value' => $this->fields["last_pages_counter"],
+                       'step' => 1,
+                    ],
+                    __('Comments') => [
+                       'name' => 'comment',
+                       'type' => 'textarea',
+                       'value' => $this->fields["comment"],
                     ],
                  ]
               ],

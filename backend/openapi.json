@@ -1,0 +1,5069 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NW-ITSM API",
+    "description": "API v2 of NW-ITSM, served by the Rust backend next to the legacy PHP application.",
+    "license": {
+      "name": "GPL-2.0-or-later"
+    },
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/api/v2/assets/racks/positions": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Places of a server room no rack outside the trash takes, like the\nclassic form offers them (`ajax/dcroom_size.php`).",
+        "operationId": "positions",
+        "parameters": [
+          {
+            "name": "room_id",
+            "in": "query",
+            "description": "Server room.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "current",
+            "in": "query",
+            "description": "Position of the rack being edited: offered although it is taken.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Free places",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RoomPositions"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create or update right on the racks",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible room",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/software-licenses/{id}/items": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the items a license is affected to.",
+        "operationId": "list_license_items",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "License id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Its items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LicenseItemList"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on the software or the licenses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible license",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Affects a license to an item, like the form of its tab: its validity\nand that of its software follow, both are noted in their history.",
+        "operationId": "add_license_item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "License id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LicenseItemFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Affected"
+          },
+          "400": {
+            "description": "A type without software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right on the software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible license or item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Business rules would change the license (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/software-licenses/{id}/items/{affectation_id}": {
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Removes an item from a license for good, like the \"Delete\npermanently\" action of its tab (no event).",
+        "operationId": "remove_license_item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "License id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "affectation_id",
+            "in": "path",
+            "description": "Affectation id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed"
+          },
+          "403": {
+            "description": "Neither the item nor the license can be changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible license or affectation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Business rules would change the license (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/softwares/{id}/versions": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the versions of a software visible to the session, by name.",
+        "operationId": "list_versions",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Software id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Its versions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VersionList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on the software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Adds a version to a software, in its entity and with its sharing. The\nsoftware notes it in its history.",
+        "operationId": "create_version",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Software id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Added",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right on the software, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/softwares/{id}/versions/{version_id}": {
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Deletes a version for good, with its installations (without history).\nLicenses bought or used with it leave it to the classic interface.",
+        "operationId": "purge_version",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Software id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "version_id",
+            "in": "path",
+            "description": "Version id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted for good"
+          },
+          "403": {
+            "description": "No update right on the software, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible software or version",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be done in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Changes a version: its history, and that of its software.",
+        "operationId": "update_version",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Software id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "version_id",
+            "in": "path",
+            "description": "Version id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VersionFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Version"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right on the software, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible software or version",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the assets of a type visible to the session (templates excluded).",
+        "operationId": "list",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number, starting at 1.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 1,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "per_page",
+            "in": "query",
+            "description": "Items per page.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32",
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Text searched in the name, serial number, inventory number (and UUID\nof computers).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "trash",
+            "in": "query",
+            "description": "List the items in the trash instead of the others.",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "name",
+                "serial",
+                "inventory_number",
+                "entity",
+                "location",
+                "type",
+                "manufacturer",
+                "state",
+                "updated_at"
+              ]
+            }
+          },
+          {
+            "name": "order",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "asc",
+                "desc"
+              ]
+            }
+          },
+          {
+            "name": "software_id",
+            "in": "query",
+            "description": "Licenses only: those of this software.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "One page of assets",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetPage"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Creates an asset in one of the selected entities.",
+        "operationId": "create",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetCreation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another item has the same values (`duplicate`), or must be created in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/choices/{field}": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Values of a form field for an asset of the entity: the entity's own\nvalues and the recursive ones of its parents, like the legacy dropdowns.",
+        "operationId": "choices",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "field",
+            "in": "path",
+            "description": "Form field",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/ChoiceField"
+            }
+          },
+          {
+            "name": "entity_id",
+            "in": "query",
+            "description": "Entity of the asset being edited: one of the selected entities.",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Text searched in the names.",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "software_id",
+            "in": "query",
+            "description": "The software whose licenses or versions are offered (licenses).",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "exclude_id",
+            "in": "query",
+            "description": "A license not offered as parent: the one being edited.",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matching values",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChoiceList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid parameters, or no such field for this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create or update right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/defaults": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Values the form of a new item of the type starts with, as the classic\nform (`getEmpty`) shows them.",
+        "operationId": "defaults",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Values of a new item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDefaults"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create or update right on this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/templates": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the templates of a type visible to the session, by name\n(`CommonDBTM::listTemplates`).",
+        "operationId": "list_templates",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The templates",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TemplateList"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read nor create right on this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Creates a template in one of the selected entities. Its fields are not\nchecked for unicity, and its status fills no date.",
+        "operationId": "create_template",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateCreation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be created in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/templates/{id}": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Returns a template visible to the session.",
+        "operationId": "get_template",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Template id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The template",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Deletes a template for good, with its history and the rows the PHP\ncode deletes with it (contracts, documents, infocom...). Linked data\nwhose purge is not ported leaves it to the classic interface.",
+        "operationId": "purge_template",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Template id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted for good"
+          },
+          "403": {
+            "description": "No purge right (on the type, or on its infocom), or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be done in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Updates a template of a selected entity. Its fields are not checked\nfor unicity.",
+        "operationId": "update_template",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Template id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Items of other entities use the shared template (`sharing_in_use`), or must be changed in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/templates/{id}/items": {
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Creates an item from a template, in the entity of the template (one of\nthe selected entities). The fields not given take the values of the\ntemplate; its other columns are copied, and its infocom, contracts and\ndocuments cloned for the item. Other linked data (components, network\nports, software...) leaves it to the classic interface.",
+        "operationId": "create_from_template",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Template id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No create right, or entity of the template not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible template",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another item has the same values (`duplicate`), or must be created in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Returns an asset visible to the session, including one in the trash.",
+        "operationId": "get_one",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Deletes an asset of the trash for good, with its history and the rows\nthe PHP code deletes with it (contracts, documents, connections,\ninfocom...). Linked data whose purge is not ported (network ports,\ncomponents, software, tickets...) leaves it to the classic interface.",
+        "operationId": "purge",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted for good"
+          },
+          "403": {
+            "description": "No purge right (on the type, or on its infocom), or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Not in the trash (`not_in_trash`), or must be done in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Updates an asset of a selected entity. For computers, the changes of\ncontact, user, group, location (and status, depending on the settings)\nare copied to the connected items and components, like the PHP code.",
+        "operationId": "update",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Updated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Another item has the same values (`duplicate`), items of other entities use the shared item (`sharing_in_use`), or must be changed in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}/licenses": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the licenses affected to an item.",
+        "operationId": "list_asset_licenses",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset, with software",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Its licenses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetLicenseList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A type without software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on the software or the asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Affects a license to an item, from the item.",
+        "operationId": "add_asset_license",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset, with software",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetLicenseFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Affected"
+          },
+          "400": {
+            "description": "A type without software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right on the software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset or license",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Business rules would change the license (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}/licenses/{affectation_id}": {
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Removes a license from an item for good.",
+        "operationId": "remove_asset_license",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset, with software",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "affectation_id",
+            "in": "path",
+            "description": "Affectation id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed"
+          },
+          "403": {
+            "description": "Neither the item nor the license can be changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset or affectation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Business rules would change the license (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}/restore": {
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Restores an asset from the trash.",
+        "operationId": "restore",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Restored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No delete right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be done in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}/software": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the software installed on an asset.",
+        "operationId": "list_installations",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset: computers, monitors, network-equipments, peripherals, phones or printers",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Its software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallationList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No software for this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on the software or on the asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Installs a version of a software on an asset, like the form of its\nsoftware tab: in the entity of the asset (the active entity of the\nsession for a phone), noted in the history of both.",
+        "operationId": "install_software",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstallationFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Installation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields, unknown version, or no software for this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Neither the asset nor the software can be changed, or their entities do not match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already installed (`already_installed`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}/software/{installation_id}": {
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Uninstalls a software from an asset, for good, like the \"Delete\npermanently\" action of its software tab (no event), noted in the\nhistory of the asset and of the version.",
+        "operationId": "uninstall_software",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "installation_id",
+            "in": "path",
+            "description": "Installation id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Uninstalled"
+          },
+          "400": {
+            "description": "No software for this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Neither the asset nor the software can be changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset or installation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}/trash": {
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Moves an asset to the trash.",
+        "operationId": "trash",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "In the trash",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetDetail"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No delete right, or entity not selected",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Must be done in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/bridge": {
+      "get": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Opens a session from the PHP application (`front/nw_bridge.php`) and\nredirects to the application. On failure, redirects to the login page.",
+        "operationId": "bridge_from_legacy",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "query",
+            "description": "Token signed by the PHP application.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "redirect",
+            "in": "query",
+            "description": "Page of the application to open (`/app/...`).",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "303": {
+            "description": "Redirection to the application or to the login page"
+          }
+        }
+      }
+    },
+    "/api/v2/auth/bridge/legacy": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Issues a token opening the classic interface as the current user.",
+        "operationId": "bridge_to_legacy",
+        "responses": {
+          "200": {
+            "description": "Token for the PHP application, nonce cookie set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BridgeToken"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Password expired since the login",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Bridge not configured",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/login": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Logs in with a local ITSM-NG account and sets the session cookie.",
+        "description": "After 5 failures for a login from an address, or 20 from an address,\nattempts are refused for 15 minutes.",
+        "operationId": "login",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Logged in, `nw_session` cookie set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Wrong login or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Account disabled, password expired or no usable profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many failures, see `Retry-After`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/logout": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Removes the session cookie.",
+        "operationId": "logout",
+        "responses": {
+          "204": {
+            "description": "Session cookie removed"
+          }
+        }
+      }
+    },
+    "/api/v2/auth/password": {
+      "post": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Changes the password of the current user. The other sessions of the user\nend; this one gets a new cookie.",
+        "operationId": "change_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed, new session cookie set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Wrong current password, same or weak new password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "External account or no `password_update` right",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many wrong passwords",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/password/expired": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Replaces an expired password and logs in (legacy `updatepassword.php`).",
+        "operationId": "change_expired_password",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ExpiredPasswordChange"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Password changed, logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Password not expired, same or weak new password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Wrong login or password",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Account disabled or locked",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Too many failures, see `Retry-After`",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/session": {
+      "get": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Returns the current session.",
+        "operationId": "current_session",
+        "responses": {
+          "200": {
+            "description": "Current session",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/session/entities": {
+      "get": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Lists the entities the active profile can select.",
+        "operationId": "selectable",
+        "responses": {
+          "200": {
+            "description": "Selectable entities",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SelectableEntities"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/session/entity": {
+      "put": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Selects the entities to work on (legacy entity selector).",
+        "operationId": "switch_entity",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EntitySwitch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Entities changed, new session cookie set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Entity not allowed for the profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/auth/session/profile": {
+      "put": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Activates another profile of the user, with its default entities (like\nthe legacy profile selector).",
+        "operationId": "switch_profile",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProfileSwitch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Profile changed, new session cookie set",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Profile not granted or not usable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Service health, without authentication.",
+        "operationId": "health",
+        "responses": {
+          "200": {
+            "description": "Service and database are up",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "Database unreachable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Health"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/languages": {
+      "get": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Languages of the application.",
+        "operationId": "list_languages",
+        "responses": {
+          "200": {
+            "description": "Every language",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Language"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/me/preferences": {
+      "patch": {
+        "tags": [
+          "session"
+        ],
+        "summary": "Updates the preferences of the current user, with an entry in the\nuser's history.",
+        "operationId": "update_preferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreferencesUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Preferences saved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SessionInfo"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Unknown language",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AssetCreation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AssetFields"
+          },
+          {
+            "type": "object",
+            "required": [
+              "entity_id"
+            ],
+            "properties": {
+              "entity_id": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Entity of the new asset: one of the selected entities."
+              }
+            }
+          }
+        ]
+      },
+      "AssetDefaults": {
+        "type": "object",
+        "description": "Values of a new item set by the settings; `null` for the other types.",
+        "properties": {
+          "is_helpdesk_visible": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Software: can be chosen in a ticket\n(`default_software_helpdesk_visible`)."
+          }
+        }
+      },
+      "AssetDetail": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Features",
+            "description": "Connectors and features of the type, `null` for the other types."
+          },
+          {
+            "$ref": "#/components/schemas/DatacenterDetail",
+            "description": "Fields of the datacenter items, `null` for the other types."
+          },
+          {
+            "$ref": "#/components/schemas/SoftwareDetail",
+            "description": "Fields of the software, `null` for the other types."
+          },
+          {
+            "$ref": "#/components/schemas/LicenseDetail",
+            "description": "Fields of the licenses, `null` for the other types."
+          },
+          {
+            "type": "object",
+            "required": [
+              "kind",
+              "id",
+              "is_deleted",
+              "is_dynamic",
+              "is_recursive",
+              "is_global",
+              "entity",
+              "is_template",
+              "permissions"
+            ],
+            "properties": {
+              "brand": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Peripherals and phones only."
+              },
+              "comment": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact_number": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "created_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "duplicates": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/DuplicateNotice"
+                },
+                "description": "After a write: items with the same values as this one, reported by\na unicity criterion that does not refuse them."
+              },
+              "entity": {
+                "$ref": "#/components/schemas/Ref"
+              },
+              "group": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "id": {
+                "type": "integer",
+                "format": "int32"
+              },
+              "initial_page_counter": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Printers only."
+              },
+              "inventory_number": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "is_deleted": {
+                "type": "boolean",
+                "description": "In the trash."
+              },
+              "is_dynamic": {
+                "type": "boolean",
+                "description": "Updated by an inventory tool."
+              },
+              "is_global": {
+                "type": "boolean",
+                "description": "Used by several computers at once."
+              },
+              "is_recursive": {
+                "type": "boolean",
+                "description": "Visible in sub-entities."
+              },
+              "is_template": {
+                "type": "boolean",
+                "description": "A template: a model of the items of its type."
+              },
+              "kind": {
+                "$ref": "#/components/schemas/AssetType"
+              },
+              "location": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "manufacturer": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "memory": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Printers (free text) and network equipment (MiB) only."
+              },
+              "model": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "network": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref",
+                    "description": "Computers, printers and network equipment only."
+                  }
+                ]
+              },
+              "number_line": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Phones only."
+              },
+              "page_counter": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Printers only: current counter of pages."
+              },
+              "permissions": {
+                "$ref": "#/components/schemas/AssetPermissions"
+              },
+              "power_supply": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref",
+                    "description": "Phones only."
+                  }
+                ]
+              },
+              "serial": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "size": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Monitors only: diagonal in inches, as stored (`\"21.50\"`)."
+              },
+              "state": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "tech_group": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "tech_user": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "template_name": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Name of a template."
+              },
+              "type": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "update_source": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref",
+                    "description": "Computers only: how the computer is updated (inventory tool...)."
+                  }
+                ]
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              },
+              "user": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/Ref"
+                  }
+                ]
+              },
+              "uuid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Computers only."
+              }
+            }
+          }
+        ]
+      },
+      "AssetFields": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Features"
+          },
+          {
+            "$ref": "#/components/schemas/DatacenterFields"
+          },
+          {
+            "$ref": "#/components/schemas/SoftwareFields"
+          },
+          {
+            "$ref": "#/components/schemas/LicenseFields"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "brand": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Peripherals and phones only."
+              },
+              "comment": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "contact_number": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "group_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "initial_page_counter": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Printers only."
+              },
+              "inventory_number": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "is_global": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "Monitors, printers, peripherals and phones only: one item for\nseveral computers."
+              },
+              "is_recursive": {
+                "type": [
+                  "boolean",
+                  "null"
+                ],
+                "description": "Visible in sub-entities. Can be set, not unset (classic interface)."
+              },
+              "location_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "manufacturer_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "memory": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Printers: free text. Network equipment: a whole number of MiB, or\nempty."
+              },
+              "model_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "network_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Computers, printers and network equipment only."
+              },
+              "number_line": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Phones only."
+              },
+              "page_counter": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Printers only."
+              },
+              "power_supply_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Phones only."
+              },
+              "serial": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "size": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Monitors only: decimal number of inches (`\"21.5\"`, `\"21,5\"`)."
+              },
+              "state_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "tech_group_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "tech_user_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "type_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "update_source_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32",
+                "description": "Computers only."
+              },
+              "user_id": {
+                "type": [
+                  "integer",
+                  "null"
+                ],
+                "format": "int32"
+              },
+              "uuid": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "Computers only."
+              }
+            }
+          }
+        ],
+        "description": "Fields of a creation or an update. Absent fields are left unchanged;\n`null` clears a field (empty text, no related object)."
+      },
+      "AssetLicense": {
+        "type": "object",
+        "description": "A license affected to an item.",
+        "required": [
+          "id",
+          "license",
+          "number",
+          "is_valid"
+        ],
+        "properties": {
+          "expire": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Id of the affectation."
+          },
+          "is_valid": {
+            "type": "boolean"
+          },
+          "license": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "software": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          }
+        }
+      },
+      "AssetLicenseFields": {
+        "type": "object",
+        "description": "A license to affect to an item.",
+        "required": [
+          "license_id"
+        ],
+        "properties": {
+          "license_id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AssetLicenseList": {
+        "type": "object",
+        "description": "The licenses affected to an item.",
+        "required": [
+          "items",
+          "can_edit"
+        ],
+        "properties": {
+          "can_edit": {
+            "type": "boolean",
+            "description": "The tab offers to add and remove licenses (a right on the\nsoftware, the item in one of the selected entities)."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetLicense"
+            },
+            "description": "Visible to the session, by software and name."
+          }
+        }
+      },
+      "AssetPage": {
+        "type": "object",
+        "required": [
+          "items",
+          "page",
+          "per_page",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetSummary"
+            }
+          },
+          "page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "per_page": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Number of matching assets on every page."
+          }
+        }
+      },
+      "AssetPermissions": {
+        "type": "object",
+        "description": "What the session may do with an asset.",
+        "required": [
+          "update",
+          "trash",
+          "purge"
+        ],
+        "properties": {
+          "purge": {
+            "type": "boolean",
+            "description": "Delete for good, from the trash."
+          },
+          "trash": {
+            "type": "boolean",
+            "description": "Move to the trash and restore."
+          },
+          "update": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AssetSummary": {
+        "type": "object",
+        "required": [
+          "id",
+          "entity"
+        ],
+        "properties": {
+          "entity": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "inventory_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "location": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "manufacturer": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "serial": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "type": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "AssetType": {
+        "type": "string",
+        "description": "Type of asset, in the paths.",
+        "enum": [
+          "computers",
+          "monitors",
+          "printers",
+          "network-equipments",
+          "peripherals",
+          "phones",
+          "racks",
+          "enclosures",
+          "pdus",
+          "passive-dc-equipments",
+          "clusters",
+          "softwares",
+          "software-licenses"
+        ]
+      },
+      "BridgeToken": {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "To pass to `front/nw_bridge.php?token=...` within one minute, from\nthe same browser (a nonce cookie is set)."
+          }
+        }
+      },
+      "Choice": {
+        "type": "object",
+        "required": [
+          "id",
+          "label"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "ChoiceField": {
+        "type": "string",
+        "description": "A field of the asset forms offering a list of values.",
+        "enum": [
+          "location",
+          "state",
+          "manufacturer",
+          "type",
+          "model",
+          "network",
+          "update_source",
+          "user",
+          "group",
+          "tech_user",
+          "tech_group",
+          "power_supply",
+          "room",
+          "category",
+          "upgrade_from",
+          "version_operating_system",
+          "version_state",
+          "software",
+          "parent_license",
+          "license_version"
+        ]
+      },
+      "ChoiceList": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Choice"
+            },
+            "description": "At most 50 values, sorted by label."
+          }
+        }
+      },
+      "DatacenterDetail": {
+        "type": "object",
+        "description": "Fields of the datacenter items.",
+        "properties": {
+          "background_color": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Racks: `#RRGGBB`."
+          },
+          "depth": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks."
+          },
+          "height": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks."
+          },
+          "max_power": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: in watts."
+          },
+          "max_weight": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks."
+          },
+          "measured_power": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: in watts."
+          },
+          "number_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks."
+          },
+          "position": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Racks: place in the room, `\"<column>,<row>\"` (`\"0\"` or empty for\nnone)."
+          },
+          "power_supplies": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Enclosures."
+          },
+          "room": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref",
+                "description": "Racks: server room."
+              }
+            ]
+          },
+          "room_orientation": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: door orientation in the room, 1 north, 2 east, 3 south, 4 west\n(0: never set)."
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Clusters."
+          },
+          "width": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks."
+          }
+        }
+      },
+      "DatacenterFields": {
+        "type": "object",
+        "description": "Fields of the datacenter items in a creation or an update.",
+        "properties": {
+          "background_color": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Racks: `#RRGGBB`."
+          },
+          "depth": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks; `null` empties it."
+          },
+          "height": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks; `null` empties it."
+          },
+          "max_power": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: in watts; `null` empties it."
+          },
+          "max_weight": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks; `null` empties it."
+          },
+          "measured_power": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: in watts; `null` empties it."
+          },
+          "number_units": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: 1 to 100."
+          },
+          "position": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Racks: place in the room, `\"<column>,<row>\"` as offered by\n`/assets/racks/positions`, `\"0\"` for none."
+          },
+          "power_supplies": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Enclosures."
+          },
+          "room_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: server room."
+          },
+          "room_orientation": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks: door orientation, 1 north, 2 east, 3 south, 4 west."
+          },
+          "version": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Clusters."
+          },
+          "width": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Racks; `null` empties it (stored as 0, like the classic form)."
+          }
+        }
+      },
+      "DuplicateNotice": {
+        "type": "object",
+        "description": "Items with the same values, reported but not refused.",
+        "required": [
+          "fields",
+          "items"
+        ],
+        "properties": {
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Columns of the unicity criterion."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ref"
+            }
+          }
+        }
+      },
+      "EntityRef": {
+        "type": "object",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Full name (\"Root > Child\")."
+          }
+        }
+      },
+      "EntitySwitch": {
+        "type": "object",
+        "properties": {
+          "entity_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Entity to select; `null` selects every entity of the profile."
+          },
+          "recursive": {
+            "type": "boolean",
+            "description": "Include the sub-entities."
+          }
+        }
+      },
+      "ErrorBody": {
+        "type": "object",
+        "description": "Error payload: `{\"error\": {\"code\": \"...\", \"message\": \"...\"}}`.",
+        "required": [
+          "error"
+        ],
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/ErrorDetail"
+          }
+        }
+      },
+      "ErrorDetail": {
+        "type": "object",
+        "required": [
+          "code",
+          "message"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "Stable, machine-readable code (`unauthenticated`, `not_found`...)."
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "More codes, for example the broken rules of `weak_password`\n(`too_short`, `missing_digit`, `missing_lowercase`,\n`missing_uppercase`, `missing_symbol`) or the reason of\n`legacy_required` (`business_rules`, `field_unicity`,\n`linked_items`, `notifications`, `plugins`), or the fields of a\n`duplicate`."
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ExpiredPasswordChange": {
+        "type": "object",
+        "required": [
+          "login",
+          "current_password",
+          "new_password"
+        ],
+        "properties": {
+          "current_password": {
+            "type": "string"
+          },
+          "login": {
+            "type": "string"
+          },
+          "new_password": {
+            "type": "string"
+          }
+        }
+      },
+      "Features": {
+        "type": "object",
+        "description": "Connectors and features of monitors, printers and phones (`have_*`).",
+        "properties": {
+          "has_bnc": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_displayport": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_dvi": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_ethernet": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Printers."
+          },
+          "has_hdmi": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_headset": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Phones."
+          },
+          "has_microphone": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_parallel": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Printers."
+          },
+          "has_pivot": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_serial": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Printers: serial port."
+          },
+          "has_speaker": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors and phones."
+          },
+          "has_subd": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Monitors."
+          },
+          "has_usb": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Printers."
+          },
+          "has_wifi": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Printers."
+          }
+        }
+      },
+      "Health": {
+        "type": "object",
+        "required": [
+          "status",
+          "database",
+          "version"
+        ],
+        "properties": {
+          "database": {
+            "type": "string",
+            "description": "`ok` or `unreachable`."
+          },
+          "status": {
+            "type": "string",
+            "description": "`ok` or `degraded`."
+          },
+          "version": {
+            "type": "string"
+          }
+        }
+      },
+      "Installation": {
+        "type": "object",
+        "description": "A software installed on the asset.",
+        "required": [
+          "id",
+          "version",
+          "is_dynamic"
+        ],
+        "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "installed_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Date of installation, given by the inventory."
+          },
+          "is_dynamic": {
+            "type": "boolean",
+            "description": "Installed by the inventory."
+          },
+          "software": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "valid_licenses": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "The licenses of the software are valid."
+          },
+          "version": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "version_state": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Status of the version."
+          }
+        }
+      },
+      "InstallationFields": {
+        "type": "object",
+        "description": "A version to install.",
+        "required": [
+          "version_id"
+        ],
+        "properties": {
+          "version_id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "InstallationList": {
+        "type": "object",
+        "description": "The software installed on an asset.",
+        "required": [
+          "items",
+          "can_edit"
+        ],
+        "properties": {
+          "can_edit": {
+            "type": "boolean",
+            "description": "The software tab offers to install and uninstall: a right on the\nsoftware, the asset in one of the selected entities. Each version\nis still checked."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Installation"
+            },
+            "description": "Outside the trash, of the software visible to the session, by\nsoftware and version."
+          }
+        }
+      },
+      "Language": {
+        "type": "object",
+        "required": [
+          "code",
+          "name"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "description": "`fr_FR`..."
+          },
+          "name": {
+            "type": "string",
+            "description": "Name in the language itself."
+          }
+        }
+      },
+      "LicenseDetail": {
+        "type": "object",
+        "description": "Fields of the licenses of a software.",
+        "properties": {
+          "allow_overquota": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "More affectations than its number are allowed."
+          },
+          "expire": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Expiration date, `YYYY-MM-DD`."
+          },
+          "full_name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Name under its parent licenses (`completename`)."
+          },
+          "is_valid": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Its number covers its affectations (computed)."
+          },
+          "number": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Number of affectations it covers (`0` or more; the classic form\ncalls 0 unlimited, but its validity counts it as 0)."
+          },
+          "parent_license": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "software": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "version_buy": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "version_use": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          }
+        }
+      },
+      "LicenseFields": {
+        "type": "object",
+        "description": "Fields of the licenses in a creation or an update.",
+        "properties": {
+          "allow_overquota": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "expire": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`YYYY-MM-DD`; `null` or empty for none."
+          },
+          "number": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "parent_license_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "A license of the same software, not under this one."
+          },
+          "software_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Its software, chosen at its creation (required then)."
+          },
+          "version_buy_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "version_use_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "LicenseItem": {
+        "type": "object",
+        "description": "An item a license is affected to.",
+        "required": [
+          "id",
+          "kind",
+          "item",
+          "entity",
+          "is_deleted"
+        ],
+        "properties": {
+          "entity": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Id of the affectation."
+          },
+          "inventory_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_deleted": {
+            "type": "boolean",
+            "description": "The item is in the trash."
+          },
+          "item": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssetType"
+          },
+          "serial": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "LicenseItemFields": {
+        "type": "object",
+        "description": "An item to affect a license to.",
+        "required": [
+          "kind",
+          "item_id"
+        ],
+        "properties": {
+          "item_id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssetType",
+            "description": "A type with software: computers, monitors, network equipment,\nperipherals, phones, printers."
+          }
+        }
+      },
+      "LicenseItemList": {
+        "type": "object",
+        "description": "The items a license is affected to.",
+        "required": [
+          "items",
+          "can_edit"
+        ],
+        "properties": {
+          "can_edit": {
+            "type": "boolean",
+            "description": "The tab offers to add and remove items (a right on the software)."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LicenseItem"
+            },
+            "description": "Visible to the session, by entity and name."
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "login",
+          "password"
+        ],
+        "properties": {
+          "login": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "PasswordChange": {
+        "type": "object",
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "properties": {
+          "current_password": {
+            "type": "string"
+          },
+          "new_password": {
+            "type": "string"
+          }
+        }
+      },
+      "PreferencesUpdate": {
+        "type": "object",
+        "properties": {
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Language code (`fr_FR`...), `null` for the default language. Absent:\nunchanged."
+          }
+        }
+      },
+      "ProfileRef": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ProfileSwitch": {
+        "type": "object",
+        "required": [
+          "profile_id"
+        ],
+        "properties": {
+          "profile_id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "Ref": {
+        "type": "object",
+        "description": "A related object: id and display name.",
+        "required": [
+          "id"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`null` when the related row no longer exists."
+          }
+        }
+      },
+      "RoomPosition": {
+        "type": "object",
+        "description": "A free place of the room.",
+        "required": [
+          "position",
+          "column",
+          "row"
+        ],
+        "properties": {
+          "column": {
+            "type": "string",
+            "description": "Column in letters (A, B... AA)."
+          },
+          "position": {
+            "type": "string",
+            "description": "Stored value, `\"<column>,<row>\"`."
+          },
+          "row": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "RoomPositions": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoomPosition"
+            },
+            "description": "By column, then row."
+          }
+        }
+      },
+      "SelectableEntities": {
+        "type": "object",
+        "required": [
+          "items"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SelectableEntity"
+            },
+            "description": "Ordered by full name."
+          }
+        }
+      },
+      "SelectableEntity": {
+        "type": "object",
+        "required": [
+          "id",
+          "level",
+          "recursive_allowed"
+        ],
+        "properties": {
+          "completename": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Full name (\"Root > Child\")."
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "level": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Depth in the tree, 1 for the root."
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "parent_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "recursive_allowed": {
+            "type": "boolean",
+            "description": "It can be selected with its sub-entities."
+          }
+        }
+      },
+      "SessionCapabilities": {
+        "type": "object",
+        "required": [
+          "change_password",
+          "bridge"
+        ],
+        "properties": {
+          "bridge": {
+            "type": "boolean",
+            "description": "The classic interface can be opened without logging in again."
+          },
+          "change_password": {
+            "type": "boolean",
+            "description": "The user can change their password here (local account and right)."
+          }
+        }
+      },
+      "SessionEntities": {
+        "type": "object",
+        "required": [
+          "recursive",
+          "unrestricted",
+          "count"
+        ],
+        "properties": {
+          "count": {
+            "type": "integer",
+            "description": "Number of visible entities.",
+            "minimum": 0
+          },
+          "recursive": {
+            "type": "boolean",
+            "description": "The selected entity includes its sub-entities."
+          },
+          "selected": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EntityRef",
+                "description": "Selected entity; `null` when every entity of the profile is selected."
+              }
+            ]
+          },
+          "unrestricted": {
+            "type": "boolean",
+            "description": "Every entity is visible."
+          }
+        }
+      },
+      "SessionInfo": {
+        "type": "object",
+        "required": [
+          "user",
+          "profile",
+          "profiles",
+          "entities",
+          "rights",
+          "capabilities"
+        ],
+        "properties": {
+          "capabilities": {
+            "$ref": "#/components/schemas/SessionCapabilities"
+          },
+          "entities": {
+            "$ref": "#/components/schemas/SessionEntities"
+          },
+          "profile": {
+            "$ref": "#/components/schemas/SessionProfile"
+          },
+          "profiles": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProfileRef"
+            },
+            "description": "Every profile granted to the user."
+          },
+          "rights": {
+            "type": "object",
+            "description": "Rights of the active profile, as legacy bitmasks per module.",
+            "additionalProperties": {
+              "type": "integer",
+              "format": "int32"
+            },
+            "propertyNames": {
+              "type": "string"
+            }
+          },
+          "user": {
+            "$ref": "#/components/schemas/SessionUser"
+          }
+        }
+      },
+      "SessionInterface": {
+        "type": "string",
+        "description": "Interface opened by the profile.",
+        "enum": [
+          "central",
+          "helpdesk"
+        ]
+      },
+      "SessionProfile": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "interface"
+        ],
+        "properties": {
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "interface": {
+            "$ref": "#/components/schemas/SessionInterface"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "SessionUser": {
+        "type": "object",
+        "required": [
+          "id",
+          "login",
+          "display_name",
+          "language",
+          "language_is_default"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "language": {
+            "type": "string",
+            "description": "Language in use (`fr_FR`...): the user's choice or the default one."
+          },
+          "language_is_default": {
+            "type": "boolean",
+            "description": "The language is the default one of the application."
+          },
+          "login": {
+            "type": "string"
+          }
+        }
+      },
+      "SoftwareDetail": {
+        "type": "object",
+        "description": "Fields of the software.",
+        "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "is_helpdesk_visible": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Can be chosen in a ticket."
+          },
+          "is_update": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "An upgrade of another software (`upgrade_from`)."
+          },
+          "upgrade_from": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "valid_licenses": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "None of its licenses is invalid (computed from the licenses)."
+          }
+        }
+      },
+      "SoftwareFields": {
+        "type": "object",
+        "description": "Fields of the software in a creation or an update.",
+        "properties": {
+          "category_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "is_helpdesk_visible": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "is_update": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Not an upgrade: the software it upgrades is cleared."
+          },
+          "upgrade_from_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Software it is an upgrade of, kept only with `is_update`."
+          }
+        }
+      },
+      "TemplateCreation": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AssetFields",
+            "description": "The fields given to the items created from the template."
+          },
+          {
+            "type": "object",
+            "required": [
+              "entity_id"
+            ],
+            "properties": {
+              "entity_id": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Entity of the new template: one of the selected entities."
+              },
+              "template_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "TemplateFields": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AssetFields"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "template_name": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            }
+          }
+        ],
+        "description": "Fields of a template. Absent fields are left unchanged; `null` clears a\nfield."
+      },
+      "TemplateList": {
+        "type": "object",
+        "description": "The templates of a type visible to the session.",
+        "required": [
+          "items",
+          "can_create"
+        ],
+        "properties": {
+          "can_create": {
+            "type": "boolean",
+            "description": "The session may create templates, and items from them."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateSummary"
+            },
+            "description": "By name."
+          }
+        }
+      },
+      "TemplateSummary": {
+        "type": "object",
+        "description": "A template in the list.",
+        "required": [
+          "id",
+          "entity"
+        ],
+        "properties": {
+          "entity": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Name given to the items created from it."
+          },
+          "template_name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Version": {
+        "type": "object",
+        "description": "A version of a software.",
+        "required": [
+          "id",
+          "entity",
+          "is_recursive",
+          "installations"
+        ],
+        "properties": {
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "entity": {
+            "$ref": "#/components/schemas/Ref",
+            "description": "The entity of its software."
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "installations": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Items it is installed on, outside the trash."
+          },
+          "is_recursive": {
+            "type": "boolean",
+            "description": "Follows the sharing of its software."
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "operating_system": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "state": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          }
+        }
+      },
+      "VersionFields": {
+        "type": "object",
+        "description": "Fields of a version. Absent fields are left unchanged (empty for a new\nversion); `null` clears a field.",
+        "properties": {
+          "comment": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "operating_system_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "state_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "A status offered for the versions (`is_visible_softwareversion`)."
+          }
+        }
+      },
+      "VersionList": {
+        "type": "object",
+        "description": "The versions of a software.",
+        "required": [
+          "items",
+          "can_edit"
+        ],
+        "properties": {
+          "can_edit": {
+            "type": "boolean",
+            "description": "The session may add, change and purge them (update right on the\nsoftware, in one of its entities)."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Version"
+            },
+            "description": "By name."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearer": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "session_cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "nw_session"
+      }
+    }
+  },
+  "security": [
+    {
+      "session_cookie": []
+    },
+    {
+      "bearer": []
+    }
+  ],
+  "tags": [
+    {
+      "name": "system",
+      "description": "Service status"
+    },
+    {
+      "name": "auth",
+      "description": "Login, logout and the bridge with the classic interface"
+    },
+    {
+      "name": "session",
+      "description": "Current session: profile, entities, password, preferences"
+    },
+    {
+      "name": "assets",
+      "description": "Inventory of assets"
+    }
+  ]
+}

@@ -310,6 +310,11 @@ class Software extends CommonDBTM
                         'value' => $this->fields['groups_id'],
                         'actions' => getItemActionButtons(['info', 'add'], "Group"),
                      ],
+                     __('Comments') => [
+                        'name' => 'comment',
+                        'type' => 'textarea',
+                        'value' => $this->fields['comment'],
+                     ],
                  ]
               ],
               __('Upgrade') => [

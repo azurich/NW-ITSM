@@ -1,6 +1,7 @@
 /config/config_db*
 /config/glpi.key
 /config/glpicrypt.key
+/config/nw-bridge.key
 /config/local_define.php
 /tests/config_db*
 /marketplace/
@@ -38,3 +39,9 @@ megalinter-reports/
 composer.lock
 package-lock.json
 .php-cs-fixer.cache
+
+# NW-ITSM (Rust backend, React frontend)
+/backend/target/
+/frontend/node_modules/
+/frontend/dist/
+!/frontend/package-lock.json

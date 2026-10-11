@@ -153,7 +153,7 @@ class PDU extends CommonDBTM
                     __('Inventory number') => [
                        'name' => 'otherserial',
                        'type' => 'text',
-                       'value' => $this->fields['serial'],
+                       'value' => $this->fields['otherserial'],
                     ],
                     __('Comments') => [
                        'name' => 'comment',

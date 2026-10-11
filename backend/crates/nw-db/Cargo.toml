@@ -1,0 +1,15 @@
+[package]
+name = "nw-db"
+description = "NW-ITSM access to the legacy ITSM-NG MariaDB schema"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+chrono.workspace = true
+nw-domain.workspace = true
+sqlx.workspace = true
+
+[lints]
+workspace = true

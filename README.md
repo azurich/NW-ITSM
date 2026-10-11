@@ -1,5 +1,18 @@
 ![logo](https://static.wixstatic.com/media/e5b7d4_f67ff8c629844818a6e3e43550cb1e17~mv2.png/v1/fill/w_348,h_122,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/Original%20on%20Transparent.png)
 
+## NW-ITSM
+
+NW-ITSM is a fork of ITSM-NG being progressively rewritten with a Rust
+backend (`backend/`) and a React frontend (`frontend/`). Both run next to
+the original PHP application, on the same database, until it can be
+retired.
+
+- [Architecture decision](docs/adr/0001-migration-progressive.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Development guide](docs/DEVELOPMENT.md)
+
+The rest of this file describes the original ITSM-NG application.
+
 ## About ITSM-NG
 
 [![Run tests](https://github.com/itsmng/itsm-ng/actions/workflows/ci.yml/badge.svg?branch=itsm_2.0.0)](https://github.com/itsmng/itsm-ng/actions/workflows/ci.yml)

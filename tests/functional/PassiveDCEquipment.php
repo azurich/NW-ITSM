@@ -151,4 +151,25 @@ class PassiveDCEquipment extends DbTestCase
         $nb_after = (int)countElementsInTable('glpi_logs', ['itemtype' => 'PassiveDCEquipment', 'items_id' => $id]);
         $this->integer($nb_after)->isidenticalTo($nb_before + 1);
     }
+
+    public function testFormShowsTheInventoryNumber()
+    {
+        $this->login();
+        $obj = new \PassiveDCEquipment();
+        $id = $obj->add([
+           'name'        => $this->method,
+           'serial'      => 'SN-PASSIVE',
+           'otherserial' => 'INV-PASSIVE',
+           'entities_id' => 0
+        ]);
+        $this->integer((int)$id)->isGreaterThan(0);
+
+        // The inventory number field shows the inventory number, so that
+        // saving the form does not replace it with the serial number.
+        $this->output(
+            function () use ($obj, $id) {
+                $obj->showForm($id);
+            }
+        )->matches('/name="otherserial"\s+type="text"\s+value="INV-PASSIVE"/');
+    }
 }

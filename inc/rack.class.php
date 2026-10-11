@@ -189,7 +189,7 @@ class Rack extends CommonDBTM
                        'name' => 'states_id',
                        'type' => 'select',
                        'itemtype' => State::class,
-                       'conditions' => ['is_visible_computer' => 1, 'entities_id' => $this->fields['entities_id']],
+                       'conditions' => ['is_visible_rack' => 1, 'entities_id' => $this->fields['entities_id']],
                        'value' => $this->fields['states_id'],
                        'actions' => getItemActionButtons(['info', 'add'], "State"),
                     ],
