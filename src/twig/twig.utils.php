@@ -5,6 +5,12 @@ function expandSelect(&$select, $fields = [])
     global $CFG_GLPI;
 
     if (isset($select["itemtype"]) && !isset($select["values"])) {
+        // The forms declare the conditions of their lists as `condition`
+        // or `conditions`.
+        if (isset($select["conditions"])) {
+            $select["condition"] = $select["conditions"] + ($select["condition"] ?? []);
+            unset($select["conditions"]);
+        }
         $restrict =
             $select["condition"]["entities_id"] ??
             ($fields["entities_id"] ??
@@ -43,7 +49,13 @@ function expandSelect(&$select, $fields = [])
         $ajaxData = [
             "itemtype" => $select["itemtype"],
             "display_emptychoice" => $select["display_emptychoice"] ?? 1,
-            "condition" => $select["condition"] ?? [],
+            // getDropdownValue.php only reads a condition stored in the
+            // session, by its key: an array sent by the browser is ignored.
+            "condition" => empty($select["condition"])
+                ? ""
+                : Dropdown::addNewCondition(
+                    qualifyDropdownCondition($select["itemtype"], $select["condition"]),
+                ),
             "permit_parent_select" => 0,
             "entity_restrict" => $restrict,
             "recursive" => $recursive,
@@ -162,10 +174,10 @@ function expandForm($form, $fields = [], $template = null)
 
 function getItemByEntity($itemtype, $entity, $conditions = [], $used = [])
 {
-    $cond = $conditions;
+    $cond = qualifyDropdownCondition($itemtype, $conditions);
     if (isset($conditions["entities_id"])) {
         $cond =
-            $conditions +
+            $cond +
             getEntitiesRestrictCriteria(
                 $itemtype::getTable(),
                 "entities_id",
@@ -203,6 +215,34 @@ function getItemByEntity($itemtype, $entity, $conditions = [], $used = [])
     return $options;
 }
 
+/**
+ * Conditions of a dropdown list, their columns prefixed by its table: they
+ * stay unambiguous when getDropdownValue joins the translations.
+ *
+ * @param string $itemtype  Item of the list
+ * @param array  $condition Criteria of the iterator
+ *
+ * @return array
+ */
+function qualifyDropdownCondition($itemtype, array $condition)
+{
+    $table = getTableForItemType($itemtype);
+    $qualified = [];
+    foreach ($condition as $key => $value) {
+        $operator = is_int($key) || in_array(strtoupper($key), ["AND", "OR", "NOT"], true);
+        if ($operator) {
+            $qualified[$key] = is_array($value)
+                ? qualifyDropdownCondition($itemtype, $value)
+                : $value;
+        } elseif (strpos($key, ".") === false) {
+            $qualified["$table.$key"] = $value;
+        } else {
+            $qualified[$key] = $value;
+        }
+    }
+    return $qualified;
+}
+
 function getOptionForItems(
     $item,
     $conditions = [],
@@ -210,24 +250,31 @@ function getOptionForItems(
     $isDevice = false,
     $used = [],
 ) {
-    $entity_restrict = false;
-    if (
-        isset($conditions["entities_id"]) &&
-        isset($conditions["is_recursive"])
-    ) {
-        $entity_restrict =
-            "[" .
-            '"entities_id": ' .
-            $conditions["entities_id"] .
-            "," .
-            '"is_recursive": ' .
-            $conditions["is_recursive"] .
-            "]";
+    // `entities_id` restricts the entities, with the recursive values of
+    // their parents; the other conditions are kept in the session, the
+    // only way getDropdownValue reads them.
+    $entity_restrict = -1;
+    if (is_array($conditions)) {
+        if (isset($conditions["entities_id"])) {
+            $entity_restrict = $conditions["entities_id"];
+        }
+        unset($conditions["entities_id"], $conditions["is_recursive"]);
+        $conditions = $conditions
+            ? Dropdown::addNewCondition(qualifyDropdownCondition($item, $conditions))
+            : "";
     }
+    // An id, or a list of ids (possibly in JSON, as the browser sends it).
+    if (is_string($entity_restrict) && substr(trim($entity_restrict), 0, 1) === "[") {
+        $entity_restrict = json_decode($entity_restrict, true) ?? -1;
+    }
+    $entity_restrict = is_array($entity_restrict)
+        ? array_map("intval", array_values($entity_restrict))
+        : (int) $entity_restrict;
     $values = Dropdown::getDropdownValue(
         [
             "itemtype" => $item,
-            "entity_restrict" => $entity_restrict ?? -1,
+            // A JSON text: the users' list decodes it.
+            "entity_restrict" => json_encode($entity_restrict),
             "condition" => $conditions,
             "used" => $used,
             "display_emptychoice" => $display_emptychoice,

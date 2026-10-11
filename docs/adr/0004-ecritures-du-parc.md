@@ -264,11 +264,11 @@ serveur PHP de test ne fournit pas).
   composants suivent l'ordre des changements de l'ordinateur, comme
   `Computer::post_updateItem`. Une valeur posée par une règle garde sa
   place.
-- Remarque : les filtres des listes de groupes de l'interface classique
-  varient selon le type (aucun pour les ordinateurs et matériels réseau,
-  groupes « assignables » pour le groupe des imprimantes et téléphones).
-  L'API garde ceux de GLPI pour tous ; les valeurs restent vérifiées en
-  existence seulement, comme en PHP.
+- Listes de choix : statuts visibles pour le type, groupes « éléments »
+  pour le groupe, groupes « assignables » pour le groupe technique, comme
+  GLPI, des deux côtés depuis la correction des listes du PHP (voir
+  ci-dessous) ; les valeurs restent vérifiées en existence seulement,
+  comme en PHP.
 
 Vérification : formulaire de chaque type récupéré dans l'interface
 classique et posté comme par un navigateur (champs dans l'ordre de la
@@ -427,25 +427,15 @@ identiques, mêmes événements.
   enregistrer le formulaire remplaçait donc le numéro d'inventaire par le
   numéro de série (tests `tests/functional/PDU.php` et
   `PassiveDCEquipment.php`).
-- Remarques :
-  - Une modification par l'API n'écrit que les champs donnés. Le
-    formulaire PHP, lui, renvoie ce qu'il affiche. Il réécrit donc, à chaque
-    enregistrement, les valeurs qu'il ne sait pas afficher, venues d'un
-    autre outil ou d'un import :
-    - modèle NULL écrit 0, avec une ligne d'historique ;
-    - 0 unité écrit 42 ;
-    - orientation inconnue écrite « nord ».
+- Remarque : une modification par l'API n'écrit que les champs donnés.
+  Le formulaire PHP, lui, renvoie ce qu'il affiche. Il réécrit donc, à
+  chaque enregistrement, les valeurs qu'il ne sait pas afficher, venues
+  d'un autre outil ou d'un import :
+  - modèle NULL écrit 0, avec une ligne d'historique ;
+  - 0 unité écrit 42 ;
+  - orientation inconnue écrite « nord ».
 
-    L'API ne reproduit pas cet effet de l'affichage.
-  - Les formulaires Twig d'ITSM-NG ignorent les conditions de leurs listes
-    déclarées sous la clé `conditions` (seule `condition` est lue par
-    `expandSelect`). La liste des statuts des baies, châssis et clusters,
-    comme celle de nombreux autres formulaires (ordinateurs, imprimantes,
-    téléphones, contrats...), n'est donc pas filtrée par type ; celle des
-    baies vise en plus la mauvaise colonne
-    (`is_visible_computer`), et celle des clusters `is_visible_line`. L'API
-    propose les statuts visibles pour le type, comme GLPI ; les valeurs
-    restent vérifiées en existence seulement, des deux côtés.
+  L'API ne reproduit pas cet effet de l'affichage.
 
 Vérification : sur des copies identiques de la base de référence (une
 salle de 3 × 2, deux baies placées, un châssis, un PDU, un équipement
@@ -464,6 +454,44 @@ informations financières et date d'achat au statut :
   équipement passif.
 
 Résultat : bases identiques, mêmes événements.
+
+### Correction côté PHP : conditions des listes des formulaires
+
+Les formulaires Twig d'ITSM-NG n'appliquaient aucune des conditions de
+leurs listes de choix (statuts visibles pour le type, groupes
+« éléments » ou « assignables », valeurs actives, élément lui-même exclu
+de ses parents possibles...) :
+
+- `expandSelect` ne lisait que la clé `condition`, alors que la plupart
+  des formulaires déclarent `conditions` ;
+- dans le navigateur, select2 recharge la liste par
+  `ajax/getDropdownValue.php`, qui n'accepte (à raison) qu'une condition
+  enregistrée en session : le tableau envoyé était ignoré, quelle que soit
+  la clé ;
+- `getOptionForItems` passait aussi ses conditions en tableau, ignorées ;
+  son filtre d'entité était un texte JSON invalide.
+
+Correction : les deux clés sont lues ; la condition est enregistrée en
+session (`Dropdown::addNewCondition`, comme `Dropdown::show`) et sa clé
+envoyée au navigateur ; ses colonnes sont préfixées par la table de la
+liste (sinon ambiguës quand les traductions des listes sont jointes) ;
+`entities_id` reste une restriction d'entité (valeurs de l'entité et
+valeurs récursives de ses parentes), pas une égalité.
+`ajax/dropdownAllItems.php`, qui passait une condition reçue du
+navigateur, n'accepte plus qu'une clé de session (sinon le navigateur
+pourrait injecter des critères). Les conditions fausses ou absentes des
+formulaires du parc sont rétablies comme dans GLPI :
+- statuts des baies (`is_visible_computer`), des clusters
+  (`is_visible_line`) et des matériels réseau (aucune) ;
+- groupe des imprimantes et téléphones (« assignables » au lieu de
+  « éléments ») ;
+- groupes des ordinateurs et matériels réseau (aucune) ;
+- statut du critère de recherche des châssis.
+
+Tests `tests/functional/Dropdown.php` : listes filtrées dans la page et
+par AJAX pour les deux clés, `getOptionForItems` (condition et entité),
+et listes des formulaires de chaque type du parc ; ils échouent sans la
+correction.
 
 ### Ce qui renvoie vers l'interface classique
 

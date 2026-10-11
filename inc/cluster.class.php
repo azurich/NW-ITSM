@@ -100,7 +100,7 @@ class Cluster extends CommonDBTM
                        'name' => 'states_id',
                        'type' => 'select',
                        'itemtype' => State::class,
-                       'conditions' => ['is_visible_line' => 1],
+                       'conditions' => ['is_visible_cluster' => 1],
                        'value' => $this->fields['states_id'] ?? '',
                        'actions' => getItemActionButtons(['info', 'add'], "State"),
                     ],
