@@ -24,6 +24,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/assets/software-licenses/{id}/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the items a license is affected to. */
+        get: operations["list_license_items"];
+        put?: never;
+        /**
+         * Affects a license to an item, like the form of its tab: its validity
+         *     and that of its software follow, both are noted in their history.
+         */
+        post: operations["add_license_item"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/assets/software-licenses/{id}/items/{affectation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Removes an item from a license for good, like the "Delete
+         *     permanently" action of its tab (no event).
+         */
+        delete: operations["remove_license_item"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/assets/softwares/{id}/versions": {
         parameters: {
             query?: never;
@@ -223,6 +264,41 @@ export interface paths {
          *     are copied to the connected items and components, like the PHP code.
          */
         patch: operations["update"];
+        trace?: never;
+    };
+    "/api/v2/assets/{kind}/{id}/licenses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the licenses affected to an item. */
+        get: operations["list_asset_licenses"];
+        put?: never;
+        /** Affects a license to an item, from the item. */
+        post: operations["add_asset_license"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/assets/{kind}/{id}/licenses/{affectation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Removes a license from an item for good. */
+        delete: operations["remove_asset_license"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v2/assets/{kind}/{id}/restore": {
@@ -699,6 +775,36 @@ export interface components {
             /** @description Computers only. */
             uuid?: string | null;
         };
+        /** @description A license affected to an item. */
+        AssetLicense: {
+            /** Format: date */
+            expire?: string | null;
+            /**
+             * Format: int32
+             * @description Id of the affectation.
+             */
+            id: number;
+            is_valid: boolean;
+            license: components["schemas"]["Ref"];
+            /** Format: int32 */
+            number: number;
+            software?: null | components["schemas"]["Ref"];
+        };
+        /** @description A license to affect to an item. */
+        AssetLicenseFields: {
+            /** Format: int32 */
+            license_id: number;
+        };
+        /** @description The licenses affected to an item. */
+        AssetLicenseList: {
+            /**
+             * @description The tab offers to add and remove licenses (a right on the
+             *     software, the item in one of the selected entities).
+             */
+            can_edit: boolean;
+            /** @description Visible to the session, by software and name. */
+            items: components["schemas"]["AssetLicense"][];
+        };
         AssetPage: {
             items: components["schemas"]["AssetSummary"][];
             /** Format: int32 */
@@ -1049,6 +1155,38 @@ export interface components {
             /** Format: int32 */
             version_use_id?: number | null;
         };
+        /** @description An item a license is affected to. */
+        LicenseItem: {
+            entity: components["schemas"]["Ref"];
+            /**
+             * Format: int32
+             * @description Id of the affectation.
+             */
+            id: number;
+            inventory_number?: string | null;
+            /** @description The item is in the trash. */
+            is_deleted: boolean;
+            item: components["schemas"]["Ref"];
+            kind: components["schemas"]["AssetType"];
+            serial?: string | null;
+        };
+        /** @description An item to affect a license to. */
+        LicenseItemFields: {
+            /** Format: int32 */
+            item_id: number;
+            /**
+             * @description A type with software: computers, monitors, network equipment,
+             *     peripherals, phones, printers.
+             */
+            kind: components["schemas"]["AssetType"];
+        };
+        /** @description The items a license is affected to. */
+        LicenseItemList: {
+            /** @description The tab offers to add and remove items (a right on the software). */
+            can_edit: boolean;
+            /** @description Visible to the session, by entity and name. */
+            items: components["schemas"]["LicenseItem"][];
+        };
         LoginRequest: {
             login: string;
             password: string;
@@ -1320,6 +1458,158 @@ export interface operations {
             };
             /** @description Unknown or not visible room */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_license_items: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description License id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Its items */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LicenseItemList"];
+                };
+            };
+            /** @description No read right on the software or the licenses */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible license */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    add_license_item: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description License id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LicenseItemFields"];
+            };
+        };
+        responses: {
+            /** @description Affected */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description A type without software */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No update right on the software */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible license or item */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Business rules would change the license (`legacy_required`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    remove_license_item: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description License id */
+                id: number;
+                /** @description Affectation id */
+                affectation_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Neither the item nor the license can be changed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible license or affectation */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Business rules would change the license (`legacy_required`) */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -2245,6 +2535,173 @@ export interface operations {
                 };
             };
             /** @description Another item has the same values (`duplicate`), items of other entities use the shared item (`sharing_in_use`), or must be changed in the classic interface (`legacy_required`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_asset_licenses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset, with software */
+                kind: components["schemas"]["AssetType"];
+                /** @description Asset id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Its licenses */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssetLicenseList"];
+                };
+            };
+            /** @description A type without software */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No read right on the software or the asset */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible asset */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    add_asset_license: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset, with software */
+                kind: components["schemas"]["AssetType"];
+                /** @description Asset id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AssetLicenseFields"];
+            };
+        };
+        responses: {
+            /** @description Affected */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description A type without software */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No update right on the software */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible asset or license */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Business rules would change the license (`legacy_required`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    remove_asset_license: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset, with software */
+                kind: components["schemas"]["AssetType"];
+                /** @description Asset id */
+                id: number;
+                /** @description Affectation id */
+                affectation_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Neither the item nor the license can be changed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible asset or affectation */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Business rules would change the license (`legacy_required`) */
             409: {
                 headers: {
                     [name: string]: unknown;

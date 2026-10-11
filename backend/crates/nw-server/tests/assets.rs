@@ -3354,3 +3354,122 @@ async fn software_licenses_like_php() {
         .await;
     assert_eq!(response.status, StatusCode::NOT_FOUND);
 }
+
+#[tokio::test]
+async fn license_affectations_like_php() {
+    let app = test_app!();
+    app.sql(
+        "INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES \
+           (4, 'software', 31), (4, 'license', 31), (1, 'software', 1), (1, 'license', 1); \
+         INSERT INTO glpi_softwares (id, entities_id, name) VALUES (40, 1, 'Editor'); \
+         INSERT INTO glpi_softwarelicenses (id, softwares_id, entities_id, name, completename, level, number) \
+         VALUES (60, 40, 1, 'Seats', 'Seats', 1, 1)",
+    )
+    .await;
+    let manager = app.login("manager").await;
+    let items = "/api/v2/assets/software-licenses/60/items";
+    let link = |action: i32, old: &str, new: &str, other: &str| {
+        (
+            0,
+            old.to_owned(),
+            new.to_owned(),
+            other.to_owned(),
+            action,
+            "manager (19)".to_owned(),
+        )
+    };
+
+    // Affected from the license: both sides note it, the event is the
+    // license's.
+    let response = app
+        .post(
+            items,
+            &manager,
+            Some(json!({ "kind": "computers", "item_id": 102 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    assert_eq!(
+        history(&app, "Computer", 102).await,
+        [link(15, "", "Editor - Seats (60)", "SoftwareLicense")]
+    );
+    assert_eq!(
+        history(&app, "SoftwareLicense", 60).await,
+        [link(15, "", "PC-PARIS-1 (102)", "Computer")]
+    );
+    assert_eq!(
+        events(&app).await.pop().unwrap(),
+        (
+            60,
+            "softwarelicense".into(),
+            "inventory".into(),
+            4,
+            "manager associates an item and a license".into()
+        )
+    );
+
+    // From the item: one more than its number, the license and its
+    // software become invalid first.
+    let response = app
+        .post(
+            "/api/v2/assets/computers/103/licenses",
+            &manager,
+            Some(json!({ "license_id": 60 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    assert_eq!(
+        history(&app, "SoftwareLicense", 60).await[1..],
+        [
+            row(9, "1", "0"),
+            link(15, "", "PC-PARIS-A (103)", "Computer")
+        ]
+    );
+    assert_eq!(history(&app, "Software", 40).await, [row(63, "1", "0")]);
+    let response = app.get(items, Some(&manager)).await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["items"].as_array().unwrap().len(), 2);
+    assert_eq!(response.body["items"][0]["kind"], json!("computers"));
+    let response = app
+        .get("/api/v2/assets/computers/103/licenses", Some(&manager))
+        .await;
+    assert_eq!(response.body["items"][0]["license"]["name"], json!("Seats"));
+    assert_eq!(response.body["items"][0]["is_valid"], json!(false));
+    let affectation = response.body["items"][0]["id"].as_i64().unwrap();
+
+    // Removed from the item: valid again, both sides note it, no event.
+    let before = events(&app).await.len();
+    let uri = format!("/api/v2/assets/computers/103/licenses/{affectation}");
+    let response = app.send(Method::DELETE, &uri, Some(&manager), None).await;
+    assert_eq!(response.status, StatusCode::NO_CONTENT, "{}", response.body);
+    assert_eq!(
+        history(&app, "SoftwareLicense", 60).await[3..],
+        [
+            row(9, "0", "1"),
+            link(16, "PC-PARIS-A (103)", "", "Computer")
+        ]
+    );
+    assert_eq!(events(&app).await.len(), before);
+    let response = app.send(Method::DELETE, &uri, Some(&manager), None).await;
+    assert_eq!(response.status, StatusCode::NOT_FOUND);
+
+    // The form needs the update right on the software; a type without
+    // software has no licenses.
+    let paris = app.login("paris").await;
+    let response = app
+        .post(
+            items,
+            &paris,
+            Some(json!({ "kind": "computers", "item_id": 102 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::FORBIDDEN);
+    let response = app
+        .post(
+            items,
+            &manager,
+            Some(json!({ "kind": "racks", "item_id": 1 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+}

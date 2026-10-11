@@ -677,6 +677,56 @@ formulaire PHP puis par l'API :
 
 Résultat : bases identiques, mêmes événements.
 
+### Logiciels : affectations des licences
+
+Quatrième étape, seconde partie : les affectations d'une licence aux
+matériels (`Item_SoftwareLicense`), sous
+`/assets/software-licenses/{id}/items` depuis la licence et
+`/assets/{type}/{id}/licenses` depuis un matériel d'un type avec
+logiciels.
+
+- **Listes** comme les onglets : éléments existants des entités de la
+  session, avec leur entité, numéros de série et d'inventaire (ceux à la
+  corbeille signalés) ; licences visibles d'un matériel, avec leur
+  logiciel, nombre, validité et expiration. Il faut le droit de lecture
+  sur les logiciels et sur le côté consulté.
+- **Affectation** comme le formulaire de l'onglet : la validité de la
+  licence est recalculée (option 9), puis celle de son logiciel
+  (option 63), avant l'historique des deux côtés
+  (`HISTORY_ADD_RELATION`, 15 : « Logiciel - licence (id) » sur le
+  matériel, « Matériel (id) » sur la licence). Événement « associe un
+  élément et une licence » (niveau 4, type `softwarelicense`, sur la
+  licence). Comme en PHP, rien n'empêche d'affecter deux fois la même
+  licence au même élément (pas de clé unique).
+- **Retrait** comme l'action « Supprimer définitivement » des onglets :
+  validité recalculée, puis historique `HISTORY_DEL_RELATION` (16), sans
+  événement.
+- **Règles métier** : un changement de validité met la licence à jour
+  comme un formulaire, ce qui exécute les règles métier du parc ; s'il
+  les déclenche et qu'elles changeraient quelque chose, l'affectation ou
+  le retrait est renvoyé vers l'interface classique (`business_rules`).
+- **Droits** : le formulaire PHP ne vérifie que le droit de modification
+  sur les logiciels, ni la licence ni l'élément ; l'API exige en plus que
+  les deux soient visibles. Le retrait suit `canPurgeItem` de la relation
+  (un côté modifiable, l'autre visible), mais exige le droit de
+  modification sur les licences là où le PHP ne vérifie que l'entité de
+  la licence (même faille que pour les installations, non corrigée côté
+  PHP à ce stade).
+- **Interface** : section « Éléments concernés » de la fiche d'une
+  licence (type, puis recherche de l'élément par nom) et « Licences
+  affectées » de la fiche d'un matériel (recherche de la licence) ;
+  formulaire et retrait quand la session a un droit d'écriture sur les
+  logiciels (et, côté matériel, qu'il est dans une entité sélectionnée).
+
+Vérification : sur des copies identiques de la base de référence, par le
+formulaire PHP et l'action de masse postés comme par un navigateur, puis
+par l'API :
+- affectation depuis la licence et depuis le matériel (la licence devient
+  invalide, son logiciel aussi) ;
+- retrait depuis la licence et depuis le matériel (validité rétablie).
+
+Résultat : bases identiques, mêmes événements.
+
 ### Correction côté PHP : conditions des listes des formulaires
 
 Les formulaires Twig d'ITSM-NG n'appliquaient aucune des conditions de
@@ -720,7 +770,7 @@ correction.
 | Motif (`details`) | Situation |
 | --- | --- |
 | `plugins` | Un plugin est activé : ses hooks ne s'exécuteraient pas |
-| `business_rules` | Une règle métier utilise un critère ou une action de plugin, une condition textuelle sur « inventaire automatique » (libellé traduit), ou une expression régulière que les deux moteurs ne lisent pas pareil |
+| `business_rules` | Une règle métier utilise un critère ou une action de plugin, une condition textuelle sur « inventaire automatique » (libellé traduit), ou une expression régulière que les deux moteurs ne lisent pas pareil ; ou une affectation de licence change sa validité et les règles métier modifieraient la licence |
 | `field_unicity` | Un critère d'unicité porte sur un champ que le formulaire n'a pas, ou pourrait s'appliquer aux informations financières (créées, datées ou recopiées d'un gabarit) ou aux cartes SIM écrites en même temps |
 | `notifications` | Un doublon relève d'un critère qui envoie des notifications, et elles sont actives |
 | `linked_data` | Une purge toucherait des données liées dont la suppression n'est pas portée (ports réseau, composants, logiciels, licences d'une version, licences filles ou affectations d'une licence, tickets, place ou contenu d'une baie, d'un châssis, d'un PDU ou d'un cluster, cartouches, réservations en cours, impact, connexions avec nettoyage à la déconnexion), ou le gabarit d'une création a des liens dont la recopie n'est pas portée (système d'exploitation, composants, ports réseau, disques, logiciels, connexions, notes, base de connaissances, cartouches, éléments d'un châssis, prises d'un PDU) |

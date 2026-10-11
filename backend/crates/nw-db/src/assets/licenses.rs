@@ -5,7 +5,7 @@
 
 use nw_domain::{
     asset::AssetKind,
-    history::{self, Change, Entry},
+    history::{self, Action, Change, Entry},
     software::{license_is_valid, license_tree},
 };
 use sqlx::{MySqlConnection, MySqlPool};
@@ -227,4 +227,294 @@ pub async fn software_of(conn: &mut MySqlConnection, id: i32) -> Result<Option<i
         .bind(id)
         .fetch_optional(conn)
         .await
+}
+
+/// An item a license is affected to.
+#[derive(Debug, Clone, sqlx::FromRow)]
+pub struct AffectedItem {
+    /// Id of the affectation.
+    pub id: i32,
+    pub itemtype: String,
+    pub items_id: i32,
+    pub name: Option<String>,
+    pub entities_id: i32,
+    pub entity: Option<String>,
+    pub serial: Option<String>,
+    pub otherserial: Option<String>,
+    pub is_deleted: bool,
+}
+
+/// The items of the types with software a license is affected to, visible
+/// to the session (`Item_SoftwareLicense::showForLicense`), by entity and
+/// name.
+pub async fn affected_items(
+    pool: &MySqlPool,
+    id: i32,
+    scope: &nw_domain::entity::EntityScope,
+) -> Result<Vec<AffectedItem>, sqlx::Error> {
+    let mut sql = sqlx::QueryBuilder::<sqlx::MySql>::new("SELECT * FROM (");
+    let kinds: Vec<AssetKind> = AssetKind::ALL
+        .into_iter()
+        .filter(|kind| kind.has_software())
+        .collect();
+    for (index, kind) in kinds.iter().enumerate() {
+        if index > 0 {
+            sql.push(" UNION ALL ");
+        }
+        sql.push(format_args!(
+            "SELECT l.id, l.itemtype, l.items_id, i.name, i.entities_id, e.completename AS entity, \
+             i.serial, i.otherserial, CAST(i.is_deleted AS SIGNED) <> 0 AS is_deleted \
+             FROM glpi_items_softwarelicenses l JOIN {table} i ON i.id = l.items_id \
+             LEFT JOIN glpi_entities e ON e.id = i.entities_id \
+             WHERE l.itemtype = ",
+            table = kind.table()
+        ));
+        sql.push_bind(kind.itemtype())
+            .push(" AND l.softwarelicenses_id = ")
+            .push_bind(id)
+            .push(" AND l.is_deleted = 0 AND i.is_template = 0");
+        crate::scope::restrict_entities(&mut sql, "i", scope);
+    }
+    sql.push(") affected ORDER BY entity, name, id");
+    sql.build_query_as().fetch_all(pool).await
+}
+
+/// A license affected to an asset.
+#[derive(Debug, Clone, sqlx::FromRow)]
+pub struct AffectedLicense {
+    /// Id of the affectation.
+    pub id: i32,
+    pub license_id: i32,
+    pub name: Option<String>,
+    pub softwares_id: i32,
+    pub software: Option<String>,
+    pub number: i32,
+    pub is_valid: bool,
+    pub expire: Option<chrono::NaiveDate>,
+}
+
+/// The licenses of an asset visible to the session, by software and name.
+pub async fn asset_licenses(
+    pool: &MySqlPool,
+    kind: AssetKind,
+    asset_id: i32,
+    scope: &nw_domain::entity::EntityScope,
+) -> Result<Vec<AffectedLicense>, sqlx::Error> {
+    let mut sql = sqlx::QueryBuilder::<sqlx::MySql>::new(
+        "SELECT l.id, sl.id AS license_id, sl.name, sl.softwares_id, s.name AS software, sl.number, \
+         sl.is_valid, sl.expire \
+         FROM glpi_items_softwarelicenses l \
+         JOIN glpi_softwarelicenses sl ON sl.id = l.softwarelicenses_id \
+         LEFT JOIN glpi_softwares s ON s.id = sl.softwares_id \
+         WHERE l.itemtype = ",
+    );
+    sql.push_bind(kind.itemtype())
+        .push(" AND l.items_id = ")
+        .push_bind(asset_id)
+        .push(" AND l.is_deleted = 0");
+    crate::scope::restrict_entities(&mut sql, "sl", scope);
+    sql.push(" ORDER BY s.name, sl.name, l.id");
+    sql.build_query_as().fetch_all(pool).await
+}
+
+/// An affectation: the license and the item.
+#[derive(Debug, Clone, Copy)]
+pub struct Affectation {
+    pub license: i32,
+    pub kind: AssetKind,
+    pub item: i32,
+}
+
+/// The affectation of an id, when its item has software.
+pub async fn affectation(pool: &MySqlPool, id: i32) -> Result<Option<Affectation>, sqlx::Error> {
+    let row: Option<(i32, String, i32)> = sqlx::query_as(
+        "SELECT softwarelicenses_id, itemtype, items_id FROM glpi_items_softwarelicenses WHERE id = ?",
+    )
+    .bind(id)
+    .fetch_optional(pool)
+    .await?;
+    Ok(row.and_then(|(license, itemtype, item)| {
+        let kind = AssetKind::from_itemtype(&itemtype).filter(|kind| kind.has_software())?;
+        Some(Affectation {
+            license,
+            kind,
+            item,
+        })
+    }))
+}
+
+/// The validity of a license once an item is added to or removed from its
+/// affectations (`None`: unchanged), to know beforehand whether its
+/// update runs.
+pub async fn validity_after(
+    pool: &MySqlPool,
+    license: i32,
+    kind: AssetKind,
+    item: i32,
+    adding: bool,
+) -> Result<Option<bool>, sqlx::Error> {
+    let mut conn = pool.acquire().await?;
+    let (number, is_valid): (i32, bool) =
+        sqlx::query_as("SELECT number, is_valid FROM glpi_softwarelicenses WHERE id = ?")
+            .bind(license)
+            .fetch_one(&mut *conn)
+            .await?;
+    let count = affectations(&mut conn, license).await?;
+    // The item counts when it exists, outside the trash and the templates.
+    let mut counted = format!(
+        "SELECT COUNT(*) FROM {} WHERE id = ? AND is_deleted = 0",
+        kind.table()
+    );
+    if kind.has_templates() {
+        counted.push_str(" AND is_template = 0");
+    }
+    let counts: i64 = sqlx::query_scalar(&counted)
+        .bind(item)
+        .fetch_one(&mut *conn)
+        .await?;
+    let count = if adding {
+        count + counts
+    } else {
+        count - counts
+    };
+    let valid = license_is_valid(i64::from(number), count);
+    Ok((valid != is_valid).then_some(valid))
+}
+
+/// Affects a license to an item (`Item_SoftwareLicense::add`): the
+/// validity of the license and of its software first (`post_addItem`),
+/// then the history of both sides (`HISTORY_ADD_RELATION`).
+pub async fn affect(
+    pool: &MySqlPool,
+    license: i32,
+    kind: AssetKind,
+    item: i32,
+    actor: &str,
+    names: &RelationNames,
+) -> Result<i32, sqlx::Error> {
+    let mut tx = pool.begin().await?;
+    let result = sqlx::query(
+        "INSERT INTO glpi_items_softwarelicenses (items_id, itemtype, softwarelicenses_id) \
+         VALUES (?, ?, ?)",
+    )
+    .bind(item)
+    .bind(kind.itemtype())
+    .bind(license)
+    .execute(&mut *tx)
+    .await?;
+    let id = i32::try_from(result.last_insert_id())
+        .map_err(|error| sqlx::Error::Decode(Box::new(error)))?;
+    if let Some(software) = update_validity(&mut tx, license, actor).await? {
+        update_software_validity(&mut tx, software, actor).await?;
+    }
+    record_relation(
+        &mut tx,
+        license,
+        kind,
+        item,
+        Action::AddRelation,
+        actor,
+        names,
+    )
+    .await?;
+    tx.commit().await?;
+    Ok(id)
+}
+
+/// Removes an affectation for good (the purge of the license and asset
+/// tabs): the validity first (`post_deleteFromDB`), then the history of
+/// both sides (`HISTORY_DEL_RELATION`). `false` when it no longer exists.
+pub async fn unaffect(
+    pool: &MySqlPool,
+    id: i32,
+    affectation: Affectation,
+    actor: &str,
+    names: &RelationNames,
+) -> Result<bool, sqlx::Error> {
+    let mut tx = pool.begin().await?;
+    let deleted = sqlx::query(
+        "DELETE FROM glpi_items_softwarelicenses WHERE id = ? AND softwarelicenses_id = ? \
+         AND itemtype = ? AND items_id = ?",
+    )
+    .bind(id)
+    .bind(affectation.license)
+    .bind(affectation.kind.itemtype())
+    .bind(affectation.item)
+    .execute(&mut *tx)
+    .await?;
+    if deleted.rows_affected() == 0 {
+        return Ok(false);
+    }
+    if let Some(software) = update_validity(&mut tx, affectation.license, actor).await? {
+        update_software_validity(&mut tx, software, actor).await?;
+    }
+    record_relation(
+        &mut tx,
+        affectation.license,
+        affectation.kind,
+        affectation.item,
+        Action::DeleteRelation,
+        actor,
+        names,
+    )
+    .await?;
+    tx.commit().await?;
+    Ok(true)
+}
+
+/// Each side as named in the history of the other.
+#[derive(Debug, Clone)]
+pub struct RelationNames {
+    /// The license, in the history of the item (with its software).
+    pub license: String,
+    /// The item, in the history of the license.
+    pub item: String,
+}
+
+/// The item first, then the license: the name of the other side is the
+/// new value of an addition, the old one of a removal.
+async fn record_relation(
+    conn: &mut MySqlConnection,
+    license: i32,
+    kind: AssetKind,
+    item: i32,
+    action: Action,
+    actor: &str,
+    names: &RelationNames,
+) -> Result<(), sqlx::Error> {
+    let values = |name: &str| -> (String, String) {
+        match action {
+            Action::AddRelation => (String::new(), name.to_owned()),
+            _ => (name.to_owned(), String::new()),
+        }
+    };
+    let license_itemtype = AssetKind::SoftwareLicense.itemtype();
+    let (old, new) = values(&names.license);
+    let on_item = Entry::link(kind.itemtype(), item, license_itemtype, action, &old, &new);
+    crate::history::record(conn, actor, &on_item).await?;
+    let (old, new) = values(&names.item);
+    let on_license = Entry::link(
+        license_itemtype,
+        license,
+        kind.itemtype(),
+        action,
+        &old,
+        &new,
+    );
+    crate::history::record(conn, actor, &on_license).await
+}
+
+/// Name of a license and of its software, as the history of an item
+/// names the license (`getNameID` with the software).
+pub async fn names_of(
+    pool: &MySqlPool,
+    id: i32,
+) -> Result<Option<(Option<String>, Option<String>)>, sqlx::Error> {
+    sqlx::query_as(
+        "SELECT sl.name, s.name FROM glpi_softwarelicenses sl \
+         LEFT JOIN glpi_softwares s ON s.id = sl.softwares_id WHERE sl.id = ?",
+    )
+    .bind(id)
+    .fetch_optional(pool)
+    .await
 }

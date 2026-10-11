@@ -112,7 +112,9 @@ Chaque lot suit la même « définition de terminé » :
 - [x] Logiciels : licences (type du parc : champs, arborescence, validité
       en chaîne jusqu'au logiciel, corbeille et purge), vérifiées contre le
       PHP
-- [ ] Logiciels : affectations des licences aux matériels
+- [x] Logiciels : affectations des licences aux matériels (depuis la
+      licence et depuis le matériel, validité en chaîne, historique des deux
+      côtés), vérifiées contre le PHP
 - [ ] Liaisons entre objets (`itemtype` / `items_id`), composants, ports réseau
 - [ ] Gestion financière (`infocoms`), contrats, fournisseurs, documents
 - [ ] **Inventaire natif** : réception des agents (GLPI-Agent et/ou OCS),

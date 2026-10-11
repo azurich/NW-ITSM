@@ -91,6 +91,199 @@
         }
       }
     },
+    "/api/v2/assets/software-licenses/{id}/items": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the items a license is affected to.",
+        "operationId": "list_license_items",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "License id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Its items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LicenseItemList"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on the software or the licenses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible license",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Affects a license to an item, like the form of its tab: its validity\nand that of its software follow, both are noted in their history.",
+        "operationId": "add_license_item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "License id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LicenseItemFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Affected"
+          },
+          "400": {
+            "description": "A type without software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right on the software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible license or item",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Business rules would change the license (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/software-licenses/{id}/items/{affectation_id}": {
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Removes an item from a license for good, like the \"Delete\npermanently\" action of its tab (no event).",
+        "operationId": "remove_license_item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "License id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "affectation_id",
+            "in": "path",
+            "description": "Affectation id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed"
+          },
+          "403": {
+            "description": "Neither the item nor the license can be changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible license or affectation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Business rules would change the license (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/assets/softwares/{id}/versions": {
       "get": {
         "tags": [
@@ -1403,6 +1596,236 @@
           },
           "409": {
             "description": "Another item has the same values (`duplicate`), items of other entities use the shared item (`sharing_in_use`), or must be changed in the classic interface (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}/licenses": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the licenses affected to an item.",
+        "operationId": "list_asset_licenses",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset, with software",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Its licenses",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssetLicenseList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A type without software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on the software or the asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Affects a license to an item, from the item.",
+        "operationId": "add_asset_license",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset, with software",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AssetLicenseFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Affected"
+          },
+          "400": {
+            "description": "A type without software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No update right on the software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset or license",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Business rules would change the license (`legacy_required`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}/licenses/{affectation_id}": {
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Removes a license from an item for good.",
+        "operationId": "remove_asset_license",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset, with software",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "affectation_id",
+            "in": "path",
+            "description": "Affectation id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Removed"
+          },
+          "403": {
+            "description": "Neither the item nor the license can be changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset or affectation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Business rules would change the license (`legacy_required`)",
             "content": {
               "application/json": {
                 "schema": {
@@ -2881,6 +3304,84 @@
         ],
         "description": "Fields of a creation or an update. Absent fields are left unchanged;\n`null` clears a field (empty text, no related object)."
       },
+      "AssetLicense": {
+        "type": "object",
+        "description": "A license affected to an item.",
+        "required": [
+          "id",
+          "license",
+          "number",
+          "is_valid"
+        ],
+        "properties": {
+          "expire": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Id of the affectation."
+          },
+          "is_valid": {
+            "type": "boolean"
+          },
+          "license": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "software": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          }
+        }
+      },
+      "AssetLicenseFields": {
+        "type": "object",
+        "description": "A license to affect to an item.",
+        "required": [
+          "license_id"
+        ],
+        "properties": {
+          "license_id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "AssetLicenseList": {
+        "type": "object",
+        "description": "The licenses affected to an item.",
+        "required": [
+          "items",
+          "can_edit"
+        ],
+        "properties": {
+          "can_edit": {
+            "type": "boolean",
+            "description": "The tab offers to add and remove licenses (a right on the\nsoftware, the item in one of the selected entities)."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssetLicense"
+            },
+            "description": "Visible to the session, by software and name."
+          }
+        }
+      },
       "AssetPage": {
         "type": "object",
         "required": [
@@ -3809,6 +4310,88 @@
               "null"
             ],
             "format": "int32"
+          }
+        }
+      },
+      "LicenseItem": {
+        "type": "object",
+        "description": "An item a license is affected to.",
+        "required": [
+          "id",
+          "kind",
+          "item",
+          "entity",
+          "is_deleted"
+        ],
+        "properties": {
+          "entity": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Id of the affectation."
+          },
+          "inventory_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_deleted": {
+            "type": "boolean",
+            "description": "The item is in the trash."
+          },
+          "item": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssetType"
+          },
+          "serial": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "LicenseItemFields": {
+        "type": "object",
+        "description": "An item to affect a license to.",
+        "required": [
+          "kind",
+          "item_id"
+        ],
+        "properties": {
+          "item_id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/AssetType",
+            "description": "A type with software: computers, monitors, network equipment,\nperipherals, phones, printers."
+          }
+        }
+      },
+      "LicenseItemList": {
+        "type": "object",
+        "description": "The items a license is affected to.",
+        "required": [
+          "items",
+          "can_edit"
+        ],
+        "properties": {
+          "can_edit": {
+            "type": "boolean",
+            "description": "The tab offers to add and remove items (a right on the software)."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LicenseItem"
+            },
+            "description": "Visible to the session, by entity and name."
           }
         }
       },

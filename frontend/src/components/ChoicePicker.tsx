@@ -104,7 +104,7 @@ export function ChoicePicker({
   )
 }
 
-function Option({
+export function Option({
   selected,
   onSelect,
   children,

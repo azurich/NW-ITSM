@@ -51,6 +51,7 @@ pub mod text {
     pub const UPDATES_LICENSE: Source = Text("%1$s updates the license %2$s");
     pub const DELETES_LICENSE: Source = Text("%1$s deletes the license %2$s");
     pub const PURGES_LICENSE: Source = Text("%1$s purges the license %2$s");
+    pub const ASSOCIATES_LICENSE: Source = Text("%s associates an item and a license");
     pub const DUPLICATE_EVENT: Source =
         Text("%1$s trying to add an item that already exists: %2$s");
     pub const IMPOSSIBLE_RECORD: Source = Text("Impossible record for %s");
@@ -117,7 +118,7 @@ pub mod text {
     pub const ALLOW_OVERQUOTA: Source = Text("Allow Over-Quota");
 
     /// Every text, for the catalog.
-    pub const ALL: [Source; 78] = [
+    pub const ALL: [Source; 79] = [
         LOGIN,
         FAILED_LOGIN,
         ADDS_ITEM,
@@ -196,6 +197,7 @@ pub mod text {
         PURCHASE_VERSION,
         EXPIRATION,
         ALLOW_OVERQUOTA,
+        ASSOCIATES_LICENSE,
     ];
 }
 

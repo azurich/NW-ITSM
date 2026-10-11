@@ -2,6 +2,7 @@
 //! and phones, the datacenter items (racks, enclosures, PDUs, passive
 //! equipment, clusters) and the software, under `/assets/{type}`.
 
+pub mod affectations;
 mod business;
 pub mod choices;
 pub mod defaults;
@@ -90,6 +91,22 @@ pub fn routes() -> Router<AppState> {
         .route(
             "/assets/{kind}/{id}/software/{installation_id}",
             axum::routing::delete(installations::uninstall),
+        )
+        .route(
+            "/assets/software-licenses/{id}/items",
+            get(affectations::license_items).post(affectations::add_license_item),
+        )
+        .route(
+            "/assets/software-licenses/{id}/items/{affectation_id}",
+            axum::routing::delete(affectations::remove_license_item),
+        )
+        .route(
+            "/assets/{kind}/{id}/licenses",
+            get(affectations::asset_licenses).post(affectations::add_asset_license),
+        )
+        .route(
+            "/assets/{kind}/{id}/licenses/{affectation_id}",
+            axum::routing::delete(affectations::remove_asset_license),
         )
         .route(
             "/assets/softwares/{id}/versions",

@@ -56,6 +56,8 @@ pub enum Action {
     UnlockItem,
     /// A link to another item was added (`HISTORY_ADD_RELATION`).
     AddRelation,
+    /// A link to another item was removed (`HISTORY_DEL_RELATION`).
+    DeleteRelation,
     /// A child item was added (`HISTORY_ADD_SUBITEM`).
     AddSubitem,
     /// A field of a child item changed (`HISTORY_UPDATE_SUBITEM`).
@@ -80,6 +82,7 @@ impl Action {
             Self::DeleteItem => 13,
             Self::RestoreItem => 14,
             Self::AddRelation => 15,
+            Self::DeleteRelation => 16,
             Self::AddSubitem => 17,
             Self::UpdateSubitem => 18,
             Self::DeleteSubitem => 19,

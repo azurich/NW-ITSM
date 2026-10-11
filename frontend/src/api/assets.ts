@@ -431,3 +431,68 @@ export const softwareLicensesQuery = (softwareId: number, trash = false) =>
         }),
       ),
   })
+
+export type LicenseItem = Schemas['LicenseItem']
+export type AssetLicense = Schemas['AssetLicense']
+
+/** Items a license is affected to. */
+export const licenseItemsQuery = (licenseId: number) =>
+  queryOptions({
+    queryKey: ['license-items', licenseId],
+    queryFn: async () =>
+      unwrap(
+        await api.GET('/api/v2/assets/software-licenses/{id}/items', { params: { path: { id: licenseId } } }),
+      ),
+  })
+
+/** Licenses affected to an item. */
+export const assetLicensesQuery = (kind: AssetType, id: number) =>
+  queryOptions({
+    queryKey: ['asset-licenses', kind, id],
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v2/assets/{kind}/{id}/licenses', { params: { path: { kind, id } } })),
+  })
+
+async function expectOk(result: { response: Response; error?: unknown }): Promise<void> {
+  if (!result.response.ok) {
+    throw toApiError(result.response.status, result.error)
+  }
+}
+
+/** Affects a license to an item. */
+export async function affectLicense(licenseId: number, kind: AssetType, itemId: number): Promise<void> {
+  await expectOk(
+    await api.POST('/api/v2/assets/software-licenses/{id}/items', {
+      params: { path: { id: licenseId } },
+      body: { kind, item_id: itemId },
+    }),
+  )
+}
+
+/** Removes an affectation, for good. */
+export async function removeAffectation(licenseId: number, affectationId: number): Promise<void> {
+  await expectOk(
+    await api.DELETE('/api/v2/assets/software-licenses/{id}/items/{affectation_id}', {
+      params: { path: { id: licenseId, affectation_id: affectationId } },
+    }),
+  )
+}
+
+/** Affects a license to an item, from the item. */
+export async function addAssetLicense(kind: AssetType, id: number, licenseId: number): Promise<void> {
+  await expectOk(
+    await api.POST('/api/v2/assets/{kind}/{id}/licenses', {
+      params: { path: { kind, id } },
+      body: { license_id: licenseId },
+    }),
+  )
+}
+
+/** Removes a license from an item, for good. */
+export async function removeAssetLicense(kind: AssetType, id: number, affectationId: number): Promise<void> {
+  await expectOk(
+    await api.DELETE('/api/v2/assets/{kind}/{id}/licenses/{affectation_id}', {
+      params: { path: { kind, id, affectation_id: affectationId } },
+    }),
+  )
+}

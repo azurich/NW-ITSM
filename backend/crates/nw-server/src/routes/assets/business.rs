@@ -42,6 +42,17 @@ impl FormInput {
         input
     }
 
+    /// Raw posted values (an update made by the code, like the validity of
+    /// a license).
+    pub fn raw(values: &[(&str, String)]) -> Self {
+        Self {
+            values: values
+                .iter()
+                .map(|(key, value)| ((*key).to_owned(), value.clone()))
+                .collect(),
+        }
+    }
+
     /// Only the given fields (the copy of a computer change to an item).
     pub fn fields(values: &[(Field, Value)]) -> Self {
         Self {

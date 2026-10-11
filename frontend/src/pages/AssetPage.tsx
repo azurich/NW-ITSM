@@ -5,7 +5,9 @@ import { useTranslation } from 'react-i18next'
 import { ApiError } from '../api/client'
 import { ASSET_TYPES, assetQuery, purgeAsset, setTrashed, type AssetType } from '../api/assets'
 import { WriteError, useColumnLabel } from '../components/AssetForm'
+import { AssetLicenses } from '../components/AssetLicenses'
 import { LegacyLink } from '../components/LegacyLink'
+import { LicenseItems } from '../components/LicenseItems'
 import { SoftwareInstallations } from '../components/SoftwareInstallations'
 import { SoftwareLicenses } from '../components/SoftwareLicenses'
 import { SoftwareVersions } from '../components/SoftwareVersions'
@@ -329,6 +331,8 @@ export function AssetPage() {
 
       {info.software && <SoftwareLicenses softwareId={asset.id} softwareName={asset.name ?? ''} />}
 
+      {info.license && <LicenseItems licenseId={asset.id} editable={!asset.is_deleted} />}
+
       {info.installations && (
         <SoftwareInstallations
           kind={kind}
@@ -337,6 +341,8 @@ export function AssetPage() {
           editable={!asset.is_deleted}
         />
       )}
+
+      {info.installations && <AssetLicenses kind={kind} assetId={asset.id} editable={!asset.is_deleted} />}
     </article>
   )
 }
