@@ -709,6 +709,27 @@ impl AssetKind {
         });
     }
 
+    /// Software can be installed on it (`$CFG_GLPI['software_types']`).
+    pub fn has_software(self) -> bool {
+        matches!(
+            self,
+            Self::Computer
+                | Self::Monitor
+                | Self::NetworkEquipment
+                | Self::Peripheral
+                | Self::Phone
+                | Self::Printer
+        )
+    }
+
+    /// Its software installations take its entity
+    /// (`isEntityForwardTo('Item_SoftwareVersion')`); the others take the
+    /// active entity of the session.
+    pub fn forwards_entity_to_installations(self) -> bool {
+        self.forward_entity_tables()
+            .contains(&"glpi_items_softwareversions")
+    }
+
     /// Tables of the items following the entity and sharing of the asset
     /// (`$forward_entity_to`), infocoms excepted.
     pub fn forward_entity_tables(self) -> &'static [&'static str] {
@@ -887,6 +908,33 @@ impl Propagation {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn software_is_installed_on_the_inventory_types_but_the_datacenter() {
+        let types: Vec<_> = AssetKind::ALL
+            .into_iter()
+            .filter(|kind| kind.has_software())
+            .map(AssetKind::itemtype)
+            .collect();
+        assert_eq!(
+            types,
+            [
+                "Computer",
+                "Monitor",
+                "Printer",
+                "NetworkEquipment",
+                "Peripheral",
+                "Phone"
+            ]
+        );
+        // Phones do not forward their entity to their installations.
+        assert!(
+            AssetKind::ALL
+                .into_iter()
+                .filter(|kind| kind.has_software())
+                .all(|kind| kind.forwards_entity_to_installations() == (kind != AssetKind::Phone))
+        );
+    }
 
     #[test]
     fn slugs_and_itemtypes_round_trip() {

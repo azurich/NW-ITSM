@@ -6,6 +6,7 @@ mod business;
 pub mod choices;
 pub mod defaults;
 mod guards;
+pub mod installations;
 pub mod racks;
 pub mod templates;
 pub mod unicity;
@@ -81,6 +82,14 @@ pub fn routes() -> Router<AppState> {
         .route("/assets/{kind}/choices/{field}", get(choices::choices))
         .route("/assets/{kind}/defaults", get(defaults::defaults))
         .route("/assets/racks/positions", get(racks::positions))
+        .route(
+            "/assets/{kind}/{id}/software",
+            get(installations::list).post(installations::install),
+        )
+        .route(
+            "/assets/{kind}/{id}/software/{installation_id}",
+            axum::routing::delete(installations::uninstall),
+        )
         .route(
             "/assets/softwares/{id}/versions",
             get(versions::list).post(versions::create),

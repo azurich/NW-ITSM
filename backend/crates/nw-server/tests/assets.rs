@@ -2940,3 +2940,200 @@ async fn software_versions_like_php() {
     let response = app.send(Method::DELETE, &uri, Some(&manager), None).await;
     assert_eq!(response.status, StatusCode::NOT_FOUND);
 }
+
+#[tokio::test]
+async fn software_installations_like_php() {
+    let app = test_app!();
+    app.sql(
+        "INSERT INTO glpi_profilerights (profiles_id, name, rights) VALUES (4, 'software', 31), (1, 'software', 1); \
+         INSERT INTO glpi_softwares (id, entities_id, is_recursive, name) VALUES (40, 1, 1, 'Editor'), (41, 2, 0, 'Lyon'); \
+         INSERT INTO glpi_softwareversions (id, softwares_id, entities_id, is_recursive, name) VALUES \
+           (50, 40, 1, 1, '1.0'), (51, 41, 2, 0, '2.0'); \
+         INSERT INTO glpi_phones (id, name, entities_id) VALUES (60, 'PHONE-A', 3)",
+    )
+    .await;
+    let manager = app.login("manager").await;
+    let link = |action: i32, old: &str, new: &str, other: &str| {
+        (
+            0,
+            old.to_owned(),
+            new.to_owned(),
+            other.to_owned(),
+            action,
+            "manager (19)".to_owned(),
+        )
+    };
+
+    // Installed like the form of the software tab: in the entity of the
+    // computer, noted on both sides, with the event of the form.
+    let response = app
+        .post(
+            "/api/v2/assets/computers/102/software",
+            &manager,
+            Some(json!({ "version_id": 50 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    let installation = response.body["id"].as_i64().unwrap();
+    assert_eq!(response.body["software"]["name"], json!("Editor"));
+    assert_eq!(response.body["version"]["name"], json!("1.0"));
+    assert_eq!(
+        column(
+            &app,
+            &format!(
+                "SELECT CAST(CONCAT_WS('|', entities_id, is_deleted_item, is_template_item, is_dynamic) AS CHAR) \
+                 FROM glpi_items_softwareversions WHERE id = {installation}"
+            )
+        )
+        .await
+        .as_deref(),
+        Some("1|0|0|0")
+    );
+    assert_eq!(
+        history(&app, "Computer", 102).await,
+        [link(4, "", "Editor - 1.0 (50)", "SoftwareVersion")]
+    );
+    assert_eq!(
+        history(&app, "SoftwareVersion", 50).await,
+        [link(4, "", "PC-PARIS-1 (102)", "Computer")]
+    );
+    assert_eq!(
+        events(&app).await.pop().unwrap(),
+        (
+            102,
+            "Computer".into(),
+            "inventory".into(),
+            5,
+            "manager installs software".into()
+        )
+    );
+    let response = app
+        .get("/api/v2/assets/computers/102/software", Some(&manager))
+        .await;
+    assert_eq!(response.status, StatusCode::OK, "{}", response.body);
+    assert_eq!(response.body["can_edit"], json!(true));
+    assert_eq!(response.body["items"].as_array().unwrap().len(), 1);
+
+    // Twice: refused. A version of another entity: refused.
+    let response = app
+        .post(
+            "/api/v2/assets/computers/102/software",
+            &manager,
+            Some(json!({ "version_id": 50 })),
+        )
+        .await;
+    assert_eq!(
+        response.error_code(),
+        "already_installed",
+        "{}",
+        response.body
+    );
+    let response = app
+        .post(
+            "/api/v2/assets/computers/102/software",
+            &manager,
+            Some(json!({ "version_id": 51 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::FORBIDDEN);
+    let response = app
+        .post(
+            "/api/v2/assets/computers/102/software",
+            &manager,
+            Some(json!({ "version_id": 99 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+    let response = app
+        .get("/api/v2/assets/racks/1/software", Some(&manager))
+        .await;
+    assert_eq!(response.status, StatusCode::BAD_REQUEST);
+
+    // The software to install: those of the entity of the asset or shared
+    // with it, outside the trash and the templates.
+    app.sql(
+        "INSERT INTO glpi_softwares (id, entities_id, name, is_deleted) VALUES (42, 1, 'Old', 1)",
+    )
+    .await;
+    let response = app
+        .get(
+            "/api/v2/assets/computers/choices/software?entity_id=1",
+            Some(&manager),
+        )
+        .await;
+    assert_eq!(
+        response.body,
+        json!({ "items": [{ "id": 40, "label": "Editor" }] })
+    );
+
+    // A phone does not give its entity: the active one of the session.
+    let response = app
+        .post(
+            "/api/v2/assets/phones/60/software",
+            &manager,
+            Some(json!({ "version_id": 50 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    assert_eq!(
+        column(
+            &app,
+            "SELECT CAST(entities_id AS CHAR) FROM glpi_items_softwareversions WHERE itemtype = 'Phone'"
+        )
+        .await
+        .as_deref(),
+        Some("1")
+    );
+
+    // The update right on the computer is enough with the view of the
+    // software; the view of both is not (deliberate difference: the PHP
+    // code accepts it).
+    let paris = app.login("paris").await;
+    let response = app
+        .post(
+            "/api/v2/assets/computers/103/software",
+            &paris,
+            Some(json!({ "version_id": 50 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::CREATED, "{}", response.body);
+    let response = app
+        .get("/api/v2/assets/computers/103/software", Some(&paris))
+        .await;
+    assert_eq!(response.body["can_edit"], json!(false));
+    app.sql("UPDATE glpi_profilerights SET rights = 1 WHERE profiles_id = 1 AND name = 'computer'")
+        .await;
+    let paris = app.login("paris").await;
+    let response = app
+        .post(
+            "/api/v2/assets/computers/102/software",
+            &paris,
+            Some(json!({ "version_id": 50 })),
+        )
+        .await;
+    assert_eq!(response.status, StatusCode::FORBIDDEN);
+
+    // Uninstalled for good, noted on both sides, without event.
+    let before = events(&app).await.len();
+    let uri = format!("/api/v2/assets/computers/102/software/{installation}");
+    let response = app.send(Method::DELETE, &uri, Some(&manager), None).await;
+    assert_eq!(response.status, StatusCode::NO_CONTENT, "{}", response.body);
+    assert_eq!(
+        history(&app, "Computer", 102).await[1..],
+        [link(5, "Editor - 1.0 (50)", "", "SoftwareVersion")]
+    );
+    assert_eq!(
+        history(&app, "SoftwareVersion", 50).await.last().unwrap(),
+        &link(5, "PC-PARIS-1 (102)", "", "Computer")
+    );
+    assert_eq!(events(&app).await.len(), before);
+    let response = app.send(Method::DELETE, &uri, Some(&manager), None).await;
+    assert_eq!(response.status, StatusCode::NOT_FOUND);
+
+    // Without the view of the software, no software tab.
+    let helpdesk = app.login("helpdesk").await;
+    let response = app
+        .get("/api/v2/assets/computers/102/software", Some(&helpdesk))
+        .await;
+    assert_eq!(response.status, StatusCode::FORBIDDEN);
+}

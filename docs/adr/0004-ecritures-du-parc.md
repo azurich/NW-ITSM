@@ -560,6 +560,61 @@ par le formulaire PHP de la version puis par l'API :
 Résultat : bases identiques, mêmes événements ; refus attendu quand une
 licence utilise la version.
 
+### Logiciels : installations
+
+Troisième étape : les logiciels installés sur un matériel
+(`Item_SoftwareVersion`, relation entre le matériel et une version), sous
+`/assets/{type}/{id}/software`, pour les types qui ont l'onglet Logiciels
+(ordinateurs, moniteurs, matériels réseau, périphériques, téléphones,
+imprimantes).
+
+- **Liste** comme l'onglet : installations hors corbeille, des logiciels
+  visibles dans les entités de la session, par logiciel et version
+  (statut de la version, catégorie, licences valides, date d'installation,
+  inventaire automatique). Il faut le droit de lecture sur le logiciel.
+- **Installation** comme le formulaire de l'onglet : l'installation prend
+  l'entité du matériel (`$forward_entity_to`), sauf pour un téléphone qui
+  ne la transmet pas : l'entité active de la session
+  (`glpiactive_entity`, la première entité du profil par nom complet
+  quand toutes sont sélectionnées). Les indicateurs corbeille et gabarit
+  du matériel sont recopiés. Événement « installe un logiciel » (niveau 5,
+  type : la classe du matériel). Une version déjà installée est refusée
+  (`already_installed`, conflit sur la clé unique).
+- **Désinstallation** comme l'action « Supprimer définitivement » de
+  l'onglet : suppression réelle, sans événement.
+- **Historique** des deux côtés (`CommonDBRelation`), le matériel puis la
+  version : `HISTORY_INSTALL_SOFTWARE` (4) ou `HISTORY_UNINSTALL_SOFTWARE`
+  (5), avec le nom de l'autre côté (« Logiciel - version (id) » sur le
+  matériel, « Matériel (id) » sur la version), en nouvelle valeur à
+  l'installation et en ancienne à la désinstallation.
+- **Droits** (`canRelationItem`) : il suffit de pouvoir modifier un côté
+  et de voir l'autre ; le droit de lecture sur le logiciel est toujours
+  exigé. À l'installation, les entités doivent concorder (même entité, ou
+  l'un partagé avec l'entité de l'autre). Une version ou un logiciel
+  disparu est refusé, comme en PHP.
+- **Écart volontaire** : côté version, le PHP ne vérifie que l'entité du
+  logiciel (`canUpdateItem` du parent), pas le droit de modification ; un
+  profil en lecture seule sur le matériel et le logiciel (Observateur)
+  peut donc installer et désinstaller. L'API exige le droit de
+  modification du logiciel pour ce côté et refuse ce cas (403) ; elle
+  n'écrit jamais autre chose que le PHP.
+- **Interface** : section « Logiciels installés » de la fiche, quand la
+  session a un droit d'écriture sur les logiciels et que le matériel est
+  dans une entité sélectionnée (comme l'onglet) ; choix d'un logiciel du
+  matériel ou partagé avec lui (hors corbeille et gabarits), puis d'une
+  de ses versions.
+
+Vérification : sur des copies identiques de la base de référence, par le
+formulaire PHP et l'action de masse postés comme par un navigateur, puis
+par l'API :
+- installation (ordinateur ; logiciel partagé depuis l'entité racine ;
+  ordinateur à la corbeille ; téléphone) ;
+- désinstallation ;
+- doublon et entités incompatibles (refusés des deux côtés).
+
+Résultat : bases identiques, mêmes événements ; seul le cas du profil en
+lecture seule diffère (accepté par le PHP, refusé par l'API).
+
 ### Correction côté PHP : conditions des listes des formulaires
 
 Les formulaires Twig d'ITSM-NG n'appliquaient aucune des conditions de

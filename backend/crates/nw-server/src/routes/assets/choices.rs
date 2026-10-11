@@ -9,8 +9,8 @@ use axum::{
 };
 use nw_db::dropdowns::{self, Table, UserRight, Visibility};
 use nw_domain::{
-    asset::{AssetKind, Field, FieldKind},
-    rights::{CREATE, UPDATE},
+    asset::{AssetKind, Field, FieldKind, NOT_LOGGED},
+    rights::{CREATE, READ, UPDATE},
     software,
     text::from_stored,
 };
@@ -56,6 +56,8 @@ pub enum ChoiceField {
     VersionOperatingSystem,
     /// Software only: status of a version.
     VersionState,
+    /// Types with software: a software to install.
+    Software,
 }
 
 impl ChoiceField {
@@ -79,6 +81,7 @@ impl ChoiceField {
             Self::UpgradeFrom => "softwares_id",
             Self::VersionOperatingSystem => "operatingsystems_id",
             Self::VersionState => "states_id",
+            Self::Software => "softwares_id",
         })
     }
 
@@ -93,6 +96,14 @@ impl ChoiceField {
                     None
                 }
             }
+            Self::Software => kind.has_software().then_some(Field {
+                column,
+                search_option: NOT_LOGGED,
+                kind: FieldKind::Dropdown {
+                    table: "glpi_softwares",
+                    tree: false,
+                },
+            }),
             _ => kind.field(column),
         }
     }
@@ -146,7 +157,13 @@ pub async fn choices(
     let Path((kind, field)) =
         path.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
     let kind = AssetKind::from(kind);
-    if !(session.rights.has(kind.right(), CREATE) || session.rights.has(kind.right(), UPDATE)) {
+    // The software to install: those the session sees, from the software
+    // tab of the asset.
+    let allowed = match field {
+        ChoiceField::Software => session.rights.has(AssetKind::Software.right(), READ),
+        _ => session.rights.has(kind.right(), CREATE) || session.rights.has(kind.right(), UPDATE),
+    };
+    if !allowed {
         return Err(ApiError::Forbidden);
     }
     let Query(params) = params.map_err(|rejection| ApiError::BadRequest(rejection.body_text()))?;
@@ -197,7 +214,9 @@ pub async fn choices(
                 ChoiceField::Group => Some("is_itemgroup = 1".to_owned()),
                 ChoiceField::TechGroup => Some("is_assign = 1".to_owned()),
                 // Not the trash nor the templates (`getDropdownValue`).
-                ChoiceField::UpgradeFrom => Some("is_deleted = 0 AND is_template = 0".to_owned()),
+                ChoiceField::UpgradeFrom | ChoiceField::Software => {
+                    Some("is_deleted = 0 AND is_template = 0".to_owned())
+                }
                 _ => None,
             };
             let table = Table {

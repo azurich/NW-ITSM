@@ -6,6 +6,7 @@ import { ApiError } from '../api/client'
 import { ASSET_TYPES, assetQuery, purgeAsset, setTrashed, type AssetType } from '../api/assets'
 import { WriteError, useColumnLabel } from '../components/AssetForm'
 import { LegacyLink } from '../components/LegacyLink'
+import { SoftwareInstallations } from '../components/SoftwareInstallations'
 import { SoftwareVersions } from '../components/SoftwareVersions'
 import { ErrorState, Loading } from '../components/States'
 import { hasField, type RefField, type TextField } from '../lib/assetForm'
@@ -283,6 +284,15 @@ export function AssetPage() {
 
       {info.software && (
         <SoftwareVersions softwareId={asset.id} entityId={asset.entity.id} editable={!asset.is_deleted} />
+      )}
+
+      {info.installations && (
+        <SoftwareInstallations
+          kind={kind}
+          assetId={asset.id}
+          entityId={asset.entity.id}
+          editable={!asset.is_deleted}
+        />
       )}
     </article>
   )

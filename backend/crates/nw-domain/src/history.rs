@@ -49,6 +49,12 @@ pub enum Action {
     UpdateSubitem,
     /// A child item was deleted (`HISTORY_DELETE_SUBITEM`).
     DeleteSubitem,
+    /// A software version was installed on an asset, recorded on both
+    /// (`HISTORY_INSTALL_SOFTWARE`).
+    InstallSoftware,
+    /// A software version was uninstalled from an asset, recorded on both
+    /// (`HISTORY_UNINSTALL_SOFTWARE`).
+    UninstallSoftware,
 }
 
 impl Action {
@@ -56,6 +62,8 @@ impl Action {
         match self {
             Self::FieldChange => 0,
             Self::UpdateDevice => 2,
+            Self::InstallSoftware => 4,
+            Self::UninstallSoftware => 5,
             Self::DeleteItem => 13,
             Self::RestoreItem => 14,
             Self::AddRelation => 15,
@@ -130,6 +138,27 @@ impl Entry {
             itemtype: itemtype.to_owned(),
             items_id,
             itemtype_link: child_itemtype.to_owned(),
+            action,
+            change: Change::new(0, old, new),
+        }
+    }
+
+    /// A link to another item was added or removed, recorded on one side
+    /// with the type and the name of the other side
+    /// (`CommonDBRelation::post_addItem`, `post_deleteFromDB`): the name
+    /// is the new value of an addition, the old one of a removal.
+    pub fn link(
+        itemtype: &str,
+        items_id: i32,
+        other_itemtype: &str,
+        action: Action,
+        old: &str,
+        new: &str,
+    ) -> Self {
+        Self {
+            itemtype: itemtype.to_owned(),
+            items_id,
+            itemtype_link: other_itemtype.to_owned(),
             action,
             change: Change::new(0, old, new),
         }

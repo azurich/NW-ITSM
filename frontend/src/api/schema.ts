@@ -242,6 +242,49 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v2/assets/{kind}/{id}/software": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lists the software installed on an asset. */
+        get: operations["list_installations"];
+        put?: never;
+        /**
+         * Installs a version of a software on an asset, like the form of its
+         *     software tab: in the entity of the asset (the active entity of the
+         *     session for a phone), noted in the history of both.
+         */
+        post: operations["install_software"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v2/assets/{kind}/{id}/software/{installation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Uninstalls a software from an asset, for good, like the "Delete
+         *     permanently" action of its software tab (no event), noted in the
+         *     history of the asset and of the version.
+         */
+        delete: operations["uninstall_software"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v2/assets/{kind}/{id}/trash": {
         parameters: {
             query?: never;
@@ -711,7 +754,7 @@ export interface components {
          * @description A field of the asset forms offering a list of values.
          * @enum {string}
          */
-        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group" | "power_supply" | "room" | "category" | "upgrade_from" | "version_operating_system" | "version_state";
+        ChoiceField: "location" | "state" | "manufacturer" | "type" | "model" | "network" | "update_source" | "user" | "group" | "tech_user" | "tech_group" | "power_supply" | "room" | "category" | "upgrade_from" | "version_operating_system" | "version_state" | "software";
         ChoiceList: {
             /** @description At most 50 values, sorted by label. */
             items: components["schemas"]["Choice"][];
@@ -918,6 +961,44 @@ export interface components {
             /** @description `ok` or `degraded`. */
             status: string;
             version: string;
+        };
+        /** @description A software installed on the asset. */
+        Installation: {
+            category?: null | components["schemas"]["Ref"];
+            /** Format: int32 */
+            id: number;
+            /**
+             * Format: date
+             * @description Date of installation, given by the inventory.
+             */
+            installed_on?: string | null;
+            /** @description Installed by the inventory. */
+            is_dynamic: boolean;
+            software?: null | components["schemas"]["Ref"];
+            /** @description The licenses of the software are valid. */
+            valid_licenses?: boolean | null;
+            version: components["schemas"]["Ref"];
+            /** @description Status of the version. */
+            version_state?: string | null;
+        };
+        /** @description A version to install. */
+        InstallationFields: {
+            /** Format: int32 */
+            version_id: number;
+        };
+        /** @description The software installed on an asset. */
+        InstallationList: {
+            /**
+             * @description The software tab offers to install and uninstall: a right on the
+             *     software, the asset in one of the selected entities. Each version
+             *     is still checked.
+             */
+            can_edit: boolean;
+            /**
+             * @description Outside the trash, of the software visible to the session, by
+             *     software and version.
+             */
+            items: components["schemas"]["Installation"][];
         };
         Language: {
             /** @description `fr_FR`... */
@@ -2168,6 +2249,184 @@ export interface operations {
             };
             /** @description Must be done in the classic interface (`legacy_required`) */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    list_installations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset: computers, monitors, network-equipments, peripherals, phones or printers */
+                kind: components["schemas"]["AssetType"];
+                /** @description Asset id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Its software */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InstallationList"];
+                };
+            };
+            /** @description No software for this type */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Not logged in */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description No read right on the software or on the asset */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible asset */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    install_software: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Asset id */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InstallationFields"];
+            };
+        };
+        responses: {
+            /** @description Installed */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Installation"];
+                };
+            };
+            /** @description Invalid fields, unknown version, or no software for this type */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Neither the asset nor the software can be changed, or their entities do not match */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible asset */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Already installed (`already_installed`) */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+        };
+    };
+    uninstall_software: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Type of asset */
+                kind: components["schemas"]["AssetType"];
+                /** @description Asset id */
+                id: number;
+                /** @description Installation id */
+                installation_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Uninstalled */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No software for this type */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Neither the asset nor the software can be changed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorBody"];
+                };
+            };
+            /** @description Unknown or not visible asset or installation */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };

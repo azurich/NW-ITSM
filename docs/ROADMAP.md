@@ -105,7 +105,11 @@ Chaque lot suit la même « définition de terminé » :
 - [x] Logiciels : versions (statut, système d'exploitation, historique
       sur le logiciel, purge avec leurs installations), vérifiées contre le
       PHP
-- [ ] Logiciels : installations, licences et affectations
+- [x] Logiciels : installations depuis la fiche d'un matériel
+      (installation, désinstallation, historique des deux côtés), vérifiées
+      contre le PHP ; droit de modification du logiciel exigé (le PHP ne
+      vérifie que son entité)
+- [ ] Logiciels : licences et affectations
 - [ ] Liaisons entre objets (`itemtype` / `items_id`), composants, ports réseau
 - [ ] Gestion financière (`infocoms`), contrats, fournisseurs, documents
 - [ ] **Inventaire natif** : réception des agents (GLPI-Agent et/ou OCS),

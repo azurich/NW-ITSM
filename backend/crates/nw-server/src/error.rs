@@ -56,6 +56,9 @@ pub enum ApiError {
     /// (`Rack::prepareInput`).
     #[error("position {0} is not available")]
     PositionUnavailable(String),
+    /// The version is already installed on the asset.
+    #[error("this version is already installed")]
+    AlreadyInstalled,
     #[error("access denied")]
     Forbidden,
     #[error("not found")]
@@ -109,6 +112,7 @@ impl ApiError {
             Self::SharingInUse(_) => (StatusCode::CONFLICT, "sharing_in_use"),
             Self::NotInTrash => (StatusCode::CONFLICT, "not_in_trash"),
             Self::PositionUnavailable(_) => (StatusCode::CONFLICT, "position_unavailable"),
+            Self::AlreadyInstalled => (StatusCode::CONFLICT, "already_installed"),
             Self::Forbidden => (StatusCode::FORBIDDEN, "forbidden"),
             Self::NotFound => (StatusCode::NOT_FOUND, "not_found"),
             Self::BadRequest(_) => (StatusCode::BAD_REQUEST, "bad_request"),

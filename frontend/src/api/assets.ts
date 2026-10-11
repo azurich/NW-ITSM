@@ -74,16 +74,26 @@ export interface AssetTypeInfo {
    * tickets, an upgrade of another software, valid licenses.
    */
   software?: boolean
+  /** Software can be installed on it. */
+  installations?: boolean
 }
 
 /** The datacenter items have no user, group nor contact. */
 const NO_USER = ['user', 'group', 'contact', 'contact_number'] as const
 
 export const ASSET_TYPES: Record<AssetType, AssetTypeInfo> = {
-  computers: { right: 'computer', legacy: 'computer', uuid: true, network: true, updateSource: true },
+  computers: {
+    right: 'computer',
+    legacy: 'computer',
+    uuid: true,
+    network: true,
+    updateSource: true,
+    installations: true,
+  },
   monitors: {
     right: 'monitor',
     legacy: 'monitor',
+    installations: true,
     global: true,
     size: true,
     features: [
@@ -100,17 +110,25 @@ export const ASSET_TYPES: Record<AssetType, AssetTypeInfo> = {
   printers: {
     right: 'printer',
     legacy: 'printer',
+    installations: true,
     network: true,
     global: true,
     memory: 'text',
     pageCounters: true,
     features: ['has_serial', 'has_parallel', 'has_usb', 'has_ethernet', 'has_wifi'],
   },
-  'network-equipments': { right: 'networking', legacy: 'networkequipment', network: true, memory: 'mib' },
-  peripherals: { right: 'peripheral', legacy: 'peripheral', brand: true, global: true },
+  'network-equipments': {
+    right: 'networking',
+    legacy: 'networkequipment',
+    network: true,
+    memory: 'mib',
+    installations: true,
+  },
+  peripherals: { right: 'peripheral', legacy: 'peripheral', brand: true, global: true, installations: true },
   phones: {
     right: 'phone',
     legacy: 'phone',
+    installations: true,
     brand: true,
     numberLine: true,
     global: true,
@@ -339,6 +357,35 @@ export async function updateVersion(softwareId: number, id: number, fields: Vers
 export async function purgeVersion(softwareId: number, id: number): Promise<void> {
   const { response, error } = await api.DELETE('/api/v2/assets/softwares/{id}/versions/{version_id}', {
     params: { path: { id: softwareId, version_id: id } },
+  })
+  if (!response.ok) {
+    throw toApiError(response.status, error)
+  }
+}
+
+export type Installation = Schemas['Installation']
+
+/** Software installed on an asset, by software and version. */
+export const installationsQuery = (kind: AssetType, id: number) =>
+  queryOptions({
+    queryKey: ['installations', kind, id],
+    queryFn: async () =>
+      unwrap(await api.GET('/api/v2/assets/{kind}/{id}/software', { params: { path: { kind, id } } })),
+  })
+
+export async function installSoftware(kind: AssetType, id: number, versionId: number): Promise<Installation> {
+  return unwrap(
+    await api.POST('/api/v2/assets/{kind}/{id}/software', {
+      params: { path: { kind, id } },
+      body: { version_id: versionId },
+    }),
+  )
+}
+
+/** Uninstalls a software, for good. */
+export async function uninstallSoftware(kind: AssetType, id: number, installationId: number): Promise<void> {
+  const { response, error } = await api.DELETE('/api/v2/assets/{kind}/{id}/software/{installation_id}', {
+    params: { path: { kind, id, installation_id: installationId } },
   })
   if (!response.ok) {
     throw toApiError(response.status, error)

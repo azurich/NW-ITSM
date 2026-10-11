@@ -372,6 +372,8 @@ export function WriteError({ error, legacyPath }: { error: unknown; legacyPath: 
       message = t('asset.errors.not_in_trash')
     } else if (error.code === 'position_unavailable') {
       message = t('asset.errors.position_unavailable')
+    } else if (error.code === 'already_installed') {
+      message = t('asset.errors.already_installed')
     } else if (error.status === 403) {
       message = t('asset.errors.forbidden')
     } else if (error.status === 404) {

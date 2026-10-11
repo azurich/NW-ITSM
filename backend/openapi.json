@@ -1456,6 +1456,253 @@
         }
       }
     },
+    "/api/v2/assets/{kind}/{id}/software": {
+      "get": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Lists the software installed on an asset.",
+        "operationId": "list_installations",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset: computers, monitors, network-equipments, peripherals, phones or printers",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Its software",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InstallationList"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "No software for this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Not logged in",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "No read right on the software or on the asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Installs a version of a software on an asset, like the form of its\nsoftware tab: in the entity of the asset (the active entity of the\nsession for a phone), noted in the history of both.",
+        "operationId": "install_software",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstallationFields"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Installed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Installation"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid fields, unknown version, or no software for this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Neither the asset nor the software can be changed, or their entities do not match",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Already installed (`already_installed`)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v2/assets/{kind}/{id}/software/{installation_id}": {
+      "delete": {
+        "tags": [
+          "assets"
+        ],
+        "summary": "Uninstalls a software from an asset, for good, like the \"Delete\npermanently\" action of its software tab (no event), noted in the\nhistory of the asset and of the version.",
+        "operationId": "uninstall_software",
+        "parameters": [
+          {
+            "name": "kind",
+            "in": "path",
+            "description": "Type of asset",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/AssetType"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Asset id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "installation_id",
+            "in": "path",
+            "description": "Installation id",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Uninstalled"
+          },
+          "400": {
+            "description": "No software for this type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Neither the asset nor the software can be changed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown or not visible asset or installation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v2/assets/{kind}/{id}/trash": {
       "post": {
         "tags": [
@@ -2798,7 +3045,8 @@
           "category",
           "upgrade_from",
           "version_operating_system",
-          "version_state"
+          "version_state",
+          "software"
         ]
       },
       "ChoiceList": {
@@ -3268,6 +3516,104 @@
           },
           "version": {
             "type": "string"
+          }
+        }
+      },
+      "Installation": {
+        "type": "object",
+        "description": "A software installed on the asset.",
+        "required": [
+          "id",
+          "version",
+          "is_dynamic"
+        ],
+        "properties": {
+          "category": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "id": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "installed_on": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date",
+            "description": "Date of installation, given by the inventory."
+          },
+          "is_dynamic": {
+            "type": "boolean",
+            "description": "Installed by the inventory."
+          },
+          "software": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Ref"
+              }
+            ]
+          },
+          "valid_licenses": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "The licenses of the software are valid."
+          },
+          "version": {
+            "$ref": "#/components/schemas/Ref"
+          },
+          "version_state": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Status of the version."
+          }
+        }
+      },
+      "InstallationFields": {
+        "type": "object",
+        "description": "A version to install.",
+        "required": [
+          "version_id"
+        ],
+        "properties": {
+          "version_id": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "InstallationList": {
+        "type": "object",
+        "description": "The software installed on an asset.",
+        "required": [
+          "items",
+          "can_edit"
+        ],
+        "properties": {
+          "can_edit": {
+            "type": "boolean",
+            "description": "The software tab offers to install and uninstall: a right on the\nsoftware, the asset in one of the selected entities. Each version\nis still checked."
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Installation"
+            },
+            "description": "Outside the trash, of the software visible to the session, by\nsoftware and version."
           }
         }
       },

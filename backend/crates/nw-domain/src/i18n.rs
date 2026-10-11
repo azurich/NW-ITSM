@@ -46,6 +46,7 @@ pub mod text {
     pub const ADDS_VERSION: Source = Text("%1$s adds the version %2$s");
     pub const UPDATES_VERSION: Source = Text("%1$s updates the version %2$s");
     pub const PURGES_VERSION: Source = Text("%1$s purges the version %2$s");
+    pub const INSTALLS_SOFTWARE: Source = Text("%s installs software");
     pub const DUPLICATE_EVENT: Source =
         Text("%1$s trying to add an item that already exists: %2$s");
     pub const IMPOSSIBLE_RECORD: Source = Text("Impossible record for %s");
@@ -106,7 +107,7 @@ pub mod text {
     pub const HELPDESK_VISIBLE: Source = Text("Associable to a ticket");
 
     /// Every text, for the catalog.
-    pub const ALL: [Source; 67] = [
+    pub const ALL: [Source; 68] = [
         LOGIN,
         FAILED_LOGIN,
         ADDS_ITEM,
@@ -174,6 +175,7 @@ pub mod text {
         ADDS_VERSION,
         UPDATES_VERSION,
         PURGES_VERSION,
+        INSTALLS_SOFTWARE,
     ];
 }
 

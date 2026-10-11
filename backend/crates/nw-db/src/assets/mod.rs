@@ -1,6 +1,7 @@
 //! Assets: computers, monitors, printers, network equipment, peripherals
 //! and phones (`nw_domain::asset`).
 
+pub mod installations;
 mod purge;
 pub mod racks;
 mod read;
