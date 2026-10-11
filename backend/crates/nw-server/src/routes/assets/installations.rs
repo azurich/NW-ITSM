@@ -283,11 +283,9 @@ async fn visible(
 /// the other visible. The asset is writable with its update right in one
 /// of the selected entities, visible with its read right; the version
 /// follows its software, writable with the update right on the software
-/// in one of the selected entities, visible when shared with them.
-///
-/// Deliberate difference: the PHP code checks only the entity of the
-/// software, not the update right, so a read-only profile can install a
-/// software there; the API refuses it.
+/// in one of the selected entities, visible when shared with them (the
+/// global right of the software is checked for the version side since the
+/// PHP correction of `Item_SoftwareVersion::canConnexityItem`).
 fn may_change(
     session: &Session,
     kind: AssetKind,

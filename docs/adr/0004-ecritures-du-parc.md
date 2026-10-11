@@ -592,12 +592,15 @@ imprimantes).
   exigé. À l'installation, les entités doivent concorder (même entité, ou
   l'un partagé avec l'entité de l'autre). Une version ou un logiciel
   disparu est refusé, comme en PHP.
-- **Écart volontaire** : côté version, le PHP ne vérifie que l'entité du
-  logiciel (`canUpdateItem` du parent), pas le droit de modification ; un
-  profil en lecture seule sur le matériel et le logiciel (Observateur)
-  peut donc installer et désinstaller. L'API exige le droit de
-  modification du logiciel pour ce côté et refuse ce cas (403) ; elle
-  n'écrit jamais autre chose que le PHP.
+- **Correction côté PHP** : côté version, le PHP ne vérifiait que
+  l'entité du logiciel (`canUpdateItem` de son parent), pas le droit de
+  modification : le contrôle générique ne vérifie le droit global d'un
+  côté que lorsque son type vient d'un champ (le matériel). Un profil en
+  lecture seule sur le matériel et le logiciel (Observateur) pouvait donc
+  installer et désinstaller. `Item_SoftwareVersion::canConnexityItem`
+  vérifie désormais le droit global du logiciel pour la version (test
+  `tests/functional/Item_SoftwareVersion.php`, qui échoue sans la
+  correction) ; l'API fait de même.
 - **Interface** : section « Logiciels installés » de la fiche, quand la
   session a un droit d'écriture sur les logiciels et que le matériel est
   dans une entité sélectionnée (comme l'onglet) ; choix d'un logiciel du
@@ -612,8 +615,8 @@ par l'API :
 - désinstallation ;
 - doublon et entités incompatibles (refusés des deux côtés).
 
-Résultat : bases identiques, mêmes événements ; seul le cas du profil en
-lecture seule diffère (accepté par le PHP, refusé par l'API).
+Résultat : bases identiques, mêmes événements, y compris le refus du
+profil en lecture seule après la correction du PHP.
 
 ### Correction côté PHP : conditions des listes des formulaires
 

@@ -55,6 +55,32 @@ class Item_SoftwareVersion extends CommonDBRelation
         return false;
     }
 
+
+    /**
+     * A version has no right of its own: it takes the global right of its
+     * software. The generic check verifies the global right of the item
+     * only when its type comes from a field (the asset here), and the item
+     * right of a version only checks the entity of its software: without
+     * this, a profile reading the asset and the software could install
+     * and uninstall the software in the selected entities.
+     */
+    public function canConnexityItem(
+        $methodItem,
+        $methodNotItem,
+        $item_right,
+        $itemtype,
+        $items_id,
+        ?CommonDBTM &$item = null
+    ) {
+        if ($itemtype === static::$itemtype_2 && $item_right != self::DONT_CHECK_ITEM_RIGHTS) {
+            $method = $item_right == self::HAVE_VIEW_RIGHT_ON_ITEM ? 'canView' : $methodNotItem;
+            if (!SoftwareVersion::$method()) {
+                return false;
+            }
+        }
+        return parent::canConnexityItem($methodItem, $methodNotItem, $item_right, $itemtype, $items_id, $item);
+    }
+
     public static function getTypeName($nb = 0)
     {
         return _n('Installation', 'Installations', $nb);

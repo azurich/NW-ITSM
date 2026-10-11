@@ -117,6 +117,39 @@ class Item_SoftwareVersion extends DbTestCase
     }
 
 
+    public function testChangingRequiresTheRightToChangeOneSide()
+    {
+        $this->login();
+        $this->setEntity('_test_root_entity', true);
+
+        $computer = getItemByTypeName('Computer', '_test_pc01');
+        $input = [
+           'items_id'            => $computer->getID(),
+           'itemtype'            => 'Computer',
+           'softwareversions_id' => getItemByTypeName('SoftwareVersion', '_test_softver_1', true),
+        ];
+        $id = (int)(new \Item_SoftwareVersion())->add($input);
+        $this->integer($id)->isGreaterThan(0);
+        $input['softwareversions_id'] = getItemByTypeName('SoftwareVersion', '_test_softver_2', true);
+
+        $can = function (int $computer, int $software) use ($id, $input) {
+            $_SESSION['glpiactiveprofile']['computer'] = $computer;
+            $_SESSION['glpiactiveprofile']['software'] = $software;
+            return [
+               (new \Item_SoftwareVersion())->can(-1, CREATE, $input),
+               (new \Item_SoftwareVersion())->can($id, PURGE),
+            ];
+        };
+
+        // Reading both sides is not enough to install or uninstall.
+        $this->array($can(READ, READ))->isIdenticalTo([false, false]);
+        // Changing one side and reading the other is.
+        $this->array($can(READ, READ | UPDATE))->isIdenticalTo([true, true]);
+        $this->array($can(READ | UPDATE, READ))->isIdenticalTo([true, true]);
+        // Without reading the other side, no.
+        $this->array($can(0, READ | UPDATE))->isIdenticalTo([false, false]);
+    }
+
     public function testCountInstall()
     {
         $this->login();

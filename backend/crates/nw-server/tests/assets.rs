@@ -3086,8 +3086,7 @@ async fn software_installations_like_php() {
     );
 
     // The update right on the computer is enough with the view of the
-    // software; the view of both is not (deliberate difference: the PHP
-    // code accepts it).
+    // software; the view of both is not.
     let paris = app.login("paris").await;
     let response = app
         .post(
