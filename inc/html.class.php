@@ -1950,7 +1950,8 @@ JAVASCRIPT
            ],
         ];
         $twig_vars['help_link'] = 'https://www.itsm-ng.org';
-        if (is_dir(GLPI_ROOT . '/docs')) {
+        // An embedded documentation site, not the NW-ITSM developer docs.
+        if (is_file(GLPI_ROOT . '/docs/index.html')) {
             $twig_vars['help_link'] = $CFG_GLPI['root_doc'] . '/docs';
         };
         if (isset($sector) && isset($menu[$sector])) {
@@ -1984,6 +1985,7 @@ JAVASCRIPT
         $user->getFromDB(Session::getLoginUserID());
 
         $twig_vars['username'] = getUserName(Session::getLoginUserID());
+        $twig_vars['nw_bridge'] = \itsmng\NwBridge::isEnabled();
         $twig_vars['main_menu']['args']['access'] = Session::getCurrentInterface();
         renderTwigTemplate('headers/header.twig', $twig_vars);
         // call static function callcron() every 5min

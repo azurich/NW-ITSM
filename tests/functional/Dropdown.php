@@ -1511,4 +1511,207 @@ class Dropdown extends DbTestCase
             $this->variable($dropdown_entry['id'])->isEqualTo($expected[$key]);
         }
     }
+
+    /**
+     * Ids of the values of a getDropdownValue result, children included.
+     */
+    private function dropdownIds(array $results): array
+    {
+        $ids = [];
+        foreach ($results as $result) {
+            if (isset($result['children'])) {
+                $ids = array_merge($ids, $this->dropdownIds($result['children']));
+            } elseif (isset($result['id'])) {
+                $ids[] = $result['id'];
+            }
+        }
+        return $ids;
+    }
+
+    public function testFormListsApplyTheirConditions()
+    {
+        $this->login();
+        $state = new \State();
+        $for_racks = (int)$state->add([
+           'name'                => __FUNCTION__ . ' rack',
+           'entities_id'         => 0,
+           'is_recursive'        => 1,
+           'is_visible_computer' => 0,
+        ]);
+        $for_computers = (int)$state->add([
+           'name'            => __FUNCTION__ . ' computer',
+           'entities_id'     => 0,
+           'is_recursive'    => 1,
+           'is_visible_rack' => 0,
+        ]);
+        $this->integer($for_racks)->isGreaterThan(0);
+        $this->integer($for_computers)->isGreaterThan(0);
+
+        // Both keys used by the forms, for the values written in the page
+        // and for those the browser asks while the user types.
+        foreach (['condition', 'conditions'] as $key) {
+            $select = [
+               'type'     => 'select',
+               'name'     => 'states_id',
+               'itemtype' => \State::class,
+               $key       => ['is_visible_rack' => 1],
+            ];
+            \expandSelect($select);
+            // Values by entity for a tree dropdown.
+            $values = [];
+            array_walk_recursive($select['values'], function ($label, $id) use (&$values) {
+                $values[$id] = $label;
+            });
+            $this->array($values)
+               ->hasKey($for_racks)
+               ->notHasKey($for_computers);
+
+            // The browser sends the key of a condition kept in the
+            // session: getDropdownValue.php ignores a condition it sends.
+            $data = $select['ajax']['data'];
+            $this->string($data['condition'])->isNotEmpty();
+            $this->array($_SESSION['glpicondition'][$data['condition']])
+               ->isIdenticalTo(['glpi_states.is_visible_rack' => 1]);
+            $ids = $this->dropdownIds(
+                \Dropdown::getDropdownValue($data + ['searchText' => __FUNCTION__], false)['results']
+            );
+            $this->array($ids)
+               ->contains($for_racks)
+               ->notContains($for_computers);
+        }
+    }
+
+    protected function assetFormListsProvider()
+    {
+        return [
+           [\Computer::class, 'states_id', \State::class, 'is_visible_computer'],
+           [\Computer::class, 'groups_id', \Group::class, 'is_itemgroup'],
+           [\Computer::class, 'groups_id_tech', \Group::class, 'is_assign'],
+           [\NetworkEquipment::class, 'states_id', \State::class, 'is_visible_networkequipment'],
+           [\NetworkEquipment::class, 'groups_id', \Group::class, 'is_itemgroup'],
+           [\NetworkEquipment::class, 'groups_id_tech', \Group::class, 'is_assign'],
+           [\Printer::class, 'states_id', \State::class, 'is_visible_printer'],
+           [\Printer::class, 'groups_id', \Group::class, 'is_itemgroup'],
+           [\Phone::class, 'states_id', \State::class, 'is_visible_phone'],
+           [\Phone::class, 'groups_id', \Group::class, 'is_itemgroup'],
+           [\Monitor::class, 'states_id', \State::class, 'is_visible_monitor'],
+           [\PDU::class, 'states_id', \State::class, 'is_visible_pdu'],
+           [\PassiveDCEquipment::class, 'states_id', \State::class, 'is_visible_passivedcequipment'],
+           [\Rack::class, 'states_id', \State::class, 'is_visible_rack'],
+           [\Enclosure::class, 'states_id', \State::class, 'is_visible_enclosure'],
+           [\Cluster::class, 'states_id', \State::class, 'is_visible_cluster'],
+        ];
+    }
+
+    /**
+     * @dataProvider assetFormListsProvider
+     */
+    public function testAssetFormListsOfferTheirValues($itemtype, $field, $listed, $flag)
+    {
+        $this->login();
+        $value = new $listed();
+        $offered = (int)$value->add([
+           'name'         => "$itemtype $field offered",
+           'entities_id'  => 0,
+           'is_recursive' => 1,
+           $flag          => 1,
+        ]);
+        $hidden = (int)$value->add([
+           'name'         => "$itemtype $field hidden",
+           'entities_id'  => 0,
+           'is_recursive' => 1,
+           $flag          => 0,
+        ]);
+        $this->integer($offered)->isGreaterThan(0);
+        $this->integer($hidden)->isGreaterThan(0);
+
+        // A new item, as its form shows it.
+        $item = new $itemtype();
+        $item->getEmpty();
+        $this->output(
+            function () use ($item) {
+                $item->showForm(-1);
+            }
+        )->matches(
+            '/<select[^>]*name="' . $field . '"[^>]*>(?:(?!<\/select>).)*'
+            . '<option value="' . $offered . '"\s*>/s'
+        )->notMatches(
+            '/<select[^>]*name="' . $field . '"[^>]*>(?:(?!<\/select>).)*'
+            . '<option value="' . $hidden . '"\s*>/s'
+        );
+    }
+
+    public function testQualifyDropdownCondition()
+    {
+        $expression = new \QueryExpression('1 = 1');
+        $this->array(\qualifyDropdownCondition(\State::class, [
+           'is_visible_rack' => 1,
+           'glpi_states.entities_id' => 0,
+           'NOT' => ['id' => [1, 2]],
+           'OR' => [['name' => 'a'], ['name' => 'b']],
+           $expression,
+        ]))->isIdenticalTo([
+           'glpi_states.is_visible_rack' => 1,
+           'glpi_states.entities_id' => 0,
+           'NOT' => ['glpi_states.id' => [1, 2]],
+           'OR' => [['glpi_states.name' => 'a'], ['glpi_states.name' => 'b']],
+           $expression,
+        ]);
+    }
+
+    public function testGetOptionForItemsAppliesItsConditions()
+    {
+        $this->login();
+        $state = new \State();
+        $for_monitors = (int)$state->add([
+           'name'                => __FUNCTION__ . ' monitor',
+           'entities_id'         => 0,
+           'is_recursive'        => 1,
+           'is_visible_computer' => 0,
+        ]);
+        $for_computers = (int)$state->add([
+           'name'               => __FUNCTION__ . ' computer',
+           'entities_id'        => 0,
+           'is_recursive'       => 1,
+           'is_visible_monitor' => 0,
+        ]);
+        $values = [];
+        $options = \getOptionForItems(\State::class, ['is_visible_monitor' => 1]);
+        array_walk_recursive(
+            $options,
+            function ($label, $id) use (&$values) {
+                $values[$id] = $label;
+            }
+        );
+        $this->array($values)
+           ->hasKey($for_monitors)
+           ->notHasKey($for_computers);
+
+        // An entity restricts the values to it and to the recursive values
+        // of its parents.
+        $entity = getItemByTypeName('Entity', '_test_child_1', true);
+        $location = new \Location();
+        $own = (int)$location->add(['name' => __FUNCTION__ . ' own', 'entities_id' => $entity]);
+        $other = (int)$location->add([
+           'name' => __FUNCTION__ . ' other',
+           'entities_id' => getItemByTypeName('Entity', '_test_child_2', true),
+        ]);
+        $shared = (int)$location->add([
+           'name' => __FUNCTION__ . ' shared',
+           'entities_id' => 0,
+           'is_recursive' => 1,
+        ]);
+        $values = [];
+        $options = \getOptionForItems(\Location::class, ['entities_id' => $entity]);
+        array_walk_recursive(
+            $options,
+            function ($label, $id) use (&$values) {
+                $values[$id] = $label;
+            }
+        );
+        $this->array($values)
+           ->hasKey($own)
+           ->hasKey($shared)
+           ->notHasKey($other);
+    }
 }

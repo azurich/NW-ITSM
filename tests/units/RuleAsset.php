@@ -62,7 +62,7 @@ class RuleAsset extends DbTestCase
         $root_ent_id = getItemByTypeName('Entity', '_test_root_entity', true);
 
         // prepare rule
-        $this->_createRuleComment(\RuleAsset::ONUPDATE);
+        $this->_createRuleComment(\RuleAsset::ONADD);
 
         // test create ticket (trigger on title)
         $computer = new \Computer();
@@ -184,6 +184,13 @@ class RuleAsset extends DbTestCase
             $items_id = $item->add($item_input);
             $this->integer((int)$items_id)->isGreaterThan(0);
             $this->boolean((bool)$item->getFromDB($items_id))->isTrue();
+
+            // Rules for updates only: nothing applied on creation
+            $this->string((string)$item->getField('comment'))->isEqualTo('mycomment');
+            $this->integer((int)$item->getField('locations_id'))->isEqualTo(0);
+
+            $this->boolean($item->update(['id' => $items_id, '_auto' => 1]))->isTrue();
+            $this->boolean((bool)$item->getFromDB($items_id))->isTrue();
             if ($itemtype == 'Computer') {
                 $this->string((string)$item->getField('comment'))->isEqualTo('comment1');
             } else {
@@ -191,6 +198,63 @@ class RuleAsset extends DbTestCase
             }
             $this->integer((int)$item->getField('locations_id'))->isGreaterThan(0);
         }
+    }
+
+    public function testConditionIsRespected()
+    {
+        $this->login();
+        $this->setEntity('_test_root_entity', true);
+
+        $root_ent_id = getItemByTypeName('Entity', '_test_root_entity', true);
+
+        // Comment on creation only, location on update only
+        $this->_createRuleComment(\RuleAsset::ONADD);
+        $this->_createRuleLocation(\RuleAsset::ONUPDATE);
+
+        $computer = new \Computer();
+        $computers_id = $computer->add([
+           'name'        => 'computer condition',
+           '_auto'       => 1,
+           'entities_id' => $root_ent_id,
+        ]);
+        $this->integer((int)$computers_id)->isGreaterThan(0);
+        $this->boolean((bool)$computer->getFromDB($computers_id))->isTrue();
+        $this->string((string)$computer->getField('comment'))->isEqualTo('comment1');
+        $this->integer((int)$computer->getField('locations_id'))->isEqualTo(0);
+
+        $this->boolean($computer->update([
+           'id'      => $computers_id,
+           '_auto'   => 1,
+           'comment' => 'changed',
+        ]))->isTrue();
+        $this->boolean((bool)$computer->getFromDB($computers_id))->isTrue();
+        $this->string((string)$computer->getField('comment'))->isEqualTo('changed');
+        $this->integer((int)$computer->getField('locations_id'))->isGreaterThan(0);
+    }
+
+    public function testRulesOfAnotherConditionAreNotKept()
+    {
+        global $DB;
+
+        $this->login();
+        $this->setEntity('_test_root_entity', true);
+
+        $root_ent_id = getItemByTypeName('Entity', '_test_root_entity', true);
+
+        // No rule for creations: the default rules (add and update) are off
+        $DB->update('glpi_rules', ['is_active' => 0], ['sub_type' => 'RuleAsset']);
+        $this->_createRuleLocation(\RuleAsset::ONUPDATE);
+
+        $monitor = new \Monitor();
+        $first_id = $monitor->add(['name' => 'monitor 1', 'entities_id' => $root_ent_id]);
+        $this->boolean($monitor->update(['id' => $first_id, 'comment' => 'updated']))->isTrue();
+        $this->boolean((bool)$monitor->getFromDB($first_id))->isTrue();
+        $this->integer((int)$monitor->getField('locations_id'))->isGreaterThan(0);
+
+        // The rules loaded for the update do not apply to a creation
+        $second_id = $monitor->add(['name' => 'monitor 2', 'entities_id' => $root_ent_id]);
+        $this->boolean((bool)$monitor->getFromDB($second_id))->isTrue();
+        $this->integer((int)$monitor->getField('locations_id'))->isEqualTo(0);
     }
 
     private function _createRuleComment($condition)

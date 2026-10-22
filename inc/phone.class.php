@@ -266,7 +266,7 @@ class Phone extends CommonDBTM
                        'name' => 'groups_id',
                        'type' => 'select',
                        'itemtype' => Group::class,
-                       'conditions' => ['is_assign' => 1],
+                       'conditions' => ['is_itemgroup' => 1],
                        'value' => $this->fields["groups_id"],
                        'actions' => getItemActionButtons(['info', 'add'], "Group"),
                     ],

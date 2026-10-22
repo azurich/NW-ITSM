@@ -1,0 +1,24 @@
+# Routes one origin to both applications, so they share cookies and links:
+#   /api/v2/*  NW-ITSM API (Rust)
+#   /app/*     NW-ITSM web application (built by the API, or Vite in dev)
+#   *          legacy ITSM-NG (PHP)
+{
+	admin off
+}
+
+:8000 {
+	handle /api/v2/* {
+		reverse_proxy api:8080
+	}
+	handle /app* {
+		reverse_proxy {$APP_UPSTREAM}
+	}
+	handle {
+		# The PHP built-in server ignores the .htaccess files: refuse what
+		# they protect (keys, configuration, uploaded files), and the
+		# sources that are not part of the classic interface.
+		@private path /config/* /files/* /install/mysql/* /locales/* /.git* /backend/* /frontend/* /dev/* /docs/* /tests/*
+		respond @private 404
+		reverse_proxy legacy:8000
+	}
+}

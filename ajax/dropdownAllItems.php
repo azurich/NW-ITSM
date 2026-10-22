@@ -43,8 +43,14 @@ if ($_POST["idtable"] && class_exists($_POST["idtable"])) {
     if (isset($_POST['entity_restrict'])) {
         $entity_restrict = $_POST['entity_restrict'];
     }
-    if (isset($_POST['condition'])) {
-        $condition = $_POST['condition'];
+    // Only a condition kept in the session: the criteria sent by the
+    // browser are not trusted.
+    if (
+        isset($_POST['condition'])
+        && is_string($_POST['condition'])
+        && isset($_SESSION['glpicondition'][$_POST['condition']])
+    ) {
+        $condition = $_SESSION['glpicondition'][$_POST['condition']];
     }
 
     $isDevice  = strpos($_POST["idtable"], "Device") === 0;

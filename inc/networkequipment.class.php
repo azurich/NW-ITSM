@@ -308,6 +308,7 @@ class NetworkEquipment extends CommonDBTM
                        'type' => 'select',
                        'value' => $this->fields['states_id'],
                        'itemtype' => State::class,
+                       'conditions' => ['is_visible_networkequipment' => 1],
                        'actions' => getItemActionButtons(['info', 'add'], "State"),
                     ],
                     __('Location') => [
@@ -343,6 +344,7 @@ class NetworkEquipment extends CommonDBTM
                        'type' => 'select',
                        'value' => $this->fields['groups_id_tech'],
                        'itemtype' => Group::class,
+                       'conditions' => ['is_assign' => 1],
                        'actions' => getItemActionButtons(['info', 'add'], "Group"),
                     ],
                     __("Model") => [
@@ -391,6 +393,7 @@ class NetworkEquipment extends CommonDBTM
                        'type' => 'select',
                        'value' => $this->fields['groups_id'],
                        'itemtype' => Group::class,
+                       'conditions' => ['is_itemgroup' => 1],
                        'actions' => getItemActionButtons(['info', 'add'], "Group"),
                     ],
                     __("Memory") => [

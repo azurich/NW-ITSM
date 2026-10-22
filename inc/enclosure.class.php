@@ -202,7 +202,7 @@ class Enclosure extends CommonDBTM
            'field'              => 'completename',
            'name'               => __('Status'),
            'datatype'           => 'dropdown',
-           'condition'          => ['is_visible_computer' => 1]
+           'condition'          => ['is_visible_enclosure' => 1]
         ];
 
         $tab[] = [

@@ -1339,7 +1339,14 @@ class CommonDBTM extends CommonGLPI
         foreach ($override_input as $key => $value) {
             $input[$key] = $value;
         }
+        // An item created from a template keeps the name it is given: the
+        // template is a model, the new item is not a copy of it.
+        $name_field = static::getNameField();
+        $given_name = $this->isTemplate() ? ($input[$name_field] ?? null) : null;
         $input = $new_item->prepareInputForClone($input);
+        if ($given_name !== null) {
+            $input[$name_field] = $given_name;
+        }
         if (isset($input['id'])) {
             $input['_oldID'] =  $input['id'];
             unset($input['id']);
@@ -5841,11 +5848,13 @@ class CommonDBTM extends CommonGLPI
             if (!isset($this->input['_auto'])) {
                 $input['_auto'] = 0;
             }
-            //Set the condition (add or update)
+            //Set the condition (add or update): an option of the collection,
+            //so that only the rules of this condition are processed (still
+            //given in the parameters, which the plugins receive)
             $params = [
                'condition' => $condition
             ];
-            $output = $ruleasset->processAllRules($input, [], $params);
+            $output = $ruleasset->processAllRules($input, [], $params, $params);
             //If at least one rule has matched
             if (isset($output['_rule_process'])) {
                 foreach ($output as $key => $value) {
